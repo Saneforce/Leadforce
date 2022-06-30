@@ -1,0 +1,1 @@
+{"callerid":"918035074047","custom":"none","type":"cdr","appid":2223671,"to":9715602246,"cmiuuid":"995f80f6-056d-4f1f-a16c-c33421cc2cd2","status":"answered","user":"136_2223671","user_no":"9578258311","time":1655363267476,"direction":"outbound","answeredsec":22,"click_to_call":true,"record":true,"filename":"16553632674763273185301102_2223671.mp3"}

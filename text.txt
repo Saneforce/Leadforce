@@ -1,0 +1,9 @@
+{"status":"COMPLETED","start_at":""}
+
+http://182.73.138.2:7070/perfex_crm/admin/Cronjob/webhook_daffy_history?
+status={{status}}&
+from={{from}}&
+to={{to}}&
+start_at={{start_at}}&
+recording_url={{recording_url}}&
+duration={{outgoing.billing}}

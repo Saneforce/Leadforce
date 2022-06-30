@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+  <configuration>
+    <system.webServer>
+      <httpProtocol>
+        <customHeaders>
+          <add name="Access-Control-Allow-Origin" value="*" />
+		  <add name="Access-Control-Allow-Headers" value="X-API-KEY, X-Requested-With, Content-Type, access_token, Access_token, AccessToken" />
+        </customHeaders>
+      </httpProtocol>
+    </system.webServer>
+  </configuration>
