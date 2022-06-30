@@ -85,13 +85,10 @@ if (defined('APP_DB_ENCRYPT')) {
 }
 $db['default'] = [
     'dsn'          => '', // Not Supported
-    'hostname'     => 'localhost',
-    'username'     => 'root',
-    'password'     => '',
-    'database'     => 'crm_5',//APP_DB_NAME.((defined('SUB_DOMAIN_NAME') && !empty(SUB_DOMAIN_NAME)) ? '_'.SUB_DOMAIN_NAME : ''),
-   // 'database'     => 'trial276',//APP_DB_NAME.((defined('SUB_DOMAIN_NAME') && !empty(SUB_DOMAIN_NAME)) ? '_'.SUB_DOMAIN_NAME : ''),
-   // 'database'     => 'sfpandcrm',//APP_DB_NAME.((defined('SUB_DOMAIN_NAME') && !empty(SUB_DOMAIN_NAME)) ? '_'.SUB_DOMAIN_NAME : ''),
-   // 'database'     => 'trail3',//APP_DB_NAME.((defined('SUB_DOMAIN_NAME') && !empty(SUB_DOMAIN_NAME)) ? '_'.SUB_DOMAIN_NAME : ''),
+    'hostname'     => APP_DB_HOSTNAME,
+    'username'     => APP_DB_USERNAME,
+    'password'     => APP_DB_PASSWORD,
+    'database'     => APP_DB_NAME,
     'dbdriver'     => defined('APP_DB_DRIVER') ? APP_DB_DRIVER : 'mysqli',
     'dbprefix'     => db_prefix(),
     'pconnect'     => false,
