@@ -462,10 +462,10 @@ function init_relation_tasks_table1($table_attributes = [])
 function init_relation_tasks_table($table_attributes = [])
 {
 	$fields = get_option('deal_fields');
-	$need_fields = array('project_name','id','tasktype','priority','assignees','task_name','description','tags','startdate');
+	$need_fields = array('project_name','id','tasktype','priority','assignees','task_name','description','tags','startdate','dateadded','datemodified','datefinished');
 	if(!empty($fields) && $fields != 'null'){
 		$req_fields = json_decode($fields);
-		$i = 9;
+		$i = 12;
 		if(!empty($req_fields)){
 			
 			foreach($req_fields as $req_field11){
@@ -513,7 +513,19 @@ function init_relation_tasks_table($table_attributes = [])
                 ],
             ],
 		'startdate'=>[
+			'name'     => _l('scheduled_date'),
+			'th_attrs' => ['class' => 'duedate'],
+		],
+		'dateadded'=>[
 			'name'     => _l('create_date'),
+			'th_attrs' => ['class' => 'duedate'],
+		],
+		'datemodified'=>[
+			'name'     => _l('modified_date'),
+			'th_attrs' => ['class' => 'duedate'],
+		],
+		'datefinished'=>[
+			'name'     => _l('finished_date'),
 			'th_attrs' => ['class' => 'duedate'],
 		],
 		'assignees'=>[
@@ -734,7 +746,7 @@ $table_data = array();
     // In this case we need to add new identifier eq task-relation
     $table_attributes['data-last-order-identifier'] = 'tasks';
     $table_attributes['data-default-order']         = get_table_last_order('tasks');
-
+	
     $table .= render_datatable($table_data, $name, [], $table_attributes);
 
     return $table;

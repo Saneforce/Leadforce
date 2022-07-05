@@ -1499,6 +1499,7 @@ class Tasks_model extends App_Model
                 $data['status'] = 2;
             }
         }
+        $data ['datemodified'] =date('Y-m-d H:i:s');
         $this->db->where('id', $id);
         $this->db->update(db_prefix() . 'tasks', $data);
         if ($this->db->affected_rows() > 0) {

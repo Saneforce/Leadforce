@@ -8,7 +8,19 @@ $table_datas = [
     'tasktype'=> _l('tasktype'),
     'description'=>_l('description'),
     'startdate'=>[
+        'name'     => _l('scheduled_date'),
+        'th_attrs' => ['class' => 'duedate'],
+    ],
+    'dateadded'=>[
         'name'     => _l('create_date'),
+        'th_attrs' => ['class' => 'duedate'],
+    ],
+    'datemodified'=>[
+        'name'     => _l('modified_date'),
+        'th_attrs' => ['class' => 'duedate'],
+    ],
+    'datefinished'=>[
+        'name'     => _l('finished_date'),
         'th_attrs' => ['class' => 'duedate'],
     ],
     'assignees'=>_l('task_assigned'),
