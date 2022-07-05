@@ -3982,6 +3982,9 @@ $lang['edit_current_value']		=	'Edit current value...';
 $lang['clear_field']			=	'Clear the field';
 $lang['stages']					= 'Stages';
 $lang['create_date']			= 'Created date';
+$lang['scheduled_date']			= 'Scheduled date';
+$lang['modified_date']			= 'Modified date';
+$lang['finished_date']			= 'Finished date';
 
 $lang['reminder']				= 'Reminder';
 $lang['enable_reminder']		= 'Enable Reminder';

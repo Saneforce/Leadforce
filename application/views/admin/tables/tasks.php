@@ -17,6 +17,9 @@ $aColumns_temp = array(
     'tasktype'=>db_prefix() . 'tasktype.name as tasktype',
     'project_contacts'=>db_prefix() . 'contacts.firstname as project_contacts', 
     'startdate'=>'startdate', 
+    'dateadded'=>'dateadded', 
+    'datemodified'=>'datemodified', 
+    'datefinished'=>'datefinished', 
     'assignees'=>'(SELECT GROUP_CONCAT(CONCAT(firstname, \' \', lastname) SEPARATOR ",") FROM tblstaff where staffid IN (select staffid from tbltask_assigned where taskid = tbltasks.id)) as assignees',
     'tags'=>'(SELECT GROUP_CONCAT(name SEPARATOR ",") FROM ' . db_prefix() . 'taggables JOIN ' . db_prefix() . 'tags ON ' . db_prefix() . 'taggables.tag_id = ' . db_prefix() . 'tags.id WHERE rel_id = ' . db_prefix() . 'tasks.id and rel_type="task" ORDER by tag_order ASC) as tags',
     'priority'=>'priority',
@@ -401,6 +404,9 @@ foreach ($rResult as $aRow) {
     
     //$row_temp['startdate']  = _d($aRow['startdate']);
     $row_temp['startdate']  = '<span style="white-space:nowrap">'.date('d-m-Y H:i', strtotime($aRow['startdate'])).'</span>';
+    $row_temp['dateadded']  = '<span style="white-space:nowrap">'.date('d-m-Y H:i', strtotime($aRow['startdate'])).'</span>';
+    $row_temp['datemodified']  = '<span style="white-space:nowrap">'.(($aRow['datemodified'] == NULL)?'':date('d-m-Y H:i', strtotime($aRow['datemodified']))).'</span>';
+    $row_temp['datefinished']  = '<span style="white-space:nowrap">'.(($aRow['datefinished'] == NULL)?'':date('d-m-Y H:i', strtotime($aRow['datefinished']))).'</span>';
     
 
     $row_temp['assignees']  = format_display_members_by_ids_and_names($aRow['is_assigned'], $aRow['assignees']);

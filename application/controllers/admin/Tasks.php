@@ -45,7 +45,7 @@ class Tasks extends AdminController
 
         $data['title'] = _l('tasks');
 		$fields = get_option('deal_fields');
-		$data['need_fields'] = array('project_name','id','tasktype','priority','assignees','task_name','description','tags','company','project_contacts','teamleader','status','project_status','startdate');
+		$data['need_fields'] = array('project_name','id','tasktype','priority','assignees','task_name','description','tags','company','project_contacts','teamleader','status','project_status','startdate','dateadded','datemodified','datefinished');
 		
         $this->load->view('admin/tasks/manage', $data);
     }
@@ -298,7 +298,7 @@ class Tasks extends AdminController
     public function init_relation_tasks($rel_id, $rel_type)
     {
 		$fields = get_option('deal_fields');
-		$data['need_fields'] = array('project_name','id','tasktype','priority','assignees','task_name','description','tags');
+        $data['need_fields'] = array('project_name','id','tasktype','priority','assignees','task_name','description','tags','company','project_contacts','teamleader','status','project_status','startdate','dateadded','datemodified','datefinished');
 		if(!empty($fields) && $fields != 'null'){
 			$req_fields = json_decode($fields);
 			$i = 8;
