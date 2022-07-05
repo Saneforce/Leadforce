@@ -10,16 +10,8 @@ class Authentication extends App_Controller
 
         load_admin_language();
 		$this->load->model('Authenticationapi_model');
-
-		// Need to check why we update the post value here 
-		// $postdata = file_get_contents("php://input");
-        // $_POST = (array) json_decode($postdata);
-
-		if(!isset($_POST) || (is_array($_POST) && empty($_POST))){
-			$postdata = file_get_contents("php://input");
-			$_POST = (array) json_decode($postdata);
-		}
-
+		$postdata = file_get_contents("php://input");
+        $_POST = (array) json_decode($postdata);
     }
 
     public function loginapi()
