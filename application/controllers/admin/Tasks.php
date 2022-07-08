@@ -301,7 +301,7 @@ class Tasks extends AdminController
         $data['need_fields'] = array('project_name','id','tasktype','priority','assignees','task_name','description','tags','company','project_contacts','teamleader','status','project_status','startdate','dateadded','datemodified','datefinished');
 		if(!empty($fields) && $fields != 'null'){
 			$req_fields = json_decode($fields);
-			$i = 8;
+			$i = 17;
 			if(!empty($req_fields)){
 				
 				foreach($req_fields as $req_field11){
