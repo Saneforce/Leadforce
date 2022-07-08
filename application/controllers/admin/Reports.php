@@ -300,7 +300,7 @@ class Reports extends AdminController
 		$data['mandatory_fields1']	=	$needed['mandatory_fields1'];
 		$data['report_filter'] =  $this->load->view('admin/reports/filter', $data,true);
 		$data['report_footer'] =  $this->load->view('admin/reports/report_footer', $data,true);
-        $this->load->view('admin/reports/deals', $data);
+        $this->load->view('admin/reports/deals_views', $data);
 	}
 	public function edit($id){
 		$data = array();
@@ -326,7 +326,7 @@ class Reports extends AdminController
 		$data['mandatory_fields1']	=	$needed['mandatory_fields1'];
 		$data['report_filter'] =  $this->load->view('admin/reports/filter', $data,true);
 		$data['report_footer'] =  $this->load->view('admin/reports/report_footer', $data,true);
-        $this->load->view('admin/reports/deals', $data);
+        $this->load->view('admin/reports/deals_views', $data);
 	}
 	public function get_req_val($req_val,$sel_val,$s_val,$d_val,$key,$all_val){
 		$cur_id12 = '';
