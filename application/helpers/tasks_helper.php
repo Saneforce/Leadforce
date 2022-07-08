@@ -746,7 +746,7 @@ $table_data = array();
     // In this case we need to add new identifier eq task-relation
     $table_attributes['data-last-order-identifier'] = 'tasks';
     $table_attributes['data-default-order']         = get_table_last_order('tasks');
-	
+
     $table .= render_datatable($table_data, $name, [], $table_attributes);
 
     return $table;
@@ -2635,6 +2635,7 @@ function get_attachement(){
 	return $attachments;
 }
 function deal_values(){
+	$CI   = &get_instance();
 	$colarr = array(
 		"name"=>array("ins"=>"name","ll"=>"project_name"),
 		"project_cost"=>array("ins"=>"project_cost","ll"=>"project_cost"),
@@ -2660,4 +2661,84 @@ function deal_values(){
 	}
 	$req_out = array('all_clmns'=>$colarr,'cus_flds'=>$cus_1);
 	return json_encode($req_out);
+}
+function deal_needed_fields(){
+	$fields = get_option('deal_fields');
+	$fields1 = get_option('deal_mandatory');
+	$data['need_fields'] = $data['need_fields_edit'] =  $data['mandatory_fields1'] = array('name');
+	$data['need_fields_label'] = array('project_name');
+	$i = $j = 1;
+	if(!empty($fields1) && $fields1 != 'null'){
+		$i1 =0;
+		$req_fields2 = json_decode($fields1);
+		if(!empty($req_fields2)){
+			foreach($req_fields2 as $req_field2){
+				$data['mandatory_fields1'][$i1] = $req_field2;
+				$i1++;
+			}
+		}
+	}
+	if(!empty($fields) && $fields != 'null'){
+		$req_fields = json_decode($fields);
+		if(!empty($req_fields)){
+			foreach($req_fields as $req_field11){
+				$data['need_fields_edit'][$i] = $req_field11;
+				if($req_field11 == 'clientid'){
+					$data['need_fields'][$i] = 'company';
+					$data['need_fields_label'][$j] = 'project_customer';
+				}
+				else if($req_field11 == 'primary_contact'){
+					$data['need_fields_label'][$j] = 'project_primary_contacts';
+					$data['need_fields'][$i] = 'contact_email1';
+					$i++;
+					$data['need_fields'][$i] = 'contact_phone1';
+					$i++;
+					$data['need_fields'][$i] = 'contact_name';
+				}
+				else if($req_field11 == 'teamleader'){
+					$data['need_fields'][$i] = 'teamleader_name';
+					$data['need_fields_label'][$j] = 'teamleader';
+				}
+				else if($req_field11 == 'project_members[]'){
+					$data['need_fields'][$i] = 'members';
+					$data['need_fields_label'][$j] = 'project_members';
+				}
+				else if($req_field11 == 'project_contacts[]'){
+					$data['need_fields'][$i] = 'project_contacts[]';
+					$data['need_fields_label'][$j] = 'project_contacts';
+				}
+				else if($req_field11 == 'project_cost'){
+					$data['need_fields'][$i] = 'project_cost';
+					$data['need_fields_label'][$j] = 'project_total_cost';
+				}
+				else if($req_field11 == 'pipeline_id'){
+					$data['need_fields'][$i] = 'pipeline_id';
+					$data['need_fields_label'][$j] = 'pipeline';
+				}
+				else{
+					
+					$data['need_fields_label'][$j] = $req_field11;
+					$data['need_fields'][$i] = $req_field11;
+					if($req_field11 == 'status'){
+						$i++;
+						$data['need_fields_label'][$j] = 'project_status';
+						$data['need_fields'][$i] = 'project_status';
+					}
+				}
+				$i++;
+				$j++;
+			}
+			
+		}
+	}
+	$data['need_fields'][$i] = 'id';
+	$i++;
+	$data['need_fields'][$i] = 'product_qty';
+	$i++;
+	$data['need_fields'][$i] = 'product_amt';
+	$i++;
+	$data['need_fields'][$i] = 'projects_budget';
+	$i++;
+	$data['need_fields'][$i] = 'customers_hyperlink';
+	return json_encode($data);
 }

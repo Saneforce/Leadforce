@@ -195,8 +195,8 @@ function app_init_admin_sidebar_menu_items() {
         //$projurl = admin_url('projects/kanban_noscroll?pipelines='.$pipelines[0]['id'].'&member=&gsearch=');
         $projurl = admin_url('projects/index_list?pipelines=&member=&gsearch=');
         if(!is_admin(get_staff_user_id())) {
-            // $projurl = admin_url('projects/kanban_noscroll?pipelines='.$pipelines[0]['id'].'&member='.get_staff_user_id().'&gsearch=');
-			$projurl = admin_url('projects/index_list?pipelines=&member='.get_staff_user_id().'&gsearch=');
+            $projurl = admin_url('projects/kanban_noscroll?pipelines='.$pipelines[0]['id'].'&member='.get_staff_user_id().'&gsearch=');
+			//$projurl = admin_url('projects/index_list?pipelines=&member='.get_staff_user_id().'&gsearch=');
         }
         $CI->app_menu->add_sidebar_menu_item('projects', [
             'name' => _l('projects'),
@@ -389,7 +389,18 @@ function app_init_admin_sidebar_menu_items() {
             'href' => admin_url('reports/activities'),
             'position' => 6,
         ]);
-		
+		$CI->app_menu->add_sidebar_children_item('reports', [
+            'slug' => 'add-report',
+            'name' => _l('add_report'),
+            'href' => admin_url('reports/add'),
+            'position' => 7,
+        ]);
+		$CI->app_menu->add_sidebar_children_item('reports', [
+            'slug' => 'view-report',
+            'name' => _l('view_report'),
+            'href' => admin_url('reports/view_deal_folder'),
+            'position' => 8,
+        ]);
 
         // $CI->app_menu->add_sidebar_children_item('reports', [
         //     'slug' => 'sales-reports',

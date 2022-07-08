@@ -24,10 +24,10 @@ class Authenticationapi_model extends App_Model
 			$this->load->model('base');
 			$domain = $req_domain[0];
 			$this->dynamicDB = array(	
-				'hostname' => 'localhost',	
-				'username' => 'root',	
-				'password' => 'opc@345Pass',	
-				'database' => 'dev_crm',	
+				'hostname' => APP_DB_HOSTNAME,	
+				'username' => APP_DB_USERNAME,	
+				'password' => APP_DB_PASSWORD,	
+				'database' => APP_DB_NAME,	
 				'dbdriver' => 'mysqli',	
 				'dbprefix' => 'tbl',	
 				'pconnect' => FALSE,	

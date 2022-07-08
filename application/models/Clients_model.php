@@ -25,7 +25,6 @@ class Clients_model extends App_Model {
 
         $this->db->join(db_prefix() . 'countries', '' . db_prefix() . 'countries.country_id = ' . db_prefix() . 'clients.country', 'left');
         $this->db->join(db_prefix() . 'contacts', '' . db_prefix() . 'contacts.userid = ' . db_prefix() . 'clients.userid AND is_primary = 1', 'left');
-
         if ((is_array($where) && count($where) > 0) || (is_string($where) && $where != '')) {
             $this->db->where($where);
         }
@@ -45,10 +44,9 @@ class Clients_model extends App_Model {
         }
 
         $this->db->order_by('company', 'asc');
-		$this->db->get(db_prefix() . 'clients')->result_array();
-		
-
-        return $this->db->get(db_prefix() . 'clients')->result_array();
+		$result = $this->db->get(db_prefix() . 'clients')->result_array();
+        //return $this->db->get(db_prefix() . 'clients')->result_array();
+        return $result;
     }
 
     /**
