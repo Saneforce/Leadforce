@@ -1197,7 +1197,7 @@ class Reports extends AdminController
 					else if($fields->type == 'select'){
 						$req_array = array();
 						if (str_contains($fields->options, ',')) { 
-							$options = explode(',',$fields->options,);
+							$options = explode(',',$fields->options);
 							foreach($options as $option1){
 								$req_array[$option1] = $option1;
 							}
