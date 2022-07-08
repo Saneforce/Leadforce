@@ -245,6 +245,9 @@ else {
         'project_name'=>db_prefix() . 'projects.name as project_name',
         'status'=>db_prefix() .'tasks.status as status',
         'startdate'=>'startdate',
+        'dateadded'=>'dateadded', 
+        'datemodified'=>'datemodified', 
+        'datefinished'=>'datefinished', 
         'project_contacts'=>db_prefix() . 'contacts.firstname as project_contacts', 
         'tasktype'=>db_prefix() . 'tasktype.name as tasktype',
         'assignees'=>get_sql_select_task_asignees_full_names() . ' as assignees',
@@ -618,6 +621,9 @@ else {
         
         //$row_temp['startdate']  = _d($aRow['startdate']);
         $row_temp['startdate']  = '<span class="single_linet">'.date('d-m-Y H:i', strtotime($aRow['startdate'])).'</span>';
+        $row_temp['dateadded']  = '<span style="white-space:nowrap">'.date('d-m-Y H:i', strtotime($aRow['startdate'])).'</span>';
+        $row_temp['datemodified']  = '<span style="white-space:nowrap">'.(($aRow['datemodified'] == NULL)?'':date('d-m-Y H:i', strtotime($aRow['datemodified']))).'</span>';
+        $row_temp['datefinished']  = '<span style="white-space:nowrap">'.(($aRow['datefinished'] == NULL)?'':date('d-m-Y H:i', strtotime($aRow['datefinished']))).'</span>';
         
     
         $row_temp['assignees']  = format_display_members_by_ids_and_names($aRow['assignees_ids'], $aRow['assignees']);
