@@ -55,7 +55,7 @@ $sTable       = db_prefix().'clients';
 $where        = [];
 
 // Add blank where all filter can be stored
-$filter = $customFieldsColumns = [];
+$filter = $customFieldsColumns = $locationCustomFields= [];
 
 $join = [
     'LEFT JOIN '.db_prefix().'contacts ON '.db_prefix().'contacts.userid='.db_prefix().'clients.userid AND '.db_prefix().'contacts.is_primary=1',
@@ -63,6 +63,9 @@ $join = [
 
 foreach ($custom_fields as $key => $field) {
     $selectAs = (is_cf_date($field) ? 'date_picker_cvalue_' . $field['slug'] : 'cvalue_' . $field['slug']);
+    if($field['type'] =='location'){
+        array_push($locationCustomFields, 'cvalue_' .$field['slug']);
+    }
     array_push($customFieldsColumns, $selectAs);
     array_push($aColumns, 'ctable_' . $key . '.value as ' . $selectAs);
     array_push($join, 'LEFT JOIN '.db_prefix().'customfieldsvalues as ctable_' . $key . ' ON '.db_prefix().'clients.userid = ctable_' . $key . '.relid AND ctable_' . $key . '.fieldto="' . $field['fieldto'] . '" AND ctable_' . $key . '.fieldid=' . $field['id']);
@@ -368,7 +371,11 @@ foreach ($rResult as $aRow) {
     
     // Custom fields add values
     foreach ($customFieldsColumns as $customFieldColumn) {
-        $row_temp[str_replace("cvalue_","",$customFieldColumn)] =  empty($aRow[$customFieldColumn])?'':$aRow[$customFieldColumn];
+        if(in_array($customFieldColumn,$locationCustomFields)){
+            $row_temp[str_replace("cvalue_","",$customFieldColumn)] =  empty($aRow[$customFieldColumn])?'':custom_field_location_icon_link($aRow[$customFieldColumn]);
+        }else{
+            $row_temp[str_replace("cvalue_","",$customFieldColumn)] =  empty($aRow[$customFieldColumn])?'':$aRow[$customFieldColumn];
+        }
     }
 
     

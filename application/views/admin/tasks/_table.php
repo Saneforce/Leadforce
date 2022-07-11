@@ -27,6 +27,7 @@ $table_datas = [
     'tags'=>_l('tags'),
     'project_name'=> '(Deal / Lead) Name',
     'project_status'=>_l('project_status'),
+    'project_pipeline'=>_l('pipeline'),
     'company'=>_l('client'),
     'teamleader'=>_l('teamleader'),
     'project_contacts'=>_l('project_contacts'),

@@ -77,8 +77,16 @@ if(empty($callsettings) || $callsettings->enable_call == '0') {
 		</div>
 	</div>
 </div>
+<?php 
 
+$CI = &get_instance();
+$CI->app_scripts->add('jquery validator', [
+     'path'       => 'https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js',
+ ]);
+
+?>
 <script >
+var callSettings =JSON.parse('<?php echo json_encode($callsettings); ?>');
 function enable_div(a){
 	if(a == 1) {
 		$('#enable_call_div').show();
@@ -96,35 +104,54 @@ function check_call(a){
 	$('.app_secret').hide();
 	$('#ch_country').hide();
 	if(a.value=='telecmi'){
+		if(callSettings.source_from =='telecmi'){
+			$('#appid').val(callSettings.app_id);
+			$('#appsecret').val(callSettings.app_secret);
+		}
+
 		$('#app_id').show();
 		$('#app_secret').show();
 		$('#appid').attr("placeholder", "APP ID");
 		$('#appsecret').attr("placeholder", "App Secret");
 	}
 	else if(a.value=='daffytel'){
+		if(callSettings.source_from =='daffytel'){
+			$('#appid').val(callSettings.app_id);
+			$('#country_sel').val(callSettings.country_code).trigger('change');
+			$('#webhook').val(callSettings.webhook);
+			$('#appsecret').val(callSettings.app_secret);
+		}
 		$('#accss_token').show();
 		$('#bridge').show();
 		$('#ch_country').show();
-		$('#country_sel').val('');
 		$('#appid').attr("placeholder", "Access Token");
 		$('#appsecret').attr("placeholder", "Bridge No.");
 	}
 	else{
 		$('#login_id').show();
 		$('#app_psw').show();
+		if(callSettings.source_from =='tata'){
+			$('#appid').val(callSettings.app_id);
+			$('#appsecret').val(callSettings.app_secret);
+		}
 		$('#appid').attr("placeholder", "Login Id");
 		$('#appsecret').attr("placeholder", "Password");
 	}
 }
 </script>
 <?php //init_tail(); ?>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"> </script>  
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js"> </script>  
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"> </script>   -->
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js"> </script>   -->
 <script>
 // just for the demos, avoids form submit
-$( "#settings-form" ).validate({
 
+document.addEventListener("DOMContentLoaded", function(event) { 
+    $( "#settings-form" ).validate({
+
+	});
 });
+
+
 </script>
 <style>
 .error{

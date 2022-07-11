@@ -462,10 +462,10 @@ function init_relation_tasks_table1($table_attributes = [])
 function init_relation_tasks_table($table_attributes = [])
 {
 	$fields = get_option('deal_fields');
-	$need_fields = array('project_name','id','tasktype','priority','assignees','task_name','description','tags','startdate','dateadded','datemodified','datefinished');
+	$need_fields = array('project_name','id','tasktype','priority','assignees','task_name','description','tags','startdate','dateadded','datemodified','datefinished','project_pipeline');
 	if(!empty($fields) && $fields != 'null'){
 		$req_fields = json_decode($fields);
-		$i = 12;
+		$i = 13;
 		if(!empty($req_fields)){
 			
 			foreach($req_fields as $req_field11){
@@ -537,6 +537,7 @@ function init_relation_tasks_table($table_attributes = [])
 		'tags'=>_l('tags'),
 		'project_name'=>_l('project_name'),
 		'project_status'=>_l('project_status'),
+		'project_pipeline'=>_l('pipeline'),
 		'company'=>_l('client'),
 		'teamleader'=>_l('teamleader'),
 		'project_contacts'=>_l('project_contacts'),
@@ -817,8 +818,10 @@ function tasks_summary_data($rel_id = null, $rel_type = null)
         // }
         
 //echo $tasks_where; exit;
-        $tasks_where = 'rel_type = "project" AND '.$tasks_where;
-        $tasks_my_where = 'rel_type = "project" AND '.$tasks_my_where;
+		//$tasks_where = 'rel_type = "project" AND '.$tasks_where;
+		//$tasks_my_where = 'rel_type = "project" AND '.$tasks_my_where;
+		$tasks_where =$tasks_where;
+        $tasks_my_where = $tasks_my_where;
         $summary                   = [];
         $summary['total_tasks']    = total_rows(db_prefix() . 'tasks', $tasks_where);
         //echo $CI->db->last_query(); exit;

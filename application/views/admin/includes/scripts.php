@@ -8,7 +8,14 @@
 /**
  * Global function for custom field of type hyperlink
  */
-echo get_custom_fields_hyperlink_js_function(); ?>
+echo get_custom_fields_hyperlink_js_function(); 
+
+$CI = &get_instance();
+if(!$CI->input->is_ajax_request()){
+  echo get_custom_field_location_js_data();
+}
+        
+        ?>
 <?php
 /**
  * Check for any alerts stored in session

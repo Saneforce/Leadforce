@@ -621,7 +621,7 @@ else {
         
         //$row_temp['startdate']  = _d($aRow['startdate']);
         $row_temp['startdate']  = '<span class="single_linet">'.date('d-m-Y H:i', strtotime($aRow['startdate'])).'</span>';
-        $row_temp['dateadded']  = '<span style="white-space:nowrap">'.date('d-m-Y H:i', strtotime($aRow['startdate'])).'</span>';
+        $row_temp['dateadded']  = '<span style="white-space:nowrap">'.date('d-m-Y H:i', strtotime($aRow['dateadded'])).'</span>';
         $row_temp['datemodified']  = '<span style="white-space:nowrap">'.(($aRow['datemodified'] == NULL)?'':date('d-m-Y H:i', strtotime($aRow['datemodified']))).'</span>';
         $row_temp['datefinished']  = '<span style="white-space:nowrap">'.(($aRow['datefinished'] == NULL)?'':date('d-m-Y H:i', strtotime($aRow['datefinished']))).'</span>';
         

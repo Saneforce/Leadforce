@@ -93,11 +93,15 @@ $join = [
     'LEFT JOIN ' . db_prefix() . 'leads_sources ON ' . db_prefix() . 'leads_sources.id = ' . db_prefix() . 'leads.source'
 ];
 $k = 0;
+$locationCustomFields= [];
 foreach($arrval as $key => $val) {
     foreach ($custom_fields as $key => $field) {
         if($val == $field['slug']) { 
             unset($aColumns[$k]);
             $selectAs = 'cvalue_' .$field['slug'];
+            if($field['type'] =='location'){
+                array_push($locationCustomFields, 'cvalue_' .$field['slug']);
+            }
             array_push($customFieldsColumns, $selectAs);
             array_push($aColumns, 'ctable_' . $key . '.value as ' . $selectAs);
             array_push($join, 'LEFT JOIN ' . db_prefix() . 'customfieldsvalues as ctable_' . $key . ' ON ' . db_prefix() . 'leads.id = ctable_' . $key . '.relid AND ctable_' . $key . '.fieldto="' . $field['fieldto'] . '" AND ctable_' . $key . '.fieldid=' . $field['id']);
@@ -309,7 +313,11 @@ foreach ($rResult as $aRow) {
     //     $row[] = (strpos($customFieldColumn, 'date_picker_') !== false ? _d($aRow[$customFieldColumn]) : $aRow[$customFieldColumn]);
     // }
     foreach ($customFieldsColumns as $customFieldColumn) {
-        $row[str_replace("cvalue_","",$customFieldColumn)] =  empty($aRow[$customFieldColumn])?'':$aRow[$customFieldColumn];
+        if(in_array($customFieldColumn,$locationCustomFields)){
+            $row[str_replace("cvalue_","",$customFieldColumn)] =  empty($aRow[$customFieldColumn])?'':custom_field_location_icon_link($aRow[$customFieldColumn]);
+        }else{
+            $row[str_replace("cvalue_","",$customFieldColumn)] =  empty($aRow[$customFieldColumn])?'':$aRow[$customFieldColumn];
+        }
     }
     $row_new = [];
     $i2 = 0;

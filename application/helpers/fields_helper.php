@@ -1022,3 +1022,63 @@ function format_external_form_custom_fields($custom_fields)
 
     return $cfields;
 }
+
+function render_location_picker($name, $label = '', $value = '', $input_attrs = [], $form_group_attr = [], $form_group_class = '', $input_class = '')
+{   
+    $lat=$lng='0';
+    if(set_value($name, $value)){
+        list($lat,$lng) =explode(',',set_value($name,$value));
+    }
+    set_custom_field_location_js_data($lat,$lng,$name);
+    $input            = '';
+    $_form_group_attr = '';
+    $_input_attrs     = '';
+	$cur_req = 1;
+    foreach ($input_attrs as $key => $val) {
+        // tooltips
+        if ($key == 'title') {
+            $val = _l($val);
+        }
+		if ($key == 'required') {
+			$cur_req = 2;
+		}
+        $_input_attrs .= $key . '=' . '"' . $val . '" ';
+    }
+
+    $_input_attrs = rtrim($_input_attrs);
+
+    $form_group_attr['app-field-wrapper'] = $name;
+
+    foreach ($form_group_attr as $key => $val) {
+        // tooltips
+        if ($key == 'title') {
+            $val = _l($val);
+        }
+        $_form_group_attr .= $key . '=' . '"' . $val . '" ';
+    }
+
+    $_form_group_attr = rtrim($_form_group_attr);
+
+    if (!empty($form_group_class)) {
+        $form_group_class = ' ' . $form_group_class;
+    }
+    if (!empty($input_class)) {
+        $input_class = ' ' . $input_class;
+    }
+    $input .= '<div class="form-group' . $form_group_class . '" ' . $_form_group_attr . '>';
+    if ($label != '') {
+		if ($cur_req == 1) {
+			$input .= '<label for="' . $name . '" class="control-label">' . _l($label, '', false) . '</label>';
+		}else{
+			$input .= '<label for="' . $name . '" class="control-label"> <small class="req text-danger">* </small>' . _l($label, '', false) . '</label>';
+		}
+    }
+    $input .= '<div class="input-group" style="width:100%">';
+
+    $input .='<input id="cgmapsearchInput" class="controls mapsearchInput" type="text" placeholder="Search location">';
+    $input .='<div id="cgmap" style="height: 400px; width: 100%; position: relative; overflow: hidden;"></div>';
+    $input .= '<input type="hidden" id="' . $name . '" name="' . $name . '" value="' . set_value($name, $value) . '" />';
+    $input .= '</div>';
+    $input .= '</div>';
+    return $input;
+}

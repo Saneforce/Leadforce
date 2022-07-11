@@ -205,15 +205,25 @@
                      if(is_admin(get_staff_user_id())) {
                         //unset($_SESSION['alpha']);
                       //pre($_SESSION);
+                        // $where_summary_activeperson_qry = 'SELECT  COUNT(*) AS `numrows`
+                        // FROM tblcontacts
+                        // LEFT JOIN tblclients ON tblclients.userid=tblcontacts.userid LEFT JOIN tblcustomfieldsvalues as ctable_0 ON tblcontacts.id = ctable_0.relid AND ctable_0.fieldto="contacts" AND ctable_0.fieldid=7  where tblcontacts.active=1  AND tblcontacts.deleted_status=0 AND tblclients.deleted_status=0 '.$likeqry;
+
                         $where_summary_activeperson_qry = 'SELECT  COUNT(*) AS `numrows`
                         FROM tblcontacts
-                        LEFT JOIN tblclients ON tblclients.userid=tblcontacts.userid LEFT JOIN tblcustomfieldsvalues as ctable_0 ON tblcontacts.id = ctable_0.relid AND ctable_0.fieldto="contacts" AND ctable_0.fieldid=7  where tblcontacts.active=1  AND tblcontacts.deleted_status=0 AND tblclients.deleted_status=0 '.$likeqry;
+                        where tblcontacts.active=1  AND tblcontacts.deleted_status=0 '.$likeqry;
+
                         $CI          = & get_instance();
                         $where_summary_activeperson     = $CI->db->query($where_summary_activeperson_qry)->result_array();
 
+                        // $where_summary_inactiveperson_qry = 'SELECT  COUNT(*) AS `numrows`
+                        // FROM tblcontacts
+                        // LEFT JOIN tblclients ON tblclients.userid=tblcontacts.userid LEFT JOIN tblcustomfieldsvalues as ctable_0 ON tblcontacts.id = ctable_0.relid AND ctable_0.fieldto="contacts" AND ctable_0.fieldid=7  where tblcontacts.active=0  AND tblcontacts.deleted_status=0 AND tblclients.deleted_status=0 '.$likeqry;
+
                         $where_summary_inactiveperson_qry = 'SELECT  COUNT(*) AS `numrows`
                         FROM tblcontacts
-                        LEFT JOIN tblclients ON tblclients.userid=tblcontacts.userid LEFT JOIN tblcustomfieldsvalues as ctable_0 ON tblcontacts.id = ctable_0.relid AND ctable_0.fieldto="contacts" AND ctable_0.fieldid=7  where tblcontacts.active=0  AND tblcontacts.deleted_status=0 AND tblclients.deleted_status=0 '.$likeqry;
+                        where tblcontacts.active=0  AND tblcontacts.deleted_status=0 '.$likeqry;
+
                         $CI          = & get_instance();
                         $where_summary_inactiveperson     = $CI->db->query($where_summary_inactiveperson_qry)->result_array();
 

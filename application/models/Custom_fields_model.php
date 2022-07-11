@@ -32,6 +32,19 @@ class Custom_fields_model extends App_Model
     }
 
     /**
+     * @param  string $fieldto
+     * @param  string $type
+     * @return boolean
+     * check field whether exsist or not
+     */
+    public function check_field_exist($fieldto,$type)
+    {
+        $this->db->where('fieldto', $fieldto);
+        $this->db->where('type', $type);
+        return ($this->db->get(db_prefix().'customfields')->row())?true:false;
+    }
+
+    /**
      * Add new custom field
      * @param mixed $data All $_POST data
      * @return  boolean

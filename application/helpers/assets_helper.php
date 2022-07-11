@@ -61,6 +61,8 @@ function _init_admin_assets()
 
     $CI->app_scripts->add('common-js', 'assets/builds/common.js');
 
+    $CI->app_scripts->add('cgmap-js', 'assets/js/cgmap.js');
+
     $CI->app_scripts->add(
         'app-js',
         base_url($CI->app_scripts->core_file('assets/js', 'main.js')) . '?v=' . $CI->app_css->core_version(),

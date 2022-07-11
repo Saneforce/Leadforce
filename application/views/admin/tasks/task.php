@@ -327,7 +327,7 @@ p#rel_id-error {
                   </div>
                </div>
                <?php
-               if($rel_type && $rel_type != 'project' && $rel_type != 'customer') {
+               if(!$rel_type||($rel_type && $rel_type != 'project' && $rel_type != 'customer')) {
                   $style="display:block;";
                } else {
                   $style="display:none;";
@@ -341,7 +341,7 @@ p#rel_id-error {
                         <?php } ?>
                             <option value="project"
                               <?php if(isset($task) || $this->input->get('rel_type')){if($rel_type == 'project'){echo 'selected';}} ?>><?php echo _l('project'); ?></option>
-                        <?php if($rel_type) { ?>
+                        <?php if(/*$rel_type*/true) { ?>
                               <option value="invoice" <?php if(isset($task) || $this->input->get('rel_type')){if($rel_type == 'invoice'){echo 'selected';}} ?>>
                               <?php echo _l('invoice'); ?>
                            </option>

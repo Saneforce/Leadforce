@@ -45,13 +45,24 @@ class Custom_fields extends AdminController
     {
         if ($this->input->post()) {
             if ($id == '') {
-                $id = $this->custom_fields_model->add($this->input->post());
-
-                if ($id) {
-                    set_alert('success', _l('added_successfully', _l('custom_field')));
-                   // redirect(admin_url('custom_fields/field/' . $id));
-                    redirect(admin_url('custom_fields'));
+                if($this->input->post('type')=='location'){
+                    $exist =$this->custom_fields_model->check_field_exist($this->input->post('fieldto'), 'location');
+                }else{
+                    $exist =false;
                 }
+
+                if($exist){
+                    set_alert('warning', _l('custom_location_field_duplicate_error'));
+                }else{
+                    $id = $this->custom_fields_model->add($this->input->post());
+
+                    if ($id) {
+                        set_alert('success', _l('added_successfully', _l('custom_field')));
+                    // redirect(admin_url('custom_fields/field/' . $id));
+                        redirect(admin_url('custom_fields'));
+                    }
+                }
+                
             } else {
                 $success = $this->custom_fields_model->update($this->input->post(), $id);
 				$ch_data = $this->input->post();
