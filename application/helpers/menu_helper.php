@@ -195,8 +195,9 @@ function app_init_admin_sidebar_menu_items() {
         //$projurl = admin_url('projects/kanban_noscroll?pipelines='.$pipelines[0]['id'].'&member=&gsearch=');
         $projurl = admin_url('projects/index_list?pipelines=&member=&gsearch=');
         if(!is_admin(get_staff_user_id())) {
-            $projurl = admin_url('projects/kanban_noscroll?pipelines='.$pipelines[0]['id'].'&member='.get_staff_user_id().'&gsearch=');
+          //  $projurl = admin_url('projects/kanban_noscroll?pipelines='.$pipelines[0]['id'].'&member='.get_staff_user_id().'&gsearch=');
 			//$projurl = admin_url('projects/index_list?pipelines=&member='.get_staff_user_id().'&gsearch=');
+				$projurl = admin_url('projects/index_list?pipelines=&member='.get_staff_user_id().'&gsearch=');
         }
         $CI->app_menu->add_sidebar_menu_item('projects', [
             'name' => _l('projects'),
