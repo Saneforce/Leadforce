@@ -545,8 +545,13 @@ foreach ($rResult as $aRow) {
         $row_temp['product_amt'] = '0.00';
 
     $row_temp['company']  =  $aRow['company'] ;
+	$req_tag = '';
+	if(!empty($aRow['tags'])){
+		
+		$req_tag = rtrim($req_tag,", ");
+	}
 
-    $row_temp['tags']  = render_tags($aRow['tags']);
+    $row_temp['tags']  = $aRow['tags'];
 
     $row_temp['start_date']   = _d($aRow['start_date']);
 

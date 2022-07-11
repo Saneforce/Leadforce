@@ -57,10 +57,25 @@ $table_data = hooks()->apply_filters('projects_table_columns', $table_data);
 		 <title><?php echo isset($title) ? $title : get_option('companyname'); ?></title>
 		<!-- Datatable CSS -->
 		<link href='https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/tabletools/2.2.4/css/dataTables.tableTools.css">
+		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css">
+		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.4.0/css/select.dataTables.min.css">
+
 		<!-- jQuery Library -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 		<!-- Datatable JS -->
 		<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+		<script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+		<script src="//cdn.datatables.net/tabletools/2.2.4/js/dataTables.tableTools.min.js"></script>
+		<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.4.1/css/buttons.dataTables.min.css">
+<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+ <script src="https://cdn.datatables.net/buttons/2.0.1/js/dataTables.buttons.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+ <script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.html5.min.js"></script>
+ <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.4.1/js/buttons.print.min.js"></script>
 	</head>
 	<body>
 		<div class="container">
@@ -69,6 +84,7 @@ $table_data = hooks()->apply_filters('projects_table_columns', $table_data);
 					<div class="col-md-6"></div>
 						<div class="col-md-6">
 							<h2>Report</h2>
+							<div class="info" id="buttons"></div>
 							<table id='empTable' class='display dataTable' >
 							  <thead>
 								<tr>
@@ -90,7 +106,23 @@ $table_data = hooks()->apply_filters('projects_table_columns', $table_data);
 	</body>
 	<script>
 	$(document).ready(function(){
-	   $('#empTable').DataTable({
+	    var table = $('#empTable').DataTable({
+			lengthMenu: [
+            [10, 25, 50, -1],
+            [10, 25, 50, 'All'],
+        ],
+		oLanguage: {
+       sLengthMenu: "_MENU_",
+    },
+		dom: 'lBfrtip',
+   buttons: [
+       'excelHtml5',
+       'csvHtml5',
+       'pdfHtml5',
+       'print'
+    ],
+        select: false,
+        colReorder: false,
 		  'processing': true,
 		  'serverSide': true,
 		  'serverMethod': 'post',
@@ -106,13 +138,24 @@ $table_data = hooks()->apply_filters('projects_table_columns', $table_data);
 			}?>
 		  ]
 	   });
+	   
+	
+	   /* var tableTools = new $.fn.dataTable.TableTools(table, {
+               "buttons": ["copy",
+                                  "csv",
+                                  "xls",
+                                  "pdf",{ "type": "print", "buttonText": "Print me!" } ],
+                                  "sSwfPath": "//cdn.datatables.net/tabletools/2.2.2/swf/copy_csv_xls_pdf.swf" });
+           $(tableTools.fnContainer()).prependTo('#mytable_wrapper');*/
 	});
 	</script>
 	<style>
+	select{
+		height:40px;
+		margin-right:15px;
+	}
 	.container{
-		   position: absolute;
-		padding: 10px;
-		width: 96% !important;
+		margin: 25px;
 		overflow-x: scroll;
 	}
 	</style>
