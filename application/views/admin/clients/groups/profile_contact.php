@@ -135,25 +135,7 @@
 						
 						<div class="input-group-addon" style="opacity: 1;"><a href="#" data-toggle="modal" data-target="#clientid_add_modal"><i class="fa fa-plus"></i></a></div>
                     </div> </div>
-
-                <?php $custom_fields = get_custom_fields('contacts');
-                    if(!empty($custom_fields)){ 
-                        foreach($custom_fields as $field){ 
-                            $value = get_custom_field_value($contact->id,$field['id'],'contacts');
-                                ?>
-                            <div class="col-md-6">   
-                                <div class="form-group">
-                                    <label for="website"><?php echo ucfirst($field['name']); ?></label>
-                                    <div class="">
-                                        <input type="text" value="<?php echo $value; ?>" class="form-control" name="custom_fields[contacts][<?php echo $field['id']; ?>]">
-                                    </div>
-                                </div>
-                            </div>
-                            <?php 
-                            
-                        }
-                    } 
-                ?>				
+                <?php echo render_custom_fields( 'contacts',$contact->id); ?>				
         </div>
     </div>
     <div class="btn-bottom-toolbar btn-toolbar-container-out text-right">

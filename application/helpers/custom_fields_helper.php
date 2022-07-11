@@ -467,6 +467,8 @@ function render_custom_fields($belongs_to, $rel_id = false, $where = [], $items_
                 $fields_html .= render_date_range_picker($cf_name, $field_name, ($value), $_input_attrs);
             } elseif ($field['type'] == 'date_time_range') {
                 $fields_html .= render_date_time_range_picker($cf_name, $field_name, ($value), $_input_attrs);
+            } elseif ($field['type'] == 'location') {
+                $fields_html .= render_location_picker($cf_name, $field_name, ($value), $_input_attrs);
             } elseif ($field['type'] == 'date_picker_time') {
                 $fields_html .= render_datetime_input($cf_name, $field_name, _dt($value), $_input_attrs);
             } elseif ($field['type'] == 'textarea') {
@@ -646,6 +648,13 @@ function render_custom_fields($belongs_to, $rel_id = false, $where = [], $items_
         if (!$items_add_edit_preview && !$items_applied) {
             $fields_html .= '</div>';
         }
+
+        // adding custom location field scripts
+        $CI = &get_instance();
+        if($CI->input->is_ajax_request()){
+            $fields_html .=get_custom_field_location_js_data();
+        }
+        
     }
 
     return $fields_html;
@@ -5996,4 +6005,76 @@ function is_custom_fields_smart_transfer_enabled()
     }
 
     return false;
+}
+
+function custom_field_location_icon_link($latlng){
+    return '<a class="mx-auto" target="_blank" href = "https://maps.google.com/?q='.$latlng.'" style="color:#DD4B3E"><i class="fa fa-map-marker" style="font-size:32px;" aria-hidden="true"></i></a>';
+}
+
+/**
+ * Store the custom field location details
+ */
+global $location_js_data;
+function set_custom_field_location_js_data($lat,$lng,$fieldName)
+{
+    global $location_js_data;
+    if(!is_array($location_js_data))
+        $location_js_data =[];
+
+    $id =count($location_js_data);
+    $location_js_data[] =array("id"=>$id,"lat"=>$lat,"lng"=>$lng,"fieldName"=>$fieldName);
+}
+
+/**
+ * return the custom field location details
+ */
+function get_custom_field_location_js_data()
+{ 
+    global $location_js_data;
+    ob_start();
+?>
+<script>
+            <?php
+            if(is_array($location_js_data)){
+            foreach($location_js_data as $location){
+            ?>
+            window.loadGoogleMaps = function(){
+            if(typeof cgmapLoaded == 'undefined' || cgmapLoaded==true){cgmapinitialize(); return;}
+            var script_tag = document.createElement('script');
+            script_tag.setAttribute("type","text/javascript");
+            script_tag.setAttribute("src","https://maps.google.com/maps/api/js?libraries=places&key=AIzaSyAER5hPywUW-5DRlyKJZEfsqgZlaqytxoU&callback=cgmapinitialize");
+            (document.getElementsByTagName("body")[0] || document.documentElement).appendChild(script_tag);
+            }
+            function cgmapinitialize(){
+                cgmapLoaded =true;
+                var cgampOptions ={
+                    center: {lat: parseFloat(<?php echo $location['lat']; ?>), lng: parseFloat(<?php echo $location['lng']; ?>)},
+                    zoom: 13
+                };
+                new Cgmap(
+                    new google.maps.Map(document.getElementById('cgmap'),cgampOptions),
+                    <?php echo $location['lat']; ?>,
+                    <?php echo $location['lng']; ?>,
+                    '<?php echo $location['fieldName']; ?>'
+                );
+            };
+            loadGoogleMaps();
+            <?php
+            break;}}
+            ?>
+</script>
+<?php 
+    $scripts = ob_get_contents();
+    ob_end_clean();
+    return '<style>
+    .cgmapsearchInput{
+        border: 2px solid #444;
+        padding: 10px;
+        border-radius: 5px;
+        top: 10px !important;
+    }
+    .pac-container{
+        z-index:10000;
+    }
+    </style>'.$scripts;
 }

@@ -356,6 +356,9 @@
          if(count($custom_fields) > 0){ ?>
          <?php foreach($custom_fields as $field){ ?>
          <?php $value = get_custom_field_value($project->id,$field['id'],'projects');
+         if($field['type'] =='location'){
+            $value ='<iframe src = "https://maps.google.com/maps?q='.$value.'&hl=es;z=14&output=embed"></iframe>'; 
+         }
          if($value == ''){continue;} ?>
          <tr>
             <td class="bold"><?php echo ucfirst($field['name']); ?></td>
@@ -475,6 +478,7 @@
          <?php } } ?>
 
          </h5>
+         <a href="#" onclick="callfromdeal(<?php echo $contact['contacts_id'].','.$contact['project_id'].','.$contact['phonenumber'].',\'deal\'';?>);" title="Call Now"><img src="<?php echo APP_BASE_URL ?>/assets/images/call.png" style="width:25px;margin-left:10px;"></a>
          <?php
             if($contact['is_primary'] == 1) {
         ?>

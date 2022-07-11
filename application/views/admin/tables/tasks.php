@@ -11,6 +11,7 @@ $aColumns_temp = array(
     'task_name'=>db_prefix() . 'tasks.name as task_name',
     'project_name'=>db_prefix() . 'projects.name as project_name',
     'project_status'=>db_prefix() . 'projects_status.name as project_status',
+    'project_pipeline'=>db_prefix() . 'pipeline.name as project_pipeline',
     'company'=>db_prefix() . 'clients.company as company',
     'teamleader'=>db_prefix() . 'projects.teamleader as p_teamleader', 
     'status'=>db_prefix() .'tasks.status as status',
@@ -42,17 +43,18 @@ $wherewo = [];
 array_push($join, 'LEFT JOIN '.db_prefix().'tasktype  as '.db_prefix().'tasktype ON '.db_prefix().'tasktype.id = ' .db_prefix() . 'tasks.tasktype');
 array_push($join, 'LEFT JOIN '.db_prefix().'projects  as '.db_prefix().'projects ON '.db_prefix().'projects.id = ' .db_prefix() . 'tasks.rel_id AND ' .db_prefix() . 'tasks.rel_type ="project" ');
 array_push($join, 'LEFT JOIN '.db_prefix().'projects_status  as '.db_prefix().'projects_status ON '.db_prefix().'projects_status.id = ' .db_prefix() . 'projects.status');
+array_push($join, 'LEFT JOIN '.db_prefix().'pipeline  as '.db_prefix().'pipeline ON '.db_prefix().'pipeline.id = ' .db_prefix() . 'projects.pipeline_id');
 array_push($join, 'LEFT JOIN '.db_prefix().'clients  as '.db_prefix().'clients ON '.db_prefix().'clients.userid = ' .db_prefix() . 'projects.clientid');
 array_push($join, 'LEFT JOIN '.db_prefix().'contacts  as '.db_prefix().'contacts ON '.db_prefix().'contacts.id = ' .db_prefix() . 'tasks.contacts_id');
 include_once(APPPATH . 'views/admin/tables/includes/tasks_filter.php');
 include_once(APPPATH . 'views/admin/tables/includes/tasks_wo_status_filter.php');
 //pre($wherewo);
-array_push($where, 'AND CASE WHEN rel_type="project" AND rel_id IN (SELECT project_id FROM ' . db_prefix() . 'project_settings WHERE project_id=rel_id AND name="hide_tasks_on_main_tasks_table" AND value=1) THEN rel_type != "project" ELSE 1=1 END');
-array_push($where, ' AND rel_type != "invoice" AND rel_type != "estimate" AND rel_type != "proposal"');
+// array_push($where, 'AND CASE WHEN rel_type="project" AND rel_id IN (SELECT project_id FROM ' . db_prefix() . 'project_settings WHERE project_id=rel_id AND name="hide_tasks_on_main_tasks_table" AND value=1) THEN rel_type != "project" ELSE 1=1 END');
+// array_push($where, ' AND rel_type != "invoice" AND rel_type != "estimate" AND rel_type != "proposal"');
 
 
-array_push($wherewo, 'AND CASE WHEN rel_type="project" AND rel_id IN (SELECT project_id FROM ' . db_prefix() . 'project_settings WHERE project_id=rel_id AND name="hide_tasks_on_main_tasks_table" AND value=1) THEN rel_type != "project" ELSE 1=1 END');
-array_push($wherewo, ' AND rel_type != "invoice" AND rel_type != "estimate" AND rel_type != "proposal"');
+// array_push($wherewo, 'AND CASE WHEN rel_type="project" AND rel_id IN (SELECT project_id FROM ' . db_prefix() . 'project_settings WHERE project_id=rel_id AND name="hide_tasks_on_main_tasks_table" AND value=1) THEN rel_type != "project" ELSE 1=1 END');
+// array_push($wherewo, ' AND rel_type != "invoice" AND rel_type != "estimate" AND rel_type != "proposal"');
 
 
 // ROle based records
@@ -97,7 +99,7 @@ $custom_fields = get_table_custom_fields('tasks');
 //$custom_fields =array_merge($custom_fields, get_table_custom_fields('contacts'));
 
 //$custom_fields = array_merge($custom_fields,get_table_custom_fields('customers'));
-$customFieldsColumns = $cus = [];
+$customFieldsColumns= $locationCustomFields = $cus = [];
 //pre($tasks_list_column_order);
 foreach ($custom_fields as $key => $field) {
     $fieldtois= 'clients.userid';
@@ -110,6 +112,9 @@ foreach ($custom_fields as $key => $field) {
         $fieldtois= 'tasks.id';
     }
     if(isset($tasks_list_column_order[$field['slug']])){
+        if($field['type'] =='location'){
+            array_push($locationCustomFields, 'cvalue_' .$field['slug']);
+        }
         $selectAs = 'cvalue_' .$field['slug'];
         // array_push($customFieldsColumns, $selectAs);
         // array_push($aColumns, '(SELECT value FROM ' . db_prefix() . 'customfieldsvalues WHERE ' . db_prefix() . 'customfieldsvalues.relid=' . db_prefix() . 'clients.userid AND ' . db_prefix() . 'customfieldsvalues.fieldid=' . $field['id'] . ' AND ' . db_prefix() . 'customfieldsvalues.fieldto="' . $field['fieldto'] . '" LIMIT 1) as ' . $selectAs);
@@ -146,7 +151,6 @@ if($idkey == 0) {
 
 //pre($idkey);
 $aColumns = hooks()->apply_filters('tasks_table_sql_columns', $aColumns);
-
 $result = data_tables_init(
     $aColumns,
     $sIndexColumn,
@@ -212,7 +216,10 @@ foreach ($rResult as $aRow) {
 	if(isset($aRow['project_status']) && !empty($aRow['project_status'])){
 		$row_temp['project_status'] = '<span style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">'.$aRow['project_status'].'</span>';
 	}
-	
+    $row_temp['project_pipeline']  = ' ';
+    if(isset($aRow['project_pipeline']) && !empty($aRow['project_pipeline'])){
+	    $row_temp['project_pipeline'] =$aRow['project_pipeline'];
+    }
 	$row_temp['company']  = ' ';
 	if(isset($aRow['company']) && !empty($aRow['company'])){
 		$row_temp['company'] =  '<a class="task-table-related" data-toggle="tooltip" title="' . _l('company') . '" href="' . admin_url("clients/client/".$aRow['userid']) . '">' . $aRow['company'] . '</a>';;
@@ -404,7 +411,7 @@ foreach ($rResult as $aRow) {
     
     //$row_temp['startdate']  = _d($aRow['startdate']);
     $row_temp['startdate']  = '<span style="white-space:nowrap">'.date('d-m-Y H:i', strtotime($aRow['startdate'])).'</span>';
-    $row_temp['dateadded']  = '<span style="white-space:nowrap">'.date('d-m-Y H:i', strtotime($aRow['startdate'])).'</span>';
+    $row_temp['dateadded']  = '<span style="white-space:nowrap">'.date('d-m-Y H:i', strtotime($aRow['dateadded'])).'</span>';
     $row_temp['datemodified']  = '<span style="white-space:nowrap">'.(($aRow['datemodified'] == NULL)?'':date('d-m-Y H:i', strtotime($aRow['datemodified']))).'</span>';
     $row_temp['datefinished']  = '<span style="white-space:nowrap">'.(($aRow['datefinished'] == NULL)?'':date('d-m-Y H:i', strtotime($aRow['datefinished']))).'</span>';
     
@@ -442,7 +449,11 @@ foreach ($rResult as $aRow) {
         $row_temp['priority']   = $outputPriority;
     }
     foreach ($customFieldsColumns as $customFieldColumn) {
-        $row_temp[str_replace("cvalue_","",$customFieldColumn)] =  empty($aRow[$customFieldColumn])?'':$aRow[$customFieldColumn];
+        if(in_array($customFieldColumn,$locationCustomFields)){
+            $row_temp[str_replace("cvalue_","",$customFieldColumn)] =  empty($aRow[$customFieldColumn])?'':custom_field_location_icon_link($aRow[$customFieldColumn]);
+        }else{
+            $row_temp[str_replace("cvalue_","",$customFieldColumn)] =  empty($aRow[$customFieldColumn])?'':$aRow[$customFieldColumn];
+        }
     }
 	 foreach($tasks_list_column_order as $ckey=>$cval){
         if(isset($row_temp[$ckey])){

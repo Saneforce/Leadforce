@@ -2055,7 +2055,7 @@ class Projects_model extends App_Model
 
     public function get_project_contacts($id)
     {
-        $this->db->select('email,project_id,contacts_id,firstname,tblproject_contacts.is_primary');
+        $this->db->select('email,project_id,contacts_id,firstname,tblproject_contacts.is_primary,phonenumber');
         $this->db->join(db_prefix() . 'contacts', db_prefix() . 'contacts.id=' . db_prefix() . 'project_contacts.contacts_id');
         $this->db->where('project_id', $id);
         $this->db->where('deleted_status', 0);

@@ -112,7 +112,7 @@ $req_fields[$req_cnt + 13]= 'contact_phone1';
 $projects_list_column_order = (array)json_decode(get_option('projects_list_column_order')); 
 //pre($projects_list_column_order);
 $custom_fields = array_merge($custom_fields,get_table_custom_fields('customers'));
-$customFieldsColumns = $cus = [];
+$customFieldsColumns = $locationCustomFields = $cus = [];
 //pre($custom_fields);
 foreach ($custom_fields as $key => $field) {
     $fieldtois= 'clients.userid';
@@ -123,6 +123,9 @@ foreach ($custom_fields as $key => $field) {
     }
     if(isset($projects_list_column_order[$field['slug']])){
         $selectAs = 'cvalue_' .$field['slug'];
+        if($field['type'] =='location'){
+            array_push($locationCustomFields, 'cvalue_' .$field['slug']);
+        }
         array_push($customFieldsColumns, $selectAs);
         $cus[$field['slug']] =  'ctable_' . $key . '.value as ' . $selectAs;
         array_push($join, 'LEFT JOIN '.db_prefix().'customfieldsvalues as ctable_' . $key . ' ON '.db_prefix().$fieldtois.' = ctable_' . $key . '.relid AND ctable_' . $key . '.fieldto="' . $field['fieldto'] . '" AND ctable_' . $key . '.fieldid=' . $field['id']);
@@ -339,7 +342,11 @@ foreach ($rResult as $aRow) {
     // }
 	
 	foreach ($customFieldsColumns as $customFieldColumn) {
-        $row_temp[str_replace("cvalue_","",$customFieldColumn)] =  empty($aRow[$customFieldColumn])?'':$aRow[$customFieldColumn];
+        if(in_array($customFieldColumn,$locationCustomFields)){
+            $row_temp[str_replace("cvalue_","",$customFieldColumn)] =  empty($aRow[$customFieldColumn])?'':custom_field_location_icon_link($aRow[$customFieldColumn]);
+        }else{
+            $row_temp[str_replace("cvalue_","",$customFieldColumn)] =  empty($aRow[$customFieldColumn])?'':$aRow[$customFieldColumn];
+        }
     }
 	$i2 = 0;
     foreach($projects_list_column_order as $ckey=>$cval){

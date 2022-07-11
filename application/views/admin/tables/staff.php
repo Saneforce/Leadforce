@@ -22,10 +22,14 @@ $join         = ['LEFT JOIN '.db_prefix().'roles ON '.db_prefix().'roles.roleid 
 $join[]        = 'LEFT JOIN '.db_prefix().'designations ON '.db_prefix().'designations.designationid = '.db_prefix().'staff.designation';
 $join[]        = 'LEFT JOIN '.db_prefix().'staff as reporting ON reporting.staffid = '.db_prefix().'staff.reporting_to';
 $i            = 0;
+$locationCustomFields =[];
 foreach ($custom_fields as $field) {
     $select_as = 'cvalue_' . $i;
     if ($field['type'] == 'date_picker' || $field['type'] == 'date_picker_time') {
         $select_as = 'date_picker_cvalue_' . $i;
+    }
+    if($field['type'] =='location'){
+        array_push($locationCustomFields, 'ctable_' . $i . '.value as ' . $select_as);
     }
     array_push($aColumns, 'ctable_' . $i . '.value as ' . $select_as);
     array_push($join, 'LEFT JOIN '.db_prefix().'customfieldsvalues as ctable_' . $i . ' ON '.db_prefix().'staff.staffid = ctable_' . $i . '.relid AND ctable_' . $i . '.fieldto="' . $field['fieldto'] . '" AND ctable_' . $i . '.fieldid=' . $field['id']);
@@ -56,6 +60,9 @@ foreach ($rResult as $aRow) {
             $_data = $aRow[strafter($aColumns[$i], 'as ')];
         } else {
             $_data = $aRow[$aColumns[$i]];
+        }
+        if(in_array($aColumns[$i] , $locationCustomFields)){
+            $_data = $_data==''?'':custom_field_location_icon_link($_data);
         }
         if ($aColumns[$i] == 'last_login') {
             if ($_data != null) {

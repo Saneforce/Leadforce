@@ -3898,6 +3898,7 @@ $lang['followdeals']           		    = 'Followed Deals';
 $lang['activities']           		    = 'Activities';
 $lang['contacts']           		    = 'Contacts';
 $lang['call_settings']           		    = 'Call Settings';
+$lang['agent']                              ='Agent';
 $lang['staff_id'] = 'Agent';
 $lang['phone'] = 'Phone';
 $lang['password'] = 'Password';
@@ -4034,3 +4035,5 @@ $lang['view_report']			= 'View Report';
 $lang['public_link']			= 'Public Link';
 $lang['create_date']			= 'Created Date';
 $lang['update_date']			= 'Updated Date';
+
+$lang['custom_location_field_duplicate_error']      ='Cannot use location field multiply times in same type';

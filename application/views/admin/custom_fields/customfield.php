@@ -88,6 +88,7 @@
                                 <option value="time_picker" <?php if(isset($custom_field) && $custom_field->type == 'time_picker'){echo 'selected';} ?>>Time Picker</option>
                                 <option value="date_range" <?php if(isset($custom_field) && $custom_field->type == 'date_range'){echo 'selected';} ?>>Date Range</option> -->
                                 <option value="date_time_range" <?php if(isset($custom_field) && $custom_field->type == 'date_time_range'){echo 'selected';} ?>>Datetime Range</option> -->
+                                <option value="location" <?php if(isset($custom_field) && $custom_field->type == 'location'){echo 'selected';} ?>>Location</option> -->
                                 <!-- <option value="colorpicker" <?php if(isset($custom_field) && $custom_field->type == 'colorpicker'){echo 'selected';} ?>>Color Picker</option> -->
                                 <option value="link" <?php if(isset($custom_field) && $custom_field->type == 'link'){echo 'selected';} ?><?php if(isset($custom_field) && $custom_field->fieldto == 'items'){echo 'disabled';} ?>>Hyperlink</option>
                             </select>

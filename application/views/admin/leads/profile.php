@@ -236,7 +236,11 @@ if (!isset($lead)) {
         $value = get_custom_field_value($lead->id, $field['id'], 'leads');
         ?>
                         <p class="text-muted lead-field-heading no-mtop"><?php echo $field['name']; ?></p>
-                        <p class="bold font-medium-xs"><?php echo ($value != '' ? $value : '-') ?></p>
+                        <?php if($value != '' && $field['type'] =='location'){ ?>
+                            <iframe src = "https://maps.google.com/maps?q=<?php echo $value; ?>&hl=es;z=14&output=embed"></iframe>
+                        <?php }else{ ?>
+                            <p class="bold font-medium-xs"><?php echo ($value != '' ? $value : '-') ?></p>
+                        <?php } ?>
     <?php } ?>
 <?php } ?>
             </div>

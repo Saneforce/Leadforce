@@ -28,9 +28,13 @@ $join = [
 
 $custom_fields = get_table_custom_fields('invoice');
 
+$locationCustomFields =[];
 foreach ($custom_fields as $key => $field) {
     $selectAs = (is_cf_date($field) ? 'date_picker_cvalue_' . $key : 'cvalue_' . $key);
 
+    if($field['type'] =='location'){
+        array_push($locationCustomFields, $selectAs);
+    }
     array_push($customFieldsColumns, $selectAs);
     array_push($aColumns, 'ctable_' . $key . '.value as ' . $selectAs);
     array_push($join, 'LEFT JOIN ' . db_prefix() . 'customfieldsvalues as ctable_' . $key . ' ON ' . db_prefix() . 'invoices.id = ctable_' . $key . '.relid AND ctable_' . $key . '.fieldto="' . $field['fieldto'] . '" AND ctable_' . $key . '.fieldid=' . $field['id']);
@@ -178,7 +182,11 @@ foreach ($rResult as $aRow) {
 
     // Custom fields add values
     foreach ($customFieldsColumns as $customFieldColumn) {
-        $row[] = (strpos($customFieldColumn, 'date_picker_') !== false ? _d($aRow[$customFieldColumn]) : $aRow[$customFieldColumn]);
+        if(in_array($customFieldColumn,$locationCustomFields)){
+            $row[] =  empty($aRow[$customFieldColumn])?'':custom_field_location_icon_link($aRow[$customFieldColumn]);
+        }else{
+            $row[] = (strpos($customFieldColumn, 'date_picker_') !== false ? _d($aRow[$customFieldColumn]) : $aRow[$customFieldColumn]);
+        }
     }
 
     $row['DT_RowClass'] = 'has-row-options';

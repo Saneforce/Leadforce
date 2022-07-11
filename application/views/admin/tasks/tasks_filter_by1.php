@@ -78,6 +78,7 @@
 "task_name"=>array("ins"=>"task_name","ll"=>"tasks_dt_name"),
 "project_name"=>array("ins"=>"project_name","ll"=>"task_project_name"),
 "project_status"=>array("ins"=>"project_status","ll"=>"project_status"),
+"project_pipeline"=>array("ins"=>"project_pipeline","ll"=>"pipeline"),
 "company"=>array("ins"=>"company","ll"=>"client"),
 "teamleader"=>array("ins"=>"teamleader","ll"=>"teamleader"),
 "project_contacts"=>array("ins"=>"project_contacts","ll"=>"project_contacts"),

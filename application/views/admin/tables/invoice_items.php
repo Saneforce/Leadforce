@@ -35,9 +35,13 @@ $additionalSelect = [
 
 $custom_fields = get_custom_fields('items');
 
+$locationCustomFields =[];
 foreach ($custom_fields as $key => $field) {
     $selectAs = (is_cf_date($field) ? 'date_picker_cvalue_' . $key : 'cvalue_' . $key);
 
+    if($field['type'] =='location'){
+        array_push($locationCustomFields, 'ctable_' . $key . '.value as ' . $selectAs);
+    }
     array_push($customFieldsColumns, $selectAs);
     array_push($aColumns, 'ctable_' . $key . '.value as ' . $selectAs);
     array_push($join, 'LEFT JOIN ' . db_prefix() . 'customfieldsvalues as ctable_' . $key . ' ON ' . db_prefix() . 'items.id = ctable_' . $key . '.relid AND ctable_' . $key . '.fieldto="items_pr" AND ctable_' . $key . '.fieldid=' . $field['id']);
@@ -60,6 +64,9 @@ foreach ($rResult as $aRow) {
             $_data = $aRow[$aColumns[$i]];
         }
 
+        if(in_array($aColumns[$i] , $locationCustomFields)){
+            $_data = $_data==''?'':custom_field_location_icon_link($_data);
+        }
         if ($aColumns[$i] == '1') {
             $_data = '<div class="checkbox"><input type="checkbox" value="' . $aRow['id'] . '"><label></label></div>';
         } elseif ($aColumns[$i] == 'tax') {
