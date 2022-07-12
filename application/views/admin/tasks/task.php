@@ -339,9 +339,15 @@ p#rel_id-error {
                         <?php if($rel_type) { ?> 
                           <option value=""></option> 
                         <?php } ?>
+                           <option value="project"
+                              <?php if(isset($task) || $this->input->get('rel_type')){if($rel_type == 'project'){echo 'selected';}} ?>><?php echo _l('project'); ?></option>
+
+                              <option value="invoice" <?php if(isset($task) || $this->input->get('rel_type')){if($rel_type == 'invoice'){echo 'selected';}} ?>>
+                              <?php echo _l('invoice'); ?>
+                           </option>
                             <option value="project"
                               <?php if(isset($task) || $this->input->get('rel_type')){if($rel_type == 'project'){echo 'selected';}} ?>><?php echo _l('project'); ?></option>
-                        <?php if(/*$rel_type*/true) { ?>
+
                               <option value="invoice" <?php if(isset($task) || $this->input->get('rel_type')){if($rel_type == 'invoice'){echo 'selected';}} ?>>
                               <?php echo _l('invoice'); ?>
                            </option>
@@ -368,7 +374,6 @@ p#rel_id-error {
                            <option value="proposal" <?php if(isset($task) || $this->input->get('rel_type')){if($rel_type == 'proposal'){echo 'selected';}} ?>>
                               <?php echo _l('proposal'); ?>
                            </option>
-                        <?php } ?>
                         </select>
                      </div>
                   </div>
