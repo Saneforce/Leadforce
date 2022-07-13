@@ -291,7 +291,7 @@
          </tr>
 		   <?php }if(!empty($need_fields) && in_array("project_deadline", $need_fields)){//if($project->deadline){ ?>
          <tr class="project-overview-deadline">
-            <td class="bold"><?php echo _l('project_deadline'); ?></td>
+            <td class="bold"><?php echo _l('expected_closing_date'); ?></td>
             <td class='deadline'>
                         <div class="data_display">
                      <span class="updated_text">

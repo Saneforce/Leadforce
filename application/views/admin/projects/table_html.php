@@ -14,13 +14,16 @@ $table_datas = [
     ],
    'tags'=>_l('tags'),
    'project_start_date'=>_l('project_start_date'),
-   'project_deadline'=>_l('project_deadline'),
+   'project_deadline'=>_l('expected_closing_date'),
    'members'=>_l('project_members'),
    'status'=> _l('project_status'),
    'project_status'=> _l('status'),
    'pipeline_id'=>_l('pipeline'),
    'contact_email1'=>_l('company_primary_email'),
    'contact_phone1'=>_l('company_primary_phone'),
+   'won_date'=>_l('won_date'),
+   'lost_date'=>_l('lost_date'),
+   'loss_reason_name'=>_l('loss_reason'),
 ];
 $table_data_temp = array();
 foreach($table_datas as $ckey=>$cval){ 

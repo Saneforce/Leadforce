@@ -174,6 +174,12 @@ class Projects extends AdminController
 		$data['need_fields'][$i] = 'projects_budget';
 		$i++;
 		$data['need_fields'][$i] = 'customers_hyperlink';
+        $i++;
+		$data['need_fields'][$i] = 'won_date';
+        $i++;
+		$data['need_fields'][$i] = 'lost_date';
+        $i++;
+		$data['need_fields'][$i] = 'loss_reason_name';
 		//$data['client_contacts']     = $this->clients_model->get_deals_contacts_list('', ['active' => 1]);
 		$data['client_contacts']     = $this->clients_model->getAllContacts_active();
 		$allcurrency = $this->projects_model->get_allcurrency();
@@ -186,10 +192,10 @@ class Projects extends AdminController
     public function table($clientid = '')
     {
 		$fields = get_option('deal_fields');
-		$data['need_fields'] = array('name','product_qty','id','product_amt','projects_budget','customers_hyperlink');
+		$data['need_fields'] = array('name','product_qty','id','product_amt','projects_budget','customers_hyperlink','won_date','lost_date','loss_reason_name');
 		if(!empty($fields) && $fields != 'null'){
 			$req_fields = json_decode($fields);
-			$i = 6;
+			$i = 9;
 			if(!empty($req_fields)){
 				foreach($req_fields as $req_field11){
 					if($req_field11 == 'clientid'){
