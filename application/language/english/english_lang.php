@@ -3925,6 +3925,8 @@ $lang['choose_goal_type']	= 'Choose Goal Type';
 $lang['added']				= 'Added';
 $lang['progressed']			= 'Progressed';
 $lang['won']				= 'Won';
+$lang['won_date']				= 'Won date';
+$lang['lost_date']				= 'Lost date';
 $lang['continue']			= 'Continue';
 $lang['add_goal_deal']		= 'Add goal - Deals';
 $lang['edit_goal_deal']		= 'Edit goal - Deals';
@@ -4029,6 +4031,7 @@ $lang['conversion']				= 'Conversion';
 $lang['duration']				= 'Duration';
 $lang['performance']			= 'Performance';
 $lang['progress']				= 'Progress';
+
 $lang['folder']					= 'Folder';
 $lang['report']					= 'Report';
 $lang['view_report']			= 'View Report';
@@ -4037,3 +4040,9 @@ $lang['create_date']			= 'Created Date';
 $lang['update_date']			= 'Updated Date';
 
 $lang['custom_location_field_duplicate_error']      ='Cannot use location field multiply times in same type';
+
+$lang['custom_location_field_duplicate_error']      ='Cannot use location field multiply times in same type';
+$lang['date_less_than_error'] ='Cannot be less than %s field';
+$lang['expected_closing_date'] ='Expected closing date';
+$lang['loss_reason'] ='Loss reason';
+

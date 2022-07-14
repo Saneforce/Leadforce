@@ -364,7 +364,7 @@
 											</td>
 										</tr>
 										<tr>
-											<td><?php echo _l('end_date'); ?></td>
+											<td><?php echo _l('expected_closing_date'); ?></td>
 											<td>
 												<div class="form-check form-switch">
 													<label class="switch">

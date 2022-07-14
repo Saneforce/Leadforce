@@ -66,13 +66,16 @@
 "company"=>array("ins"=>"company","ll"=>"project_customer"),
 "tags"=>array("ins"=>"tags","ll"=>"tags"),
 "project_start_date"=>array("ins"=>"start_date","ll"=>"project_start_date"),
-"project_deadline"=>array("ins"=>"deadline","ll"=>"project_deadline"),
+"project_deadline"=>array("ins"=>"deadline","ll"=>"expected_closing_date"),
 "members"=>array("ins"=>"project_contacts","ll"=>"project_members"),
 "status"=>array("ins"=>"status","ll"=>"project_status"),
 "project_status"=>array("ins"=>"stage_of","ll"=>"status"),
 "pipeline_id"=>array("ins"=>"pipeline_id","ll"=>"pipeline"),
 "contact_email1"=>array("ins"=>"contact_email1","ll"=>"company_primary_email"),
 "contact_phone1"=>array("ins"=>"contact_phone1","ll"=>"company_primary_phone"),
+"won_date"=>array("ins"=>"won_date","ll"=>"won_date"),
+"lost_date"=>array("ins"=>"lost_date","ll"=>"lost_date"),
+"loss_reason_name"=>array("ins"=>"loss_reason_name","ll"=>"loss_reason"),
 ); 
 $custom_fields = get_table_custom_fields('projects');
 $cus_1 = array();

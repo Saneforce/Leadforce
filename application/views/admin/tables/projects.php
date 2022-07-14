@@ -24,6 +24,9 @@ $aColumns_temp = [
    'pipeline_id'=> 'pipeline_id',
    'contact_email1'=>'(SELECT ' . db_prefix() . 'contacts.email FROM ' . db_prefix() . 'project_contacts JOIN ' . db_prefix() . 'contacts on ' . db_prefix() . 'contacts.id = ' . db_prefix() . 'project_contacts.contacts_id WHERE tblproject_contacts.project_id=' . db_prefix() . 'projects.id AND tblproject_contacts.is_primary = 1) as contact_email1',
    'contact_phone1'=>'(SELECT ' . db_prefix() . 'contacts.phonenumber FROM ' . db_prefix() . 'project_contacts JOIN ' . db_prefix() . 'contacts on ' . db_prefix() . 'contacts.id = ' . db_prefix() . 'project_contacts.contacts_id WHERE tblproject_contacts.project_id=' . db_prefix() . 'projects.id AND tblproject_contacts.is_primary = 1) as contact_phone1',
+    'won_date'=>'stage_on as won_date',
+    'lost_date'=>'stage_on as lost_date',
+    'loss_reason_name'=>db_prefix() . 'deallossreasons.name as loss_reason_name',
     ];
     //pre($aColumns_temp);
 
@@ -34,6 +37,7 @@ $sTable       = db_prefix() . 'projects';
 $join = [
     'LEFT JOIN  ' . db_prefix() . 'projects_status ON ' . db_prefix() . 'projects_status.id = ' . db_prefix() . 'projects.status',
     'LEFT JOIN  ' . db_prefix() . 'clients ON ' . db_prefix() . 'clients.userid = ' . db_prefix() . 'projects.clientid',
+    'LEFT JOIN  ' . db_prefix() . 'deallossreasons ON ' . db_prefix() . 'deallossreasons.id = ' . db_prefix() . 'projects.loss_reason',
 ];
 
 $where  = [];
@@ -109,6 +113,9 @@ $req_fields[$req_cnt + 10]= 'start_date';
 $req_fields[$req_cnt + 11]= 'deadline';
 $req_fields[$req_cnt + 12]= 'contact_email1';
 $req_fields[$req_cnt + 13]= 'contact_phone1';
+$req_fields[$req_cnt + 14]= 'won_date';
+$req_fields[$req_cnt + 15]= 'lost_date';
+$req_fields[$req_cnt + 16]= 'loss_reason_name';
 $projects_list_column_order = (array)json_decode(get_option('projects_list_column_order')); 
 //pre($projects_list_column_order);
 $custom_fields = array_merge($custom_fields,get_table_custom_fields('customers'));
@@ -277,6 +284,17 @@ foreach ($rResult as $aRow) {
     $row_temp['start_date']   = _d($aRow['start_date']);
 
     $row_temp['deadline']  = _d($aRow['deadline']);
+
+    $row_temp['loss_reason_name'] =$aRow['loss_reason_name'];
+    $row_temp['won_date'] =$row_temp['lost_date'] ='';
+    if($aRow['project_status']) {
+        if($aRow['project_status'] ==1){
+            $row_temp ['won_date'] = _d($aRow['won_date']);
+        }else{
+            $row_temp['lost_date']   = _d($aRow['lost_date']);
+        }
+    }
+    
 
     $row_temp['pipeline_id']  = $aRow['pipeline_name'];
     $row_temp['contact_email1']  = $aRow['contact_email1'];

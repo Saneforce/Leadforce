@@ -424,7 +424,7 @@
 									$end_array = array('data-date-min-date'=>$start_date,'readonly'=>'readonly');
 								}
 								?>
-                                <?php echo render_date_input('deadline','project_deadline',$deadline,$end_array); ?>
+                                <?php echo render_date_input('deadline','expected_closing_date',$deadline,$end_array); ?>
                             </div>
 							<?php }?>
                         </div>
