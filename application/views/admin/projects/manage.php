@@ -76,6 +76,11 @@
 "won_date"=>array("ins"=>"won_date","ll"=>"won_date"),
 "lost_date"=>array("ins"=>"lost_date","ll"=>"lost_date"),
 "loss_reason_name"=>array("ins"=>"loss_reason_name","ll"=>"loss_reason"),
+"project_currency"=>array("ins"=>"project_currency","ll"=>"currency"),
+"project_created"=>array("ins"=>"project_created","ll"=>"create_date"),
+"project_modified"=>array("ins"=>"project_modified","ll"=>"modified_date"),
+"modified_by"=>array("ins"=>"modified_by","ll"=>"modified_by"),
+"created_by"=>array("ins"=>"created_by","ll"=>"created_by"),
 ); 
 $custom_fields = get_table_custom_fields('projects');
 $cus_1 = array();
