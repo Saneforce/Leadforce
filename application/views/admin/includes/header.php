@@ -331,8 +331,8 @@ ob_end_clean();
 					</div>
 					<div class="col-md-7" style="border-left:2px solid #e5e5e5;margin-top:10px;">
 						<p class="p_head_1"><?php echo _l('choose_report_type');?></p>
-						<fieldset id="tab011" class="show">
-							
+						<fieldset id="tab0113" class="show" style="display:block !important">
+								<input type="hidden" id="report_12_id" name="report_12_id">
 								<input type="hidden" name="<?php echo $this->security->get_csrf_token_name();?>" value="<?php echo $this->security->get_csrf_hash();?>">
 								<div class="modal-body">
 									<div class="form-group">
@@ -381,6 +381,7 @@ function report_cancel(){
 	$('#add_report_popup').modal('hide');
 }
 function show_div_1(a,b){
+	$('#report_12_id').val(b);
 	$('#goal_txt').html(b);
 	//$('.error').hide();
 	$('label[class="error"]').hide();

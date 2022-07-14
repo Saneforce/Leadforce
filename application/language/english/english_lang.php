@@ -4033,7 +4033,18 @@ $lang['conversion']				= 'Conversion';
 $lang['duration']				= 'Duration';
 $lang['performance']			= 'Performance';
 $lang['progress']				= 'Progress';
+
+$lang['folder']					= 'Folder';
+$lang['report']					= 'Report';
+$lang['view_report']			= 'View Report';
+$lang['public_link']			= 'Public Link';
+$lang['create_date']			= 'Created Date';
+$lang['update_date']			= 'Updated Date';
+
+$lang['custom_location_field_duplicate_error']      ='Cannot use location field multiply times in same type';
+
 $lang['custom_location_field_duplicate_error']      ='Cannot use location field multiply times in same type';
 $lang['date_less_than_error'] ='Cannot be less than %s field';
 $lang['expected_closing_date'] ='Expected closing date';
 $lang['loss_reason'] ='Loss reason';
+

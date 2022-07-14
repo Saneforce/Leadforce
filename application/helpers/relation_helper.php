@@ -26,7 +26,13 @@ function get_relation_data($type, $rel_id = '')
             } else {
                 $where_clients .= '((tblclients.addedfrom = "'.get_staff_user_id().'") OR tblclients.userid IN (SELECT userid FROM tblcontacts WHERE email=(SELECT email FROM tblstaff WHERE staffid="'.get_staff_user_id().'")) OR (tblclients.userid IN (select clientid from tblprojects where id IN (select project_id from tblproject_members where staff_id="'.get_staff_user_id().'") OR tblclients.userid IN ( select clientid from tblprojects where teamleader = "'.get_staff_user_id().'")) )) AND (company LIKE "%' . $q . '%" OR CONCAT(firstname, " ", lastname) LIKE "%' . $q . '%" OR email LIKE "%' . $q . '%") AND '.db_prefix().'clients.active = 1 AND '.db_prefix().'clients.deleted_status = 0';
             }
-        }
+        }else{
+			if(is_admin(get_staff_user_id())) {
+                $where_clients .= db_prefix().'clients.active = 1 AND '.db_prefix().'clients.deleted_status = 0';
+            } else {
+                $where_clients .= '((tblclients.addedfrom = "'.get_staff_user_id().'") OR tblclients.userid IN (SELECT userid FROM tblcontacts WHERE email=(SELECT email FROM tblstaff WHERE staffid="'.get_staff_user_id().'")) OR (tblclients.userid IN (select clientid from tblprojects where id IN (select project_id from tblproject_members where staff_id="'.get_staff_user_id().'") OR tblclients.userid IN ( select clientid from tblprojects where teamleader = "'.get_staff_user_id().'")) )) AND  '.db_prefix().'clients.active = 1 AND '.db_prefix().'clients.deleted_status = 0';
+            }
+		}
 
         $data = $CI->clients_model->get($rel_id, $where_clients);
     } elseif ($type == 'contact' || $type == 'contacts') {
@@ -149,7 +155,10 @@ function get_relation_data($type, $rel_id = '')
             $search = $CI->misc_model->_search_staff($q);
             $data   = $search['result'];
         }
-    } elseif ($type == 'manager') {
+    } elseif ($type == 'tags') {
+            $search = $CI->misc_model->_search_tags($q);
+            $data   = $search['result'];
+	}elseif ($type == 'manager') {
             $search = $CI->misc_model->_search_manager($q);
             $data   = $search['result'];
 	}elseif ($type == 'tasks' || $type == 'task') {
@@ -360,6 +369,15 @@ function get_relation_values($relation, $type)
             $name = $relation->firstname . ' ' . $relation->lastname;
         }
         $link = admin_url('profile/' . $id);
+    }elseif ($type == 'tags') {
+        if (is_array($relation)) {
+            $id   = $relation['id'];
+            $name = $relation['name'];
+        } else {
+            $id   = $relation->id;
+            $name = $relation->name;
+        }
+        $link = '#';
     } elseif ($type == 'project') {
         if (is_array($relation)) {
             $id       = $relation['id'];

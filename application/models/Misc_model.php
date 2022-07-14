@@ -1177,7 +1177,30 @@ class Misc_model extends App_Model
             }
             $this->db->order_by('firstname', 'ASC');
             $result['result'] = $this->db->get()->result_array();
+			 return $result;
         }
+	}
+	public function _search_tags($q, $limit = 0)
+    {
+        $result = [
+            'result'         => [],
+            'type'           => 'tags',
+            'search_heading' => _l('tags'),
+        ];
+
+        //if (has_permission('staff', '', 'view')) {
+            // Staff
+            $this->db->select();
+			 $this->db->like('name', $q);
+            $this->db->from(db_prefix() . 'tags');
+			
+           
+            if ($limit != 0) {
+                $this->db->limit($limit);
+            }
+            $this->db->order_by('name', 'ASC');
+            $result['result'] = $this->db->get()->result_array();
+        //}
 
         return $result;
     }
