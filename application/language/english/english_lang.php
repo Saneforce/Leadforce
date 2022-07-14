@@ -3987,6 +3987,8 @@ $lang['stages']					= 'Stages';
 $lang['create_date']			= 'Created date';
 $lang['scheduled_date']			= 'Scheduled date';
 $lang['modified_date']			= 'Modified date';
+$lang['modified_by']			= 'Modified by';
+$lang['created_by']			= 'Created by';
 $lang['finished_date']			= 'Finished date';
 
 $lang['reminder']				= 'Reminder';

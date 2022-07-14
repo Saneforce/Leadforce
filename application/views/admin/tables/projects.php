@@ -27,6 +27,11 @@ $aColumns_temp = [
     'won_date'=>'stage_on as won_date',
     'lost_date'=>'stage_on as lost_date',
     'loss_reason_name'=>db_prefix() . 'deallossreasons.name as loss_reason_name',
+    'project_currency'=>'project_currency',
+    'project_created'=>'project_created',
+    'project_modified'=>'project_modified',
+    'modified_by'=>'(SELECT GROUP_CONCAT(CONCAT(firstname, \' \', lastname) SEPARATOR ",") FROM ' . db_prefix() . 'staff WHERE tblstaff.staffid=' . db_prefix() . 'projects.modified_by) as modified_by',
+    'created_by'=>'(SELECT GROUP_CONCAT(CONCAT(firstname, \' \', lastname) SEPARATOR ",") FROM ' . db_prefix() . 'staff WHERE tblstaff.staffid=' . db_prefix() . 'projects.created_by) as created_by',
     ];
     //pre($aColumns_temp);
 
@@ -116,6 +121,11 @@ $req_fields[$req_cnt + 13]= 'contact_phone1';
 $req_fields[$req_cnt + 14]= 'won_date';
 $req_fields[$req_cnt + 15]= 'lost_date';
 $req_fields[$req_cnt + 16]= 'loss_reason_name';
+$req_fields[$req_cnt + 17]= 'project_currency';
+$req_fields[$req_cnt + 18]= 'project_created';
+$req_fields[$req_cnt + 19]= 'project_modified';
+$req_fields[$req_cnt + 20]= 'modified_by';
+$req_fields[$req_cnt + 21]= 'crated_by';
 $projects_list_column_order = (array)json_decode(get_option('projects_list_column_order')); 
 //pre($projects_list_column_order);
 $custom_fields = array_merge($custom_fields,get_table_custom_fields('customers'));
@@ -295,6 +305,11 @@ foreach ($rResult as $aRow) {
         }
     }
     
+    $row_temp['project_created'] =_d($aRow['project_created']);
+    $row_temp['project_modified'] =_d($aRow['project_modified']);
+    $row_temp['project_currency'] =$aRow['project_currency'];
+    $row_temp['modified_by'] =$aRow['modified_by'];
+    $row_temp['created_by'] =$aRow['created_by'];
 
     $row_temp['pipeline_id']  = $aRow['pipeline_name'];
     $row_temp['contact_email1']  = $aRow['contact_email1'];

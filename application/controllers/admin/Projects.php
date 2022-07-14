@@ -180,6 +180,16 @@ class Projects extends AdminController
 		$data['need_fields'][$i] = 'lost_date';
         $i++;
 		$data['need_fields'][$i] = 'loss_reason_name';
+        $i++;
+		$data['need_fields'][$i] = 'project_currency';
+        $i++;
+		$data['need_fields'][$i] = 'project_created';
+        $i++;
+		$data['need_fields'][$i] = 'project_modified';
+        $i++;
+		$data['need_fields'][$i] = 'modified_by';
+        $i++;
+		$data['need_fields'][$i] = 'created_by';
 		//$data['client_contacts']     = $this->clients_model->get_deals_contacts_list('', ['active' => 1]);
 		$data['client_contacts']     = $this->clients_model->getAllContacts_active();
 		$allcurrency = $this->projects_model->get_allcurrency();
@@ -192,10 +202,10 @@ class Projects extends AdminController
     public function table($clientid = '')
     {
 		$fields = get_option('deal_fields');
-		$data['need_fields'] = array('name','product_qty','id','product_amt','projects_budget','customers_hyperlink','won_date','lost_date','loss_reason_name');
+		$data['need_fields'] = array('name','product_qty','id','product_amt','projects_budget','customers_hyperlink','won_date','lost_date','loss_reason_name','project_currency','project_created','project_modified','modified_by','created_by');
 		if(!empty($fields) && $fields != 'null'){
 			$req_fields = json_decode($fields);
-			$i = 9;
+			$i = 14;
 			if(!empty($req_fields)){
 				foreach($req_fields as $req_field11){
 					if($req_field11 == 'clientid'){
@@ -412,6 +422,7 @@ class Projects extends AdminController
                 unset($data['total']);
 				$data['progress'] = $this->projects_model->getprogressstatus($data['status']);
                 //pr($data); exit;
+                $data['created_by'] =get_staff_user_id();
                 $id = $this->projects_model->add($data);
                 if ($id) {
                     if($products) {
@@ -432,6 +443,7 @@ class Projects extends AdminController
                 unset($data['price']);
                 unset($data['qty']);
                 unset($data['total']);
+                $data['project_modified'] =date('Y-m-d H:i:s');
                 $success = $this->projects_model->update($data, $id);
                 if ($success) {
                     set_alert('success', _l('updated_successfully', _l('project')));
@@ -1659,27 +1671,27 @@ class Projects extends AdminController
             $data = $this->input->post();
             
             if(isset($data['clientid_copy_project']) && !empty($data['clientid_copy_project'])){
-                $success = $this->projects_model->update(array('clientid'=>$data['clientid_copy_project']), $data['project_id']);
+                $success = $this->projects_model->update(array('clientid'=>$data['clientid_copy_project'],'project_modified'=>date('Y-m-d H:i:s'),'modified_by'=>get_staff_user_id()), $data['project_id']);
             }elseif(isset($data['pipeline_id']) && !empty($data['pipeline_id'])){
-                $success = $this->projects_model->update(array('pipeline_id'=>$data['pipeline_id']), $data['project_id']);
+                $success = $this->projects_model->update(array('pipeline_id'=>$data['pipeline_id'],'project_modified'=>date('Y-m-d H:i:s'),'modified_by'=>get_staff_user_id()), $data['project_id']);
             }elseif(isset($data['teamleader']) && !empty($data['teamleader'])){
-                $success = $this->projects_model->update(array('teamleader'=>$data['teamleader']), $data['project_id']);
+                $success = $this->projects_model->update(array('teamleader'=>$data['teamleader'],'project_modified'=>date('Y-m-d H:i:s'),'modified_by'=>get_staff_user_id()), $data['project_id']);
             }elseif(isset($data['project_cost']) && !empty($data['project_cost'])){
-                $success = $this->projects_model->update(array('project_cost'=>$data['project_cost']), $data['project_id']);
+                $success = $this->projects_model->update(array('project_cost'=>$data['project_cost'],'project_modified'=>date('Y-m-d H:i:s'),'modified_by'=>get_staff_user_id()), $data['project_id']);
             }elseif(isset($data['name']) && !empty($data['name'])){
-                $success = $this->projects_model->update(array('name'=>$data['name']), $data['project_id']);
+                $success = $this->projects_model->update(array('name'=>$data['name'],'project_modified'=>date('Y-m-d H:i:s'),'modified_by'=>get_staff_user_id()), $data['project_id']);
             }elseif(isset($data['deadline']) && !empty($data['deadline'])){
                 $checkdeadline = $this->projects_model->checkdeadline($data['deadline'], $data['project_id']);
                 if($checkdeadline) {
-                    $success = $this->projects_model->update(array('deadline'=>$data['deadline']), $data['project_id']);
+                    $success = $this->projects_model->update(array('deadline'=>$data['deadline'],'project_modified'=>date('Y-m-d H:i:s'),'modified_by'=>get_staff_user_id()), $data['project_id']);
                 } else {
                     $error = 'Close date should not be lesser than Start date.';
                 }
             }elseif(isset($data['date_finished']) && !empty($data['date_finished'])){
-                $success = $this->projects_model->update(array('date_finished'=>$data['date_finished']), $data['project_id']);
+                $success = $this->projects_model->update(array('date_finished'=>$data['date_finished'],'project_modified'=>date('Y-m-d H:i:s'),'modified_by'=>get_staff_user_id()), $data['project_id']);
             }elseif(isset($data['status']) && !empty($data['status'])){
                 
-                $success = $this->projects_model->update(array('status'=>$data['status']), $data['project_id']);
+                $success = $this->projects_model->update(array('status'=>$data['status'],'project_modified'=>date('Y-m-d H:i:s'),'modified_by'=>get_staff_user_id()), $data['project_id']);
             }
             if ($success) {
                 $data['message'] = _l('updated_successfully', _l('project'));

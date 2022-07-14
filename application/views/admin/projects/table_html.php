@@ -24,6 +24,11 @@ $table_datas = [
    'won_date'=>_l('won_date'),
    'lost_date'=>_l('lost_date'),
    'loss_reason_name'=>_l('loss_reason'),
+   'project_currency'=>_l('currency'),
+   'project_created'=>_l('create_date'),
+   'project_modified'=>_l('modified_date'),
+   'modified_by'=>_l('modified_by'),
+   'created_by'=>_l('crated_by'),
 ];
 $table_data_temp = array();
 foreach($table_datas as $ckey=>$cval){ 
