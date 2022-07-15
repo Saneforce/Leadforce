@@ -2673,7 +2673,7 @@ function deal_get_fields(){
 	   'project_created'=>_l('create_date'),
 	   'project_modified'=>_l('modified_date'),
 	   'modified_by'=>_l('modified_by'),
-	   'created_by'=>_l('crated_by'),
+	   'created_by'=>_l('created_by'),
 	   'won_date'=>_l('won_date'),
 	   'lost_date'=>_l('lost_date'),
 	   'loss_reason_name'=>_l('loss_reason'),
@@ -2681,7 +2681,7 @@ function deal_get_fields(){
 	   'project_created'=>_l('create_date'),
 	   'project_modified'=>_l('modified_date'),
 	   'modified_by'=>_l('modified_by'),
-	   'created_by'=>_l('crated_by'),
+	   'created_by'=>_l('created_by'),
 	); 
 	return $colarr;
 }

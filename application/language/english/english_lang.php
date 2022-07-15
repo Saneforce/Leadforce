@@ -3985,6 +3985,7 @@ $lang['stages']					= 'Stages';
 $lang['create_date']			= 'Created date';
 $lang['scheduled_date']			= 'Scheduled date';
 $lang['modified_date']			= 'Modified date';
+$lang['modified_by']			= 'Modified by';
 $lang['finished_date']			= 'Finished date';
 
 $lang['reminder']				= 'Reminder';
@@ -4052,3 +4053,4 @@ $lang['custom_location_field_duplicate_error']      ='Cannot use location field 
 $lang['date_less_than_error'] ='Cannot be less than %s field';
 $lang['expected_closing_date'] ='Expected closing date';
 $lang['loss_reason'] ='Loss reason';
+$lang['invalid_data'] ='Invalid data';
