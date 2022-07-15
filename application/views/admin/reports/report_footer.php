@@ -1,4 +1,7 @@
 <style>
+.error{
+	color:red;
+}
 .m-bt-10{
 	margin-bottom:10px;
 }
@@ -260,26 +263,94 @@ function delete_link(a){
 	});
 }
 $(function(){
-	var frm = $('#section_add');
-    frm.submit(function (e) {
-        e.preventDefault();
-        $.ajax({
-            type: frm.attr('method'),
-            url: frm.attr('action'),
-            data: frm.serialize(),
-            success: function (data) {
-				alert_float('success', 'Folder Added Successfully');
-				var emp = jQuery.parseJSON(data); 
-				$("#folder").empty().append(emp.success);
-			   $('#folder').selectpicker('refresh');
-               $('#section_modal').modal('toggle');
-            },
-            error: function (data) {
-                console.log('An error occurred.');
-                console.log(data);
-            },
-        });
+	$('#clientid_add_group_modal').on('submit', function () {
+		var name_val = $('#name').val();
+		$('#name_id').hide();
+		if ( name_val.match(/^[a-zA-Z0-9]+/)  ) {
+		} else {
+			$('#name_id').show();
+			return false;
+		}
+        return true;
     });
+	$("#section_add").submit(function(e) {
+		var name_val = $('#name1').val();
+		e.preventDefault(); // avoid to execute the actual submit of the form.
+		var form = $(this);
+		var actionUrl = form.attr('action');
+		if ( name_val.match(/^[a-zA-Z0-9]+/) && name_val!='' ) {
+			$.ajax({
+				type: form.attr('method'),
+				url: actionUrl,
+				data: form.serialize(), // serializes the form's elements.
+				success: function(data)
+				{
+					alert_float('success', 'Folder Added Successfully');
+					var emp = jQuery.parseJSON(data); 
+					$("#folder").empty().append(emp.success);
+					$('#folder').selectpicker('refresh');
+					$('#section_modal').modal('toggle');
+				}
+			});
+		}
+		
+	});
+	$("#update_public_name").submit(function(e) {
+		e.preventDefault(); // avoid to execute the actual submit of the form.
+		var form = $(this);
+		var actionUrl = form.attr('action');
+		var name_val = $('#ch_name12').val();
+		$('#ch_name12_id').hide();
+		if ( name_val.match(/^[a-zA-Z0-9]+/)  ) {
+			document.getElementById('overlay_deal12').style.display = '';
+			$.ajax({
+				type: form.attr('method'),
+				url: actionUrl,
+				data: form.serialize(), // serializes the form's elements.
+				success: function(data)
+				{
+					$('.dataTable').DataTable().ajax.reload();
+					alert_float('success', 'Link Name Updated Successfully');
+					document.getElementById('overlay_deal12').style.display = 'none';
+					$('#clientid_add_modal_public').modal('toggle');
+					var a = '<?php echo $id;?>';
+					load_public(a);
+				}
+			});
+		}
+		else{
+			$('#ch_name12_id').show();
+			return false;
+		}
+	});
+	$("#share_report1").submit(function(e) {
+		e.preventDefault(); // avoid to execute the actual submit of the form.
+		var form = $(this);
+		var team = $('#teamleader12').val();
+		var shared = $('#shared').val();
+		var name_val = $('#name').val();
+		$('#name_id').hide();
+		
+		if((team!='' && shared =='Selected Person') || shared =='Everyone'){
+				var actionUrl = form.attr('action');
+				$.ajax({
+					type: form.attr('method'),
+					url: actionUrl,
+					data: form.serialize(), // serializes the form's elements.
+					success: function(data)
+					{
+						alert_float('success', 'Report Shared Successfully');
+						$('#shared_add_modal').modal('toggle');
+					}
+				});
+			
+		}
+		else{
+			$('#error_staff').html('This field is required');
+		}
+		
+		
+	});
 	$('#end_date_edit_1').datepicker({
 		 dateFormat:'dd-mm-yy',
 		 calendarWeeks: true,
@@ -309,6 +380,63 @@ $(function(){
 	});
 	appDatepicker();
 });
+function check_validate(a){
+	var name_val = $('#'+a.id).val();
+	$('#'+a.id+'_id').hide();
+	if ( name_val.match(/^[a-zA-Z0-9]+/)  ) {
+	} else {
+		$('#'+a.id+'_id').show();
+		return false;
+	}
+}
+function load_public(a){
+	  document.getElementById('overlay_deal_public').style.display = '';
+	  var data = {cur_id:a};
+	  $('#cur_report').val(a);
+		var ajaxRequest = $.ajax({
+			type: 'POST',
+			url: admin_url + 'reports/load_public',
+			data: data,
+			dataType: '',
+			success: function(msg) {
+				$('#public_all').html(msg);
+				document.getElementById('overlay_deal_public').style.display = 'none';
+			}
+		});
+  }
+  function myFunction(a) {
+	  /* Get the text field */
+	  var copyText = document.getElementById("name_"+a);
+	  /* Select the text field */
+	  copyText.select();
+	  copyText.setSelectionRange(0, 99999); /* For mobile devices */
+
+	  /* Copy the text inside the text field */
+	  document.execCommand( 'copy' );
+	  alert_float('success', 'Link Copied Successfully');
+	  
+	  /* Alert the copied text */
+ }
+ function check_publick(a){
+	 document.getElementById('overlay_deal12').style.display = '';
+	 document.getElementById('overlay_deal').style.display = '';
+	var data = {req_val:a};
+	 var ajaxRequest = $.ajax({
+		type: 'POST',
+		url: admin_url + 'reports/check_publick',
+		data: data,
+		dataType: '',
+		success: function(msg) {
+			$('#ch_name12').val(msg);
+			$('#link_id').val(a);
+			document.getElementById('overlay_deal').style.display = 'none';
+			document.getElementById('overlay_deal12').style.display = 'none';
+		}
+	});
+}
+function check_name(a){
+	$('#'+a.id).val(a.value.trim());
+}
 function add_filter(){
 	document.getElementById('overlay_deal').style.display = '';
 	var cur_num = $('#cur_num').val();
@@ -387,7 +515,7 @@ function check_filter(a){
 	var cur_id = a.id;
 	var req_val = cur_id.split("filter_option_");
 	req_val = req_val[1];
-	$('#2_'+req_val+"_filter").show();
+	/*$('#2_'+req_val+"_filter").show();
 	$('#3_'+req_val+"_filter").show();
 	$('#4_'+req_val+"_filter").show();
 	$("#start_date_edit_"+req_val).show();
@@ -398,7 +526,7 @@ function check_filter(a){
 		$('#4_'+req_val+"_filter").hide();
 		$("#start_date_edit_"+req_val).hide();
 		$("#end_date_edit_"+req_val).hide();
-	}
+	}*/
 	var cur_id12 = $('#cur_id12').val();
 	var data = {cur_val:a.value,req_val:req_val,cur_id12:cur_id12};
 	var ajaxRequest = $.ajax({
@@ -467,7 +595,7 @@ function change_filter1(a,b){
 					onSelect: function(selectedDate) {
 						$('#year_'+req_val).val('custom_period');
 						$('#year_'+req_val).selectpicker('refresh');
-						change_4_filter(req_val);
+						//change_4_filter(req_val);
 					}
 				});
 				$('#start_date_edit_'+req_val).datepicker({
@@ -481,7 +609,7 @@ function change_filter1(a,b){
 						$('#end_date_edit_'+req_val).datepicker('option', 'minDate', selectedDate);
 						$('#year_'+req_val).val('custom_period');
 						$('#year_'+req_val).selectpicker('refresh');
-						change_3_filter(req_val);
+						//change_3_filter(req_val);
 					  }
 				});
 				appDatepicker();
@@ -559,6 +687,17 @@ function check_all_val(){
 function check_all_val1(){
 	$('#check_search_id').val('');
 	$('.dropdown-menu open').hide();
+}
+function shared1(a){
+	$('#ch_staff').hide();
+	if(a.value == 'Selected Person'){
+		$('#ch_staff').show();
+	}
+}
+function ch_staff(a){
+	if(a.value != ''){
+		$('#error_staff').html('');
+	}
 }
 $(function(){
      var ProjectsServerParams = {};

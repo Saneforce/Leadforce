@@ -3925,8 +3925,6 @@ $lang['choose_goal_type']	= 'Choose Goal Type';
 $lang['added']				= 'Added';
 $lang['progressed']			= 'Progressed';
 $lang['won']				= 'Won';
-$lang['won_date']				= 'Won date';
-$lang['lost_date']				= 'Lost date';
 $lang['continue']			= 'Continue';
 $lang['add_goal_deal']		= 'Add goal - Deals';
 $lang['edit_goal_deal']		= 'Edit goal - Deals';
@@ -3987,8 +3985,6 @@ $lang['stages']					= 'Stages';
 $lang['create_date']			= 'Created date';
 $lang['scheduled_date']			= 'Scheduled date';
 $lang['modified_date']			= 'Modified date';
-$lang['modified_by']			= 'Modified by';
-$lang['created_by']			= 'Created by';
 $lang['finished_date']			= 'Finished date';
 
 $lang['reminder']				= 'Reminder';
@@ -4033,7 +4029,6 @@ $lang['conversion']				= 'Conversion';
 $lang['duration']				= 'Duration';
 $lang['performance']			= 'Performance';
 $lang['progress']				= 'Progress';
-
 $lang['folder']					= 'Folder';
 $lang['report']					= 'Report';
 $lang['view_report']			= 'View Report';
@@ -4041,10 +4036,19 @@ $lang['public_link']			= 'Public Link';
 $lang['create_date']			= 'Created Date';
 $lang['update_date']			= 'Updated Date';
 
-$lang['custom_location_field_duplicate_error']      ='Cannot use location field multiply times in same type';
+$lang['edit_name']				= 'Edit Name';
+$lang['num_reports']			= 'Number Of Reports';
+$lang['apply_filter']			= 'Apply Filter';
+$lang['back']					= 'Back';
+$lang['share_with']				= 'Share With';
+$lang['share_report']			= 'Share Report';
+$lang['shared_list']			= 'Shared Report List';
+$lang['won_date']				= 'Won Date';
+$lang[' lost_date']				= 'Lost Date';
+
+$lang['filters_applied_successfully']			= 'Filters Applied Successfully';
 
 $lang['custom_location_field_duplicate_error']      ='Cannot use location field multiply times in same type';
 $lang['date_less_than_error'] ='Cannot be less than %s field';
 $lang['expected_closing_date'] ='Expected closing date';
 $lang['loss_reason'] ='Loss reason';
-

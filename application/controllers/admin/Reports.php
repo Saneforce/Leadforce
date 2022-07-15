@@ -199,88 +199,18 @@ class Reports extends AdminController
 		$data['filters2']	=	$this->session->userdata('filters2'.$cur_id);
 		$data['filters3']	=	$this->session->userdata('filters3'.$cur_id);
 		$data['filters4']	=	$this->session->userdata('filters4'.$cur_id);
-		$fields = get_option('deal_fields');
-		$data['need_fields'] = $data['need_fields_edit'] =  $data['mandatory_fields1'] = array('name');
-		$data['need_fields_label'] = array('project_name');
-		$i = $j = 1;
-		if(!empty($fields1) && $fields1 != 'null'){
-			$i1 =0;
-			$req_fields2 = json_decode($fields1);
-			if(!empty($req_fields2)){
-				foreach($req_fields2 as $req_field2){
-					$data['mandatory_fields1'][$i1] = $req_field2;
-					$i1++;
-				}
-			}
-		}
-		if(!empty($fields) && $fields != 'null'){
-			$req_fields = json_decode($fields);
-			
-			if(!empty($req_fields)){
-				foreach($req_fields as $req_field11){
-					$data['need_fields_edit'][$i] = $req_field11;
-					if($req_field11 == 'clientid'){
-						$data['need_fields'][$i] = 'company';
-						$data['need_fields_label'][$j] = 'project_customer';
-					}
-					else if($req_field11 == 'primary_contact'){
-						$data['need_fields_label'][$j] = 'project_primary_contacts';
-						$data['need_fields'][$i] = 'contact_email1';
-						$i++;
-						$data['need_fields'][$i] = 'contact_phone1';
-						$i++;
-						$data['need_fields'][$i] = 'contact_name';
-					}
-					else if($req_field11 == 'teamleader'){
-						$data['need_fields'][$i] = 'teamleader_name';
-						$data['need_fields_label'][$j] = 'teamleader';
-					}
-					else if($req_field11 == 'project_members[]'){
-						$data['need_fields'][$i] = 'members';
-						$data['need_fields_label'][$j] = 'project_members';
-					}
-					else if($req_field11 == 'project_contacts[]'){
-						$data['need_fields'][$i] = 'project_contacts[]';
-						$data['need_fields_label'][$j] = 'project_contacts';
-					}
-					else if($req_field11 == 'project_cost'){
-						$data['need_fields'][$i] = 'project_cost';
-						$data['need_fields_label'][$j] = 'project_total_cost';
-					}
-					else if($req_field11 == 'pipeline_id'){
-						$data['need_fields'][$i] = 'pipeline_id';
-						$data['need_fields_label'][$j] = 'pipeline';
-					}
-					else{
-						
-						$data['need_fields_label'][$j] = $req_field11;
-						$data['need_fields'][$i] = $req_field11;
-						if($req_field11 == 'status'){
-							$i++;
-							$data['need_fields_label'][$j] = 'project_status';
-							$data['need_fields'][$i] = 'project_status';
-						}
-					}
-					$i++;
-					$j++;
-				}
-				
-			}
-		}
-		$data['need_fields'][$i] = 'id';
-		$i++;
-		$data['need_fields'][$i] = 'product_qty';
-		$i++;
-		$data['need_fields'][$i] = 'product_amt';
-		$i++;
-		$data['need_fields'][$i] = 'projects_budget';
-		$i++;
-		$data['need_fields'][$i] = 'customers_hyperlink';
+		$fields = deal_needed_fields();
+		$needed = json_decode($fields,true);
+		$data['need_fields']		=	$needed['need_fields'];
+		$data['need_fields_label']	=	$needed['need_fields_label'];
+		$data['need_fields_edit']	=	$needed['need_fields_edit'];
+		$data['mandatory_fields1']	=	$needed['mandatory_fields1'];
 		$data['clientid'] = '';
         $this->app->get_table_data('report_deal', $data);
         
     }
 	public function add(){
+		$this->load->model('pipeline_model');
 		$data = array();
 		$data['title'] = _l('add_report');
 		$deal_val = deal_values();
@@ -294,15 +224,18 @@ class Reports extends AdminController
 		$data['id'] = $data['links'] = '';
 		$fields = deal_needed_fields();
 		$needed = json_decode($fields,true);
+		$data['report_name']		=	$data['folder_id'] = '';
 		$data['need_fields']		=	$needed['need_fields'];
 		$data['need_fields_label']	=	$needed['need_fields_label'];
 		$data['need_fields_edit']	=	$needed['need_fields_edit'];
 		$data['mandatory_fields1']	=	$needed['mandatory_fields1'];
 		$data['report_filter'] =  $this->load->view('admin/reports/filter', $data,true);
 		$data['report_footer'] =  $this->load->view('admin/reports/report_footer', $data,true);
+		$data['teamleaders'] = $this->staff_model->get('', [ 'active' => 1]);
         $this->load->view('admin/reports/deals_views', $data);
 	}
 	public function edit($id){
+		$this->load->model('pipeline_model');
 		$data = array();
 		$data['title'] = _l('add_report');
 		$deal_val = deal_values();
@@ -314,25 +247,120 @@ class Reports extends AdminController
 		$data['filters3']	=	$this->session->userdata('filters3_edit_'.$id);
 		$data['filters4']	=	$this->session->userdata('filters4_edit_'.$id);
 		$data['folders']	=	$this->db->query('SELECT * FROM ' . db_prefix() . 'folder order by folder asc')->result_array();
+		$data['teamleaders'] = $this->staff_model->get('', [ 'active' => 1]);
 		$data['links'] = $this->db->query("SELECT * FROM " . db_prefix() . "report_public WHERE report_id = '".$id."' ")->result_array();
 		if(empty($data['filters'])){
 			//redirect(admin_url());
 		}
+		$reports1 = $this->db->query("SELECT * FROM " . db_prefix() . "report WHERE id = '".$id."' ")->row();
 		$fields = deal_needed_fields();
 		$needed = json_decode($fields,true);
+		$data['report_name']		=	$reports1->report_name;
+		$data['folder_id']			=	$reports1->folder_id;
 		$data['need_fields']		=	$needed['need_fields'];
 		$data['need_fields_label']	=	$needed['need_fields_label'];
 		$data['need_fields_edit']	=	$needed['need_fields_edit'];
 		$data['mandatory_fields1']	=	$needed['mandatory_fields1'];
 		$data['report_filter'] =  $this->load->view('admin/reports/filter', $data,true);
 		$data['report_footer'] =  $this->load->view('admin/reports/report_footer', $data,true);
+		$shares = $this->db->query("SELECT * FROM " . db_prefix() ."shared where  report_id = '".$id."'")->result_array();
+		$data['share_types'] = $data['share_persons'] = array();
+		$share_id = '';
+		if(!empty($shares)){
+			$i = 0;
+			foreach($shares as $share12){
+				$data['share_types'][$i] = $share12['share_type'];
+				$share_id = $share12['id'];
+				$i++;
+			}
+		}
+		$share_persons = $this->db->query("SELECT * FROM " . db_prefix() ."shared_staff where  share_id = '".$share_id."'")->result_array();
+		if(!empty($share_persons)){
+			$i = 0;
+			foreach($share_persons as $share_person12){
+				$data['share_persons'][$i] = $share_person12['staff_id'];
+				$i++;
+			}
+		}
         $this->load->view('admin/reports/deals_views', $data);
+	}
+	public function share_report(){
+		if ($this->input->is_ajax_request()) {
+			extract($_REQUEST);
+			$shares = $this->db->query("SELECT * FROM " . db_prefix() ."shared where  report_id = '".$report_id."'")->result_array();
+			if(empty($shares)){
+				$ins_share = array();
+				$ins_share['report_id']		= $_REQUEST['report_id'];
+				$ins_share['share_type']	= $_REQUEST['shared'];
+				$this->db->insert(db_prefix() . 'shared', $ins_share);
+				$share_id	=	$this->db->insert_id();
+				$ins_share = array();
+				$ins_share['share_id']		= $share_id;
+				if(!empty($teamleader12)){
+					foreach($teamleader12 as $teamleader11){
+						$ins_share['staff_id']		= $teamleader11;
+						$this->db->insert(db_prefix() . 'shared_staff', $ins_share);
+					}
+				}
+			}
+			else{
+				$upd_share = array();
+				$share_id = $shares[0]['id'];
+				$cond['id']		= $share_id;
+				$upd_share['share_type']	= $_REQUEST['shared'];
+				$result = $this->db->update(db_prefix() . 'shared', $upd_share, $cond);
+				$ins_share = array();
+				$ins_share['share_id']		= $share_id;
+				if(!empty($teamleader12)){
+					foreach($teamleader12 as $teamleader11){
+						$ins_share['staff_id']		= $teamleader11;
+						$this->db->insert(db_prefix() . 'shared_staff', $ins_share);
+					}
+				}
+				
+			}
+			echo json_encode([
+				'success' => 'success'
+			]);
+		}
+	}
+	public function save_filter_report(){
+		$cur_id =  '';
+		if(!empty($_REQUEST['cur_id121'])){
+			$cur_id = '_edit_'.$_REQUEST['cur_id121'];
+		}
+		$filter_data = array();
+		$filters	=	$this->session->userdata('filters'.$cur_id);
+		if(!empty($filters)){
+			$i = $j = 0;
+			foreach($filters as $filter12){
+				if(!empty($_REQUEST['filter_'.$filter12])){
+					$req_val = implode(",",$_REQUEST['filter_'.$filter12]);
+					$filter_data['filters2'.$cur_id][$i]	=	$req_val;
+					if($req_val == 'this_year' || $req_val == 'last_year' || $req_val == 'custom_period' ){
+						$filter_data['filters3'.$cur_id][$i]	=	$_REQUEST['filter_4'][$j];  
+						$filter_data['filters4'.$cur_id][$i]	=	$_REQUEST['filter_5'][$j]; 
+						$j++;
+					}
+					$i++;
+				}
+			}
+		}
+		$this->session->set_userdata($filter_data);
+		set_alert('success', _l('filters_applied_successfully', _l('report')));
+		if(!empty($_REQUEST['cur_id121'])){
+			redirect(admin_url('reports/edit/'.$_REQUEST['cur_id121']));
+		}
+		else{
+			redirect(admin_url('reports/add'));
+		}
 	}
 	public function get_req_val($req_val,$sel_val,$s_val,$d_val,$key,$all_val){
 		$cur_id12 = '';
 		if(!empty($_REQUEST['cur_id12'])){
 			$cur_id12 = '_edit_'.$_REQUEST['cur_id12'];
 		}
+		$filters	=	$this->session->userdata('filters'.$cur_id12);
 		$filters1	=	$this->session->userdata('filters1'.$cur_id12);
 		$filters2	=	$this->session->userdata('filters2'.$cur_id12);
 		$filters3	=	$this->session->userdata('filters3'.$cur_id12);
@@ -359,7 +387,7 @@ class Reports extends AdminController
 			$req_out .= '<option value="is_empty" '.$is_emp.'>Is Empty</option>';
 			$req_out .= '<option value="is_not_empty" '.$is_nemp.'>Is Not Empty</option>';
 			$req_out .= '</select></div>';
-			$req_out .= '<div class="col-md-6" id="2_'.$req_val.'_filter" '.$req_disp.'><div class="col-md-12"><select data-live-search="true" data-width="100%" class="ajax-search selectpicker" data-none-selected-text="Nothing selected" tabindex="-98" id="year_'.$req_val.'" '.$req_mul.' onchange="change_2_filter(this)" >';
+			$req_out .= '<div class="col-md-6" id="2_'.$req_val.'_filter" '.$req_disp.'><div class="col-md-12"><select data-live-search="true" data-width="100%" class="ajax-search selectpicker" data-none-selected-text="Nothing selected" tabindex="-98" id="year_'.$req_val.'" '.$req_mul.'  name="filter_'.$filters[$req_val-1].'[]">';
 			if (str_contains($d_val, ',')) {
 				
 				$d_all_vals = explode(',',$d_val);
@@ -398,7 +426,7 @@ class Reports extends AdminController
 			}
 			$del_val ="'".$req_val."'";
 			$req_out .= '</select></div></div><div class="col-md-1" >
-						<a href="javascript:void(0);" onclick="del_filter('.$del_val.')" style="margin-left:'.$req_marg.';"><i class="fa fa-trash fa-2x" style="color:red"></i></a>
+						<a href="javascript:void(0);" onclick="del_filter('.$del_val.')" style="margin-left:'.$req_marg.';"><i class="fa fa-trash" style="color:red;font-size: 20px;margin-top: 5px;" title="'._l('delete').'"></i></a>
 					</div>';
 			$req_out .= '<div>';
 			
@@ -412,7 +440,7 @@ class Reports extends AdminController
 				$req_out .= '<option value="is_empty" '.$is_emp.'>Is Empty</option>';
 				$req_out .= '<option value="is_not_empty" '.$is_nemp.'>Is Not Empty</option>';
 				$req_out .= '</select></div>';
-				$req_out .= '<div class="col-md-6" id="2_'.$req_val.'_filter"  '.$req_disp.'><div class="col-md-12"><select data-live-search="true" data-width="100%" class="ajax-search selectpicker" data-none-selected-text="Nothing selected" tabindex="-98" id="year_'.$req_val.'"  '.$req_mul.' onchange="change_2_filter(this)">';
+				$req_out .= '<div class="col-md-6" id="2_'.$req_val.'_filter"  '.$req_disp.'><div class="col-md-12"><select data-live-search="true" data-width="100%" class="ajax-search selectpicker" data-none-selected-text="Nothing selected" tabindex="-98" id="year_'.$req_val.'"  '.$req_mul.' name="filter_'.$filters[$req_val-1].'[]">';
 				if(!empty($all_val)){
 					foreach($all_val as $key => $val1){
 						$ch_sel = ($filters2[$req_val-1]==$key)?"selected":"";
@@ -421,7 +449,7 @@ class Reports extends AdminController
 				}
 				$del_val ="'".$req_val."'";
 				$req_out .= '</select></div></div><div class="col-md-1" >
-						<a href="javascript:void(0);" onclick="del_filter('.$del_val.')" style="margin-left:'.$req_marg.';"><i class="fa fa-trash fa-2x" style="color:red"></i></a>
+						<a href="javascript:void(0);" onclick="del_filter('.$del_val.')" style="margin-left:'.$req_marg.';"><i class="fa fa-trash" style="color:red;font-size: 20px;margin-top: 5px;" title="'._l('delete').'"></i></a>
 					</div>';
 				$req_out .= '<div>';
 		}
@@ -434,10 +462,10 @@ class Reports extends AdminController
 			$req_out .= '<option value="is_empty" '.$is_emp.'>Is Empty</option>';
 			$req_out .= '<option value="is_not_empty" '.$is_nemp.'>Is Not Empty</option>';
 			$req_out .= '</select></div>';
-			$req_out .= '<div class="col-md-7" id="2_'.$req_val.'_filter"  '.$req_disp.'><div class="col-md-10"><input type="text" class="form-control" id="year_'.$req_val.'" value="'.$filters2[$req_val-1].'" onkeyup="change_2_filter(this)">';
+			$req_out .= '<div class="col-md-7" id="2_'.$req_val.'_filter"  '.$req_disp.'><div class="col-md-10"><input type="text" class="form-control" id="year_'.$req_val.'" value="'.$filters2[$req_val-1].'" name="filter_'.$filters[$req_val-1].'[]">';
 			$del_val ="'".$req_val."'";
 			$req_out .= '</div><div class="col-md-2" >
-						<a href="javascript:void(0);" onclick="del_filter('.$del_val.')" style="margin-left:-8px;"><i class="fa fa-trash fa-2x" style="color:red"></i></a>
+						<a href="javascript:void(0);" onclick="del_filter('.$del_val.')" style="margin-left:-8px;"><i class="fa fa-trash" style="color:red;font-size: 20px;margin-top: 5px;" title="'._l('delete').'"></i></a>
 					</div></div>';
 			$req_out .= '<div>';
 		}
@@ -449,10 +477,10 @@ class Reports extends AdminController
 			$req_out .= '<option value="is_empty" '.$is_emp.'>Is Empty</option>';
 			$req_out .= '<option value="is_not_empty" '.$is_nemp.'>Is Not Empty</option>';
 			$req_out .= '</select></div>';
-			$req_out .= '<div class="col-md-7" id="2_'.$req_val.'_filter"  '.$req_disp.'><div class="col-md-10"><input type="number" class="form-control" id="year_'.$req_val.'" value="'.$filters2[$req_val-1].'" onkeyup="change_2_filter(this)">';
+			$req_out .= '<div class="col-md-7" id="2_'.$req_val.'_filter"  '.$req_disp.'><div class="col-md-10"><input type="number" class="form-control" id="year_'.$req_val.'" value="'.$filters2[$req_val-1].'" name="filter_'.$filters[$req_val-1].'[]">';
 			$del_val ="'".$req_val."'";
 			$req_out .= '</div><div class="col-md-2" >
-						<a href="javascript:void(0);" onclick="del_filter('.$del_val.')" style="margin-left:-8px;"><i class="fa fa-trash fa-2x" style="color:red"></i></a>
+						<a href="javascript:void(0);" onclick="del_filter('.$del_val.')" style="margin-left:-8px;"><i class="fa fa-trash" style="color:red;font-size: 20px;margin-top: 5px;" title="'._l('delete').'"></i></a>
 					</div></div>';
 			$req_out .= '<div>';
 		}
@@ -467,16 +495,16 @@ class Reports extends AdminController
 			$req_out .= '<option value="is_empty" '.$is_emp.'>Is Empty</option>';
 			$req_out .= '<option value="is_not_empty" '.$is_nemp.'>Is Not Empty</option>';
 			$req_out .= '</select></div>';
-			$req_out .= '<div class="col-md-3" id="2_'.$req_val.'_filter"  '.$req_disp.'><select data-live-search="false" data-width="100%" class="ajax-search selectpicker" data-none-selected-text="Nothing selected" tabindex="-98" id="year_'.$req_val.'" onchange="change_2_filter(this)">';
+			$req_out .= '<div class="col-md-3" id="2_'.$req_val.'_filter"  '.$req_disp.'><select data-live-search="false" data-width="100%" class="ajax-search selectpicker" data-none-selected-text="Nothing selected" tabindex="-98" id="year_'.$req_val.'" onchange="change_2_filter(this)" name="filter_'.$filters[$req_val-1].'[]">';
 			$req_out .= '<option value="this_year" '.$this_yr.'>This Year</option>
 						<option value="last_year" '.$last_yr.' >Last Year</option>
 						<option value="custom_period" '.$cus_pr.'>Custom Period</option>';
 			$req_out .= '</select></div>';
-			$req_out .= '<div class="col-md-7"><div class="col-md-5" id="'.$req_val.'_3_filter"  '.$req_disp.'><input type="text" class="form-control" id="start_date_edit_'.$req_val.'" value="'.$filters3[$req_val-1].'"></div>';
-			$req_out .= '<div class="col-md-5" id="'.$req_val.'_4_filter"  '.$req_disp.'><input type="text" class="form-control" id="end_date_edit_'.$req_val.'" value="'.$filters4[$req_val-1].'" ></div>';
+			$req_out .= '<div class="col-md-7"><div class="col-md-5" id="'.$req_val.'_3_filter"  '.$req_disp.'><input type="text" class="form-control" id="start_date_edit_'.$req_val.'" value="'.$filters3[$req_val-1].'" name="filter_4[]"></div>';
+			$req_out .= '<div class="col-md-5" id="'.$req_val.'_4_filter"  '.$req_disp.'><input type="text" class="form-control" id="end_date_edit_'.$req_val.'" value="'.$filters4[$req_val-1].'" name="filter_5[]" ></div>';
 			$del_val ="'".$req_val."'";
 			$req_out .= '<div><div class="col-md-2" >
-						<a href="javascript:void(0);" onclick="del_filter('.$del_val.')"  style="margin-left:-5px;"><i class="fa fa-trash fa-2x" style="color:red"></i></a>
+						<a href="javascript:void(0);" onclick="del_filter('.$del_val.')"  style="margin-left:-5px;"><i class="fa fa-trash" style="color:red;font-size: 20px;margin-top: 5px;" title="'._l('delete').'"></i></a>
 					</div></div>';
 			
 		}
@@ -1225,7 +1253,7 @@ class Reports extends AdminController
 	public function add_folder(){
 		if ($this->input->is_ajax_request()) {
 			$ins_section = array();
-			$ins_section['folder'] = $_REQUEST['name'];
+			$ins_section['folder'] = $_REQUEST['name1'];
 			$this->db->insert(db_prefix() . 'folder', $ins_section);
 			$data =  $this->db->query('SELECT * FROM ' . db_prefix() . 'folder order by folder asc')->result_array();
 			$options = '';
@@ -1310,33 +1338,32 @@ class Reports extends AdminController
 		$cond = array('id'=>$public_id);
 		$upd_public['share_link'] = md5($public_id.$report_id.'_sharelink');
 		$this->db->update(db_prefix() . 'report_public', $upd_public, $cond);
-		$req_out = '';
-		$links = $this->db->query("SELECT * FROM " . db_prefix() . "report_public WHERE report_id = '".$report_id."' ")->result_array();
-		if(!empty($links)){
-			foreach($links as $link12){
-				$req_id = "'".$link12['id']."'";
-				$req_out .= '<div class="form-group" app-field-wrapper="name" id="ch_name"><label for="name" class="control-label"> Share Link</label><input type="text" id="name" name="name" class="form-control" value="'.base_url('shared/index/'.$link12['share_link']).'"  readonly style="width:90%;float:left;"><a href="javascript:void(0);" onclick="delete_link('.$req_id.')" style="margin-left:10px;float:left"><i class="fa fa-trash fa-2x" style="color:red"></i></a></div>
-						';
-			}
-		}
+		$req_out = get_public($report_id);
 		echo $req_out;
 	}
 	public function load_public(){
 		$report_id = $_REQUEST['cur_id'];
-		$req_out = '';
-		$links = $this->db->query("SELECT * FROM " . db_prefix() . "report_public WHERE report_id = '".$report_id."' ")->result_array();
-		if(!empty($links)){
-			foreach($links as $link12){
-				$req_id = "'".$link12['id']."'";
-				$req_out .= '<div class="form-group" app-field-wrapper="name" id="ch_name"><label for="name" class="control-label"> Share Link</label><input type="text" id="name" name="name" class="form-control" value="'.base_url('shared/index/'.$link12['share_link']).'"  readonly style="width:90%;float:left;"><a href="javascript:void(0);" onclick="delete_link('.$req_id.')" style="margin-left:10px;float:left"><i class="fa fa-trash fa-2x" style="color:red"></i></a></div>
-						';
-			}
-		}
+		$req_out = get_public($report_id);
 		echo $req_out;
 	}
+	public function check_publick(){
+		$report_id = $_REQUEST['req_val'];
+		$req_out = '';
+		$links = $this->db->query("SELECT * FROM " . db_prefix() . "report_public WHERE id = '".$report_id."' ")->row();
+		echo $req_out = $links->link_name;
+		
+	}
+	public function update_public_name(){
+		extract($_REQUEST);
+		$cond = array('id'=>$link_id);
+		$upd_data = array('link_name'=>$ch_name12);
+		$result = $this->db->update(db_prefix() . "report_public", $upd_data, $cond);
+		return true;
+	}
 	public function save_report(){
-		extract($_POST);
 		$cur_id12 = '';
+		extract($_POST);
+		
 		if(!empty($_REQUEST['cur_id12'])){
 			$cur_id12 = '_edit_'.$_REQUEST['cur_id12'];
 		}
@@ -1369,6 +1396,7 @@ class Reports extends AdminController
 				$i++;;
 			}
 		}
+		
 		$this->session->unset_userdata('filters'.$cur_id12);
 		$this->session->unset_userdata('filters1'.$cur_id12);
 		$this->session->unset_userdata('filters2'.$cur_id12);
@@ -1385,15 +1413,90 @@ class Reports extends AdminController
 		$data['title']    =  _l('view_report');
 		$this->load->view('admin/reports/folder_deal', $data);
 	}
+	public function all_share(){
+		if (!has_permission('report', '', 'view')) {
+            access_denied('report');
+        }
+		$data = array();
+		$data['title']    =  _l('shared_list');
+		$this->load->view('admin/reports/shared_list', $data);
+	}
+	public function view_shared($id){
+		$this->load->model('pipeline_model');
+		$data = array();
+		$data['title'] = _l('add_report');
+		$deal_val = deal_values();
+		$data =  json_decode($deal_val, true);
+		
+		
+		$shares = $this->db->query("SELECT * FROM " . db_prefix() . "shared WHERE id = '".$id."' ")->row();
+		$id = $shares->report_id;
+		$data['id'] = $id;
+		$reports1 = $this->db->query("SELECT * FROM " . db_prefix() . "report WHERE id = '".$id."' ")->row();
+		
+		$data['report_name']		=	$reports1->report_name;
+		$data['folder_id']			=	$reports1->folder_id;
+		$fields = deal_needed_fields();
+		$needed = json_decode($fields,true);
+		$data['need_fields']		=	$needed['need_fields'];
+		$data['need_fields_label']	=	$needed['need_fields_label'];
+		$data['need_fields_edit']	=	$needed['need_fields_edit'];
+		$data['mandatory_fields1']	=	$needed['mandatory_fields1'];
+		
+        $this->load->view('admin/reports/share_view', $data);
+	}
+	public function shared_list(){
+		if (!has_permission('reports', '', 'view')) {
+            ajax_access_denied();
+        }
+        $this->app->get_table_data('shared_list');
+	}
+	public function folder_edit(){
+		$folder_id = $_REQUEST['cur_id'];
+		$req_out = '';
+		$result = $this->db->query("SELECT * FROM " . db_prefix() . "folder WHERE id = '".$folder_id."' ")->row();
+		echo $result->folder;
+	}
+	public function report_edit(){
+		$report_id = $_REQUEST['cur_id'];
+		$req_out = '';
+		$result = $this->db->query("SELECT * FROM " . db_prefix() . "report WHERE id = '".$report_id."' ")->row();
+		echo $result->report_name;
+	}
+	public function update_folder(){
+		if ($this->input->is_ajax_request()) {
+			$upd_folder = array();
+			$upd_folder['folder'] = $_REQUEST['name'];
+			$cond['id']			  = $_REQUEST['folder_id'];
+			$result = $this->db->update(db_prefix() . 'folder', $upd_folder, $cond);
+			echo json_encode([
+				'success' => 'success'
+			]);
+		}
+	}
+	public function update_edit_report(){
+		if ($this->input->is_ajax_request()) {
+			$upd_report = array();
+			$upd_report['report_name'] = $_REQUEST['name'];
+			$cond['id']			  = $_REQUEST['report_id'];
+			$result = $this->db->update(db_prefix() . 'report', $upd_report, $cond);
+			echo json_encode([
+				'success' => 'success'
+			]);
+		}
+	}
 	public function view_deal_report($id=''){
 		if (!has_permission('report', '', 'view')) {
             access_denied('report');
         }
 		$data = array();
 		$data['id']		  =	 $id;
-		$data['title']    =  _l('view_report');
+		$report = $this->db->query("SELECT * FROM " . db_prefix() . "report WHERE id = '".$id."'")->row();
+		$folder = $this->db->query("SELECT * FROM " . db_prefix() . "folder WHERE id = '".$report->folder_id."' ")->row();
+		$data['title']    =  _l('view_report').' Of '.$folder->folder;
 		$this->load->view('admin/reports/report_deal', $data);
 	}
+	
 	public function delete_report($id){
 		$reports =  $this->db->query("SELECT * FROM " . db_prefix() . "report WHERE id = '".$id."'")->result_array();
 		$folder = $reports[0]['folder_id'];
@@ -1419,6 +1522,7 @@ class Reports extends AdminController
         }
         $this->app->get_table_data('folder_deal_view');
 	}
+	
 	public function report_deal_view($id){
 		if (!has_permission('reports', '', 'view')) {
             ajax_access_denied();

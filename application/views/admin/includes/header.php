@@ -98,9 +98,15 @@ ob_end_clean();
              <b class="caret"></b>
              <?php } ?>
          </a>
+		 <?php 
+		 $staffid = get_staff_user_id();
+		  $cur_sql = "SELECT * FROM tblshared LEFT JOIN ".db_prefix()."report ON ".db_prefix()."shared.report_id = ".db_prefix()."report.id WHERE ".db_prefix()."shared.share_type = 'Everyone' OR ".db_prefix()."shared.id in(SELECT share_id FROM ".db_prefix()."shared_staff where staff_id = '".$staffid."')";
+		 $ch_shared = $this->db->query($cur_sql)->result_array();
+		 ?>
          <?php if(count($item['children']) > 0){ ?>
          <ul class="dropdown-menu animated fadeIn" aria-expanded="false">
             <?php foreach($item['children'] as $submenu){
+				if($submenu['name'] !='Shared Report List' || !empty($ch_shared)){
                ?>
             <li class="sub-menu-item-<?php echo $submenu['slug']; ?>">
 				<?php if($submenu['name']=='Add Report'){?>
@@ -115,7 +121,9 @@ ob_end_clean();
                </span>
                </a>
             </li>
-            <?php } ?>
+            <?php }
+			}
+			?>
          </ul>
          <?php } ?>
       </li>

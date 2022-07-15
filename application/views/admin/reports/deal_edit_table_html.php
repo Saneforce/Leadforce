@@ -1,6 +1,26 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
 
-$table_datas = deal_get_fields();
+$table_datas = [
+   'name'=>_l('project_name'),
+   'teamleader_name'=>_l('teamleader_name'),
+   'contact_name'=>_l('contact_name'),
+   'project_cost'=>_l('project_cost'),
+   'product_qty'=>_l('product_qty'),
+   'product_amt'=>_l('product_amt'),
+   'company'=> [
+         'name'     => _l('project_customer'),
+         'th_attrs' => ['class' => isset($client) ? '' : ''],
+    ],
+   'tags'=>_l('tags'),
+   'project_start_date'=>_l('project_start_date'),
+   'project_deadline'=>_l('project_deadline'),
+   'members'=>_l('project_members'),
+   'status'=> _l('project_status'),
+   'project_status'=> _l('status'),
+   'pipeline_id'=>_l('pipeline'),
+   'contact_email1'=>_l('company_primary_email'),
+   'contact_phone1'=>_l('company_primary_phone'),
+];
 $table_data_temp = array();
 foreach($table_datas as $ckey=>$cval){ 
 	$req_key = $ckey;

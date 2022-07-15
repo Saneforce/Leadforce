@@ -2639,6 +2639,53 @@ function get_attachement(){
 }
 function deal_values(){
 	$CI   = &get_instance();
+	$colarr = deal_all_fields(); 
+	$custom_fields = get_table_custom_fields('projects');
+	$cus_1 = array();
+	foreach($custom_fields as $cfkey=>$cfval){
+		$cus_1[$cfval['slug']] =  array("ins"=>$cfval['name'],"ll"=>$cfval['name']);
+	}
+	$req_out = array('all_clmns'=>$colarr,'cus_flds'=>$cus_1);
+	return json_encode($req_out);
+}
+function deal_get_fields(){
+	$colarr = array(
+		"name"=>_l("project_name"),
+		"project_cost"=>_l("project_cost"),
+		"teamleader_name"=>_l("teamleader_name"),
+		"contact_name"=>_l("contact_name"),
+		"product_qty"=>_l("product_qty"),
+		"product_amt"=>_l("product_amt"),
+		"company"=>_l("project_customer"),
+		"tags"=>_l("tags"),
+		"project_start_date"=>_l("project_start_date"),
+		"project_deadline"=>_l("project_deadline"),
+		"members"=>_l("project_members"),
+		"status"=>_l("project_status"),
+		"project_status"=>_l("status"),
+		"pipeline_id"=>_l("pipeline"),
+		"contact_email1"=>_l("company_primary_email"),
+		"contact_phone1"=>_l("company_primary_phone"),
+		'won_date'=>_l('won_date'),
+	   'lost_date'=>_l('lost_date'),
+	   'loss_reason_name'=>_l('loss_reason'),
+	   'project_currency'=>_l('currency'),
+	   'project_created'=>_l('create_date'),
+	   'project_modified'=>_l('modified_date'),
+	   'modified_by'=>_l('modified_by'),
+	   'created_by'=>_l('crated_by'),
+	   'won_date'=>_l('won_date'),
+	   'lost_date'=>_l('lost_date'),
+	   'loss_reason_name'=>_l('loss_reason'),
+	   'project_currency'=>_l('currency'),
+	   'project_created'=>_l('create_date'),
+	   'project_modified'=>_l('modified_date'),
+	   'modified_by'=>_l('modified_by'),
+	   'created_by'=>_l('crated_by'),
+	); 
+	return $colarr;
+}
+function deal_all_fields(){
 	$colarr = array(
 		"name"=>array("ins"=>"name","ll"=>"project_name"),
 		"project_cost"=>array("ins"=>"project_cost","ll"=>"project_cost"),
@@ -2656,14 +2703,16 @@ function deal_values(){
 		"pipeline_id"=>array("ins"=>"pipeline_id","ll"=>"pipeline"),
 		"contact_email1"=>array("ins"=>"contact_email1","ll"=>"company_primary_email"),
 		"contact_phone1"=>array("ins"=>"contact_phone1","ll"=>"company_primary_phone"),
-	); 
-	$custom_fields = get_table_custom_fields('projects');
-	$cus_1 = array();
-	foreach($custom_fields as $cfkey=>$cfval){
-		$cus_1[$cfval['slug']] =  array("ins"=>$cfval['name'],"ll"=>$cfval['name']);
-	}
-	$req_out = array('all_clmns'=>$colarr,'cus_flds'=>$cus_1);
-	return json_encode($req_out);
+		"won_date"=>array("ins"=>"won_date","ll"=>"won_date"),
+		"lost_date"=>array("ins"=>"lost_date","ll"=>"lost_date"),
+		"loss_reason_name"=>array("ins"=>"loss_reason_name","ll"=>"loss_reason"),
+		"project_currency"=>array("ins"=>"project_currency","ll"=>"currency"),
+		"project_created"=>array("ins"=>"project_created","ll"=>"create_date"),
+		"project_modified"=>array("ins"=>"project_modified","ll"=>"modified_date"),
+		"modified_by"=>array("ins"=>"modified_by","ll"=>"modified_by"),
+		"created_by"=>array("ins"=>"created_by","ll"=>"created_by"),
+		); 
+	return $colarr;
 }
 function deal_needed_fields(){
 	$fields = get_option('deal_fields');
@@ -2743,5 +2792,34 @@ function deal_needed_fields(){
 	$data['need_fields'][$i] = 'projects_budget';
 	$i++;
 	$data['need_fields'][$i] = 'customers_hyperlink';
+	$i++;
+	$data['need_fields'][$i] = 'won_date';
+     $i++;
+	$data['need_fields'][$i] = 'lost_date';
+	$i++;
+	$data['need_fields'][$i] = 'loss_reason_name';
+	$i++;
+	$data['need_fields'][$i] = 'project_currency';
+	$i++;
+	$data['need_fields'][$i] = 'project_created';
+	$i++;
+	$data['need_fields'][$i] = 'project_modified';
+	$i++;
+	$data['need_fields'][$i] = 'modified_by';
+	$i++;
+	$data['need_fields'][$i] = 'created_by';
 	return json_encode($data);
+}
+function get_public($report_id){
+	$CI   = &get_instance();
+	$req_out = '';
+	$links = $CI->db->query("SELECT * FROM " . db_prefix() . "report_public WHERE report_id = '".$report_id."' ")->result_array();
+	if(!empty($links)){
+		foreach($links as $link12){
+			$req_id = "'".$link12['id']."'";
+			$req_out .= '<div class="form-group" app-field-wrapper="name" style="float:left;width:100%"><label for="name" class="control-label"> '.$link12['link_name'].' <a href="javascript:void(0)" onclick="check_publick('.$req_id.')" style="margin-left:5px;" data-toggle="modal" data-target="#clientid_add_modal_public"><i class="fa fa-edit"></i></a></label><br><input type="text" id="name_'.$link12['id'].'" name="name" class="form-control" value="'.base_url('shared/index/'.$link12['share_link']).'"  readonly style="width:75%;float:left;"><button onclick="myFunction('.$req_id.')" style="float:left;margin-left:15px;height:35px;">Copy Link</button><a href="javascript:void(0);" onclick="delete_link('.$req_id.')" style="margin-left:10px;float:left"><i class="fa fa-trash fa-2x" style="color:red"></i></a></div>
+					';
+		}
+	}
+	echo $req_out;
 }

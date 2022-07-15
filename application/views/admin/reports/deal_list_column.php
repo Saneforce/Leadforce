@@ -15,24 +15,8 @@
       <div class="modal-body">
         <div class="form-group">
 
-<?php $colarr = array(
-"name"=>array("ins"=>"name","ll"=>"project_name"),
-"project_cost"=>array("ins"=>"project_cost","ll"=>"project_cost"),
-"teamleader_name"=>array("ins"=>"teamleader","ll"=>"teamleader_name"),
-"contact_name"=>array("ins"=>"project_contacts","ll"=>"contact_name"),
-"product_qty"=>array("ins"=>"product_qty","ll"=>"product_qty"),
-"product_amt"=>array("ins"=>"product_amt","ll"=>"product_amt"),
-"company"=>array("ins"=>"company","ll"=>"project_customer"),
-"tags"=>array("ins"=>"tags","ll"=>"tags"),
-"project_start_date"=>array("ins"=>"start_date","ll"=>"project_start_date"),
-"project_deadline"=>array("ins"=>"deadline","ll"=>"project_deadline"),
-"members"=>array("ins"=>"project_contacts","ll"=>"project_members"),
-"status"=>array("ins"=>"status","ll"=>"project_status"),
-"project_status"=>array("ins"=>"stage_of","ll"=>"status"),
-"pipeline_id"=>array("ins"=>"pipeline_id","ll"=>"pipeline"),
-"contact_email1"=>array("ins"=>"contact_email1","ll"=>"company_primary_email"),
-"contact_phone1"=>array("ins"=>"contact_phone1","ll"=>"company_primary_phone"),
-); 
+<?php $colarr = deal_all_fields(); 
+
 $custom_fields = get_table_custom_fields('projects');
 $cus_1 = array();
 foreach($custom_fields as $cfkey=>$cfval){
