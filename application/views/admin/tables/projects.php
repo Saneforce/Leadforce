@@ -125,7 +125,7 @@ $req_fields[$req_cnt + 17]= 'project_currency';
 $req_fields[$req_cnt + 18]= 'project_created';
 $req_fields[$req_cnt + 19]= 'project_modified';
 $req_fields[$req_cnt + 20]= 'modified_by';
-$req_fields[$req_cnt + 21]= 'crated_by';
+$req_fields[$req_cnt + 21]= 'created_by';
 $projects_list_column_order = (array)json_decode(get_option('projects_list_column_order')); 
 //pre($projects_list_column_order);
 $custom_fields = array_merge($custom_fields,get_table_custom_fields('customers'));

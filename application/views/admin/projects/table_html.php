@@ -28,7 +28,7 @@ $table_datas = [
    'project_created'=>_l('create_date'),
    'project_modified'=>_l('modified_date'),
    'modified_by'=>_l('modified_by'),
-   'created_by'=>_l('crated_by'),
+   'created_by'=>_l('created_by'),
 ];
 $table_data_temp = array();
 foreach($table_datas as $ckey=>$cval){ 
