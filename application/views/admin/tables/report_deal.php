@@ -65,13 +65,13 @@ if(!empty($filters))
 		}
 		if($filter12 == 'project_deadline'){
 			if($filters1[$i1]=='is'){
-				array_push($where, " AND " . db_prefix() . "projects.project_deadline >='".date('Y-m-d',strtotime($filters3[$i1]))."' AND " . db_prefix() . "projects.project_deadline <='".date('Y-m-d',strtotime($filters4[$i1]))."'");
+				array_push($where, " AND " . db_prefix() . "projects.deadline>='".date('Y-m-d',strtotime($filters3[$i1]))."' AND " . db_prefix() . "projects.deadline <='".date('Y-m-d',strtotime($filters4[$i1]))."'");
 			}
 			else if($filters1[$i1]=='is_empty'){
-				array_push($where, " AND (" . db_prefix() . "projects.project_deadline ='' or " . db_prefix() . "projects.project_deadline='0000-00-00')");
+				array_push($where, " AND (" . db_prefix() . "projects.deadline ='' or " . db_prefix() . "projects.deadline='0000-00-00')");
 			}
 			else if($filters21[$i1]=='is_not_empty'){
-				array_push($where, " AND (" . db_prefix() . "projects.project_deadline !='' or " . db_prefix() . "projects.project_deadline !='0000-00-00') ");
+				array_push($where, " AND (" . db_prefix() . "projects.deadline !='' or " . db_prefix() . "projects.deadline !='0000-00-00') ");
 			}
 			
 		}
