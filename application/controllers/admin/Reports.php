@@ -554,7 +554,7 @@ class Reports extends AdminController
 		if($cur_val=='last_year'){
 			if(!empty($filters3)){
 				foreach($filters3 as $key12 => $filter3){
-					$filter_data['filters3'.$cur_id12][$key12]	=	$filters3;  
+					$filter_data['filters3'.$cur_id12][$key12]	=	$filter3;  
 				}
 				$filter_data['filters3'.$cur_id12][$key12]	=	'01-01-'.date('Y')-1;  
 			}
