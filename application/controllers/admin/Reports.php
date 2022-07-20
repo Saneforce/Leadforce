@@ -554,31 +554,31 @@ class Reports extends AdminController
 		if($cur_val=='last_year'){
 			if(!empty($filters3)){
 				foreach($filters3 as $key12 => $filter3){
-					$filter_data['filters3'.$cur_id12][$key12]	=	$filters3;  
+					$filter_data['filters3'.$cur_id12][$key12]	=	$filter3;  
 				}
-				$filter_data['filters3'.$cur_id12][$key12]	=	'01-01-'.date('Y')-1;  
+				//$filter_data['filters3'.$cur_id12][$key12]	=	'01-01-'.date('Y')-1;  
 			}
 			$filters4	=	$this->session->userdata('filters4'.$cur_id12);
 			if(!empty($filters4)){
 				foreach($filters4 as $key12 => $filter4){
 					$filter_data['filters4'.$cur_id12][$key12]	=	$filter4;  
 				}
-				$filter_data['filters4'.$cur_id12][$key12]	=	'31-12-'.date('Y')-1;
+				//$filter_data['filters4'.$cur_id12][$key12]	=	'31-12-'.date('Y')-1;
 			}
 		}
 		if($cur_val=='this_year'){
 			if(!empty($filters3)){
 				foreach($filters3 as $key12 => $filter3){
-					$filter_data['filters3'.$cur_id12][$key12]	=	$filters3;  
+					$filter_data['filters3'.$cur_id12][$key12]	=	$filter3;  
 				}
-				$filter_data['filters3'.$cur_id12][$key12]	=	'01-01-'.date('Y');  
+				//$filter_data['filters3'.$cur_id12][$key12]	=	'01-01-'.date('Y');  
 			}
 			$filters4	=	$this->session->userdata('filters4'.$cur_id12);
 			if(!empty($filters4)){
 				foreach($filters4 as $key12 => $filter4){
 					$filter_data['filters4'.$cur_id12][$key12]	=	$filter4;  
 				}
-				$filter_data['filters4'.$cur_id12][$key12]	=	'31-12-'.date('Y');
+				//$filter_data['filters4'.$cur_id12][$key12]	=	'31-12-'.date('Y');
 			}
 		}
 		$this->session->set_userdata($filter_data);
