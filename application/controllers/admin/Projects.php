@@ -98,8 +98,7 @@ class Projects extends AdminController
         $data['title']    = _l('projects');
 		$fields = get_option('deal_fields');
 		$fields1 = get_option('deal_mandatory');
-		$data['need_fields'] = $data['need_fields_edit'] =  $data['mandatory_fields1'] = array('name');
-		$data['need_fields_label'] = array('project_name');
+		$data['mandatory_fields1'] = array('name');
 		$i = $j = 1;
 		if(!empty($fields1) && $fields1 != 'null'){
 			$i1 =0;
@@ -111,85 +110,12 @@ class Projects extends AdminController
 				}
 			}
 		}
-		if(!empty($fields) && $fields != 'null'){
-			$req_fields = json_decode($fields);
-			
-			if(!empty($req_fields)){
-				foreach($req_fields as $req_field11){
-					$data['need_fields_edit'][$i] = $req_field11;
-					if($req_field11 == 'clientid'){
-						$data['need_fields'][$i] = 'company';
-						$data['need_fields_label'][$j] = 'project_customer';
-					}
-					else if($req_field11 == 'primary_contact'){
-						$data['need_fields_label'][$j] = 'project_primary_contacts';
-						$data['need_fields'][$i] = 'contact_email1';
-						$i++;
-						$data['need_fields'][$i] = 'contact_phone1';
-						$i++;
-						$data['need_fields'][$i] = 'contact_name';
-					}
-					else if($req_field11 == 'teamleader'){
-						$data['need_fields'][$i] = 'teamleader_name';
-						$data['need_fields_label'][$j] = 'teamleader';
-					}
-					else if($req_field11 == 'project_members[]'){
-						$data['need_fields'][$i] = 'members';
-						$data['need_fields_label'][$j] = 'project_members';
-					}
-					else if($req_field11 == 'project_contacts[]'){
-						$data['need_fields'][$i] = 'project_contacts[]';
-						$data['need_fields_label'][$j] = 'project_contacts';
-					}
-					else if($req_field11 == 'project_cost'){
-						$data['need_fields'][$i] = 'project_cost';
-						$data['need_fields_label'][$j] = 'project_total_cost';
-					}
-					else if($req_field11 == 'pipeline_id'){
-						$data['need_fields'][$i] = 'pipeline_id';
-						$data['need_fields_label'][$j] = 'pipeline';
-					}
-					else{
-						
-						$data['need_fields_label'][$j] = $req_field11;
-						$data['need_fields'][$i] = $req_field11;
-						if($req_field11 == 'status'){
-							$i++;
-							$data['need_fields_label'][$j] = 'project_status';
-							$data['need_fields'][$i] = 'project_status';
-						}
-					}
-					$i++;
-					$j++;
-				}
-				
-			}
-		}
-		$data['need_fields'][$i] = 'id';
-		$i++;
-		$data['need_fields'][$i] = 'product_qty';
-		$i++;
-		$data['need_fields'][$i] = 'product_amt';
-		$i++;
-		$data['need_fields'][$i] = 'projects_budget';
-		$i++;
-		$data['need_fields'][$i] = 'customers_hyperlink';
-        $i++;
-		$data['need_fields'][$i] = 'won_date';
-        $i++;
-		$data['need_fields'][$i] = 'lost_date';
-        $i++;
-		$data['need_fields'][$i] = 'loss_reason_name';
-        $i++;
-		$data['need_fields'][$i] = 'project_currency';
-        $i++;
-		$data['need_fields'][$i] = 'project_created';
-        $i++;
-		$data['need_fields'][$i] = 'project_modified';
-        $i++;
-		$data['need_fields'][$i] = 'modified_by';
-        $i++;
-		$data['need_fields'][$i] = 'created_by';
+		
+        $deal_fields = deal_needed_fields();
+		$needed_fields = json_decode($deal_fields,true);
+		$data['need_fields'] = $needed_fields['need_fields'];
+		$data['need_fields_label'] = $needed_fields['need_fields_label'];
+
 		//$data['client_contacts']     = $this->clients_model->get_deals_contacts_list('', ['active' => 1]);
 		$data['client_contacts']     = $this->clients_model->getAllContacts_active();
 		$allcurrency = $this->projects_model->get_allcurrency();
@@ -202,40 +128,12 @@ class Projects extends AdminController
     public function table($clientid = '')
     {
 		$fields = get_option('deal_fields');
-		$data['need_fields'] = array('name','product_qty','id','product_amt','projects_budget','customers_hyperlink','won_date','lost_date','loss_reason_name','project_currency','project_created','project_modified','modified_by','created_by');
-		if(!empty($fields) && $fields != 'null'){
-			$req_fields = json_decode($fields);
-			$i = 14;
-			if(!empty($req_fields)){
-				foreach($req_fields as $req_field11){
-					if($req_field11 == 'clientid'){
-						$data['need_fields'][$i] = 'company';
-					}
-					else if($req_field11 == 'primary_contact'){
-						$data['need_fields'][$i] = 'contact_email1';
-						$i++;
-						$data['need_fields'][$i] = 'contact_phone1';
-						$i++;
-						$data['need_fields'][$i] = 'contact_name';
-					}
-					else if($req_field11 == 'teamleader'){
-						$data['need_fields'][$i] = 'teamleader_name';
-					}
-					else if($req_field11 == 'project_members[]'){
-						$data['need_fields'][$i] = 'members';
-					}
-					else{
-						$data['need_fields'][$i] = $req_field11;
-						if($req_field11 == 'status'){
-							$i++;
-							$data['need_fields'][$i] = 'project_status';
-						}
+        $data =array();
 
-					}
-					$i++;
-				}
-			}
-		}
+        $deal_fields = deal_needed_fields();
+		$needed_fields = json_decode($deal_fields,true);
+		$data['need_fields'] = $needed_fields['need_fields'];
+
 		$data['clientid'] = $clientid;
         $this->app->get_table_data('projects', $data);
        /* $this->app->get_table_data('projects', [
