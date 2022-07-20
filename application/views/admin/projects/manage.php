@@ -55,33 +55,7 @@
       <div class="modal-body">
         <div class="form-group">
 
-<?php $colarr = array(
-  "id"=>array("ins"=>"id","ll"=>"id"),
-"name"=>array("ins"=>"name","ll"=>"project_name"),
-"project_cost"=>array("ins"=>"project_cost","ll"=>"project_cost"),
-"teamleader_name"=>array("ins"=>"teamleader","ll"=>"teamleader_name"),
-"contact_name"=>array("ins"=>"project_contacts","ll"=>"contact_name"),
-"product_qty"=>array("ins"=>"product_qty","ll"=>"product_qty"),
-"product_amt"=>array("ins"=>"product_amt","ll"=>"product_amt"),
-"company"=>array("ins"=>"company","ll"=>"project_customer"),
-"tags"=>array("ins"=>"tags","ll"=>"tags"),
-"project_start_date"=>array("ins"=>"start_date","ll"=>"project_start_date"),
-"project_deadline"=>array("ins"=>"deadline","ll"=>"expected_closing_date"),
-"members"=>array("ins"=>"project_contacts","ll"=>"project_members"),
-"status"=>array("ins"=>"status","ll"=>"project_status"),
-"project_status"=>array("ins"=>"stage_of","ll"=>"status"),
-"pipeline_id"=>array("ins"=>"pipeline_id","ll"=>"pipeline"),
-"contact_email1"=>array("ins"=>"contact_email1","ll"=>"company_primary_email"),
-"contact_phone1"=>array("ins"=>"contact_phone1","ll"=>"company_primary_phone"),
-"won_date"=>array("ins"=>"won_date","ll"=>"won_date"),
-"lost_date"=>array("ins"=>"lost_date","ll"=>"lost_date"),
-"loss_reason_name"=>array("ins"=>"loss_reason_name","ll"=>"loss_reason"),
-"project_currency"=>array("ins"=>"project_currency","ll"=>"currency"),
-"project_created"=>array("ins"=>"project_created","ll"=>"create_date"),
-"project_modified"=>array("ins"=>"project_modified","ll"=>"modified_date"),
-"modified_by"=>array("ins"=>"modified_by","ll"=>"modified_by"),
-"created_by"=>array("ins"=>"created_by","ll"=>"created_by"),
-); 
+<?php $colarr = deal_all_fields(); 
 $custom_fields = get_table_custom_fields('projects');
 $cus_1 = array();
 foreach($custom_fields as $cfkey=>$cfval){
