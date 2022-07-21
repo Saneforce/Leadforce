@@ -334,9 +334,9 @@ echo render_select('teamleader', $teamleaders, array('staffid', array('firstname
 
             <div class="col-md-6">
 <?php $value = (isset($lead) ? $lead->name : ''); ?>
-<?php echo render_input('name', 'lead_add_edit_name', $value); ?>
+<?php echo render_input('name', 'lead_add_edit_name', $value,'text',['onblur'=>'validate_lead_profile_text_input(this.value,\'name\')','maxlength'=>'150']); ?>
 <?php $value = (isset($lead) ? $lead->title : ''); ?>
-<?php echo render_input('title', 'lead_title', $value); ?>
+<?php echo render_input('title', 'lead_title', $value,'text',['onblur'=>'validate_lead_profile_text_input(this.value,\'title\')','maxlength'=>'100']); ?>
 <?php $value = (isset($lead) ? $lead->email : ''); ?>
 <div class="form-group" app-field-wrapper="email">
     <label for="email" class="control-label">Email Address</label>
@@ -346,7 +346,7 @@ echo render_select('teamleader', $teamleaders, array('staffid', array('firstname
 <?php
 if ((isset($lead) && empty($lead->website)) || !isset($lead)) {
     $value = (isset($lead) ? $lead->website : '');
-    echo render_input('website', 'lead_website', $value);
+    echo render_input('website', 'lead_website', $value,'text',['onblur'=>'validate_lead_profile_text_input(this.value,\'website\')','maxlength'=>'100']);
 } else {
     ?>
                     <div class="form-group">
@@ -366,9 +366,9 @@ if ((isset($lead) && empty($lead->website)) || !isset($lead)) {
                 }
                 $value = (isset($lead) ? $lead->phonenumber : '');
                 ?>
-                <?php echo render_input('phonenumber', 'lead_add_edit_phonenumber', $value); ?>
+                <?php echo render_input('phonenumber', 'lead_add_edit_phonenumber', $value,'text',['onblur'=>'validate_lead_profile_no_space(this.value,\'phonenumber\')','maxlength'=>'100']); ?>
                 <?php $value = (isset($lead) ? $lead->company : ''); ?>
-<?php echo render_input('company', 'lead_company', $value); ?>
+<?php echo render_input('company', 'lead_company', $value,'text',['onblur'=>'validate_lead_profile_text_input(this.value,\'company\')','maxlength'=>'148']); ?>
 <div class="form-group" app-field-wrapper="company" id="source_addlead">
                 <label for="company" class="control-label">Source</label>
                 <?php
@@ -384,11 +384,11 @@ if ((isset($lead) && empty($lead->website)) || !isset($lead)) {
             </div>
             <div class="col-md-6">
                         <?php $value = (isset($lead) ? $lead->address : ''); ?>
-                        <?php echo render_textarea('address', 'lead_address', $value, array('rows' => 1, 'style' => 'height:36px;font-size:100%;')); ?>
+                        <?php echo render_textarea('address', 'lead_address', $value, array('onblur'=>'validate_lead_profile_text_input(this.value,\'address\')','maxlength'=>'148','rows' => 1, 'style' => 'height:36px;font-size:100%;')); ?>
                         <?php $value = (isset($lead) ? $lead->city : ''); ?>
-                        <?php echo render_input('city', 'lead_city', $value); ?>
+                        <?php echo render_input('city', 'lead_city', $value,'text',['onblur'=>'validate_lead_profile_text_input(this.value,\'city\')','maxlength'=>'148']); ?>
                         <?php $value = (isset($lead) ? $lead->state : ''); ?>
-                        <?php echo render_input('state', 'lead_state', $value); ?>
+                        <?php echo render_input('state', 'lead_state', $value,'text',['onblur'=>'validate_lead_profile_text_input(this.value,\'state\')','maxlength'=>'148']); ?>
                         <?php
                         $countries = get_all_countries();
                         $customer_default_country = get_option('customer_default_country');
@@ -396,7 +396,7 @@ if ((isset($lead) && empty($lead->website)) || !isset($lead)) {
                         echo render_select('country', $countries, array('country_id', array('short_name')), 'lead_country', $selected, array('data-none-selected-text' => _l('dropdown_non_selected_tex')));
                         ?>
 <?php $value = (isset($lead) ? $lead->zip : ''); ?>
-                <?php echo render_input('zip', 'lead_zip', $value); ?>
+                    <?php echo render_input('zip', 'lead_zip', $value,'text',['onblur'=>'validate_lead_profile_no_space(this.value,\'zip\')','maxlength'=>'148']); ?>
                     <div class="form_assigned">
                     <?php
                         $assigned_attrs = array();

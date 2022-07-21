@@ -879,6 +879,7 @@ class Leads extends AdminController
 
         $data['members'] = $this->staff_model->get('', [
             'active'       => 1,
+            'action_for'       => 'Active',
             //'role' => 1,
         ]);
 
@@ -1066,10 +1067,21 @@ class Leads extends AdminController
                 if (isset($data['inline'])) {
                     unset($data['inline']);
                 }
+                if(strlen(trim($data['name'])) ==0) {
+                    set_alert('warning', 'Name field cannot be empty');
+                    return false;
+                }elseif(strlen(trim($data['name'])) !=strlen($data['name'])) {
+                    set_alert('warning', 'Name field cannot contain space in either begining or end');
+                    return false;
+                }elseif(preg_match(' ^[a-zA-Z]+[a-zA-Z0-9-_ ]*[a-zA-Z0-9]$', $data['name'])==false){
+                    set_alert('warning', 'Name field is invalid format');
+                    return false;
+                }
                 $data['slug'] = strtolower($data['name']);
                 $this->db->select('slug');
                 $this->db->where('slug', $data['slug']);
                 $slug = $this->db->get(db_prefix() . 'leads_sources')->row()->slug;
+
                 if($slug == $data['slug']) {
                     set_alert('warning', 'Record already exist. Please try with different Social Media Name.');
                     return false;

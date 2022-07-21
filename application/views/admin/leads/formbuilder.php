@@ -54,7 +54,7 @@
                         <div class="row">
                            <div class="col-md-6">
                               <?php $value = (isset($form) ? $form->name : ''); ?>
-                              <?php echo render_input('name', 'form_name', $value); ?>
+                              <?php echo render_input('name', 'form_name', $value,'',['maxlength'=>100]); ?>
                               <?php
                                  if (get_option('recaptcha_secret_key') != '' && get_option('recaptcha_site_key') != '') { ?>
                               <div class="form-group">
@@ -86,7 +86,7 @@
                                  </select>
                               </div> -->
                               <?php $value = (isset($form) ? $form->submit_btn_name : 'Submit'); ?>
-                              <?php echo render_input('submit_btn_name', 'form_btn_submit_text', $value); ?>
+                              <?php echo render_input('submit_btn_name', 'form_btn_submit_text', $value,'',['maxlength'=>39]); ?>
                               <?php $value = (isset($form) ? $form->success_submit_msg : ''); ?>
                               <?php echo render_textarea('success_submit_msg', 'form_success_submit_msg', $value); ?>
 <!-- 
@@ -277,13 +277,30 @@ if(formData.length){
        });
      });
 
+      jQuery.validator.addMethod("noSpace", function(value, element) { 
+         return value == '' || value.trim().length != 0;  
+      }, "No space please an don't leave it empty");
+
+      jQuery.validator.addMethod("noNumeric", function(value, element) { 
+         return value.match(/^\d*[a-z][a-z\d\s]*$/i);  
+      }, "Invalid format");
+
+
      appValidateForm('#form_info',{
-       name:'required',
+       name:{
+         required: true,
+         noSpace:true,
+         noNumeric:true,
+       },
        teamleader: 'required',
        lead_status: 'required',
        language:'required',
        success_submit_msg:'required',
-       submit_btn_name:'required',
+       submit_btn_name:{
+         required: true,
+         noSpace:true,
+         noNumeric:true,
+       },
        responsible: {
          required: {
             depends:function(element){
