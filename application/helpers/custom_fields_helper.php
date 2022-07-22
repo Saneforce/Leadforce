@@ -190,7 +190,7 @@ function render_custom_fields_indiaMart($belongs_to, $rel_id = false, $where = [
                 $fields_html .= '<option value=""' . ($field['type'] == 'multiselect' ? ' class="hidden"' : '') . '></option>';
 
                 //$options = explode(',', $field['options']);
-                $options = array('QUERY_ID' => 'QUERY_ID',
+               /* $options = array('QUERY_ID' => 'QUERY_ID',
                         'QTYPE' => 'QTYPE',
                         'SENDERNAME' => 'SENDERNAME',
                         'SENDERMAIL' => 'SENDERMAIL',
@@ -210,7 +210,28 @@ function render_custom_fields_indiaMart($belongs_to, $rel_id = false, $where = [
                         'ENQ_CALL_DURATION' => 'ENQ_CALL_DURATION',
                         'ENQ_RECEIVER_MOB' => 'ENQ_RECEIVER_MOB',
                         'EMAIL_ALT' => 'EMAIL_ALT',
-                        'MOBILE_ALT' => 'MOBILE_ALT');
+                        'MOBILE_ALT' => 'MOBILE_ALT');*/
+				 $options = array('UNIQUE_QUERY_ID' => 'QUERY_ID',
+        'QUERY_TYPE' => 'QTYPE',
+        'SENDER_NAME' => 'SENDERNAME',
+        'SENDER_EMAIL' => 'SENDERMAIL',
+        'SENDER_MOBILE' => 'MOB',
+       // 'GLUSER_USR_COMPANYNAME' => 'GLUSER_USR_COMPANYNAME',
+        'SENDER_ADDRESS' => 'ENQ_ADDRESS',
+        'SENDER_CITY' => 'ENQ_CITY',
+        'ENQ_STATE' => 'ENQ_STATE',
+        'SENDER_COUNTRY_ISO' => 'COUNTRY_ISO',
+        'QUERY_PRODUCT_NAME' => 'PRODUCT_NAME',
+        'QUERY_MESSAGE' => 'ENQ_MESSAGE',
+        //'DATE_RE' => 'DATE_RE',
+      //  'DATE_R' => 'DATE_R',
+       // 'DATE_TIME_RE' => 'DATE_TIME_RE',
+       // 'LOG_TIME' => 'LOG_TIME',
+  //      'QUERY_MODID' => 'QUERY_MODID',
+        'CALL_DURATION' => 'ENQ_CALL_DURATION',
+        'RECEIVER_MOBILE' => 'ENQ_RECEIVER_MOB',
+        'SENDER_EMAIL_ALT' => 'EMAIL_ALT',
+        'SENDER_MOBILE_ALT' => 'MOBILE_ALT');
 
                 if ($field['type'] == 'multiselect') {
                     $value = explode(',', $value);
