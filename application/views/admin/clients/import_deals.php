@@ -40,13 +40,16 @@
 					foreach($mandatory_fields1 as $mandatory_field12){
 						echo $mandatory_field12.', ';
 					}
-				  }?>
-				  Activity name, Activity type, Priority, Activity start date.</li></ul>
+				  }?></li></ul>
+          <ul>
+              <li class="">2. Make sure the following details should not be empty when adding activity to deal
+                <ul style="margin-left: 26px; list-style-type: disclosure-closed;">
+                  <li>Activity name, Activity type, Activity start date, Activity assigned person mail id</li></ul>
               </li>
               
-              <li class="">2. Make sure the following details should be valid.
+              <li class="">3. Make sure the following details should be valid.
                 <ul style="margin-left: 26px; list-style-type: disclosure-closed;">
-                  <li>Pipeline, Pipeline stage, Deal Owner Mail Id, Assigned Person Mail Id.</li>
+                  <li>Pipeline, Pipeline stage, Deal Owner Mail Id.</li>
                 </ul>
               </li>
             </ul>
@@ -115,7 +118,11 @@
             }
               echo 'Imported - '.$file['imported'].'<br>';
               echo 'Skipped - '.$file['skipped'].'<br>';
-              echo '<a href="#" onclick="download_csv_files(\''.$file['import_id'].'\');"  style="'.$style.'">Download Skipped File</a>';
+              $url = './uploads/import_files/'.$file['import_id'].'/skipped_file.xls';
+              if($file['skipped']>0){
+                echo '<a href="#" onclick="download_csv_files(\''.$file['import_id'].'\');"  style="'.$style.'">Download Skipped File</a>';
+              }
+              
             ?>
           </td>
           

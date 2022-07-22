@@ -2650,6 +2650,7 @@ function deal_values(){
 }
 function deal_get_fields(){
 	$colarr = array(
+		'id'=>_l('the_number_sign'),
 		"name"=>_l("project_name"),
 		"project_cost"=>_l("project_cost"),
 		"teamleader_name"=>_l("teamleader_name"),
@@ -2687,6 +2688,7 @@ function deal_get_fields(){
 }
 function deal_all_fields(){
 	$colarr = array(
+		"id"=>array("ins"=>"id","ll"=>"id"),
 		"name"=>array("ins"=>"name","ll"=>"project_name"),
 		"project_cost"=>array("ins"=>"project_cost","ll"=>"project_cost"),
 		"teamleader_name"=>array("ins"=>"teamleader","ll"=>"teamleader_name"),

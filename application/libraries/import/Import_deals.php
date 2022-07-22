@@ -204,70 +204,72 @@ class Import_deals extends App_import
 							}
 							$deal['imported_id'] = $this->uniqueId;
 							$dealId = $this->insertDeal($deal, $orgId, $personId);
-							//Activity
-							$activity = array();
-							if($insert['activity_name']) {
-								$activity['name'] = $insert['activity_name'];
-							}
-							if($insert['activity_tasktype']) {
-								$activity['tasktype'] = $insert['activity_tasktype'];
-							}
-							if($insert['activity_description']) {
-								$activity['description'] = $insert['activity_description'];
-							}
-							if($insert['activity_send_reminder']) {
-								$activity['send_reminder'] = $insert['activity_send_reminder'];
-							}
-							if($insert['activity_priority']) {
-								$priority = strtolower($insert['activity_priority']);
-								if($priority == 'low') {
-									$activity['priority'] = 1;
-								} else if($priority == 'medium') {
-									$activity['priority'] = 2;
-								} else if($priority == 'high') {
-									$activity['priority'] = 3;
-								} else {
-									$activity['priority'] = 4;
-								}
-							}
-							if($insert['activity_startdate']) {
-								$startdate = date('Y-m-d H:i:s',strtotime($insert['activity_startdate']));
-								$activity['startdate'] = $startdate;
-								$activity['dateadded'] = $startdate;
-								if($startdate == date('Y-m-d')){
-									$activity['status']  = 3;
-								}
-								if($startdate < date('Y-m-d')){
-									$activity['status']  = 2;
-								}
-								if (date('Y-m-d') < $startdate) {
-									$activity['status'] = 1;
-								}
-							}
-							$activity['rel_id'] = $dealId;
-							$activity['rel_type'] = 'project'; 
-							$activity['contacts_id'] = $personId;
-							$activity['addedfrom'] = get_staff_user_id();
-							$activity['imported_id'] = $this->uniqueId;
-							$activityId = $this->insertActivity($activity, $insert['activity_assignedto']);
+                            if($insert['activity_name'] || $insert['activity_tasktype'] || $insert['activity_priority'] || $insert['activity_startdate']){
+                                //Activity
+                                $activity = array();
+                                if($insert['activity_name']) {
+                                    $activity['name'] = $insert['activity_name'];
+                                }
+                                if($insert['activity_tasktype']) {
+                                    $activity['tasktype'] = $insert['activity_tasktype'];
+                                }
+                                if($insert['activity_description']) {
+                                    $activity['description'] = $insert['activity_description'];
+                                }
+                                if($insert['activity_send_reminder']) {
+                                    $activity['send_reminder'] = $insert['activity_send_reminder'];
+                                }
+                                if($insert['activity_priority']) {
+                                    $priority = strtolower($insert['activity_priority']);
+                                    if($priority == 'low') {
+                                        $activity['priority'] = 1;
+                                    } else if($priority == 'medium') {
+                                        $activity['priority'] = 2;
+                                    } else if($priority == 'high') {
+                                        $activity['priority'] = 3;
+                                    } else {
+                                        $activity['priority'] = 4;
+                                    }
+                                }
+                                if($insert['activity_startdate']) {
+                                    $startdate = date('Y-m-d H:i:s',strtotime($insert['activity_startdate']));
+                                    $activity['startdate'] = $startdate;
+                                    $activity['dateadded'] = $startdate;
+                                    if($startdate == date('Y-m-d')){
+                                        $activity['status']  = 3;
+                                    }
+                                    if($startdate < date('Y-m-d')){
+                                        $activity['status']  = 2;
+                                    }
+                                    if (date('Y-m-d') < $startdate) {
+                                        $activity['status'] = 1;
+                                    }
+                                }
+                                $activity['rel_id'] = $dealId;
+                                $activity['rel_type'] = 'project'; 
+                                $activity['contacts_id'] = $personId;
+                                $activity['addedfrom'] = get_staff_user_id();
+                                $activity['imported_id'] = $this->uniqueId;
+                                $activityId = $this->insertActivity($activity, $insert['activity_assignedto']);
 						
-							foreach ($this->getCustomFields() as $field) {
-								$insertCusField = [];
-								if($insert[$field['slug']] && $insert[$field['slug']] != '') {
-									if($field['fieldto'] == 'customers') {
-										$relid = $orgId;
-									} elseif ($field['fieldto'] == 'contacts') {
-										$relid = $personId;
-									} else {
-										$relid = $dealId;
-									}
-									$insertCusField['relid'] = $relid;
-									$insertCusField['fieldid'] = $field['id'];
-									$insertCusField['fieldto'] = $field['fieldto'];
-									$insertCusField['value'] = $insert[$field['slug']];
-									$activityId = $this->insertCustomValue($insertCusField);
-								}
-							}
+                                foreach ($this->getCustomFields() as $field) {
+                                    $insertCusField = [];
+                                    if($insert[$field['slug']] && $insert[$field['slug']] != '') {
+                                        if($field['fieldto'] == 'customers') {
+                                            $relid = $orgId;
+                                        } elseif ($field['fieldto'] == 'contacts') {
+                                            $relid = $personId;
+                                        } else {
+                                            $relid = $dealId;
+                                        }
+                                        $insertCusField['relid'] = $relid;
+                                        $insertCusField['fieldid'] = $field['id'];
+                                        $insertCusField['fieldto'] = $field['fieldto'];
+                                        $insertCusField['value'] = $insert[$field['slug']];
+                                        $activityId = $this->insertCustomValue($insertCusField);
+                                    }
+                                }
+                            }
 						}
 					} else {
 						//pre($insert);
@@ -441,42 +443,50 @@ class Import_deals extends App_import
 				}
 			}
 		}
-        if(!$data['activity_name']) {
-            if($reason)
-                $reason .= ', ';
-            $reason .= 'Activity Name is empty';
+
+        if($data['activity_name'] || $data['activity_tasktype'] || $data['activity_priority'] || $data['activity_startdate']){
+
+            if(!$data['activity_name']) {
+                if($reason)
+                    $reason .= ', ';
+                $reason .= 'Activity Name is empty';
+            }
+            if(!$data['activity_tasktype']) {
+                if($reason)
+                    $reason .= ', ';
+                $reason .= 'Activity Type is empty';
+            }
+            if(!$data['activity_priority']) {
+                if($reason)
+                    $reason .= ', ';
+                $reason .= 'Activity Priority is empty';
+            }
+            if(!$data['activity_startdate']) {
+                if($reason)
+                    $reason .= ', ';
+                $reason .= 'Activity Start Date is empty';
+            }
+
+            if(in_array("project_contacts[]", $mandatory_fields) || in_array("primary_contact", $mandatory_fields)){
+                if(!$data['activity_assignedto'] ) {
+                    if($reason)
+                        $reason .= ', ';
+                    $reason .= 'Activity Assigned to is empty';
+                } else {
+                    //Get teamleader Id
+                    $this->ci->db->where('email', $data['activity_assignedto']);
+                    $staffid = $this->ci->db->get(db_prefix().'staff')->row();
+                    if(!$staffid) {
+                        if($reason)
+                            $reason .= ', ';
+                        $reason .= 'Activity Assigned Staff not exist.'; 
+                    }
+                }
+            }
+            
         }
-        if(!$data['activity_tasktype']) {
-            if($reason)
-                $reason .= ', ';
-            $reason .= 'Activity Type is empty';
-        }
-        if(!$data['activity_priority']) {
-            if($reason)
-                $reason .= ', ';
-            $reason .= 'Activity Priority is empty';
-        }
-        if(!$data['activity_startdate']) {
-            if($reason)
-                $reason .= ', ';
-            $reason .= 'Activity Start Date is empty';
-        }
-		if(in_array("project_contacts[]", $mandatory_fields) || in_array("primary_contact", $mandatory_fields)){
-			if(!$data['activity_assignedto'] ) {
-				if($reason)
-					$reason .= ', ';
-				$reason .= 'Activity Assigned to is empty';
-			} else {
-				//Get teamleader Id
-				$this->ci->db->where('email', $data['activity_assignedto']);
-				$staffid = $this->ci->db->get(db_prefix().'staff')->row();
-				if(!$staffid) {
-					if($reason)
-						$reason .= ', ';
-					$reason .= 'Activity Assigned Staff not exist.'; 
-				}
-			}
-		}
+
+		
         return $reason;
     }
 

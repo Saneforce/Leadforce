@@ -543,8 +543,66 @@ abstract class App_import
 		}
 		//pre($mandatory);exit;
         //pre($this->getImportableDatabaseFields());exit;
+
+        $required_fields =get_option('deal_mandatory');
+        if($required_fields && is_string($required_fields)){
+            $required_fields = json_decode($required_fields);
+        }
+        $required_db_fields =array('deal_name');
+        foreach($required_fields as $rfield){
+            switch ($rfield) {
+                case 'clientid':
+                    $required_db_fields [] ='organization_name';
+                    break;
+                case 'project_contacts[]':
+                    $required_db_fields [] ='deal_followers';
+                    break;
+                // case 'primary_contact':
+                //     $required_db_fields [] ='deal_followers';
+                //     break;
+                case 'pipeline_id':
+                    $required_db_fields [] ='deal_pipeline_stage';
+                    break;
+                case 'status':
+                    $required_db_fields [] ='deal_pipeline_stage';
+                    break;
+                case 'teamleader':
+                    $required_db_fields [] ='deal_owner';
+                    break;
+                case 'project_members':
+                    $required_db_fields [] ='deal_followers';
+                    break;
+                case 'project_cost':
+                    $required_db_fields [] ='deal_project_cost';
+                    break;
+                case 'project_start_date':
+                    $required_db_fields [] ='deal_start_date';
+                    break;
+                case 'project_deadline':
+                    $required_db_fields [] ='deal_deadline';
+                    break;
+                case 'description':
+                    $required_db_fields [] ='deal_description';
+                    break;
+                default:
+                    # code...
+                    break;
+            }
+        }
         foreach ($this->getImportableDatabaseFields() as $field) {
-            if(in_array($field, $mandatory)) {
+
+            if($this->formatFieldNameForHeading($field) == 'Deal owner'){
+                $objPHPExcel->getActiveSheet()->getCell($key.$totalSampleFields)->setValue('Deal Owner Mail Id');
+            }
+            else if($this->formatFieldNameForHeading($field) == 'Activity assignedto'){
+                $objPHPExcel->getActiveSheet()->getCell($key.$totalSampleFields)->setValue('Assigned Person Mail Id');
+            }else if($this->formatFieldNameForHeading($field) == 'Deal followers'){
+                $objPHPExcel->getActiveSheet()->getCell($key.$totalSampleFields)->setValue('Deal follower mail id');
+            }else{
+                $objPHPExcel->getActiveSheet()->getCell($key.$totalSampleFields)->setValue($this->formatFieldNameForHeading($field));
+            }
+
+            if(in_array($field, $required_db_fields)) {
                 // $objPHPExcel->getActiveSheet()->SetCellValue($key.$totalSampleFields, $this->formatFieldNameForHeading($field));
                 // $objPHPExcel->getActiveSheet()
                 // ->getStyle($key.$totalSampleFields)
@@ -557,29 +615,7 @@ abstract class App_import
                         'bold'  => true,
                         'color' => array('rgb' => 'fa0505')
                     ));
-                if($this->formatFieldNameForHeading($field) == 'Deal owner'){
-					$objPHPExcel->getActiveSheet()->getCell($key.$totalSampleFields)->setValue('Deal Owner Mail Id');
-				}
-				else if($this->formatFieldNameForHeading($field) == 'Activity assignedto'){
-					$objPHPExcel->getActiveSheet()->getCell($key.$totalSampleFields)->setValue('Assigned Person Mail Id');
-				}else if($this->formatFieldNameForHeading($field) == 'Deal followers'){
-					$objPHPExcel->getActiveSheet()->getCell($key.$totalSampleFields)->setValue('Deal follower mail id');
-				}else{
-					$objPHPExcel->getActiveSheet()->getCell($key.$totalSampleFields)->setValue($this->formatFieldNameForHeading($field));
-				}
                 $objPHPExcel->getActiveSheet()->getStyle($key.$totalSampleFields)->applyFromArray($styleArray);
-            } else {
-				if($this->formatFieldNameForHeading($field) == 'Deal owner'){
-					$objPHPExcel->getActiveSheet()->getCell($key.$totalSampleFields)->setValue('Deal Owner Mail Id');
-				}
-				else if($this->formatFieldNameForHeading($field) == 'Activity assignedto'){
-					$objPHPExcel->getActiveSheet()->getCell($key.$totalSampleFields)->setValue('Assigned Person Mail Id');
-				}else if($this->formatFieldNameForHeading($field) == 'Deal followers'){
-					$objPHPExcel->getActiveSheet()->getCell($key.$totalSampleFields)->setValue('Deal follower mail id');
-				}else{
-					$objPHPExcel->getActiveSheet()->getCell($key.$totalSampleFields)->setValue($this->formatFieldNameForHeading($field));
-				}
-               // $objPHPExcel->getActiveSheet()->SetCellValue($key.$totalSampleFields, $this->formatFieldNameForHeading($field));
             }
          
             //echo '"' . $this->formatFieldNameForHeading($field) . '",';
@@ -601,58 +637,134 @@ abstract class App_import
         if($_POST['download_contact_sample'] === 'true') {
             $sample_CSV = array('123','Stojanovic Goran','client@gmail.com','9787654567','Manager','test','test','test');
         } else {
-            //$sample_CSV = array('Stojanovic Goran','it012','invoices','Manager','Saneforce','9898989898','100','INR','600001','Tamilnadu','143, GJ street, kolmur, INR.','www.web.com','Deal 1907','Type Description','Hot','Payroll','seetha@saneforce.com','19-05-2021','30-05-2021','5000','Won','USD','emp1@saneforce.com,emp2@saneforce.com,emp3@saneforce.com','Call sundar','Call','Type Description','High','19-05-2021','darious@saneforce.com');
-            $sample_CSV = array('Stojanovic Goran','it012','invoices','Manager','Saneforce','9898989898','100','INR','600001','Tamilnadu','143, GJ street, kolmur, INR.','www.web.com','Deal 1907');
-			$i13 = 13;
-			if (in_array("description", $mandatory_fields)){
-				$sample_CSV[$i13] = 'Type Description';
-				$i13++;
-			}
-			if (in_array("status", $mandatory_fields)){
-				$sample_CSV[$i13] = 'Hot';
-				$i13++;
-			
-			if (in_array("pipeline_id", $mandatory_fields)){
-				$sample_CSV[$i13] = 'Payroll';
-				$i13++;
-			}}
-			if (in_array("teamleader", $mandatory_fields)){
-				$sample_CSV[$i13] = 'seetha@saneforce.com';
-				$i13++;
-			}
-			//if (in_array("start_date", $mandatory_fields)){
-			if (in_array("project_start_date", $mandatory_fields)){
-				$sample_CSV[$i13] = '19-05-2021';
-				$i13++;
-			}
-			//if (in_array("deadline", $mandatory_fields)){
-			if (in_array("project_deadline", $mandatory_fields)){
-				$sample_CSV[$i13] = '30-05-2021';
-				$i13++;
-			}
-			if (in_array("project_cost", $mandatory_fields)){
-				$sample_CSV[$i13] = '5000';
-				$i13++;
-			}
-			$sample_CSV[$i13] = 'Won';
-			$i13++;
-			$sample_CSV[$i13] = 'USD';
-			$i13++;
-			if (in_array("project_members[]", $mandatory_fields)){
-				$sample_CSV[$i13] = 'emp1@saneforce.com,emp2@saneforce.com,emp3@saneforce.com';
-				$i13++;
-			}
-			/*if (in_array("project_members[]", $mandatory_fields)){
-				$sample_CSV[$i13] = 'emp1@saneforce.com,emp2@saneforce.com,emp3@saneforce.com';
-				$i13++;
-			}*/
-			$test_array = array('Call sundar','call','Type Description','High','19-05-2021','yes','darious@saneforce.com','Custom Data','Custom Data','Custom Data','Custom Data','Custom Data','Custom Data','Custom Data','Custom Data');
-			if(!empty($test_array)){
-				foreach($test_array as $test_1){
-					$sample_CSV[$i13] = $test_1;
-					$i13++;
-				}
-			}
+            $sample_CSV =array();
+            foreach ($this->getImportableDatabaseFields() as $field) {
+                switch($field){
+                    case 'person_fullname':
+                        $sample_CSV []='Stojanovic Goran';
+                        break;
+                    case 'person_email':
+                        $sample_CSV []='client@gmail.com';
+                        break;
+                    case 'person_phonenumber':
+                        $sample_CSV []='9898989898';
+                        break;
+                    case 'person_position':
+                        $sample_CSV []='Manager';
+                        break;
+                    case 'organization_name':
+                        $sample_CSV []='Saneforce';
+                        break;
+                    case 'organization_phonenumber':
+                        $sample_CSV []='9898989898';
+                        break;
+                    case 'organization_country':
+                        $sample_CSV []='IND';
+                        break;
+                    case 'organization_city':
+                        $sample_CSV []='Chennai';
+                        break;
+                    case 'organization_zip':
+                        $sample_CSV []='600001';
+                        break;
+                    case 'organization_state':
+                        $sample_CSV []='Tamilnadu';
+                        break;
+                    case 'organization_address':
+                        $sample_CSV []='143, GJ street, kolmur';
+                        break;
+                    case 'organization_website':
+                        $sample_CSV []='www.web.com';
+                        break;
+                    case 'deal_name':
+                        $sample_CSV []='Deal 1907';
+                        break;
+                    case 'deal_description':
+                        $sample_CSV []='Type Description';
+                        break;
+                    case 'deal_pipeline_stage':
+                        $sample_CSV []='Hot';
+                        break;
+                    case 'deal_pipeline':
+                        $sample_CSV []='Payroll';
+                        break;
+                    case 'deal_owner':
+                        $sample_CSV []='seetha@saneforce.com';
+                        break;
+                    case 'deal_start_date':
+                        $sample_CSV []='19-05-2021';
+                        break;
+                    case 'deal_deadline':
+                        $sample_CSV []='30-05-2021';
+                        break;
+                    case 'deal_created_by':
+                        $sample_CSV []='100';
+                        break;
+                    case 'deal_project_modified':
+                        $sample_CSV []='30-05-2021';
+                        break;
+                    case 'deal_modified_by':
+                        $sample_CSV []='100';
+                        break;
+                    case 'deal_project_cost':
+                        $sample_CSV []='5000';
+                        break;
+                    case 'deal_stage':
+                        $sample_CSV []='Won';
+                        break;
+                    case 'deal_project_currency':
+                        $sample_CSV []='INR';
+                        break;
+                    case 'deal_lead_id':
+                        $sample_CSV []='55';
+                        break;
+                    case 'deal_followers':
+                        $sample_CSV []='emp1@saneforce.com,emp2@saneforce.com,emp3@saneforce.com';
+                        break;
+                    case 'activity_name':
+                        $sample_CSV []='Type name';
+                        break;
+                    case 'activity_tasktype':
+                        $sample_CSV []='Call';
+                        break;
+                    case 'activity_description':
+                        $sample_CSV []='Type Description';
+                        break;
+                    case 'activity_priority':
+                        $sample_CSV []='High';
+                        break;
+                    case 'activity_datemodified':
+                        $sample_CSV []='30-05-2021';
+                        break;
+                    case 'activity_startdate':
+                        $sample_CSV []='30-05-2021';
+                        break;
+                    case 'activity_send_reminder':
+                        $sample_CSV []='yes';
+                        break;
+                    case 'activity_call_request_id':
+                        $sample_CSV []='';
+                        break;
+                    case 'activity_call_code':
+                        $sample_CSV []='';
+                        break;
+                    case 'activity_call_msg':
+                        $sample_CSV []='';
+                        break;
+                    case 'activity_assignedto':
+                        $sample_CSV []='';
+                        break;
+
+                    default:
+                        $sample_CSV []='Data';
+                        break;
+                }
+            }
+
+            //added for custom fields
+            foreach ($this->getCustomFields() as $field) {
+                $sample_CSV []='Custom Data';
+            }
         }
         
         $sampleCnt = count($sample_CSV);

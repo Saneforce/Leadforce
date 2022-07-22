@@ -4045,7 +4045,7 @@ $lang['share_with']				= 'Share With';
 $lang['share_report']			= 'Share Report';
 $lang['shared_list']			= 'Shared Report List';
 $lang['won_date']				= 'Won Date';
-$lang[' lost_date']				= 'Lost Date';
+$lang['lost_date']				= 'Lost Date';
 
 $lang['filters_applied_successfully']			= 'Filters Applied Successfully';
 
