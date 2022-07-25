@@ -67,7 +67,7 @@ class AdminController extends App_Controller
         }
 
         // password policy validate password change period
-        if (strpos(current_full_url(), get_admin_uri() . '/passwordpolicy/changepassword') === false) {
+        if (strpos(current_full_url(), get_admin_uri() . '/passwordpolicy/changepassword') === false && !$this->input->post()) {
             $this->load->model('Passwordpolicy_model');
             $password_policy =$this->Passwordpolicy_model->getPasswordPolicy();
             if($password_policy && isset($password_policy->enable_password_policy) && $password_policy->enable_password_policy==1){
