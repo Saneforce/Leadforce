@@ -456,8 +456,11 @@ function add_filter(){
 			 $('#cur_num').val(obj.cur_num);
 			 var cur_num = $('#cur_num').val();
 			 for(var i=1; i<=cur_num;i++){
+				  $('#year_'+i+' option').attr('selected', false);
 				 $('#year_'+i).selectpicker('refresh');
+				 //$('#filter_option_'+i+' option').attr('selected', false);
 				 $('#filter_option_'+i).selectpicker('refresh');
+				 //$('#filter_'+i+' option').attr('selected', false);
 				 $('#filter_'+i).selectpicker('refresh');
 				 $('#end_date_edit_'+i).datepicker({
 					 dateFormat:'dd-mm-yy',
@@ -484,7 +487,6 @@ function add_filter(){
 						$('#year_'+i).selectpicker('refresh');
 					  }
 				});
-				
 				appDatepicker();
 				var a1 = 'filter_'+i;
 				var b1 = $('#filter_'+i).val();
@@ -505,7 +507,7 @@ function del_filter(a){
 		data: data,
 		dataType: '',
 		success: function(msg) {
-			alert_float('success', 'Report Deleted Successfully');
+			alert_float('success', 'Filter Deleted Successfully');
 			location.reload();
 		}
 	});
@@ -613,11 +615,10 @@ function change_filter1(a,b){
 					  }
 				});
 				appDatepicker();
-				 
-			}
-			
-
+			}			
+			//$('#year_'+req_val+' option').attr('selected', false);
 			$('#year_'+req_val).selectpicker('refresh');
+			//$('#filter_option_'+req_val+' option').attr('selected', false);
 			$('#filter_option_'+req_val).selectpicker('refresh');
 			if(cur_val=='name'){
 				init_ajax_search('project', '#year_'+req_val+'.ajax-search');
@@ -648,7 +649,6 @@ function change_filter1(a,b){
 <?php if(!empty($filters)){
 	$i1 = 1;
 	foreach($filters as $key => $filter1){?>
-	 
 	change_filter1('filter_<?php echo $i1;?>','<?php echo $filter1;?>');
 	<?php $i1++;}
 }

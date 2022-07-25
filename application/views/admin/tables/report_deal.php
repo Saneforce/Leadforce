@@ -350,7 +350,7 @@ if(!empty($filters))
 					array_push($where, " AND " . db_prefix() . "projects.stage_of = '1'");
 				}
 				if($filters2[$i1] == 'LOSS'){
-					array_push($where, " AND " . db_prefix() . "projects.stage_of != '1'");
+					array_push($where, " AND " . db_prefix() . "projects.stage_of = '2'");
 				}
 			}
 			
@@ -359,7 +359,7 @@ if(!empty($filters))
 					array_push($where, " AND " . db_prefix() . "projects.stage_of != '1'");
 				}
 				if($filters2[$i1] == 'LOSS'){
-					array_push($where, " AND " . db_prefix() . "projects.stage_of = '1'");
+					array_push($where, " AND " . db_prefix() . "projects.stage_of != '2'");
 				}
 			}
 			else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!=''){
@@ -370,9 +370,9 @@ if(!empty($filters))
 						if($req_arr1 == 'WON'){
 							$req_arr .= "'1',";
 						}
-						if($req_arr1 == 'Loss'){
+						if($req_arr1 == 'LOSS'){
 							$req_arr .= "'2',";
-							$req_arr .= "'0',";
+							//$req_arr .= "'0',";
 						}
 					}
 				}
