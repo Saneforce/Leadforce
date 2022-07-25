@@ -583,7 +583,7 @@ function change_filter1(a,b){
 		dataType: '',
 		success: function(msg) {
 			$('#ch_dr_'+req_val).html(msg);
-			$('.table-projects').DataTable().ajax.reload();
+			//$('.table-projects').DataTable().ajax.reload();
 			if(cur_val=='project_start_date' || cur_val == 'project_deadline'){
 				$('#end_date_edit_'+req_val).datepicker({
 					 dateFormat:'dd-mm-yy',

@@ -1008,27 +1008,27 @@ class Leads extends AdminController
         if (!is_admin()) {
             access_denied('Leads Sources');
         }
-        $data['indiaMart'] = array('QUERY_ID' => 'QUERY_ID',
-        'QTYPE' => 'QTYPE',
-        'SENDERNAME' => 'SENDERNAME',
-        'SENDERMAIL' => 'SENDERMAIL',
-        'MOB' => 'MOB',
-        'GLUSER_USR_COMPANYNAME' => 'GLUSER_USR_COMPANYNAME',
-        'ENQ_ADDRESS' => 'ENQ_ADDRESS',
-        'ENQ_CITY' => 'ENQ_CITY',
+        $data['indiaMart'] = array('UNIQUE_QUERY_ID' => 'QUERY_ID',
+        'QUERY_TYPE' => 'QTYPE',
+        'SENDER_NAME' => 'SENDERNAME',
+        'SENDER_EMAIL' => 'SENDERMAIL',
+        'SENDER_MOBILE' => 'MOB',
+       // 'GLUSER_USR_COMPANYNAME' => 'GLUSER_USR_COMPANYNAME',
+        'SENDER_ADDRESS' => 'ENQ_ADDRESS',
+        'SENDER_CITY' => 'ENQ_CITY',
         'ENQ_STATE' => 'ENQ_STATE',
-        'COUNTRY_ISO' => 'COUNTRY_ISO',
-        'PRODUCT_NAME' => 'PRODUCT_NAME',
-        'ENQ_MESSAGE' => 'ENQ_MESSAGE',
-        'DATE_RE' => 'DATE_RE',
-        'DATE_R' => 'DATE_R',
-        'DATE_TIME_RE' => 'DATE_TIME_RE',
-        'LOG_TIME' => 'LOG_TIME',
-        'QUERY_MODID' => 'QUERY_MODID',
-        'ENQ_CALL_DURATION' => 'ENQ_CALL_DURATION',
-        'ENQ_RECEIVER_MOB' => 'ENQ_RECEIVER_MOB',
-        'EMAIL_ALT' => 'EMAIL_ALT',
-        'MOBILE_ALT' => 'MOBILE_ALT');
+        'SENDER_COUNTRY_ISO' => 'COUNTRY_ISO',
+        'QUERY_PRODUCT_NAME' => 'PRODUCT_NAME',
+        'QUERY_MESSAGE' => 'ENQ_MESSAGE',
+        //'DATE_RE' => 'DATE_RE',
+      //  'DATE_R' => 'DATE_R',
+       // 'DATE_TIME_RE' => 'DATE_TIME_RE',
+       // 'LOG_TIME' => 'LOG_TIME',
+  //      'QUERY_MODID' => 'QUERY_MODID',
+        'CALL_DURATION' => 'ENQ_CALL_DURATION',
+        'RECEIVER_MOBILE' => 'ENQ_RECEIVER_MOB',
+        'SENDER_EMAIL_ALT' => 'EMAIL_ALT',
+        'SENDER_MOBILE_ALT' => 'MOBILE_ALT');
         $data['sources'] = $this->leads_model->get_source_admin();
         $data['members']     = $this->staff_model->get('', ['is_not_staff' => 0, 'active' => 1]);
         $data['title']   = 'Leads sources';
