@@ -2,7 +2,7 @@
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class PasswordPolicy extends AdminController
+class Passwordpolicy extends AdminController
 {
     public function __construct()
     {
