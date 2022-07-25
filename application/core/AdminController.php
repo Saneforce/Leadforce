@@ -66,6 +66,30 @@ class AdminController extends App_Controller
             redirect(admin_url('authentication'));
         }
 
+        // password policy validate password change period
+        if (strpos(current_full_url(), get_admin_uri() . '/passwordpolicy/changepassword') === false) {
+            $this->load->model('Passwordpolicy_model');
+            $password_policy =$this->Passwordpolicy_model->getPasswordPolicy();
+            if($password_policy && isset($password_policy->enable_password_policy) && $password_policy->enable_password_policy==1){
+                if($password_policy->pass_change_period >0){
+                    $date1 =strtotime("-".$password_policy->pass_change_period." days");
+                    if($currentUser->last_password_change){
+                        $date2 =strtotime(date_format(date_create($currentUser->last_password_change),'Y-m-d'));
+                    }elseif($currentUser->datecreate){
+                        $date2 =strtotime(date_format(date_create($currentUser->datecreate),'Y-m-d'));
+                    }else{
+                        $date2 =$date1;
+                    }
+                    if($date2 <= $date1){
+                        redirect(admin_url('passwordpolicy/changepassword'));
+                    }
+                }elseif($password_policy->first_time_change_pass ==1 && !$currentUser->last_password_change){
+                    redirect(admin_url('passwordpolicy/changepassword'));
+                }
+                
+                
+            }
+        }
         $GLOBALS['current_user'] = $currentUser;
 
         init_admin_assets();

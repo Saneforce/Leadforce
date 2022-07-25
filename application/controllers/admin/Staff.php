@@ -195,6 +195,21 @@ class Staff extends AdminController
 
             $data['password'] = $this->input->post('password', false);
 
+            //password policy validation
+            $this->load->model('passwordpolicy_model');
+            $policy_validation =$this->passwordpolicy_model->validate_password($data['password']);
+            
+            if($policy_validation !== true){
+                set_alert('danger', $policy_validation);
+                redirect(admin_url('staff/member'));
+            }
+            if($id !==''){
+                if(!$this->passwordpolicy_model->check_password_history(true, $id, $data['password'])){
+                    set_alert('danger', _l('cannot_use_old_password'));
+                    redirect(admin_url('staff/member/'.$id));
+                }
+            }
+            // end password policy validation
             if ($id == '') {
                 if (!has_permission('staff', '', 'create')) {
                     access_denied('staff');

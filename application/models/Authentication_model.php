@@ -9,6 +9,7 @@ class Authentication_model extends App_Model
         parent::__construct();
         $this->load->model('user_autologin');
         $this->load->model('tasks_model');
+        $this->load->model('passwordpolicy_model');
         $this->autologin();
     }
 
@@ -31,7 +32,25 @@ class Authentication_model extends App_Model
             }
             $this->db->where('email', $email);
             $user = $this->db->get($table)->row();
+            $passwordpolicy=$this->passwordpolicy_model->getPasswordPolicy();
             if ($user) {
+                if($passwordpolicy && isset($passwordpolicy->enable_password_policy) && $passwordpolicy->lock_invalid_attempt >0 && $user->login_locked_on){
+                    if($passwordpolicy->lock_auto_release >0){
+                        $date1 =time();
+                        $date2 =strtotime($user->login_locked_on)+$passwordpolicy->lock_auto_release;
+                        if($date1>=$date2){
+                            if($staff){
+                                $this->passwordpolicy_model->reset_login_fail_log($staff,$user->staffid);
+                            }
+                        }else{
+                            log_activity('Account has been locked [Email: ' . $email . ', Is Staff Member: ' . ($staff == true ? 'Yes' : 'No') . ', IP: ' . $this->input->ip_address() . ']');
+                            return [
+                                'account_locked' => true,
+                            ];
+                        }
+                    }
+                    
+                }
                 // Email is okey lets check the password now
                 if (!app_hasher()->CheckPassword($password, $user->password)) {
                     hooks()->do_action('failed_login_attempt', [
@@ -41,6 +60,10 @@ class Authentication_model extends App_Model
 
                     log_activity('Failed Login Attempt [Email: ' . $email . ', Is Staff Member: ' . ($staff == true ? 'Yes' : 'No') . ', IP: ' . $this->input->ip_address() . ']');
 
+                    if($staff){
+                        $this->passwordpolicy_model->login_fail_log($staff,$user->staffid);
+                    }
+                    
                     // Password failed, return
                     return false;
                 }
@@ -56,6 +79,9 @@ class Authentication_model extends App_Model
                 return false;
             }
 
+            if($staff){
+                $this->passwordpolicy_model->reset_login_fail_log($staff,$user->staffid);
+            }
             if ($user->active == 0) {
                 hooks()->do_action('inactive_user_login_attempt', [
                         'user'            => $user,
@@ -69,6 +95,7 @@ class Authentication_model extends App_Model
             }
 
             $twoFactorAuth = false;
+
             if ($staff == true) {
                 $twoFactorAuth = $user->two_factor_auth_enabled == 0 ? false : true;
 
@@ -369,6 +396,7 @@ class Authentication_model extends App_Model
             ];
         }
 
+        $passwordnohased =$password;
         $password = app_hash_password($password);
         $table    = db_prefix() . 'contacts';
         $_id      = 'id';
@@ -390,6 +418,7 @@ class Authentication_model extends App_Model
             $this->db->where('new_pass_key', $new_pass_key);
             $this->db->update($table);
 
+            $this->passwordpolicy_model->save_password_history($staff, $userid, $passwordnohased);
             return true;
         }
 
@@ -411,6 +440,7 @@ class Authentication_model extends App_Model
                 'expired' => true,
             ];
         }
+        $passwordnohased =$password;
         $password = app_hash_password($password);
         $table    = db_prefix() . 'contacts';
         $_id      = 'id';
@@ -435,6 +465,7 @@ class Authentication_model extends App_Model
             $this->db->where($_id, $userid);
             $user = $this->db->get($table)->row();
 
+            $this->passwordpolicy_model->save_password_history($staff, $userid, $passwordnohased);
             $merge_fields = [];
             if ($staff == false) {
                 $sent = send_mail_template('customer_contact_password_resetted', $user->email, $user->userid, $user->$_id);

@@ -61,7 +61,10 @@ class Authentication extends App_Controller
                         set_alert('success', _l('two_factor_auth_code_sent_successfully', $email));
                     }
                     redirect(admin_url('authentication/two_factor'));
-                } elseif ($data == false) {
+                }elseif (is_array($data) && isset($data['account_locked'])) {
+                    set_alert('danger', _l('your_account_has_been_locked'));
+                    redirect(admin_url('authentication'));
+                }elseif ($data == false) {
                     set_alert('danger', _l('admin_auth_invalid_email_or_password'));
                     redirect(admin_url('authentication'));
                 }
@@ -159,6 +162,16 @@ class Authentication extends App_Controller
         $this->form_validation->set_rules('passwordr', _l('admin_auth_reset_password_repeat'), 'required|matches[password]');
         if ($this->input->post()) {
             if ($this->form_validation->run() !== false) {
+
+                $policy_validation =$this->passwordpolicy_model->validate_password($this->input->post('passwordr', false));
+                if($policy_validation !== true){
+                    set_alert('danger', $policy_validation);
+                    redirect(admin_url('authentication'));
+                }
+                if(!$this->passwordpolicy_model->check_password_history($staff, $userid, $this->input->post('passwordr', false))){
+                    set_alert('danger', _l('cannot_use_old_password'));
+                    redirect(admin_url('authentication'));
+                }
                 hooks()->do_action('before_user_reset_password', [
                     'staff'  => $staff,
                     'userid' => $userid,
@@ -191,6 +204,15 @@ class Authentication extends App_Controller
             } else {
                 redirect(site_url());
             }
+        }
+        $policy_validation =$this->passwordpolicy_model->validate_password($this->input->post('passwordr', false));
+        if($policy_validation !== true){
+            set_alert('danger', $policy_validation);
+            redirect(admin_url('authentication'));
+        }
+        if(!$this->passwordpolicy_model->check_password_history($staff, $userid, $this->input->post('passwordr', false))){
+            set_alert('danger', _l('cannot_use_old_password'));
+            redirect(admin_url('authentication'));
         }
         $this->form_validation->set_rules('password', _l('admin_auth_set_password'), 'required');
         $this->form_validation->set_rules('passwordr', _l('admin_auth_set_password_repeat'), 'required|matches[password]');

@@ -4,6 +4,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Staff_model extends App_Model
 {
+    public function __construct() {
+        parent::__construct();
+        $this->load->model('passwordpolicy_model');
+    }
+
     public function delete($id, $transfer_data_to)
     {
         if (!is_numeric($transfer_data_to)) {
@@ -710,6 +715,7 @@ class Staff_model extends App_Model
             unset($data['fakepasswordremembered']);
         }
 
+        $passwordnohased =$data['password'];
         
         if(!isset($data['role']) && isset($data['designation'])){
              $this->load->model('designation_model');
@@ -853,6 +859,7 @@ class Staff_model extends App_Model
 
         $this->db->where('staffid', $id);
         $this->db->update(db_prefix() . 'staff', $data);
+        $this->passwordpolicy_model->save_password_history(1, $id, $passwordnohased);
 
         if ($this->db->affected_rows() > 0) {
 //echo "111";
@@ -955,6 +962,7 @@ class Staff_model extends App_Model
             ];
         }
 
+        $passwordnohased =$data['newpasswordr'];
         $data['newpasswordr'] = app_hash_password($data['newpasswordr']);
 
         $this->db->where('staffid', $userid);
@@ -965,6 +973,7 @@ class Staff_model extends App_Model
         if ($this->db->affected_rows() > 0) {
             log_activity('Staff Password Changed [' . $userid . ']');
 
+            $this->passwordpolicy_model->save_password_history(true, $userid, $passwordnohased);
             return true;
         }
 

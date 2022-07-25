@@ -459,6 +459,15 @@ function app_init_admin_sidebar_menu_items() {
         ]);
     }
 
+    if (has_permission('password_policy', '', 'view')) {
+        $CI->app_menu->add_setup_menu_item('password_policy', [
+            'name' => _l('password_policy'),
+            'href' => admin_url('passwordpolicy'),
+            'position' => 5,
+        ]);
+    }
+
+
     if (is_admin()) {
         if (has_permission('customers')) {
             $CI->app_menu->add_setup_menu_item('customers', [
