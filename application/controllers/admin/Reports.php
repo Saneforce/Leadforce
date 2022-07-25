@@ -157,9 +157,13 @@ class Reports extends AdminController
 			$filter_data['filters2'][0]	=	'this_year';  
 			$filter_data['filters3'][0]	=	'01-01-'.date('Y');  
 			$filter_data['filters4'][0]	=	'31-12-'.date('Y');  
-			$filter_data['filters'][1]	=	'project_status';  
-			$filter_data['filters1'][1]	=	'is_any_of';  
-			$filter_data['filters2'][1]	=	'WON,LOSS'; 
+			$pipelines = $this->pipeline_model->getPipeline();
+			$filter_data['filters'][1]	=	'pipeline_id';  
+			$filter_data['filters1'][1]	=	'is';  
+			$filter_data['filters2'][1]	=	$pipelines[0]['id']; 
+			$filter_data['filters'][2]	=	'project_status';  
+			$filter_data['filters1'][2]	=	'is_any_of';  
+			$filter_data['filters2'][2]	=	'WON,LOSS'; 
 		}
 		else if($report_12_id == 'progress'){
 			$filter_data['filters'][0]	=	'project_start_date';  
@@ -936,8 +940,8 @@ class Reports extends AdminController
 				if(!empty($cus_flds)){
 					$req_out	.=	'<optgroup label="Custom Fields" data-max-options="2">';
 					foreach ($cus_flds as  $key12 => $cus_fld1){
-						if($key12==$filter1 || !in_array($key1, $filters)){
-							if($key1==$filter1){
+						if($key12==$filter1 || !in_array($key12, $filters)){
+							if($key12==$filter1){
 								$req_out	.=	'<option value="'.$key12.'" selected>'.$cus_fld1['ll'].'</option>';
 							}else{
 								$req_out	.=	'<option value="'.$key12.'">'.$cus_fld1['ll'].'</option>';
