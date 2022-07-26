@@ -60,10 +60,10 @@ class Passwordpolicy extends AdminController
             $policy_validation =$this->passwordpolicy_model->validate_password($this->input->post('newpasswordr', false));
             if($policy_validation !==true){
                 set_alert('danger', $policy_validation);
-                redirect(admin_url('authentication'));
+                redirect(admin_url('password_policy/changepassword'));
             }elseif(!$this->passwordpolicy_model->check_password_history(true, get_staff_user_id(), $this->input->post('newpasswordr', false))){
                 set_alert('danger', _l('cannot_use_old_password'));
-                redirect(admin_url('authentication'));
+                redirect(admin_url('password_policy/changepassword'));
             }else{
                 $response = $this->staff_model->change_password($this->input->post(null, false), get_staff_user_id());
                 if (is_array($response) && isset($response[0]['passwordnotmatch'])) {
