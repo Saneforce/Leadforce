@@ -9,8 +9,9 @@
                         <h4 class="no-margin">
                             <?php echo $title; ?>
                         </h4>
+                        
                         <hr class="hr-panel-heading" />
-                        <?php echo form_open('admin/passwordpolicy/changepassword',array('id'=>'passwordpolicy_changepassword')); ?>
+                        <?php echo form_open(admin_url('passwordpolicy/changepassword'),array('id'=>'passwordpolicy_changepassword')); ?>
                         <div class="form-group">
                             <label for="oldpassword" class="control-label"><?php echo _l('staff_edit_profile_change_old_password'); ?></label>
                             <input type="password" class="form-control" name="oldpassword" id="oldpassword">
