@@ -2719,9 +2719,9 @@ function deal_all_fields(){
 function deal_needed_fields(){
 	$fields = get_option('deal_fields');
 	$fields1 = get_option('deal_mandatory');
-	$data['need_fields'] = $data['need_fields_edit'] =  $data['mandatory_fields1'] = array('name');
-	$data['need_fields_label'] = array('project_name');
-	$i = $j = 1;
+	$data['need_fields'] = $data['need_fields_edit'] =  $data['mandatory_fields1'] = array('name','teamleader_name');
+	$data['need_fields_label'] = array('project_name','teamleader');
+	$i = $j = 2;
 	if(!empty($fields1) && $fields1 != 'null'){
 		$i1 =0;
 		$req_fields2 = json_decode($fields1);
@@ -2748,10 +2748,6 @@ function deal_needed_fields(){
 					$data['need_fields'][$i] = 'contact_phone1';
 					$i++;
 					$data['need_fields'][$i] = 'contact_name';
-				}
-				else if($req_field11 == 'teamleader'){
-					$data['need_fields'][$i] = 'teamleader_name';
-					$data['need_fields_label'][$j] = 'teamleader';
 				}
 				else if($req_field11 == 'project_members[]'){
 					$data['need_fields'][$i] = 'members';

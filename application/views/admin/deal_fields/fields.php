@@ -47,6 +47,43 @@
 												</div>
 											</td>
 										</tr>
+
+										<tr style="background-color:#ccc">
+											<td><?php echo _l('teamleader_name'); ?></td>
+											<td>
+												<div class="form-check form-switch">
+													<label class="switch">
+														<input type="checkbox" name="deal[]" value="teamleader"  checked disabled>
+														<span class="slider round"></span>
+													</label>
+													<span class="margin-left-10"><?php echo _l('is_field_needed'); ?></span>
+												
+													<label class="switch">
+														<input type="checkbox" name="deal_mandatory[]" id="mandatory_teamleader" value="teamleader" checked disabled>
+														<span class="slider round"></span>
+													</label>
+													<span class="margin-left-10 cl-red"><i class="fa fa-asterisk"></i></span><span class="margin-left-10"><?php echo _l('is_field_mandatory'); ?></span>
+													
+													<label class="switch">
+														<input type="checkbox" name="deal_important[]" id="important_teamleader" value="teamleader" checked disabled>
+														<span class="slider round"></span>
+													</label>
+													<span class="margin-left-10"><i class="fa fa-exclamation-triangle"></i></span><span class="margin-left-10"><?php echo _l('is_field_important'); ?></span>
+												</div>
+											</td>
+											<td style="width:17%">
+												<div class="row" id="message_teamleader">
+													<div  class="col-md-12">
+														<div class="form-group" >
+															<label class="control-label"><?php echo _l('important_message'); ?></label>
+															<input type="text" name="important_message[]" class="form-control" value="<?php if(!empty($important_fields) && in_array("teamleader", $important_fields) && !empty($important_msg->teamleader)){ echo $important_msg->teamleader;}?>" >
+														</div>
+													</div>
+													
+												</div>
+											</td>
+										</tr>
+
 										<tr>
 											<td><?php echo _l('project_customer'); ?></td>
 											<td>
@@ -217,41 +254,6 @@
 														<div class="form-group" >
 															<label class="control-label"><?php echo _l('important_message'); ?></label>
 															<input type="text" name="important_message[]" class="form-control" value="<?php if(!empty($important_fields) && in_array("status", $important_fields) && !empty($important_msg->status)){ echo $important_msg->status;}?>" >
-														</div>
-													</div>
-													
-												</div>
-											</td>
-										</tr>
-										<tr>
-											<td><?php echo _l('teamleader_name'); ?></td>
-											<td>
-												<div class="form-check form-switch">
-													<label class="switch">
-														<input type="checkbox" name="deal[]" value="teamleader" <?php if (!empty($needed_fields) && in_array("teamleader", $needed_fields)){ echo 'checked';}?> onclick="check_deal(this,'teamleader')">
-														<span class="slider round"></span>
-													</label>
-													<span class="margin-left-10"><?php echo _l('is_field_needed'); ?></span>
-												
-													<label class="switch">
-														<input type="checkbox" name="deal_mandatory[]" id="mandatory_teamleader" value="teamleader" <?php if (!empty($needed_fields) && in_array("teamleader", $needed_fields) && !empty($mandatory_fields) && in_array("teamleader", $mandatory_fields)){ echo 'checked';} if (empty($needed_fields) || !in_array("teamleader", $needed_fields)){ echo 'disabled';}?>>
-														<span class="slider round"></span>
-													</label>
-													<span class="margin-left-10 cl-red"><i class="fa fa-asterisk"></i></span><span class="margin-left-10"><?php echo _l('is_field_mandatory'); ?></span>
-													
-													<label class="switch">
-														<input type="checkbox" name="deal_important[]" id="important_teamleader" value="teamleader" <?php if (!empty($needed_fields) && in_array("teamleader", $needed_fields) && !empty($important_fields) && in_array("teamleader", $important_fields)){ echo 'checked';} if (empty($needed_fields) || !in_array("teamleader", $needed_fields)){ echo 'disabled';}?> onclick="check_important(this,'teamleader')">
-														<span class="slider round"></span>
-													</label>
-													<span class="margin-left-10"><i class="fa fa-exclamation-triangle"></i></span><span class="margin-left-10"><?php echo _l('is_field_important'); ?></span>
-												</div>
-											</td>
-											<td style="width:17%">
-												<div class="row" id="message_teamleader" <?php if (empty($important_fields) || !in_array("teamleader", $important_fields)){?> style="display:none" <?php }?>>
-													<div  class="col-md-12">
-														<div class="form-group" >
-															<label class="control-label"><?php echo _l('important_message'); ?></label>
-															<input type="text" name="important_message[]" class="form-control" value="<?php if(!empty($important_fields) && in_array("teamleader", $important_fields) && !empty($important_msg->teamleader)){ echo $important_msg->teamleader;}?>" >
 														</div>
 													</div>
 													

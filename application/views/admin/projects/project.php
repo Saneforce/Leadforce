@@ -214,7 +214,7 @@
                             </div>
                         </div>
                           -->
-						  <?php if(!empty($need_fields) && in_array("teamleader", $need_fields)){?>
+
                             <div <?php if(!empty($need_fields) && in_array("project_members[]", $need_fields)){?> class="col-md-6 form_teamleader" <?php }else{?> class="col-md-12 form_teamleader" <?php }?>>
                                 <?php 
                          $teamleaderselected = ((isset($project) && !empty($project->teamleader)) ? $project->teamleader : '');
@@ -232,7 +232,7 @@
                         
 ?>
                             </div>
-						  <?php }if(!empty($need_fields) && in_array("project_members[]", $need_fields)){?>
+						  <?php if(!empty($need_fields) && in_array("project_members[]", $need_fields)){?>
                             <div <?php if(!empty($need_fields) && in_array("teamleader", $need_fields)){?> class="col-md-6 form_assigned"<?php }else{?> class="col-md-12 form_assigned" <?php }?>>
                                 <?php
                          $selected = array();
@@ -977,7 +977,7 @@ $(function() {
        // primary_contact: 'required',
        // pipeline_id: 'required',
         //status: 'required',
-        //teamleader: 'required',
+        teamleader: 'required',
         // 'project_members[]': 'required',
        // start_date: 'required',
        // billing_type: 'required'
