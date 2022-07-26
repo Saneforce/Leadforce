@@ -9,6 +9,7 @@
                         <h4 class="no-margin">
                             <?php echo $title; ?>
                         </h4>
+                        
                         <hr class="hr-panel-heading" />
                         <?php echo form_open(admin_url('passwordpolicy/changepassword'),array('id'=>'passwordpolicy_changepassword')); ?>
                         <div class="form-group">
