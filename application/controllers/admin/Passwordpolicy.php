@@ -44,6 +44,12 @@ class Passwordpolicy extends AdminController
         foreach($data['password_policy'] as $name => $value){
             $_POST[$name] =$value;
         }
+        if(!isset($_POST['first_time_change_pass'])){
+            $_POST['first_time_change_pass'] =0;
+        }
+        if(!isset($_POST['password_strength'])){
+            $_POST['password_strength'] ='low';
+        }
         $this->load->view('admin/password_policy/settings', $data);
     }
 

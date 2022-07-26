@@ -73,16 +73,16 @@
 								<div class="form-group col-md-12">
 									<label for="rtl_support_admin" class="control-label clearfix">Password Strength</label>
 									<div class="radio radio-primary radio-inline">
-										<input type="radio" id="password_strength" name="password_strength" value="low" <?php echo set_value('password_strength')=='low'?'checked=""':''?>>
-										<label for="password_strength">Low</label>
+										<input type="radio" id="password_strength_low" name="password_strength" value="low" <?php echo set_value('password_strength')=='low'?'checked=""':''?>>
+										<label for="password_strength_low">Low</label>
 									</div>
 									<div class="radio radio-primary radio-inline">
-										<input type="radio" id="password_strength" name="password_strength" value="medium" <?php echo set_value('password_strength')=='medium'?'checked=""':''?>>
-										<label for="password_strength">Medium</label>
+										<input type="radio" id="password_strength_medium" name="password_strength" value="medium" <?php echo set_value('password_strength')=='medium'?'checked=""':''?>>
+										<label for="password_strength_medium">Medium</label>
 									</div>
 									<div class="radio radio-primary radio-inline">
-										<input type="radio" id="password_strength" name="password_strength" value="high" <?php echo set_value('password_strength')=='high'?'checked=""':''?>>
-										<label for="password_strength">Heigh</label>
+										<input type="radio" id="password_strength_high" name="password_strength" value="high" <?php echo set_value('password_strength')=='high'?'checked=""':''?>>
+										<label for="password_strength_high">Heigh</label>
 									</div>
 								</div>
 								<?php $attrs =['min'=>1]; ?>
