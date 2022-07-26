@@ -21,7 +21,7 @@ class ImportData extends AdminController
 		
 		$fields = get_option('deal_fields');
 		$fields1 = get_option('deal_mandatory');
-		$data['need_fields'] = $data['mandatory_fields'] = array("name");
+		$data['need_fields'] = $data['mandatory_fields'] = array("name",'teamleader_name');
 		if(!empty($fields) && $fields != 'null'){
 			$data['need_fields'] = json_decode($fields);
 		}
@@ -44,6 +44,7 @@ class ImportData extends AdminController
             $dbFieldsContact = $this->db->list_fields(db_prefix().'contacts');
             $dbFieldsDeal = $this->db->list_fields(db_prefix().'projects');
             $dbFieldsDeal1 = $data['need_fields'];
+            $dbFieldsDeal[] = 'deal_followers';
 			if (!in_array("description", $dbFieldsDeal1)){
 				if (($key = array_search('description', $dbFieldsDeal)) !== false) {
 					unset($dbFieldsDeal[$key]);
@@ -85,10 +86,23 @@ class ImportData extends AdminController
 				}
 			}
 			if (!in_array("project_members[]", $dbFieldsDeal1)){
-				if (($key = array_search('followers', $dbFieldsDeal)) !== false) {
+				if (($key = array_search('deal_followers', $dbFieldsDeal)) !== false) {
 					unset($dbFieldsDeal[$key]);
 				}
 			}
+
+
+            if (!in_array("project_start_date", $dbFieldsDeal1)){
+				if (($key = array_search('start_date', $dbFieldsDeal)) !== false) {
+					unset($dbFieldsDeal[$key]);
+				}
+			}
+            if (!in_array("project_deadline", $dbFieldsDeal1)){
+				if (($key = array_search('deadline', $dbFieldsDeal)) !== false) {
+					unset($dbFieldsDeal[$key]);
+				}
+			}
+
 
 		   //array_unshift($dbFieldsDeal,"id");
             $dbFieldsOrg = $this->db->list_fields(db_prefix().'clients');
@@ -105,7 +119,6 @@ class ImportData extends AdminController
             $dbFieldsDeal = str_replace('deal_status', 'deal_pipeline_stage', array_values($dbFieldsDeal));
             $dbFieldsDeal = str_replace('deal_teamleader', 'deal_owner', array_values($dbFieldsDeal));
             $dbFieldsDeal = str_replace('deal_stage_of', 'deal_stage', array_values($dbFieldsDeal));
-            $dbFieldsDeal[] = 'deal_followers';
             
             
 
