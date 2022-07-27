@@ -120,10 +120,30 @@ class ImportData extends AdminController
             $dbFieldsDeal = str_replace('deal_teamleader', 'deal_owner', array_values($dbFieldsDeal));
             $dbFieldsDeal = str_replace('deal_stage_of', 'deal_stage', array_values($dbFieldsDeal));
             
-            
-
             $dbFieldsOrg = str_replace('organization_company', 'organization_name', array_values($dbFieldsOrg));
 
+            // unsettings noneeded fields form deal table
+            if (($key = array_search('deal_lead_id', $dbFieldsDeal)) !== false) {
+                unset($dbFieldsDeal[$key]);
+            }
+            if (($key = array_search('deal_project_modified', $dbFieldsDeal)) !== false) {
+                unset($dbFieldsDeal[$key]);
+            }
+            if (($key = array_search('deal_modified_by', $dbFieldsDeal)) !== false) {
+                unset($dbFieldsDeal[$key]);
+            }
+            if (($key = array_search('activity_datemodified', $dbFieldsTask)) !== false) {
+                unset($dbFieldsTask[$key]);
+            }
+            if (($key = array_search('activity_call_request_id', $dbFieldsTask)) !== false) {
+                unset($dbFieldsTask[$key]);
+            }
+            if (($key = array_search('activity_call_msg', $dbFieldsTask)) !== false) {
+                unset($dbFieldsTask[$key]);
+            }
+            if (($key = array_search('activity_call_code', $dbFieldsTask)) !== false) {
+                unset($dbFieldsTask[$key]);
+            }
            // $dbFieldsTask[] = 'activity_assignedto';
         
         

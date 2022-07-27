@@ -176,6 +176,9 @@ class Import_deals extends App_import
 							if($insert['deal_owner']) {
 								$deal['teamleader'] = $insert['deal_owner'];
 							}
+                            if(isset($insert['deal_created_by']) && $insert['deal_created_by']) {
+								$deal['created_by'] = $insert['deal_created_by'];
+							}
 							if($insert['deal_start_date']) {
 								$deal['start_date'] = date('Y-m-d',strtotime($insert['deal_start_date']));
 							}
@@ -427,6 +430,15 @@ class Import_deals extends App_import
 				}
 			}
 		}
+
+        $this->ci->db->where('email', $data['deal_created_by']);
+        $staffid = $this->ci->db->get(db_prefix().'staff')->row();
+        if(!$staffid) {
+            if($reason)
+                $reason .= ', ';
+            $reason .= 'Deal created by not exist'; 
+        }
+
 		if( in_array("teamleader", $mandatory_fields)){
 			if(!$data['deal_owner']) {
 				if($reason)
@@ -517,6 +529,14 @@ class Import_deals extends App_import
         $this->ci->db->where('name', $deal['status']);
         $status = $this->ci->db->get(db_prefix().'projects_status')->row();
 
+        // Get created by Id 
+        if(isset($deal['created_by']) && $deal['created_by']){
+            $this->ci->db->where('email', $deal['created_by']);
+            $staffid = $this->ci->db->get(db_prefix().'staff')->row();
+            if(!empty( $staffid->staffid)){
+                $deal['created_by'] = $staffid->staffid;
+            }
+        }
         //Get teamleader Id
         $this->ci->db->where('email', $deal['teamleader']);
         $staffid = $this->ci->db->get(db_prefix().'staff')->row();

@@ -444,6 +444,8 @@ abstract class App_import
 					}
 					else if($this->formatFieldNameForHeading($field) == 'Activity assignedto'){
 						$dbFieldKeys[] = 'Assigned Person Mail Id';
+					}else if($this->formatFieldNameForHeading($field) == 'Deal stage'){
+						$dbFieldKeys[] = 'Deal status';
 					}
 					else if($this->formatFieldNameForHeading($field) == 'Deal followers'){
 						$dbFieldKeys[] = 'Deal follower mail id';
@@ -561,7 +563,7 @@ abstract class App_import
                 //     $required_db_fields [] ='deal_followers';
                 //     break;
                 case 'pipeline_id':
-                    $required_db_fields [] ='deal_pipeline_stage';
+                    $required_db_fields [] ='deal_pipeline';
                     break;
                 case 'status':
                     $required_db_fields [] ='deal_pipeline_stage';
@@ -595,6 +597,8 @@ abstract class App_import
                 $objPHPExcel->getActiveSheet()->getCell($key.$totalSampleFields)->setValue('Assigned Person Mail Id');
             }else if($this->formatFieldNameForHeading($field) == 'Deal followers'){
                 $objPHPExcel->getActiveSheet()->getCell($key.$totalSampleFields)->setValue('Deal follower mail id');
+            }else if($this->formatFieldNameForHeading($field) == 'Deal stage'){
+                $objPHPExcel->getActiveSheet()->getCell($key.$totalSampleFields)->setValue('Deal status');
             }else{
                 $objPHPExcel->getActiveSheet()->getCell($key.$totalSampleFields)->setValue($this->formatFieldNameForHeading($field));
             }
@@ -695,13 +699,13 @@ abstract class App_import
                         $sample_CSV []='30-05-2021';
                         break;
                     case 'deal_created_by':
-                        $sample_CSV []='100';
+                        $sample_CSV []='seetha@saneforce.com';
                         break;
                     case 'deal_project_modified':
                         $sample_CSV []='30-05-2021';
                         break;
                     case 'deal_modified_by':
-                        $sample_CSV []='100';
+                        $sample_CSV []='seetha@saneforce.com';
                         break;
                     case 'deal_project_cost':
                         $sample_CSV []='5000';
