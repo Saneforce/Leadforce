@@ -107,13 +107,39 @@ class ImportData extends AdminController
 		   //array_unshift($dbFieldsDeal,"id");
             $dbFieldsOrg = $this->db->list_fields(db_prefix().'clients');
             $dbFieldsTask = $this->db->list_fields(db_prefix().'tasks');
-            $dbFieldsContact = preg_filter('/^/', 'person_', $dbFieldsContact);
             $dbFieldsDeal = preg_filter('/^/', 'deal_', $dbFieldsDeal);
             $dbFieldsOrg = preg_filter('/^/', 'organization_', $dbFieldsOrg);
-            $dbFieldsTask = preg_filter('/^/', 'activity_', $dbFieldsTask);
+            
 
-            $dbFieldsContact = str_replace('person_firstname', 'person_fullname', array_values($dbFieldsContact));
-            $dbFieldsContact = str_replace('person_title', 'person_position', array_values($dbFieldsContact));
+            if (in_array("primary_contact", $dbFieldsDeal1) || in_array("project_contacts[]", $dbFieldsDeal1)){
+                $dbFieldsContact = preg_filter('/^/', 'person_', $dbFieldsContact);
+                $dbFieldsContact = str_replace('person_firstname', 'person_fullname', array_values($dbFieldsContact));
+                $dbFieldsContact = str_replace('person_title', 'person_position', array_values($dbFieldsContact));
+
+                $dbFieldsTask = preg_filter('/^/', 'activity_', $dbFieldsTask);
+                if (($key = array_search('activity_datemodified', $dbFieldsTask)) !== false) {
+                    unset($dbFieldsTask[$key]);
+                }
+                if (($key = array_search('activity_call_request_id', $dbFieldsTask)) !== false) {
+                    unset($dbFieldsTask[$key]);
+                }
+                if (($key = array_search('activity_call_msg', $dbFieldsTask)) !== false) {
+                    unset($dbFieldsTask[$key]);
+                }
+                if (($key = array_search('activity_call_code', $dbFieldsTask)) !== false) {
+                    unset($dbFieldsTask[$key]);
+                }
+                /*if (!in_array("project_contacts[]", $dbFieldsDeal1) && !in_array("primary_contact", $dbFieldsDeal1) ){
+                    $dbFieldsContact = array();
+                }
+                else{*/
+                    $dbFieldsTask[] = 'activity_assignedto';
+                //}
+            }else{
+                $dbFieldsContact =array();
+                $dbFieldsTask =array();
+            }
+            
 
             $dbFieldsDeal = str_replace('deal_pipeline_id', 'deal_pipeline', array_values($dbFieldsDeal));
             $dbFieldsDeal = str_replace('deal_status', 'deal_pipeline_stage', array_values($dbFieldsDeal));
@@ -132,18 +158,6 @@ class ImportData extends AdminController
             if (($key = array_search('deal_modified_by', $dbFieldsDeal)) !== false) {
                 unset($dbFieldsDeal[$key]);
             }
-            if (($key = array_search('activity_datemodified', $dbFieldsTask)) !== false) {
-                unset($dbFieldsTask[$key]);
-            }
-            if (($key = array_search('activity_call_request_id', $dbFieldsTask)) !== false) {
-                unset($dbFieldsTask[$key]);
-            }
-            if (($key = array_search('activity_call_msg', $dbFieldsTask)) !== false) {
-                unset($dbFieldsTask[$key]);
-            }
-            if (($key = array_search('activity_call_code', $dbFieldsTask)) !== false) {
-                unset($dbFieldsTask[$key]);
-            }
            // $dbFieldsTask[] = 'activity_assignedto';
         
         
@@ -156,12 +170,7 @@ class ImportData extends AdminController
                     $dbFields[$key] = 'contact_phonenumber';
                 }
             }
-			/*if (!in_array("project_contacts[]", $dbFieldsDeal1) && !in_array("primary_contact", $dbFieldsDeal1) ){
-				$dbFieldsContact = array();
-			}
-			else{*/
-				$dbFieldsTask[] = 'activity_assignedto';
-			//}
+			
 			if (!in_array("clientid", $dbFieldsDeal1)  ){
 				$dbFieldsOrg = array();
 			}

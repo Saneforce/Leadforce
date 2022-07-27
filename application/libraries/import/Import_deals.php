@@ -112,6 +112,7 @@ class Import_deals extends App_import
 							}
 							//Person
 							$person = array();
+                            $personId ='';
 							if(!empty($needed_fields) && (in_array("primary_contact", $needed_fields) || in_array("project_contacts[]", $needed_fields) )) {
 								if($insert['person_fullname']) {
 									$person['firstname'] = $insert['person_fullname'];
@@ -132,6 +133,7 @@ class Import_deals extends App_import
 								} else {
 									$personId = $this->insertPerson($person, $orgId);
 								}
+                               
 							}
 							//Deal
 							$deal = array();
@@ -207,7 +209,7 @@ class Import_deals extends App_import
 							}
 							$deal['imported_id'] = $this->uniqueId;
 							$dealId = $this->insertDeal($deal, $orgId, $personId);
-                            if($insert['activity_name'] || $insert['activity_tasktype'] || $insert['activity_priority'] || $insert['activity_startdate']){
+                            if($personId >0 && $insert['activity_name'] || $insert['activity_tasktype'] || $insert['activity_priority'] || $insert['activity_startdate']){
                                 //Activity
                                 $activity = array();
                                 if($insert['activity_name']) {
@@ -576,11 +578,15 @@ class Import_deals extends App_import
 
         $this->ci->db->insert(db_prefix() . 'projects', $deal);
         $dealid = $this->ci->db->insert_id();
-        $data = [];
-        $data['contacts_id'] = $personid;
-        $data['project_id'] = $dealid;
-        $data['is_primary'] = 1;
-        $this->ci->db->insert(db_prefix() . 'project_contacts', $data);
+
+        if($personId >0){
+            $data = [];
+            $data['contacts_id'] = $personid;
+            $data['project_id'] = $dealid;
+            $data['is_primary'] = 1;
+            $this->ci->db->insert(db_prefix() . 'project_contacts', $data);
+        }
+        
 
         //Insert Deal Followers
         $followerExp = explode(',',$dealFollowers);
