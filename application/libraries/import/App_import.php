@@ -548,7 +548,7 @@ abstract class App_import
         if($required_fields && is_string($required_fields)){
             $required_fields = json_decode($required_fields);
         }
-        $required_db_fields =array('deal_name');
+        $required_db_fields =array('deal_name','deal_owner');
         foreach($required_fields as $rfield){
             switch ($rfield) {
                 case 'clientid':
@@ -565,9 +565,6 @@ abstract class App_import
                     break;
                 case 'status':
                     $required_db_fields [] ='deal_pipeline_stage';
-                    break;
-                case 'teamleader':
-                    $required_db_fields [] ='deal_owner';
                     break;
                 case 'project_members':
                     $required_db_fields [] ='deal_followers';
