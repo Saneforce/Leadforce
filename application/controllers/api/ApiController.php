@@ -11,9 +11,15 @@ class ApiController extends BaseController
         $this->load->model('Authenticationapi_model');
         $this->load->model('projects_model');
         $this->load->model('tasktype_model');
+        $this->load->model('tasks_model');
         $this->load->model('staff_model');
         $this->load->model('pipeline_model');
         $this->load->model('gdpr_model');
+
+        $this->load->library([
+            'app_object_cache'
+        ]);
+
         $postdata = file_get_contents("php://input");
         $_POST = (array) json_decode($postdata);
     }
@@ -3010,6 +3016,168 @@ class ApiController extends BaseController
             $outputArr["status"] = false;
             $outputArr["error_message"] = 'No Records Found.';
         }
+        echo $out =json_encode($outputArr);
+    }
+
+    public function activity_mark_as_done(){
+        $outputArr =array(
+            'status_code' =>400,
+            'status' =>true,
+            'error_message' =>'Could not change activity status'
+        );
+
+        $id =$_POST['id'];
+        $status =5;
+        $this->load->helper('tasks_helper');
+        if ($this->tasks_model->is_task_assignee(get_staff_user_id(), $id)
+            || $this->tasks_model->is_task_creator(get_staff_user_id(), $id)
+            || has_permission('tasks', '', 'edit')) {
+            $success = $this->tasks_model->mark_as($status, $id);
+            $message = '';
+
+            if ($success) {
+                $message = _l('task_marked_as_success', format_task_status($status, true, true));
+                $outputArr =array(
+                    'status_code' =>200,
+                    'status' =>true,
+                    'response' =>$message
+                );
+            }
+        }
+        echo json_encode($outputArr);
+    }
+
+
+    public function activity_unmark_as_done()
+    {
+        $id =$_POST['id'];
+
+        $outputArr =array(
+            'status_code' =>400,
+            'status' =>true,
+            'error_message' =>'Could not change activity status'
+        );
+
+        if ($this->tasks_model->is_task_assignee(get_staff_user_id(), $id)
+            || $this->tasks_model->is_task_creator(get_staff_user_id(), $id)
+            || has_permission('tasks', '', 'edit')) {
+            $success = $this->tasks_model->unmark_complete($id);
+            $message = '';
+            if ($success) {
+                $message = _l('task_unmarked_as_complete');
+                $outputArr =array(
+                    'status_code' =>200,
+                    'status' =>true,
+                    'response' =>$message
+                );
+            }
+        }
+        echo json_encode($outputArr);
+    }
+
+
+    public function get_organizations_by_person()
+    {
+        
+        $this->db->select('*');
+        $this->db->from(db_prefix().'clients');
+        $this->db->join(db_prefix().'contacts_clients', db_prefix().'clients.userid = '.db_prefix().'contacts_clients.userid');
+        $this->db->where(db_prefix().'contacts_clients.contactid',$_POST['id']);
+        $this->db->where(db_prefix().'clients.deleted_status',0);
+        $this->db->where(db_prefix().'clients.active',1);
+        if($_POST['page'] > 1)
+            $this->db->limit(25,(($_POST['page']-1) * 25));
+        else
+            $this->db->limit(25,0);
+
+        
+        $query = $this->db->get();
+        $result = $query->result_array();
+        $outputArr =array();
+        if($result) {
+            $outputArr["status_code"] = 200;
+            $outputArr["status"] = true;
+            $outputArr["response"] = $result;
+        } else {
+            $outputArr["status_code"] = 400;
+            $outputArr["status"] = false;
+            $outputArr["error_message"] = 'No Records Found.';
+        }
+        echo $out =json_encode($outputArr);
+    }
+
+
+    public function global_search()
+    {
+        $gsearch   = $_POST['q'];
+        $my_staffids = $this->staff_model->get_my_staffids();
+        //pre($my_staffids);
+        $data = array();
+        if(!is_admin(get_staff_user_id())) {
+            if($my_staffids) {
+                $data['projects'] = $this->db->query('SELECT * FROM tblprojects where ((teamleader in (' . implode(',',$my_staffids) . ')) OR id IN (select project_id from tblproject_members where staff_id in (' . implode(',',$my_staffids) . '))) AND name like "%'.$gsearch.'%" ')->result_array();
+            } else {
+                $data['projects'] = $this->db->query('SELECT * FROM tblprojects where ((teamleader = "'.get_staff_user_id().'") OR id IN (select project_id from tblproject_members where staff_id="'.get_staff_user_id().'")) AND name like "%'.$gsearch.'%" ')->result_array();
+            }
+        } else {
+            $data['projects'] = $this->projects_model->get('',[
+            //   'active' => 1,
+                "name like '%".$gsearch."%'" => "",
+            ]);
+        }
+        
+        if(!is_admin(get_staff_user_id())) {
+            if($my_staffids) {
+                $data['clients'] = $this->db->query('SELECT * FROM tblclients where ((addedfrom in (' . implode(',',$my_staffids) . ')) OR userid IN (select clientid from tblprojects where id IN (select project_id from tblproject_members where staff_id in (' . implode(',',$my_staffids) . '))) OR userid IN ( select clientid from tblprojects where teamleader in (' . implode(',',$my_staffids) . '))) AND active = 1 AND (company like "%'.$gsearch.'%" OR phonenumber like "%'.$gsearch.'%")')->result_array();
+            } else {
+                $data['clients'] = $this->db->query('SELECT * FROM tblclients where ((addedfrom="'.get_staff_user_id().'") OR userid IN (select clientid from tblprojects where id IN (select project_id from tblproject_members where staff_id="'.get_staff_user_id().'")) OR userid IN ( select clientid from tblprojects where teamleader = "'.get_staff_user_id().'")) AND active = 1 AND (company like "%'.$gsearch.'%" OR phonenumber like "%'.$gsearch.'%")')->result_array();
+            }
+            
+        } else {
+            $data['clients'] = $this->clients_model->get('',[
+                db_prefix() .'clients.active' => 1, " (".
+                db_prefix() ."clients.company like '%".$gsearch."%'" . " OR ".
+                db_prefix() ."clients.phonenumber like '%".$gsearch."%'" .") and ".db_prefix()."clients.company != " => "",
+            ]);
+        }
+
+        if(!is_admin(get_staff_user_id())) {
+            if($my_staffids) {
+                $where = ' WHERE ('.db_prefix().'contacts.addedfrom IN (' . implode(',',$my_staffids) . ') OR (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')  AND tblprojects.clientid != "")) OR  (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects where ' . db_prefix() . 'projects.teamleader in (' . implode(',',$my_staffids) . ') AND tblprojects.clientid != "" )))   AND (tblcontacts.firstname like "%'.$gsearch.'%" OR tblcontacts.email like "%'.$gsearch.'%" OR tblcontacts.phonenumber like "%'.$gsearch.'%")  AND tblcontacts.deleted_status=0 AND tblclients.deleted_status=0 '.$likeqry;
+                $where_summary_inactiveperson_qry = 'SELECT  tblcontacts.*
+                FROM tblcontacts
+                LEFT JOIN tblclients ON tblclients.userid=tblcontacts.userid LEFT JOIN tblcustomfieldsvalues as ctable_0 ON tblcontacts.id = ctable_0.relid AND ctable_0.fieldto="contacts" AND ctable_0.fieldid=7'.$where;
+
+                // $where_summary_inactiveperson_qry = 'SELECT  tblcontacts.*
+                //             FROM tblcontacts
+                //             LEFT JOIN tblclients ON tblclients.userid=tblcontacts.userid 
+                //             WHERE  (tblcontacts.addedfrom in (' . implode(',',$my_staffids) . ') OR tblcontacts.userid IN (select userid from tblcontacts where id IN (select contacts_id from tbltasks where id IN (SELECT taskid FROM `tbltask_assigned` WHERE staffid in (' . implode(',',$my_staffids) . ')))) OR (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')  AND tblprojects.clientid != "")) OR  (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects where ' . db_prefix() . 'projects.teamleader in (' . implode(',',$my_staffids) . ') AND tblprojects.clientid != "" ))) AND (tblcontacts.firstname like "%'.$gsearch.'%" OR tblcontacts.email like "%'.$gsearch.'%" OR tblcontacts.phonenumber like "%'.$gsearch.'%")  AND tblcontacts.deleted_status=0 ';
+            } else {
+                $where = ' WHERE ('.db_prefix().'contacts.addedfrom = "'.get_staff_user_id().'" OR (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id = "'.get_staff_user_id().'"  AND tblprojects.clientid != "")) OR  (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects where ' . db_prefix() . 'projects.teamleader = "'.get_staff_user_id().'" AND tblprojects.clientid != "" )))   AND (tblcontacts.firstname like "%'.$gsearch.'%" OR tblcontacts.email like "%'.$gsearch.'%" OR tblcontacts.phonenumber like "%'.$gsearch.'%")  AND tblcontacts.deleted_status=0 AND tblclients.deleted_status=0 '.$likeqry;
+                $where_summary_inactiveperson_qry = 'SELECT  tblcontacts.*
+                FROM tblcontacts
+                LEFT JOIN tblclients ON tblclients.userid=tblcontacts.userid LEFT JOIN tblcustomfieldsvalues as ctable_0 ON tblcontacts.id = ctable_0.relid AND ctable_0.fieldto="contacts" AND ctable_0.fieldid=7'.$where;
+                // $where_summary_inactiveperson_qry = 'SELECT  tblcontacts.*
+                //         FROM tblcontacts
+                //         LEFT JOIN tblclients ON tblclients.userid=tblcontacts.userid 
+                //         WHERE  (tblcontacts.addedfrom = "'.get_staff_user_id().'" OR tblcontacts.userid IN (select userid from tblcontacts where id IN (select contacts_id from tbltasks where id IN (SELECT taskid FROM `tbltask_assigned` WHERE staffid = "'.get_staff_user_id().'"))) OR (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id = "'.get_staff_user_id().'"  AND tblprojects.clientid != "")) OR  (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects where ' . db_prefix() . 'projects.teamleader = "'.get_staff_user_id().'" AND tblprojects.clientid != "" ))) AND (tblcontacts.firstname like "%'.$gsearch.'%" OR tblcontacts.email like "%'.$gsearch.'%" OR tblcontacts.phonenumber like "%'.$gsearch.'%") AND tblcontacts.active=1  AND tblcontacts.deleted_status=0 ';
+                        
+            }
+            $data['contacts'] = $this->db->query($where_summary_inactiveperson_qry)->result_array();
+        } else {
+            $data['contacts'] = $this->clients_model->get_contacts('',[
+                db_prefix() .'contacts.active' => 1," (".
+                db_prefix() ."contacts.firstname like '%".$gsearch."%' OR ".
+                db_prefix() ."contacts.email like '%".$gsearch."%' OR " .
+                db_prefix() ."contacts.phonenumber like '%".$gsearch."%'".") and ".db_prefix()."contacts.firstname != " => "",
+            ]);
+        }
+
+        $outputArr =array(
+            'status_code' =>200,
+            'status' =>true,
+            'response' =>$data
+        );
         echo $out =json_encode($outputArr);
     }
 

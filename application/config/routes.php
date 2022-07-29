@@ -78,6 +78,8 @@ $route['api/getcontacts'] = "api/ApiController/getcontacts";
 $route['api/getactivitytypes'] = "api/ApiController/getactivitytypes";
 $route['api/getsearchdeal'] = "api/ApiController/getsearchdeal";
 $route['api/get_org_person_bydeal'] = "api/ApiController/get_org_person_bydeal";
+$route['api/activity_mark_as_done'] = "api/ApiController/activity_mark_as_done";
+$route['api/activity_unmark_as_done'] = "api/ApiController/activity_unmark_as_done";
 /*Deal*/
 $route['api/getdeals'] = "api/ApiController/getdeals";
 $route['api/getdealbyid'] = "api/ApiController/getdealbyid";
@@ -106,6 +108,8 @@ $route['api/getorgactivity'] = "api/ApiController/getorgactivity";
 /*Organisation*/
 $route['api/organisationlist'] = "api/ApiController/organisationlist";
 $route['api/addclient_byapi'] = "api/ApiController/addclient_byapi";
+$route['api/get_organizations_by_person'] = "api/ApiController/get_organizations_by_person";
+$route['api/global_search'] = "api/ApiController/global_search";
 
 
 $route['api/getcustomfields'] = "api/ApiController/getcustomfields";
