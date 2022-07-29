@@ -61,7 +61,12 @@ class Authentication_model extends App_Model
                     log_activity('Failed Login Attempt [Email: ' . $email . ', Is Staff Member: ' . ($staff == true ? 'Yes' : 'No') . ', IP: ' . $this->input->ip_address() . ']');
 
                     if($staff){
-                        $this->passwordpolicy_model->login_fail_log($staff,$user->staffid);
+                        $login_fail_log =$this->passwordpolicy_model->login_fail_log($staff,$user->staffid);
+                        if($login_fail_log['locked']){
+                            return [
+                                'account_locked' => true,
+                            ];
+                        }
                     }
                     
                     // Password failed, return

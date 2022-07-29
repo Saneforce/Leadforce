@@ -199,14 +199,23 @@ class Staff extends AdminController
             $this->load->model('passwordpolicy_model');
             $policy_validation =$this->passwordpolicy_model->validate_password($data['password']);
             
-            if($policy_validation !== true){
-                set_alert('danger', $policy_validation);
-                redirect(admin_url('staff/member'));
-            }
+            
             if($id !==''){
-                if(!$this->passwordpolicy_model->check_password_history(true, $id, $data['password'])){
-                    set_alert('danger', _l('cannot_use_old_password'));
-                    redirect(admin_url('staff/member/'.$id));
+                if($data['password']){
+                    if($policy_validation !== true){
+                        set_alert('danger', $policy_validation);
+                        redirect(admin_url('staff/member/'.$id));
+                    }
+                    if(!$this->passwordpolicy_model->check_password_history(true, $id, $data['password'])){
+                        set_alert('danger', _l('cannot_use_old_password'));
+                        redirect(admin_url('staff/member/'.$id));
+                    }
+                }
+                
+            }else{
+                if($policy_validation !== true){
+                    set_alert('danger', $policy_validation);
+                    redirect(admin_url('staff/member'));
                 }
             }
             // end password policy validation
@@ -578,6 +587,14 @@ class Staff extends AdminController
     public function change_password_profile()
     {
         if ($this->input->post()) {
+            $policy_validation =$this->passwordpolicy_model->validate_password($this->input->post('newpasswordr', false));
+            if($policy_validation !==true){
+                set_alert('danger', $policy_validation);
+                redirect(admin_url('staff/edit_profile'));
+            }elseif(!$this->passwordpolicy_model->check_password_history(true, get_staff_user_id(), $this->input->post('newpasswordr', false))){
+                set_alert('danger', _l('cannot_use_old_password'));
+                redirect(admin_url('staff/edit_profile'));
+            }
             $response = $this->staff_model->change_password($this->input->post(null, false), get_staff_user_id());
             if (is_array($response) && isset($response[0]['passwordnotmatch'])) {
                 set_alert('danger', _l('staff_old_password_incorrect'));

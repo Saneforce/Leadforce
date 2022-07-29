@@ -34,6 +34,7 @@ class Passwordpolicy extends AdminController
                 $password_policy ['last_modified_by'] =get_staff_user_id();
             }else{
                 $password_policy ['enable_password_policy'] =0;
+                unset($_POST);
             }
             $this->passwordpolicy_model->updatePasswordPolicy(json_encode($password_policy));
             set_alert('success', _l('updated_successfully', _l('password_policy')));

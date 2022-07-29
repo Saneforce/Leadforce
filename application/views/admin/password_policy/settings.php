@@ -64,6 +64,8 @@
 									$attrs =['min'=>1]; 
 									if(set_value('lock_invalid_attempt') ==''){
 										$attrs['disabled'] ='disabled';
+									}else{
+										$attrs['required'] ='required';
 									}
 									
 								?>
@@ -159,9 +161,12 @@
 	$("#lock_invalid_attempt").keyup(function(){
 		if($(this).val() >0){
 			$("#lock_auto_release").removeAttr('disabled');
+			$("#lock_auto_release").attr('required','required');
 		}else{
 			$("#lock_auto_release").val('');
 			$("#lock_auto_release").attr('disabled','disabled');
+			$("#lock_auto_release").removeAttr('required');
+			
 		}
 	});
 

@@ -579,7 +579,7 @@ class Import_deals extends App_import
         $this->ci->db->insert(db_prefix() . 'projects', $deal);
         $dealid = $this->ci->db->insert_id();
 
-        if($personId >0){
+        if($personid >0){
             $data = [];
             $data['contacts_id'] = $personid;
             $data['project_id'] = $dealid;

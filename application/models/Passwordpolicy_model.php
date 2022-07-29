@@ -88,6 +88,7 @@ class Passwordpolicy_model extends App_Model {
 
     public function login_fail_log($staff,$staffid)
     {
+        $response =['locked'=>false];
         $passwordpolicy=$this->getPasswordPolicy();
         if($passwordpolicy && isset($passwordpolicy->enable_password_policy) && $passwordpolicy->lock_invalid_attempt >0){
             if($staff){
@@ -98,11 +99,12 @@ class Passwordpolicy_model extends App_Model {
                 $data =['login_fails'=>$user->login_fails+1];
                 if($user->login_fails+1 >= $passwordpolicy->lock_invalid_attempt){
                     $data['login_locked_on'] =date ('Y-m-d H:i:s');
+                    $response =['locked'=>true];
                 }
                 $this->db->update(db_prefix() . 'staff',$data);
             }
         }
-        
+        return $response;
     }
 
     public function reset_login_fail_log($staff,$staffid)
