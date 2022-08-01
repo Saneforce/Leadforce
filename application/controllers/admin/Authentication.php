@@ -166,11 +166,11 @@ class Authentication extends App_Controller
                 $policy_validation =$this->passwordpolicy_model->validate_password($this->input->post('passwordr', false));
                 if($policy_validation !== true){
                     set_alert('danger', $policy_validation);
-                    redirect(admin_url('authentication/reset_password'));
+                    redirect(admin_url('authentication/reset_password/'.$staff.'/'.$userid.'/'.$new_pass_key));
                 }
                 if(!$this->passwordpolicy_model->check_password_history($staff, $userid, $this->input->post('passwordr', false))){
                     set_alert('danger', _l('cannot_use_old_password'));
-                    redirect(admin_url('authentication/reset_password'));
+                    redirect(admin_url('authentication/reset_password/'.$staff.'/'.$userid.'/'.$new_pass_key));
                 }
                 hooks()->do_action('before_user_reset_password', [
                     'staff'  => $staff,
