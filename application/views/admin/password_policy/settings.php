@@ -166,7 +166,9 @@
 			$("#lock_auto_release").val('');
 			$("#lock_auto_release").attr('disabled','disabled');
 			$("#lock_auto_release").removeAttr('required');
-			
+			$("#lock_auto_release").attr('aria-invalid','false');
+			$("#lock_auto_release").parent().removeClass('has-error');
+			$("#lock_auto_release-error").remove();
 		}
 	});
 
