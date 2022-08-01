@@ -44,7 +44,7 @@ class ImportData extends AdminController
             $dbFieldsContact = $this->db->list_fields(db_prefix().'contacts');
             $dbFieldsDeal = $this->db->list_fields(db_prefix().'projects');
             $dbFieldsDeal1 = $data['need_fields'];
-            $dbFieldsDeal[] = 'deal_followers';
+            $dbFieldsDeal[] = 'followers';
 			if (!in_array("description", $dbFieldsDeal1)){
 				if (($key = array_search('description', $dbFieldsDeal)) !== false) {
 					unset($dbFieldsDeal[$key]);
@@ -86,7 +86,7 @@ class ImportData extends AdminController
 				}
 			}
 			if (!in_array("project_members[]", $dbFieldsDeal1)){
-				if (($key = array_search('deal_followers', $dbFieldsDeal)) !== false) {
+				if (($key = array_search('followers', $dbFieldsDeal)) !== false) {
 					unset($dbFieldsDeal[$key]);
 				}
 			}

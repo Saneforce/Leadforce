@@ -447,7 +447,7 @@ abstract class App_import
 					}else if($this->formatFieldNameForHeading($field) == 'Deal stage'){
 						$dbFieldKeys[] = 'Deal status';
 					}
-					else if($this->formatFieldNameForHeading($field) == 'Deal deal followers'){
+					else if($this->formatFieldNameForHeading($field) == 'Deal followers'){
 						$dbFieldKeys[] = 'Deal follower mail id';
 					}
 					else{
@@ -595,7 +595,7 @@ abstract class App_import
             }
             else if($this->formatFieldNameForHeading($field) == 'Activity assignedto'){
                 $objPHPExcel->getActiveSheet()->getCell($key.$totalSampleFields)->setValue('Assigned Person Mail Id');
-            }else if($this->formatFieldNameForHeading($field) == 'Deal deal followers'){
+            }else if($this->formatFieldNameForHeading($field) == 'Deal followers'){
                 $objPHPExcel->getActiveSheet()->getCell($key.$totalSampleFields)->setValue('Deal follower mail id');
             }else if($this->formatFieldNameForHeading($field) == 'Deal stage'){
                 $objPHPExcel->getActiveSheet()->getCell($key.$totalSampleFields)->setValue('Deal status');
@@ -719,7 +719,7 @@ abstract class App_import
                     case 'deal_lead_id':
                         $sample_CSV []='55';
                         break;
-                    case 'deal_deal_followers':
+                    case 'deal_followers':
                         $sample_CSV []='emp1@saneforce.com,emp2@saneforce.com,emp3@saneforce.com';
                         break;
                     case 'activity_name':
