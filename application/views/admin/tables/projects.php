@@ -12,7 +12,8 @@ $aColumns_temp = [
     'teamleader_name'=>'(SELECT GROUP_CONCAT(CONCAT(firstname, \' \', lastname) SEPARATOR ",") FROM ' . db_prefix() . 'staff WHERE tblstaff.staffid=' . db_prefix() . 'projects.teamleader) as teamleader_name',
     'contact_name'=>'(SELECT GROUP_CONCAT(CONCAT(firstname, \' \', lastname) SEPARATOR ",") FROM ' . db_prefix() . 'project_contacts JOIN ' . db_prefix() . 'contacts on ' . db_prefix() . 'contacts.id = ' . db_prefix() . 'project_contacts.contacts_id WHERE tblproject_contacts.project_id=' . db_prefix() . 'projects.id AND tblproject_contacts.is_primary = 1) as contact_name',
     'project_cost'=>'project_cost',
-    'product_qty'=>'(SELECT count(id) FROM tblproject_products WHERE projectid = ' . db_prefix() . 'projects.id) as product_qty',
+    'product_qty'=>'(SELECT sum(quantity) FROM tblproject_products WHERE projectid = ' . db_prefix() . 'projects.id) as product_qty',
+    'product_count'=>'(SELECT count(id) FROM tblproject_products WHERE projectid = ' . db_prefix() . 'projects.id) as product_count',
     'product_amt'=>'(SELECT sum(price) FROM tblproject_products WHERE projectid = ' . db_prefix() . 'projects.id) as product_amt',
    'company'=> get_sql_select_client_company(),
     'tags'=>'(SELECT GROUP_CONCAT(name SEPARATOR ",") FROM ' . db_prefix() . 'taggables JOIN ' . db_prefix() . 'tags ON ' . db_prefix() . 'taggables.tag_id = ' . db_prefix() . 'tags.id WHERE rel_id = ' . db_prefix() . 'projects.id and rel_type="project" ORDER by tag_order ASC) as tags',
@@ -126,6 +127,7 @@ $req_fields[$req_cnt + 18]= 'project_created';
 $req_fields[$req_cnt + 19]= 'project_modified';
 $req_fields[$req_cnt + 20]= 'modified_by';
 $req_fields[$req_cnt + 21]= 'created_by';
+$req_fields[$req_cnt + 22]= 'product_count';
 $projects_list_column_order = (array)json_decode(get_option('projects_list_column_order')); 
 //pre($projects_list_column_order);
 $custom_fields = array_merge($custom_fields,get_table_custom_fields('customers'));
@@ -282,6 +284,7 @@ foreach ($rResult as $aRow) {
     
 
     $row_temp['product_qty'] = $aRow['product_qty'];
+    $row_temp['product_count'] = $aRow['product_count'];
     if($aRow['product_amt'] > 0)
         $row_temp['product_amt'] = $aRow['product_amt'];
     else

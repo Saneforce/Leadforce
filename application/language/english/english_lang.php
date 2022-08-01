@@ -1244,6 +1244,7 @@ $lang['product_status']              = 'Status';
 $lang['project_cost']              = 'Value';
 $lang['product_amt']              = 'Item Amount';
 $lang['product_qty']              = 'Item Quantity';
+$lang['product_count']              = 'Item Count';
 $lang['AddProductsToDeal']              = 'Add Products to Deal';
 $lang['dealcurrency']              = 'Deal Currency';
 $lang['notax'] = 'No Tax';

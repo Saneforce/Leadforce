@@ -2656,6 +2656,7 @@ function deal_get_fields(){
 		"teamleader_name"=>_l("teamleader_name"),
 		"contact_name"=>_l("contact_name"),
 		"product_qty"=>_l("product_qty"),
+		"product_count"=>_l("product_count"),
 		"product_amt"=>_l("product_amt"),
 		"company"=>_l("project_customer"),
 		"tags"=>_l("tags"),
@@ -2694,6 +2695,7 @@ function deal_all_fields(){
 		"teamleader_name"=>array("ins"=>"teamleader","ll"=>"teamleader_name"),
 		"contact_name"=>array("ins"=>"project_contacts","ll"=>"contact_name"),
 		"product_qty"=>array("ins"=>"product_qty","ll"=>"product_qty"),
+		"product_count"=>array("ins"=>"product_count","ll"=>"product_count"),
 		"product_amt"=>array("ins"=>"product_amt","ll"=>"product_amt"),
 		"company"=>array("ins"=>"company","ll"=>"project_customer"),
 		"tags"=>array("ins"=>"tags","ll"=>"tags"),
@@ -2784,6 +2786,8 @@ function deal_needed_fields(){
 	$data['need_fields'][$i] = 'id';
 	$i++;
 	$data['need_fields'][$i] = 'product_qty';
+	$i++;
+	$data['need_fields'][$i] = 'product_count';
 	$i++;
 	$data['need_fields'][$i] = 'product_amt';
 	$i++;
