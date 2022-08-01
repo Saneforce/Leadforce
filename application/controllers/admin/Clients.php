@@ -432,67 +432,10 @@ class Clients extends AdminController
 					}
 				}
 			}
-			if(!empty($fields) && $fields != 'null'){
-				$req_fields = json_decode($fields);
-				
-				if(!empty($req_fields)){
-					foreach($req_fields as $req_field11){
-						$data['need_fields_edit'][$i] = $req_field11;
-						if($req_field11 == 'clientid'){
-							$data['need_fields'][$i] = 'company';
-							$data['need_fields_label'][$j] = 'project_customer';
-						}
-						else if($req_field11 == 'primary_contact'){
-							$data['need_fields_label'][$j] = 'project_primary_contacts';
-							$data['need_fields'][$i] = 'contact_email1';
-							$i++;
-							$data['need_fields'][$i] = 'contact_phone1';
-							$i++;
-							$data['need_fields'][$i] = 'contact_name';
-						}
-						else if($req_field11 == 'teamleader'){
-							$data['need_fields'][$i] = 'teamleader_name';
-							$data['need_fields_label'][$j] = 'teamleader';
-						}
-						else if($req_field11 == 'project_members[]'){
-							$data['need_fields'][$i] = 'members';
-							$data['need_fields_label'][$j] = 'project_members';
-						}
-						else if($req_field11 == 'project_contacts[]'){
-							$data['need_fields'][$i] = 'project_contacts[]';
-							$data['need_fields_label'][$j] = 'project_contacts';
-						}
-						else if($req_field11 == 'project_cost'){
-							$data['need_fields'][$i] = 'project_cost';
-							$data['need_fields_label'][$j] = 'project_total_cost';
-						}
-						else if($req_field11 == 'pipeline_id'){
-							$data['need_fields'][$i] = 'pipeline_id';
-							$data['need_fields_label'][$j] = 'pipeline';
-						}
-						else{
-							$data['need_fields'][$i] = $req_field11;
-							$data['need_fields_label'][$j] = $req_field11;
-							if($req_field11 == 'status'){
-								$i++;
-								$data['need_fields'][$i] = 'project_status';
-							}
-						}
-						$i++;
-						$j++;
-					}
-					
-				}
-			}
-			$data['need_fields'][$i] = 'id';
-			$i++;
-			$data['need_fields'][$i] = 'product_qty';
-			$i++;
-			$data['need_fields'][$i] = 'product_amt';
-			$i++;
-			$data['need_fields'][$i] = 'projects_budget';
-			$i++;
-			$data['need_fields'][$i] = 'customers_hyperlink';
+			$deal_fields = deal_needed_fields();
+            $needed_fields = json_decode($deal_fields,true);
+            $data['need_fields'] = $needed_fields['need_fields'];
+            $data['need_fields_label'] = $needed_fields['need_fields_label'];
 		}
 
         $this->load->view('admin/clients/client', $data);
@@ -582,67 +525,10 @@ class Clients extends AdminController
 					}
 				}
 			}
-			if(!empty($fields) && $fields != 'null'){
-				$req_fields = json_decode($fields);
-				
-				if(!empty($req_fields)){
-					foreach($req_fields as $req_field11){
-						$data['need_fields_edit'][$i] = $req_field11;
-						if($req_field11 == 'clientid'){
-							$data['need_fields'][$i] = 'company';
-							$data['need_fields_label'][$j] = 'project_customer';
-						}
-						else if($req_field11 == 'primary_contact'){
-							$data['need_fields_label'][$j] = 'project_primary_contacts';
-							$data['need_fields'][$i] = 'contact_email1';
-							$i++;
-							$data['need_fields'][$i] = 'contact_phone1';
-							$i++;
-							$data['need_fields'][$i] = 'contact_name';
-						}
-						else if($req_field11 == 'teamleader'){
-							$data['need_fields'][$i] = 'teamleader_name';
-							$data['need_fields_label'][$j] = 'teamleader';
-						}
-						else if($req_field11 == 'project_members[]'){
-							$data['need_fields'][$i] = 'members';
-							$data['need_fields_label'][$j] = 'project_members';
-						}
-						else if($req_field11 == 'project_contacts[]'){
-							$data['need_fields'][$i] = 'project_contacts[]';
-							$data['need_fields_label'][$j] = 'project_contacts';
-						}
-						else if($req_field11 == 'project_cost'){
-							$data['need_fields'][$i] = 'project_cost';
-							$data['need_fields_label'][$j] = 'project_total_cost';
-						}
-						else if($req_field11 == 'pipeline_id'){
-							$data['need_fields'][$i] = 'pipeline_id';
-							$data['need_fields_label'][$j] = 'pipeline';
-						}
-						else{
-							$data['need_fields'][$i] = $req_field11;
-							$data['need_fields_label'][$j] = $req_field11;
-							if($req_field11 == 'status'){
-								$i++;
-								$data['need_fields'][$i] = 'project_status';
-							}
-						}
-						$i++;
-						$j++;
-					}
-					
-				}
-			}
-			$data['need_fields'][$i] = 'id';
-			$i++;
-			$data['need_fields'][$i] = 'product_qty';
-			$i++;
-			$data['need_fields'][$i] = 'product_amt';
-			$i++;
-			$data['need_fields'][$i] = 'projects_budget';
-			$i++;
-			$data['need_fields'][$i] = 'customers_hyperlink';
+			$deal_fields = deal_needed_fields();
+            $needed_fields = json_decode($deal_fields,true);
+            $data['need_fields'] = $needed_fields['need_fields'];
+            $data['need_fields_label'] = $needed_fields['need_fields_label'];
 		}
 
         $this->load->view('admin/clients/view_contact', $data);
