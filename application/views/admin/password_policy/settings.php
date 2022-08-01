@@ -84,7 +84,7 @@
 									</div>
 									<div class="radio radio-primary radio-inline">
 										<input type="radio" id="password_strength_high" name="password_strength" value="high" <?php echo set_value('password_strength')=='high'?'checked=""':''?>>
-										<label for="password_strength_high">Heigh</label>
+										<label for="password_strength_high">High</label>
 									</div>
 								</div>
 								<?php $attrs =['min'=>1]; ?>
