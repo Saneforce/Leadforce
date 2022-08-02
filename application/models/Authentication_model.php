@@ -46,6 +46,7 @@ class Authentication_model extends App_Model
                             log_activity('Account has been locked [Email: ' . $email . ', Is Staff Member: ' . ($staff == true ? 'Yes' : 'No') . ', IP: ' . $this->input->ip_address() . ']');
                             return [
                                 'account_locked' => true,
+                                'un_lock_time' => abs($date1 - $date2)
                             ];
                         }
                     }
@@ -65,6 +66,7 @@ class Authentication_model extends App_Model
                         if($login_fail_log['locked']){
                             return [
                                 'account_locked' => true,
+                                'un_lock_time' => $passwordpolicy->lock_auto_release,
                             ];
                         }
                     }

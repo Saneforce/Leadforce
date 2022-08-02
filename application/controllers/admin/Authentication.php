@@ -62,7 +62,7 @@ class Authentication extends App_Controller
                     }
                     redirect(admin_url('authentication/two_factor'));
                 }elseif (is_array($data) && isset($data['account_locked'])) {
-                    set_alert('danger', _l('your_account_has_been_locked'));
+                    set_alert('danger', _l('your_account_has_been_locked',$data['un_lock_time']));
                     redirect(admin_url('authentication'));
                 }elseif ($data == false) {
                     set_alert('danger', _l('admin_auth_invalid_email_or_password'));

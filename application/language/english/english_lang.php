@@ -4067,4 +4067,4 @@ $lang['password_strength'] ='Password strength';
 $lang['cannot_use_old_password'] ='Cannot use old password';
 $lang['minimum_character_error'] ='%s should have minimum %s characters';
 $lang['maximum_character_error'] ='%s should be maximum %s characters';
-$lang['your_account_has_been_locked'] ='Your account has been locked';
+$lang['your_account_has_been_locked'] ='Your account has been locked. Please try after %s seconds';
