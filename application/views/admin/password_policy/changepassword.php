@@ -36,7 +36,7 @@
 
 <script>
     $(function(){
-    appValidateForm($('#passwordpolicy_changepassword'),{oldpassword:'required',newpassword:'required',newpasswordr: { equalTo: "#newpassword"},newpasswordr:'required'});
+    appValidateForm($('#passwordpolicy_changepassword'),{oldpassword:'required',newpassword:'required',newpasswordr: { equalTo: "#newpassword",required:true}});
     });
 </script>
 </body>
