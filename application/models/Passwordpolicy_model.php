@@ -37,7 +37,6 @@ class Passwordpolicy_model extends App_Model {
             $query =$this->db->get(db_prefix() . 'pass_history');
             foreach ($query->result() as $row){
                 if(app_hasher()->CheckPassword($password, $row->new_pass)){
-                    echo $row->new_pass;
                     return false;
                 }
             }
