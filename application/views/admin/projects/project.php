@@ -233,7 +233,7 @@
 ?>
                             </div>
 						  <?php if(!empty($need_fields) && in_array("project_members[]", $need_fields)){?>
-                            <div <?php if(!empty($need_fields) && in_array("teamleader", $need_fields)){?> class="col-md-6 form_assigned"<?php }else{?> class="col-md-12 form_assigned" <?php }?>>
+                            <div <?php if(!empty($need_fields) && in_array("teamleader", $need_fields)){?> class="col-md-6 form_assigned"<?php }else{?> class="col-md-6 form_assigned" <?php }?>>
                                 <?php
                          $selected = array();
                          if(isset($project_members)){

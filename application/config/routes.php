@@ -250,3 +250,7 @@ $route['authentication/set_password/(:num)/(:num)/(:any)'] = 'admin/authenticati
 if (file_exists(APPPATH . 'config/my_routes.php')) {
     include_once(APPPATH . 'config/my_routes.php');
 }
+
+if (file_exists(APPPATH . 'config/routes_api.php')) {
+    include_once(APPPATH . 'config/routes_api.php');
+}

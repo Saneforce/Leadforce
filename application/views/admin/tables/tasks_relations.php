@@ -346,7 +346,7 @@ else {
         array_push($where, $rel_to_query);
     }
     if($_GET['call']) {
-      //  array_push($where, ' AND tbltasks.call_request_id != ""');
+       array_push($where, ' AND tbltasks.call_request_id != ""');
     }
 
     $join = [];

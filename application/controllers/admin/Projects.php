@@ -654,10 +654,10 @@ class Projects extends AdminController
             $data['viewIds'] = $this->staff_model->getFollowersViewList();
 			if($group == 'project_tasks'){
 				$fields = get_option('deal_fields');
-				$data['need_fields'] = array('project_name','id','tasktype','priority','assignees','task_name','description','tags','startdate','dateadded','datemodified','datefinished');
+				$data['need_fields'] = array('project_name','id','tasktype','priority','assignees','task_name','description','tags','company','project_contacts','teamleader','status','project_status','startdate','dateadded','datemodified','datefinished','project_pipeline');
 				if(!empty($fields) && $fields != 'null'){
 					$req_fields = json_decode($fields);
-					$i = 12;
+					$i = 18;
 					if(!empty($req_fields)){
 						
 						foreach($req_fields as $req_field11){
@@ -685,10 +685,10 @@ class Projects extends AdminController
 			}
 			if($group == 'project_tasks_bycall'){
 				$fields = get_option('deal_fields');
-				$data['need_fields'] = array('project_name','id','tasktype','priority','assignees','task_name','description','tags');
+				$data['need_fields'] = array('project_name','id','tasktype','priority','assignees','task_name','description','tags','company','project_contacts','teamleader','status','project_status','startdate','dateadded','datemodified','datefinished','project_pipeline');
 				if(!empty($fields) && $fields != 'null'){
 					$req_fields = json_decode($fields);
-					$i = 8;
+					$i = 18;
 					//pre($req_fields);
 					if(!empty($req_fields)){
 						

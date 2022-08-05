@@ -6,91 +6,8 @@ $hasPermissionEdit   = has_permission('tasks', '', 'edit');
 $hasPermissionDelete = has_permission('tasks', '', 'delete');
 $tasksPriorities     = get_tasks_priorities();
 $CI = &get_instance();
-$aColumns_temp = array(
-    //'id'=>db_prefix() . 'tasks.id as id',
-    'task_name'=>db_prefix() . 'tasks.name as task_name',
-    'project_name'=>db_prefix() . 'projects.name as project_name',
-    'project_status'=>db_prefix() . 'projects_status.name as project_status',
-    'project_pipeline'=>db_prefix() . 'pipeline.name as project_pipeline',
-    'company'=>db_prefix() . 'clients.company as company',
-    'teamleader'=>db_prefix() . 'projects.teamleader as p_teamleader', 
-    'status'=>db_prefix() .'tasks.status as status',
-    'tasktype'=>db_prefix() . 'tasktype.name as tasktype',
-    'project_contacts'=>db_prefix() . 'contacts.firstname as project_contacts', 
-    'startdate'=>'startdate', 
-    'dateadded'=>'dateadded', 
-    'datemodified'=>'datemodified', 
-    'datefinished'=>'datefinished', 
-    'assignees'=>'(SELECT GROUP_CONCAT(CONCAT(firstname, \' \', lastname) SEPARATOR ",") FROM tblstaff where staffid IN (select staffid from tbltask_assigned where taskid = tbltasks.id)) as assignees',
-    'tags'=>'(SELECT GROUP_CONCAT(name SEPARATOR ",") FROM ' . db_prefix() . 'taggables JOIN ' . db_prefix() . 'tags ON ' . db_prefix() . 'taggables.tag_id = ' . db_prefix() . 'tags.id WHERE rel_id = ' . db_prefix() . 'tasks.id and rel_type="task" ORDER by tag_order ASC) as tags',
-    'priority'=>'priority',
-    'description'=>db_prefix() . 'tasks.description as description',
-    'rel_type'=>db_prefix() . 'tasks.rel_type as rel_type',
-);
 
 $tasks_list_column_order = (array)json_decode(get_option('tasks_list_column_order')); //pr($tasks_list_column_order);
-$aColumns = array();
-$aColumns[] = db_prefix() . 'tasks.id as id';
-
-
-// pre($aColumns);
-$sIndexColumn = 'id';
-$sTable       = db_prefix() . 'tasks';
-
-$where = [];
-$join  = [];
-$wherewo = [];
-array_push($join, 'LEFT JOIN '.db_prefix().'tasktype  as '.db_prefix().'tasktype ON '.db_prefix().'tasktype.id = ' .db_prefix() . 'tasks.tasktype');
-array_push($join, 'LEFT JOIN '.db_prefix().'projects  as '.db_prefix().'projects ON '.db_prefix().'projects.id = ' .db_prefix() . 'tasks.rel_id AND ' .db_prefix() . 'tasks.rel_type ="project" ');
-array_push($join, 'LEFT JOIN '.db_prefix().'projects_status  as '.db_prefix().'projects_status ON '.db_prefix().'projects_status.id = ' .db_prefix() . 'projects.status');
-array_push($join, 'LEFT JOIN '.db_prefix().'pipeline  as '.db_prefix().'pipeline ON '.db_prefix().'pipeline.id = ' .db_prefix() . 'projects.pipeline_id');
-array_push($join, 'LEFT JOIN '.db_prefix().'clients  as '.db_prefix().'clients ON '.db_prefix().'clients.userid = ' .db_prefix() . 'projects.clientid');
-array_push($join, 'LEFT JOIN '.db_prefix().'contacts  as '.db_prefix().'contacts ON '.db_prefix().'contacts.id = ' .db_prefix() . 'tasks.contacts_id');
-include_once(APPPATH . 'views/admin/tables/includes/tasks_filter.php');
-include_once(APPPATH . 'views/admin/tables/includes/tasks_wo_status_filter.php');
-//pre($wherewo);
-// array_push($where, 'AND CASE WHEN rel_type="project" AND rel_id IN (SELECT project_id FROM ' . db_prefix() . 'project_settings WHERE project_id=rel_id AND name="hide_tasks_on_main_tasks_table" AND value=1) THEN rel_type != "project" ELSE 1=1 END');
-// array_push($where, ' AND rel_type != "invoice" AND rel_type != "estimate" AND rel_type != "proposal"');
-
-
-// array_push($wherewo, 'AND CASE WHEN rel_type="project" AND rel_id IN (SELECT project_id FROM ' . db_prefix() . 'project_settings WHERE project_id=rel_id AND name="hide_tasks_on_main_tasks_table" AND value=1) THEN rel_type != "project" ELSE 1=1 END');
-// array_push($wherewo, ' AND rel_type != "invoice" AND rel_type != "estimate" AND rel_type != "proposal"');
-
-
-// ROle based records
-$my_staffids = $this->ci->staff_model->get_my_staffids();
-if($my_staffids){
-    array_push($where, ' AND (' . db_prefix() . 'tasks.id in (select taskid from tbltask_assigned where staffid in (' . implode(',',$my_staffids) . ')) OR ' . db_prefix() . 'tasks.rel_id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')) OR  ' . db_prefix() . 'projects.teamleader in (' . implode(',',$my_staffids) . ') )');
-    array_push($wherewo, ' AND (' . db_prefix() . 'tasks.id in (select taskid from tbltask_assigned where staffid in (' . implode(',',$my_staffids) . ')) OR ' . db_prefix() . 'tasks.rel_id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')) OR  ' . db_prefix() . 'projects.teamleader in (' . implode(',',$my_staffids) . ') )');
-}
-if(isset($_REQUEST['search']['value']) && ($_REQUEST['search']['value'] == 'deal' || $_REQUEST['search']['value'] == 'Deal')) {
-    array_push($where, ' AND ' . db_prefix() . 'tasks.rel_type like "%project%"');
-    
-}
-// if(!empty($gsearch)){
-//     array_push($where, ' AND ' . db_prefix() . 'projects.id IN (SELECT id FROM ' . db_prefix() . 'projects WHERE name like "%' . $gsearch . '%")');
-// }
-// $aColumns[] = db_prefix().'clients.userid as userid';
-// $aColumns[] = db_prefix().'projects.id as projectid';
-// $aColumns[] = db_prefix().'projects.teamleader as p_teamleader';
-// $aColumns[] = db_prefix().'contacts.id as contactsid';
-
-$idkey = 0;
-
-$view_ids = $this->ci->staff_model->getFollowersViewList();
-    
-/*foreach($tasks_list_column_order as $ckey=>$cval){
-    if($ckey == 'id' ) {
-        $idkey = 1;
-        $aColumns[] = db_prefix() . 'tasks.id as id';
-    }
-    
-	 if(isset($aColumns_temp[$ckey])){
-		 $aColumns[] =$aColumns_temp[$ckey];
-     }
-    //  pr($aColumns);
-}*/
-
 
 $custom_fields = get_table_custom_fields('tasks');
 
@@ -116,66 +33,12 @@ foreach ($custom_fields as $key => $field) {
             array_push($locationCustomFields, 'cvalue_' .$field['slug']);
         }
         $selectAs = 'cvalue_' .$field['slug'];
-        // array_push($customFieldsColumns, $selectAs);
-        // array_push($aColumns, '(SELECT value FROM ' . db_prefix() . 'customfieldsvalues WHERE ' . db_prefix() . 'customfieldsvalues.relid=' . db_prefix() . 'clients.userid AND ' . db_prefix() . 'customfieldsvalues.fieldid=' . $field['id'] . ' AND ' . db_prefix() . 'customfieldsvalues.fieldto="' . $field['fieldto'] . '" LIMIT 1) as ' . $selectAs);
         array_push($customFieldsColumns, $selectAs);
-		$cus[$field['slug']] =  'ctable_' . $key . '.value as ' . $selectAs;
-        //array_push($aColumns, 'ctable_' . $key . '.value as ' . $selectAs);
-        array_push($join, 'LEFT JOIN '.db_prefix().'customfieldsvalues as ctable_' . $key . ' ON '.db_prefix().$fieldtois.' = ctable_' . $key . '.relid AND ctable_' . $key . '.fieldto="' . $field['fieldto'] . '" AND ctable_' . $key . '.fieldid=' . $field['id']);
     }
-}
-$aColumns_temp = array_merge($aColumns_temp,$cus);
-$idkey = 0;
-foreach($tasks_list_column_order as $ckey=>$cval){
-    if($ckey == 'id' ) {
-        $idkey = 1;
-        $aColumns[] = db_prefix() . 'tasks.id as id';
-    }
-    
-	 if(isset($aColumns_temp[$ckey])){
-		 $aColumns[] =$aColumns_temp[$ckey];
-     }
-    //  pr($aColumns);
-}
-// Fix for big queries. Some hosting have max_join_limit
-if (count($custom_fields) > 4) {
-    @$this->ci->db->query('SET SQL_BIG_SELECTS=1');
-}
-//pre($idkey);
-if($idkey == 0) {
-    $idkey = ','.db_prefix() . 'tasks.id as id';
-} else {
-    $idkey = '';
 }
 
 
-//pre($idkey);
-$aColumns = hooks()->apply_filters('tasks_table_sql_columns', $aColumns);
-$result = data_tables_init(
-    $aColumns,
-    $sIndexColumn,
-    $sTable,
-    $join,
-    $where,
-    [
-        'rel_type',
-        'rel_id',
-        'contacts_id',
-        'tasktype as type_id',
-        'tblcontacts.email as contact_email',
-        'tblcontacts.phonenumber as contact_phone',
-        'recurring',
-        tasks_rel_name_select_query() . ' as rel_name',
-        'billed',
-        '(SELECT staffid FROM tbltask_assigned WHERE taskid=tbltasks.id limit 1) as is_assigned',
-        '(SELECT id FROM tblcall_history WHERE task_id=tbltasks.id limit 1) as call_id',
-        '(SELECT filename FROM tblcall_history WHERE task_id=tbltasks.id and status = "answered" limit 1) as recorded',
-        get_sql_select_task_assignees_ids() . ' as assignees_ids',
-        '(SELECT MAX(id) FROM ' . db_prefix() . 'taskstimers WHERE task_id=' . db_prefix() . 'tasks.id and staff_id=' . get_staff_user_id() . ' and end_time IS NULL) as not_finished_timer_by_current_staff',
-        '(SELECT staffid FROM ' . db_prefix() . 'task_assigned WHERE taskid=' . db_prefix() . 'tasks.id AND staffid=' . get_staff_user_id() . ' group by tbltask_assigned.taskid) as current_user_is_assigned',
-        '(SELECT CASE WHEN '.db_prefix() . 'tasks.addedfrom=' . get_staff_user_id() . ' AND is_added_from_contact=0 THEN 1 ELSE 0 END) as current_user_is_creator'.$idkey,
-    ],'','','taskpage',$wherewo
-);
+$result =$CI->tasks_model->get_tasks_list();
 $output  = $result['output'];
 $rResult = $result['rResult'];
 $allow_to_call = $this->ci->callsettings_model->accessToCall();

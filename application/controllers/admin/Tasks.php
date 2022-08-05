@@ -566,6 +566,8 @@ class Tasks extends AdminController
         if (!has_permission('tasks', '', 'edit') && !has_permission('tasks', '', 'create')) {
             ajax_access_denied();
         }
+
+        
         // $updateactiv['tasktype'] = 1; 
         // $this->db->where('tasktype', 0);
         // $this->db->update(db_prefix() . 'tasks', $updateactiv);
@@ -600,6 +602,14 @@ class Tasks extends AdminController
             $data                = $this->input->post();
             $data['description'] = $this->input->post('description', false);
 			
+            $validation =$this->tasks_model->validate_task_form_data($data,$id);
+            if( $validation !==true){
+                echo json_encode([
+                    'success' => false,
+                    'message' => $validation['error'],
+                ]);
+                die;
+            }
 			if(isset($data['task_mark_complete_id']) && !empty($data['task_mark_complete_id'])){
 				$this->tasks_model->mark_as(5, $data['task_mark_complete_id']);
 			}
