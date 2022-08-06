@@ -533,7 +533,14 @@
     		$('.edit-title').removeClass('hide');
         });
         
-        appValidateForm($('#source form'),{name:'required'},manage_leads_sources);
+        jQuery.validator.addMethod("validateName", function(value, element) {
+            if(value.length === value.trim().length && value.match(/^\d*[a-z][a-z\d`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~\s]*$/i)){
+                return true;
+            }
+            return false;
+        }, "Invalid format");
+
+        appValidateForm($('#source form'),{name:{required:true,validateName:true}},manage_leads_sources);
     	$('#source').on('hidden.bs.modal', function(event) {
     		$('#additional').html('');
     		$('#source input[name="name"]').val('');
@@ -550,10 +557,16 @@
     	return false;
     }
     function new_source(){
+        $("#source #name-error").remove();
+        $("#source .form-group").removeClass('has-error');
+        $("#name").attr('aria-invalid','false');
     	$('#source').modal('show');
     	$('.edit-title').addClass('hide');
     }
     function edit_source(invoker,id){
+        $("#source #name-error").remove();
+        $("#source .form-group").removeClass('has-error');
+        $("#name").attr('aria-invalid','false');
     	var name = $(invoker).data('name');
     	$('#additional').append(hidden_input('id',id));
     	$('#source input[name="name"]').val(name);

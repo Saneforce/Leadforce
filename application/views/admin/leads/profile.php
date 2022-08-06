@@ -366,7 +366,7 @@ if ((isset($lead) && empty($lead->website)) || !isset($lead)) {
                 }
                 $value = (isset($lead) ? $lead->phonenumber : '');
                 ?>
-                <?php echo render_input('phonenumber', 'lead_add_edit_phonenumber', $value,'text',['onblur'=>'validate_lead_profile_no_space(this.value,\'phonenumber\')','maxlength'=>'100']); ?>
+                <?php echo render_input('phonenumber', 'lead_add_edit_phonenumber', $value,'text',['onblur'=>'validate_lead_profile_phonenumber(this.value,\'phonenumber\')','maxlength'=>'100']); ?>
                 <?php $value = (isset($lead) ? $lead->company : ''); ?>
 <?php echo render_input('company', 'lead_company', $value,'text',['onblur'=>'validate_lead_profile_text_input(this.value,\'company\')','maxlength'=>'148']); ?>
 <div class="form-group" app-field-wrapper="company" id="source_addlead">

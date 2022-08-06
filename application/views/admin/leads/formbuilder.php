@@ -53,6 +53,12 @@
                         <?php echo form_open($this->uri->uri_string(), array('id'=>'form_info')); ?>
                         <div class="row">
                            <div class="col-md-6">
+                              <div class="leads-filter-column">
+                              <?php $value = (isset($form) ? $form->lead_source : ''); ?>
+                              <?php
+                                 echo render_select('lead_source',$sources,array('id','name'),_l('Source'),$value,array('required'=>true),array());
+                              ?>
+                              </div>
                               <?php $value = (isset($form) ? $form->name : ''); ?>
                               <?php echo render_input('name', 'form_name', $value,'',['maxlength'=>100]); ?>
                               <?php
@@ -88,7 +94,7 @@
                               <?php $value = (isset($form) ? $form->submit_btn_name : 'Submit'); ?>
                               <?php echo render_input('submit_btn_name', 'form_btn_submit_text', $value,'',['maxlength'=>39]); ?>
                               <?php $value = (isset($form) ? $form->success_submit_msg : ''); ?>
-                              <?php echo render_textarea('success_submit_msg', 'form_success_submit_msg', $value); ?>
+                              <?php echo render_textarea('success_submit_msg', 'form_success_submit_msg', $value,['maxlength'=>250]); ?>
 <!-- 
                              <div class="checkbox checkbox-primary">
                             <input type="checkbox" name="mark_public" id="mark_public" <?php if (isset($form) && $form->mark_public == 1) {
@@ -282,7 +288,7 @@ if(formData.length){
       }, "No space please an don't leave it empty");
 
       jQuery.validator.addMethod("noNumeric", function(value, element) { 
-         return value.match(/^\d*[a-z][a-z\d\s]*$/i);  
+         return value.match(/^\d*[a-z][a-z\d`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~\s]*$/i);  
       }, "Invalid format");
 
 
@@ -302,20 +308,7 @@ if(formData.length){
          noNumeric:true,
        },
        responsible: {
-         required: {
-            depends:function(element){
-             var isRequiredByNotifyType = ($('input[name="notify_type"]:checked').val() == 'assigned') ? true : false;
-             var isRequiredByAssignTask = ($create_task_on_duplicate.is(':checked')) ? true : false;
-             var isRequired = isRequiredByNotifyType || isRequiredByAssignTask;
-             if(isRequired) {
-                $('[for="responsible"]').find('.req').removeClass('hide');
-             } else {
-                $(element).next('p.text-danger').remove();
-                $('[for="responsible"]').find('.req').addClass('hide');
-             }
-             return isRequired;
-           }
-         }
+         required:true
        }
      });
 

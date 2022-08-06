@@ -971,6 +971,7 @@ class Leads extends AdminController
         }
         $data['bodyclass'] = 'web-to-lead-form';
         $data['db_fields'] = $db_fields;
+        $data['sources']  = $this->leads_model->get_source();
         $this->load->view('admin/leads/formbuilder', $data);
     }
 
@@ -1066,16 +1067,6 @@ class Leads extends AdminController
                 $inline = isset($data['inline']);
                 if (isset($data['inline'])) {
                     unset($data['inline']);
-                }
-                if(strlen(trim($data['name'])) ==0) {
-                    set_alert('warning', 'Name field cannot be empty');
-                    return false;
-                }elseif(strlen(trim($data['name'])) !=strlen($data['name'])) {
-                    set_alert('warning', 'Name field cannot contain space in either begining or end');
-                    return false;
-                }elseif(preg_match(' ^[a-zA-Z]+[a-zA-Z0-9-_ ]*[a-zA-Z0-9]$', $data['name'])==false){
-                    set_alert('warning', 'Name field is invalid format');
-                    return false;
                 }
                 $data['slug'] = strtolower($data['name']);
                 $this->db->select('slug');
