@@ -768,8 +768,8 @@ div#mceu_18-body {
 .mce-container.mce-panel{
 	 display: block !important;
 }
-textarea.form-control{
-	/* display:none !important; */
+textarea.tinymce-task{
+	display:none !important;
 }
 .mce-first{
 	display:none !important;
