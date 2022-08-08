@@ -16,10 +16,11 @@ class Authentication extends App_Controller
 
     public function loginapi()
     {
-        if ($_REQUEST) {
-			$email    = $_REQUEST['email'];
-			$password = $_REQUEST['password'];
-			$domain	 = $_REQUEST['domain'];
+        if ($_POST) {
+			$email    = $_POST['email'];
+			$password = $_POST['password'];
+			$domain	 = $_POST['domain'];
+
 			$remember = false;
 			$data = $this->Authenticationapi_model->login($email, $password,$domain, $remember, true);
 			if (is_array($data) && isset($data['memberinactive'])) {
