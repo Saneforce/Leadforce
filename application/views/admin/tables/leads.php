@@ -140,9 +140,9 @@ if ($this->ci->input->post('custom_view')) {
     }
 }
 
-if (!$filter || ($filter && $filter != 'lost' && $filter != 'junk')) {
-    array_push($where, 'AND lost = 0 AND junk = 0');
-}
+// if (!$filter || ($filter && $filter != 'lost' && $filter != 'junk')) {
+//     array_push($where, 'AND lost = 0 AND junk = 0');
+// }
 
 if (has_permission('leads', '', 'view') && $this->ci->input->post('assigned')) {
     array_push($where, 'AND assigned =' . $this->ci->db->escape_str($this->ci->input->post('assigned')));

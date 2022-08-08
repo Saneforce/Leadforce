@@ -462,34 +462,8 @@ function init_relation_tasks_table1($table_attributes = [])
 function init_relation_tasks_table($table_attributes = [])
 {
 	$fields = get_option('deal_fields');
-	$need_fields = array('project_name','id','tasktype','priority','assignees','task_name','description','tags','startdate','dateadded','datemodified','datefinished','project_pipeline');
-	if(!empty($fields) && $fields != 'null'){
-		$req_fields = json_decode($fields);
-		$i = 13;
-		if(!empty($req_fields)){
-			
-			foreach($req_fields as $req_field11){
-				if($req_field11 == 'clientid'){
-					$need_fields[$i] = 'company';
-				}
-				else if($req_field11 == 'project_contacts[]'){
-					$need_fields[$i] = 'project_contacts';
-				}
-				else if($req_field11 == 'teamleader'){
-					$need_fields[$i] = 'teamleader';
-				}
-				else if($req_field11 == 'status'){
-					$need_fields[$i] = 'status';
-					$i++;
-					$need_fields[$i] = 'project_status';
-				}
-				else if($req_field11 == 'startdate'){
-					$need_fields[$i] = 'startdate';
-				}
-				$i++;
-			}
-		}
-	}
+	$tasks_need_fields =get_tasks_need_fields();
+    $need_fields =$tasks_need_fields['need_fields'];
 	$table_datas = [
 	   'id'=>_l('the_number_sign'),
 		'task_name'=> [
@@ -2824,4 +2798,66 @@ function get_public($report_id){
 		}
 	}
 	echo $req_out;
+}
+
+
+function get_tasks_need_fields(){
+	$fields = get_option('deal_fields');
+	$data =array();
+	$data['need_fields'] = array('project_name','id','tasktype','priority','assignees','task_name','description','tags','company','project_contacts','teamleader','status','project_status','startdate','dateadded','datemodified','datefinished','project_pipeline');
+	if(!empty($fields) && $fields != 'null'){
+		$req_fields = json_decode($fields);
+		if(!empty($req_fields)){
+			
+			foreach($req_fields as $req_field11){
+				if($req_field11 == 'clientid'){
+					$data['need_fields'][] = 'company';
+				}
+				else if($req_field11 == 'project_contacts[]'){
+					$data['need_fields'][]= 'project_contacts';
+				}
+				else if($req_field11 == 'teamleader'){
+					$data['need_fields'][]= 'teamleader';
+				}
+				else if($req_field11 == 'status'){
+					$data['need_fields'][]= 'status';
+					$data['need_fields'][]= 'project_status';
+				}
+				else if($req_field11 == 'startdate'){
+					$data['need_fields'][]= 'startdate';
+				}
+				
+			}
+		}
+	}
+	//$data['need_fields'] = array('project_name','id','tasktype','priority','assignees','task_name','description','tags','company','project_contacts','teamleader','status','project_status','startdate');
+	//$fields = get_option('deal_fields');
+	//$data['need_fields'] = array('project_name','id','tasktype','priority','assignees','task_name','description','tags','company','project_contacts','teamleader','status','project_status','startdate');
+	return $data;
+}
+
+function get_tasks_all_fields()
+{
+	$aColumns_temp = array(
+		//'id'=>db_prefix() . 'tasks.id as id',
+		'task_name'=>db_prefix() . 'tasks.name as task_name',
+		'project_name'=>db_prefix() . 'projects.name as project_name',
+		'project_status'=>db_prefix() . 'projects_status.name as project_status',
+		'project_pipeline'=>db_prefix() . 'pipeline.name as project_pipeline',
+		'company'=>db_prefix() . 'clients.company as company',
+		'teamleader'=>db_prefix() . 'projects.teamleader as p_teamleader', 
+		'status'=>db_prefix() .'tasks.status as status',
+		'tasktype'=>db_prefix() . 'tasktype.name as tasktype',
+		'project_contacts'=>db_prefix() . 'contacts.firstname as project_contacts', 
+		'startdate'=>'startdate', 
+		'dateadded'=>'dateadded', 
+		'datemodified'=>'datemodified', 
+		'datefinished'=>'datefinished', 
+		'assignees'=>'(SELECT GROUP_CONCAT(CONCAT(firstname, \' \', lastname) SEPARATOR ",") FROM tblstaff where staffid IN (select staffid from tbltask_assigned where taskid = tbltasks.id)) as assignees',
+		'tags'=>'(SELECT GROUP_CONCAT(name SEPARATOR ",") FROM ' . db_prefix() . 'taggables JOIN ' . db_prefix() . 'tags ON ' . db_prefix() . 'taggables.tag_id = ' . db_prefix() . 'tags.id WHERE rel_id = ' . db_prefix() . 'tasks.id and rel_type="task" ORDER by tag_order ASC) as tags',
+		'priority'=>'priority',
+		'description'=>db_prefix() . 'tasks.description as description',
+		'rel_type'=>db_prefix() . 'tasks.rel_type as rel_type',
+	);
+	return $aColumns_temp;
 }

@@ -161,7 +161,7 @@
                                     <div class="modal-body">
                                        <?php if(has_permission('leads','','delete')){ ?>
                                        <div class="checkbox checkbox-danger">
-                                          <input type="checkbox" name="mass_delete" id="mass_delete">
+                                          <input type="checkbox" name="mass_delete" id="mass_delete" onchange="lead_bulkaction_confirm();">
                                           <label for="mass_delete"><?php echo _l('mass_delete'); ?></label>
                                        </div>
                                        <hr class="mass_delete_separator" />
@@ -169,7 +169,7 @@
                                        <div id="bulk_change">
                                        <div class="form-group">
                                               <div class="checkbox checkbox-primary checkbox-inline">
-                                                <input type="checkbox" name="leads_bulk_mark_lost" id="leads_bulk_mark_lost" value="1">
+                                                <input type="checkbox" name="leads_bulk_mark_lost" id="leads_bulk_mark_lost" value="1" onchange="lead_bulkaction_confirm();">
                                                 <label for="leads_bulk_mark_lost">
                                                 <?php echo _l('lead_mark_as_lost'); ?>
                                                 </label>
@@ -177,15 +177,15 @@
                                          </div>
                                           <?php //echo render_select('move_to_status_leads_bulk',$statuses,array('id','name'),'ticket_single_change_status'); ?>
                                           <?php
-                                             echo render_select('move_to_source_leads_bulk',$sources,array('id','name'),'lead_source');
+                                             echo render_select('move_to_source_leads_bulk',$sources,array('id','name'),'lead_source','',array('onchange'=>"lead_bulkaction_confirm();"));
                                              //echo render_datetime_input('leads_bulk_last_contact','leads_dt_last_contact');
                                              //if(has_permission('leads','','edit')){
-                                               echo render_select('assign_to_leads_bulk',$staff,array('staffid',array('firstname','lastname')),'leads_dt_assigned');
+                                               echo render_select('assign_to_leads_bulk',$staff,array('staffid',array('firstname','lastname')),'leads_dt_assigned','',array('onchange'=>"lead_bulkaction_confirm();"));
                                              //}
                                              ?>
                                           <div class="form-group">
                                              <?php echo '<p><b><i class="fa fa-tag" aria-hidden="true"></i> ' . _l('tags') . ':</b></p>'; ?>
-                                             <input type="text" class="tagsinput" id="tags_bulk" name="tags_bulk" value="" data-role="tagsinput">
+                                             <input type="text" class="tagsinput" id="tags_bulk" name="tags_bulk" value="" data-role="tagsinput" onchange="lead_bulkaction_confirm();">
                                           </div>
                                           <!-- <hr />
                                           <div class="form-group no-mbot">
@@ -206,7 +206,7 @@
                                     </div>
                                     <div class="modal-footer">
                                        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
-                                       <a href="#" class="btn btn-info" onclick="leads_bulk_action(this); return false;"><?php echo _l('confirm'); ?></a>
+                                       <a href="#" class="btn btn-info disabled" onclick="leads_bulk_action(this); return false;" id="lead_bulk_action_confirm"><?php echo _l('confirm'); ?></a>
                                     </div>
                                  </div>
                                  <!-- /.modal-content -->
@@ -405,6 +405,32 @@
     $( "#sortable" ).sortable();
     $( "#sortable" ).disableSelection();
   } );
+
+  function lead_bulkaction_confirm(){
+   var disabled =true;
+   if($('#mass_delete').is(':checked') == true){
+      disabled =false;
+   }
+   if($('#leads_bulk_mark_lost').is(':checked') == true){
+      disabled =false;
+   }
+   if($('#move_to_source_leads_bulk').val()>0){
+      disabled =false;
+   }
+   if($('#assign_to_leads_bulk').val() >0){
+      disabled =false;
+   }
+   if($('#tags_bulk').val().length >0){
+      disabled =false;
+   }
+   if(disabled ==true){
+      $("#lead_bulk_action_confirm").addClass('disabled');
+      
+   }else{
+      $("#lead_bulk_action_confirm").removeClass('disabled');
+   }
+   
+  }
 </script>
 
 </body>
