@@ -45,7 +45,8 @@ class Tasks extends AdminController
 
         $data['title'] = _l('tasks');
 		$fields = get_option('deal_fields');
-		$data['need_fields'] = array('project_name','id','tasktype','priority','assignees','task_name','description','tags','company','project_contacts','teamleader','status','project_status','startdate','dateadded','datemodified','datefinished','project_pipeline');
+		$tasks_need_fields =get_tasks_need_fields();
+        $data['need_fields'] =$tasks_need_fields['need_fields'];
 		
         $this->load->view('admin/tasks/manage', $data);
     }
@@ -297,46 +298,11 @@ class Tasks extends AdminController
 
     public function init_relation_tasks($rel_id, $rel_type)
     {
-		$fields = get_option('deal_fields');
-        $data['need_fields'] = array('project_name','id','tasktype','priority','assignees','task_name','description','tags','company','project_contacts','teamleader','status','project_status','startdate','dateadded','datemodified','datefinished','project_pipeline');
-		if(!empty($fields) && $fields != 'null'){
-			$req_fields = json_decode($fields);
-			$i = 18;
-			if(!empty($req_fields)){
-				
-				foreach($req_fields as $req_field11){
-					if($req_field11 == 'clientid'){
-						$data['need_fields'][$i] = 'company';
-						$i++;
-					}
-					else if($req_field11 == 'project_contacts[]'){
-						$data['need_fields'][$i] = 'project_contacts';
-						$i++;
-					}
-					else if($req_field11 == 'teamleader'){
-						$data['need_fields'][$i] = 'teamleader';
-						$i++;
-					}
-					else if($req_field11 == 'status'){
-						$data['need_fields'][$i] = 'status';
-						$i++;
-						$data['need_fields'][$i] = 'project_status';
-						$i++;
-					}
-					else if($req_field11 == 'startdate'){
-						$data['need_fields'][$i] = 'startdate';
-						$i++;
-					}
-					
-				}
-			}
-		}
-		//$data['need_fields'] = array('project_name','id','tasktype','priority','assignees','task_name','description','tags','company','project_contacts','teamleader','status','project_status','startdate');
-		//$fields = get_option('deal_fields');
-		//$data['need_fields'] = array('project_name','id','tasktype','priority','assignees','task_name','description','tags','company','project_contacts','teamleader','status','project_status','startdate');
+		$tasks_need_fields =get_tasks_need_fields();
+        $data['need_fields'] =$tasks_need_fields['need_fields'];
 		$data['rel_id'] = $rel_id;
 		$data['rel_type'] = $rel_type;
-       if ($this->input->is_ajax_request()) {
+        if ($this->input->is_ajax_request()) {
             $this->app->get_table_data('tasks_relations', $data);
         }
     }

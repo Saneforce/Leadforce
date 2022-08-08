@@ -3018,27 +3018,7 @@ class Tasks_model extends App_Model
     public function get_tasks_list($api =false)
     {
 
-        $aColumns_temp = array(
-            //'id'=>db_prefix() . 'tasks.id as id',
-            'task_name'=>db_prefix() . 'tasks.name as task_name',
-            'project_name'=>db_prefix() . 'projects.name as project_name',
-            'project_status'=>db_prefix() . 'projects_status.name as project_status',
-            'project_pipeline'=>db_prefix() . 'pipeline.name as project_pipeline',
-            'company'=>db_prefix() . 'clients.company as company',
-            'teamleader'=>db_prefix() . 'projects.teamleader as p_teamleader', 
-            'status'=>db_prefix() .'tasks.status as status',
-            'tasktype'=>db_prefix() . 'tasktype.name as tasktype',
-            'project_contacts'=>db_prefix() . 'contacts.firstname as project_contacts', 
-            'startdate'=>'startdate', 
-            'dateadded'=>'dateadded', 
-            'datemodified'=>'datemodified', 
-            'datefinished'=>'datefinished', 
-            'assignees'=>'(SELECT GROUP_CONCAT(CONCAT(firstname, \' \', lastname) SEPARATOR ",") FROM tblstaff where staffid IN (select staffid from tbltask_assigned where taskid = tbltasks.id)) as assignees',
-            'tags'=>'(SELECT GROUP_CONCAT(name SEPARATOR ",") FROM ' . db_prefix() . 'taggables JOIN ' . db_prefix() . 'tags ON ' . db_prefix() . 'taggables.tag_id = ' . db_prefix() . 'tags.id WHERE rel_id = ' . db_prefix() . 'tasks.id and rel_type="task" ORDER by tag_order ASC) as tags',
-            'priority'=>'priority',
-            'description'=>db_prefix() . 'tasks.description as description',
-            'rel_type'=>db_prefix() . 'tasks.rel_type as rel_type',
-        );
+        $aColumns_temp = get_tasks_all_fields();
         
         $tasks_list_column_order = (array)json_decode(get_option('tasks_list_column_order')); //pr($tasks_list_column_order);
         $aColumns = array();

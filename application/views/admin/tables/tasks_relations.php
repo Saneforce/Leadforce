@@ -237,24 +237,7 @@ if($rel_type == 'lead' || $rel_type == 'invoice' || $rel_type == 'estimate' || $
     
 } 
 else {
-    $aColumns_temp =  array(
-        'id'=>db_prefix() . 'tasks.id as id',
-        'task_name'=>db_prefix() . 'tasks.name as task_name',
-        'project_status'=>db_prefix() . 'projects_status.name as project_status',
-        'company'=>db_prefix() . 'clients.company as company',
-        'project_name'=>db_prefix() . 'projects.name as project_name',
-        'status'=>db_prefix() .'tasks.status as status',
-        'startdate'=>'startdate',
-        'dateadded'=>'dateadded', 
-        'datemodified'=>'datemodified', 
-        'datefinished'=>'datefinished', 
-        'project_contacts'=>db_prefix() . 'contacts.firstname as project_contacts', 
-        'tasktype'=>db_prefix() . 'tasktype.name as tasktype',
-        'assignees'=>get_sql_select_task_asignees_full_names() . ' as assignees',
-        'tags'=>'(SELECT GROUP_CONCAT(name SEPARATOR ",") FROM ' . db_prefix() . 'taggables JOIN ' . db_prefix() . 'tags ON ' . db_prefix() . 'taggables.tag_id = ' . db_prefix() . 'tags.id WHERE rel_id = ' . db_prefix() . 'tasks.id and rel_type="task" ORDER by tag_order ASC) as tags',
-        'priority'=>'priority',
-        'description'=>db_prefix() . 'tasks.description as description',
-    );
+    $aColumns_temp =  get_tasks_all_fields();
 
     /*
     if ($rel_to !== 'project') {

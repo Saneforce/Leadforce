@@ -769,7 +769,7 @@ div#mceu_18-body {
 	 display: block !important;
 }
 textarea.form-control{
-	display:none !important;
+	/* display:none !important; */
 }
 .mce-first{
 	display:none !important;

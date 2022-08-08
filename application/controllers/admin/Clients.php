@@ -415,8 +415,8 @@ class Clients extends AdminController
         $data['bodyclass'] = 'customer-profile dynamic-create-groups';
         $data['title']     = $title;
 		if ($group == 'tasks') {
-			$fields = get_option('deal_fields');
-			$data['need_fields'] = array('project_name','id','tasktype','priority','assignees','task_name','description','tags','company','project_contacts','teamleader','status','project_status','startdate');
+			$tasks_need_fields =get_tasks_need_fields();
+            $data['need_fields'] =$tasks_need_fields['need_fields'];
 		}
 		if ($group == 'projects') {
 			$fields = get_option('deal_fields');
@@ -508,8 +508,8 @@ class Clients extends AdminController
 		$data['bodyclass'] = 'customer-profile dynamic-create-groups';
         $data['title']     = $title;
 		if ($group == 'tasks') {
-			$fields = get_option('deal_fields');
-			$data['need_fields'] = array('project_name','id','tasktype','priority','assignees','task_name','description','tags','company','project_contacts','teamleader','status','project_status','startdate');
+			$tasks_need_fields =get_tasks_need_fields();
+            $data['need_fields'] =$tasks_need_fields['need_fields'];
 		}
 		if ($group == 'projects') {
 			$fields = get_option('deal_fields');
