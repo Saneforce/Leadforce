@@ -1,5 +1,5 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<?php init_head(); ?>
+<?php init_head();?>
 <div id="wrapper">
     <div class="content">
         <div class="row">
@@ -25,6 +25,20 @@
                         <?php $value = (isset($project) ? $project->name : ''); ?>
                         <?php echo render_input('name','project_name',$value,'',array('maxlength'=>191,'placeholder'=>'Enter Deal Name')); ?>
                         <div id="company_exists_info" class="hide"></div>
+
+            
+                        <?php 
+                         $teamleaderselected = ((isset($project) && !empty($project->teamleader)) ? $project->teamleader : '');
+                            if(isset($project)) {
+                                if(in_array(get_staff_user_id(),$ownerHierarchy) || $project->teamleader == get_staff_user_id() || is_admin(get_staff_user_id()))
+                                    echo render_select('teamleader', $teamleaders, array('staffid', array('firstname', 'lastname')), 'teamleader', $teamleaderselected, $assigned_attrs);
+                                else
+                                    echo render_select('teamleader', $teamleaders, array('staffid', array('firstname', 'lastname')), 'teamleader', $teamleaderselected, array('disabled'=>true));
+                            } else {
+                                echo render_select('teamleader', $teamleaders, array('staffid', array('firstname', 'lastname')), 'teamleader', $teamleaderselected, $assigned_attrs);
+                            }
+                        ?>
+
 						<?php if(!empty($need_fields) && in_array("clientid", $need_fields)){ ?>
 							<div
 								class="form-group select-placeholder clientiddiv form-group-select-input-groups_in[] input-group-select">
@@ -214,24 +228,6 @@
                             </div>
                         </div>
                           -->
-
-                            <div <?php if(!empty($need_fields) && in_array("project_members[]", $need_fields)){?> class="col-md-6 form_teamleader" <?php }else{?> class="col-md-12 form_teamleader" <?php }?>>
-                                <?php 
-                         $teamleaderselected = ((isset($project) && !empty($project->teamleader)) ? $project->teamleader : '');
-                       
-                        
-                            if(isset($project)) {
-                                if(in_array(get_staff_user_id(),$ownerHierarchy) || $project->teamleader == get_staff_user_id() || is_admin(get_staff_user_id()))
-                                    echo render_select('teamleader', $teamleaders, array('staffid', array('firstname', 'lastname')), 'teamleader', $teamleaderselected, $assigned_attrs);
-                                else
-                                    echo render_select('teamleader', $teamleaders, array('staffid', array('firstname', 'lastname')), 'teamleader', $teamleaderselected, array('disabled'=>true));
-                            } else {
-                                echo render_select('teamleader', $teamleaders, array('staffid', array('firstname', 'lastname')), 'teamleader', $teamleaderselected, $assigned_attrs);
-                            }
-                            
-                        
-?>
-                            </div>
 						  <?php if(!empty($need_fields) && in_array("project_members[]", $need_fields)){?>
                             <div <?php if(!empty($need_fields) && in_array("teamleader", $need_fields)){?> class="col-md-6 form_assigned"<?php }else{?> class="col-md-6 form_assigned" <?php }?>>
                                 <?php
