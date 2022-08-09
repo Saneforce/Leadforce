@@ -218,4 +218,30 @@ class Activities extends BaseController
         }
         $this->api_model->response_bad_request(false,[],'Could not update activity status');
     }
+
+
+    // get activity types 
+    public function gettypes()
+    {
+        $types =$this->tasktype_model->getTasktypes();
+        $this->api_model->response_ok(true,$types,'');
+    }
+
+    //get activity priorities
+    public function getpriorities()
+    {
+        $priorities =get_tasks_priorities();
+        $this->api_model->response_ok(true,$priorities,'');
+    }
+
+    //get activity realted to
+    public function getrelatedto()
+    {
+        $relatedto =[
+            'project' => _l('project'),
+            // 'customer' => _l('client'),
+            // 'lead' => _l('lead'),
+        ];
+        $this->api_model->response_ok(true,$relatedto,'');
+    }
 }
