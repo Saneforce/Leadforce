@@ -134,7 +134,8 @@ if (!is_admin() && empty($where)) {
     
 }
 
-array_push($where, '  AND tblcontacts.deleted_status=0 AND tblclients.deleted_status=0 ');
+//array_push($where, '  AND tblcontacts.deleted_status=0 AND tblclients.deleted_status=0 ');
+array_push($where, '  AND tblcontacts.deleted_status=0 ');
 
 if($likeqry) {
     $likeqry = ' AND ( '.$likeqry.' ) ';
