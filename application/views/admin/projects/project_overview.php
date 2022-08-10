@@ -76,6 +76,44 @@
                       
                   </td>
                   </tr>
+               <tr class="project-overview-customer">
+                  <td class="bold"><?php echo _l('teamleader'); ?></td>
+                  <td class="teamleader">
+                  
+                  
+                  
+                  <div class="data_display">
+                     <span class="updated_text">
+                     <?php echo (isset($teamleader)&&isset($teamleader->firstname))?($teamleader->firstname.' '.$teamleader->lastname):''; ?>
+                     </span>
+                     <?php if(is_admin(get_staff_user_id()) || $project->teamleader == get_staff_user_id() || in_array(get_staff_user_id(),$ownerHierarchy) || (!empty($my_staffids) && in_array($project->teamleader,$my_staffids) && !in_array($project->teamleader,$viewIds))) { ?>
+                        <button class="btn btn-link pull-right no-padding data_display_btn" data-val="teamleader" ><i class="fa fa-pencil"></i></button>
+                        <?php } ?>
+                      </div>
+                      <div class="data_edit" style=" display:none;">
+                        <div class="form-group select-placeholder form-group-select-input-groups_in[] input-group-select">
+                                 <div class="input-group input-group-select select-groups_in[]">
+                                 
+                                 <select id="teamleader" name="teamleader" data-live-search="true" data-width="100%"  class=" selectpicker _select_input_group">
+                                    <?php 
+                                    foreach($teamleaders as $pikay => $pival){
+                                       $selected = '';
+                                       $teamleader = (isset($project) ? $project->teamleader : '');
+                                       if($teamleader == $pival['staffid']){
+                                          $selected = 'selected="selected"';
+                                       }
+                                       echo '<option value="'.$pival['staffid'].'" '.$selected.'>'.$pival['firstname'].' '.$pival['lastname'].'</option>';
+                                    }
+                                    ?>
+                                 </select>
+                                        <div class="input-group-addon" style="opacity: 1;"><a class=" data_edit_btn" data-val="teamleader"><i class="fa fa-check"></i></a></div>
+                           </div>
+                           
+                        </div>
+                      </div>
+                  
+                  </td>
+              </tr>
 				  <?php if(!empty($need_fields) && in_array("clientid", $need_fields)){ ?>
               <tr class="project-overview-customer">
                   <td class="bold"><?php echo _l('project_customer'); ?></td>
@@ -150,45 +188,6 @@
                            
                         </div>
                       </div>
-                  </td>
-              </tr>
-				  <?php }if(!empty($need_fields) && in_array("teamleader", $need_fields)){?>
-              <tr class="project-overview-customer">
-                  <td class="bold"><?php echo _l('teamleader'); ?></td>
-                  <td class="teamleader">
-                  
-                  
-                  
-                  <div class="data_display">
-                     <span class="updated_text">
-                     <?php echo (isset($teamleader)&&isset($teamleader->firstname))?($teamleader->firstname.' '.$teamleader->lastname):''; ?>
-                     </span>
-                     <?php if(is_admin(get_staff_user_id()) || $project->teamleader == get_staff_user_id() || in_array(get_staff_user_id(),$ownerHierarchy) || (!empty($my_staffids) && in_array($project->teamleader,$my_staffids) && !in_array($project->teamleader,$viewIds))) { ?>
-                        <button class="btn btn-link pull-right no-padding data_display_btn" data-val="teamleader" ><i class="fa fa-pencil"></i></button>
-                        <?php } ?>
-                      </div>
-                      <div class="data_edit" style=" display:none;">
-                        <div class="form-group select-placeholder form-group-select-input-groups_in[] input-group-select">
-                                 <div class="input-group input-group-select select-groups_in[]">
-                                 
-                                 <select id="teamleader" name="teamleader" data-live-search="true" data-width="100%"  class=" selectpicker _select_input_group">
-                                    <?php 
-                                    foreach($teamleaders as $pikay => $pival){
-                                       $selected = '';
-                                       $teamleader = (isset($project) ? $project->teamleader : '');
-                                       if($teamleader == $pival['staffid']){
-                                          $selected = 'selected="selected"';
-                                       }
-                                       echo '<option value="'.$pival['staffid'].'" '.$selected.'>'.$pival['firstname'].' '.$pival['lastname'].'</option>';
-                                    }
-                                    ?>
-                                 </select>
-                                        <div class="input-group-addon" style="opacity: 1;"><a class=" data_edit_btn" data-val="teamleader"><i class="fa fa-check"></i></a></div>
-                           </div>
-                           
-                        </div>
-                      </div>
-                  
                   </td>
               </tr>
 				  <?php }?>
