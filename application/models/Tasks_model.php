@@ -3182,7 +3182,7 @@ class Tasks_model extends App_Model
     public function validate_task_form_data($data,$id='')
     {
         //check the required fields
-        $fields =array("tasktype","name","description","assignees","startdate","priority","rel_type","rel_id","tags","custom_fields");
+        $fields =array("tasktype","name","description","assignees","startdate","priority","rel_type","rel_id","tags");
         foreach($fields as $field){
             if(!isset($data[$field])){
                 if($id){
