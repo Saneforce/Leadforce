@@ -12,6 +12,7 @@ $aColumns_temp = [
     'contact_name'=>'(SELECT GROUP_CONCAT(CONCAT(firstname, \' \', lastname) SEPARATOR ",") FROM ' . db_prefix() . 'project_contacts JOIN ' . db_prefix() . 'contacts on ' . db_prefix() . 'contacts.id = ' . db_prefix() . 'project_contacts.contacts_id WHERE '.db_prefix() .'project_contacts.project_id=p.id AND '.db_prefix().'project_contacts.is_primary = 1) as contact_name',
     'project_cost'=>'project_cost',
     'product_qty'=>'(SELECT sum(quantity) FROM '.db_prefix().'project_products WHERE projectid = p.id) as product_qty',
+    'product_count'=>'(SELECT count(quantity) FROM '.db_prefix().'project_products WHERE projectid = p.id) as product_count',
     'product_amt'=>'(SELECT sum(price) FROM '.db_prefix().'project_products WHERE projectid = p.id) as product_amt',
    'company'=> get_sql_select_client_company(),
     'tags'=>'(SELECT GROUP_CONCAT(name SEPARATOR ",") FROM ' . db_prefix() . 'taggables JOIN ' . db_prefix() . 'tags ON ' . db_prefix() . 'taggables.tag_id = ' . db_prefix() . 'tags.id WHERE rel_id = p.id and rel_type="project" ORDER by tag_order ASC) as tags',
@@ -240,6 +241,7 @@ foreach ($rResult as $aRow) {
     $row_temp['name'] = $name;
    $row_temp['project_cost'] = $aRow['project_cost'];
     $row_temp['product_qty'] = $aRow['product_qty'];
+    $row_temp['product_count'] = $aRow['product_count'];
     if($aRow['product_amt'] > 0)
         $row_temp['product_amt'] = $aRow['product_amt'];
     else
