@@ -193,6 +193,67 @@ ul.dropdown-menu li:first-child {
 }
 </style>
 <script>
+function get_deal(clmn,crow,view_by,measure,date_range,sum_id){
+	document.getElementById('overlay_deal1234').style.display = '';
+	var view_type = $('#view_type12').val();
+	var data = {clmn:clmn,crow:crow,view_by:view_by,measure:measure,date_range:date_range,view_type:view_type,sum_id:sum_id};
+	 var ajaxRequest = $.ajax({
+		type: 'POST',
+		url: admin_url + 'reports/get_deal_summary',
+		data: data,
+		dataType: '',
+		success: function(msg) {
+			var obj = JSON.parse(msg);
+			$('#req_summary_data').html(obj.summary);
+			$('#summary_head').html(obj.cur_record);
+			document.getElementById('overlay_deal1234').style.display = 'none';
+		}
+	});
+}
+function check_view_by(a){
+	document.getElementById('overlay_deal').style.display = '';
+	var data = {view_by:a.value};
+	 var ajaxRequest = $.ajax({
+		type: 'POST',
+		url: admin_url + 'reports/check_view_by',
+		data: data,
+		dataType: '',
+		success: function(msg) {
+			$('#view_type').show();
+			$('#view_by_div').removeClass('col-md-6');
+				$('#view_by_div').addClass('col-md-3');
+			if(msg!='date'){
+				$('#view_type').hide();
+				$('#view_by_div').removeClass('col-md-3');
+				$('#view_by_div').addClass('col-md-6');
+			}
+			$('#view_type12').val(msg);
+			document.getElementById('overlay_deal').style.display = 'none';
+		}
+	});
+}
+function load_share(a){
+	document.getElementById('overlay_deal123').style.display = '';
+	var data = {report_id:a};
+	 var ajaxRequest = $.ajax({
+		type: 'POST',
+		url: admin_url + 'reports/current_share',
+		data: data,
+		dataType: '',
+		success: function(msg) {
+			var myArr = JSON.parse(msg);
+			
+			$('#shared').val(myArr.shared);
+			if(myArr.shared == 'Everyone'){
+				$('#ch_staff').hide();
+			}else{
+				$("#teamleader123").empty().append(myArr.staff);
+				$('#teamleader123').selectpicker('refresh');
+			}
+			document.getElementById('overlay_deal123').style.display = 'none';
+		}
+	});
+}
 function change_3_filter(a){
 	var req_val = a;
 	var cur_val = $('#start_date_edit_'+req_val).val();
@@ -324,6 +385,7 @@ $(function(){
 		}
 	});
 	$("#share_report1").submit(function(e) {
+		document.getElementById('overlay_deal123').style.display = '';
 		e.preventDefault(); // avoid to execute the actual submit of the form.
 		var form = $(this);
 		var team = $('#teamleader12').val();
@@ -343,9 +405,10 @@ $(function(){
 						$('#shared_add_modal').modal('toggle');
 					}
 				});
-			
+			document.getElementById('overlay_deal123').style.display = 'none';
 		}
 		else{
+			document.getElementById('overlay_deal123').style.display = 'none';
 			$('#error_staff').html('This field is required');
 		}
 		
@@ -541,7 +604,7 @@ function check_filter(a){
 			for(var i=1;i<=cur_num;i++){
 				var a1 = 'filter_'+i;
 				var b1 = $('#filter_'+i).val();
-				change_filter1(a1,b1)
+				change_filter1(a1,b1);
 			}
 		}
 	});
@@ -626,13 +689,13 @@ function change_filter1(a,b){
 			if(cur_val=='company'){
 				init_ajax_search('customer', '#year_'+req_val+'.ajax-search');
 			}
-			if(cur_val=='contact_name'){
+			if(cur_val=='contact_name' ){
 				init_ajax_search('contacts', '#year_'+req_val+'.ajax-search');
 			}
 			if(cur_val=='teamleader_name'){
 				init_ajax_search('manager', '#year_'+req_val+'.ajax-search');
 			}
-			if(cur_val=='members'){
+			if(cur_val=='members'|| cur_val=='modified_by' || cur_val=='created_by'){
 				init_ajax_search('staff', '#year_'+req_val+'.ajax-search');
 			}
 			if(cur_val=='contact_email1'){

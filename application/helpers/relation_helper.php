@@ -35,11 +35,27 @@ function get_relation_data($type, $rel_id = '')
 		}
 
         $data = $CI->clients_model->get($rel_id, $where_clients);
-    } elseif ($type == 'contact' || $type == 'contacts') {
+    } elseif ($type == 'contact' || $type == 'contacts'  ) {
         if ($rel_id != '') {
             $data = $CI->clients_model->get_contact($rel_id);
         } else {
             $where_contacts = db_prefix().'contacts.active=1';
+            if ($CI->input->post('tickets_contacts')) {
+                if (!has_permission('customers', '', 'view') && get_option('staff_members_open_tickets_to_all_contacts') == 0) {
+                    $where_contacts .= ' AND '.db_prefix().'contacts.userid IN (SELECT customer_id FROM '.db_prefix().'customer_admins WHERE staff_id=' . get_staff_user_id() . ')';
+                }
+            }
+            if ($CI->input->post('contact_userid')) {
+                $where_contacts .= ' AND '.db_prefix().'contacts.userid=' . $CI->input->post('contact_userid');
+            }
+            $search = $CI->misc_model->_search_contacts($q, 0, $where_contacts);
+            $data   = $search['result'];
+        }
+    } elseif ( $type == 'staff_phone' || $type == 'staff_email' ) {
+        if ($rel_id != '') {
+            $data = $CI->clients_model->get_contact($rel_id);
+        } else {
+            $where_contacts = db_prefix()."contacts.active=1 and ".db_prefix()."contacts.id IN(select  contacts_id from ".db_prefix()."project_contacts where is_primary=1)";
             if ($CI->input->post('tickets_contacts')) {
                 if (!has_permission('customers', '', 'view') && get_option('staff_members_open_tickets_to_all_contacts') == 0) {
                     $where_contacts .= ' AND '.db_prefix().'contacts.userid IN (SELECT customer_id FROM '.db_prefix().'customer_admins WHERE staff_id=' . get_staff_user_id() . ')';
@@ -119,7 +135,8 @@ function get_relation_data($type, $rel_id = '')
             $search = $CI->misc_model->_search_proposals($q);
             $data   = $search['result'];
         }
-    } elseif ($type == 'project') {
+    } 
+	elseif ($type == 'project') {
 		$fields = get_option('deal_fields');
 		$fields1 = get_option('deal_mandatory');
 		$need_fields = $mandatory_fields = array("name");
@@ -147,7 +164,8 @@ function get_relation_data($type, $rel_id = '')
             $search = $CI->misc_model->_search_projects($q, 0, $where_projects);
             $data   = $search['result'];
         }
-    } elseif ($type == 'staff' || $type == 'staff_email' || $type == 'staff_phone') {
+    }
+	elseif ($type == 'staff' ) {
         if ($rel_id != '') {
             $CI->load->model('staff_model');
             $data = $CI->staff_model->get($rel_id);
@@ -155,7 +173,7 @@ function get_relation_data($type, $rel_id = '')
             $search = $CI->misc_model->_search_staff($q);
             $data   = $search['result'];
         }
-    } elseif ($type == 'tags') {
+    }elseif ($type == 'tags') {
             $search = $CI->misc_model->_search_tags($q);
             $data   = $search['result'];
 	}elseif ($type == 'manager') {
@@ -343,23 +361,29 @@ function get_relation_values($relation, $type)
         }
         $link = admin_url('profile/' . $id);
     }elseif ($type == 'staff_email') {
-        if (is_array($relation)) {
-            $id   = $relation['staffid'];
+       if (is_array($relation)) {
+            $id   = $relation['email'];
+			$userid = isset($relation['userid']) ? $relation['userid'] : $relation['relid'];
             $name = $relation['email'];
         } else {
-            $id   = $relation->staffid;
+            $id   = $relation->email;
+			$userid = $relation->userid;
             $name = $relation->email;
         }
-        $link = admin_url('profile/' . $id);
+		//$subtext = get_company_name($userid);
+        $link    = admin_url('clients/client/' . $userid . '?contactid=' . $id);
     }elseif ($type == 'staff_phone') {
         if (is_array($relation)) {
-            $id   = $relation['staffid'];
+            $id   = $relation['phonenumber'];
+			$userid = isset($relation['userid']) ? $relation['userid'] : $relation['relid'];
             $name = $relation['phonenumber'];
         } else {
-            $id   = $relation->staffid;
+            $id   = $relation->phonenumber;
+			$userid = $relation->userid;
             $name = $relation->phonenumber;
         }
-        $link = admin_url('profile/' . $id);
+		//$subtext = get_company_name($userid);
+        $link    = admin_url('clients/client/' . $userid . '?contactid=' . $id);
     }elseif ($type == 'manager') {
         if (is_array($relation)) {
             $id   = $relation['staffid'];

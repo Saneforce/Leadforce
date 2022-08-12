@@ -271,7 +271,6 @@ function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = [], $where 
 	if(($sTable == 'tblcontacts ' ) && !empty($sGroupBy)){
 		$sGroupBy = ' group by '.$sGroupBy.' ';
 	}
-
     $join = implode(' ', $join);
 	if($sTable == 'tbltarget ' || $sTable == 'tbltarget') {
 		$sQuery = '
@@ -333,7 +332,7 @@ function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = [], $where 
     " . $wherewo . "
     $sGroupBy
     ";
-//echo $sQuery; //exit;
+//echo $sQuery; exit;
     $rResult = $CI->db->query($sQuery)->result_array();
 //pre($rResult);
     $rResult = hooks()->apply_filters('datatables_sql_query_results', $rResult, [
@@ -353,12 +352,28 @@ function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = [], $where 
     }
     /* Total data set length */
     if(empty($sGroupBy)){
-        $sQuery = '
-        SELECT COUNT(' . $sTable . '.' . $sIndexColumn . ")
-        FROM $sTable " . $join . ' ' . $where;
+		if (str_contains($sTable, 'as')) {
+			$ch_column = explode('as',$sTable);
+			$sQuery = '
+			SELECT COUNT(' . $ch_column[1] . '.' . $sIndexColumn . ")
+			FROM $sTable " . $join . ' ' . $where;
+		}
+		else{
+			$sQuery = '
+			SELECT COUNT(' . $sTable . '.' . $sIndexColumn . ")
+			FROM $sTable " . $join . ' ' . $where;
+		}
     }else{
-        $sQuery = '
-        SELECT COUNT(' . $sTable . '.' . $sIndexColumn . ') from (SELECT COUNT(' . $sTable . '.' . $sIndexColumn . ') as '.$sIndexColumn.' FROM '.$sTable . $join . ' ' . $where.$sGroupBy.') as '.$sTable;
+		if (str_contains($sTable, 'as')) {
+			$ch_column = explode('as',$sTable);
+			$sQuery = '
+			SELECT COUNT(' . $ch_column[1] . '.' . $sIndexColumn . ') from (SELECT COUNT(' . $sTable . '.' . $sIndexColumn . ') as '.$sIndexColumn.' FROM '.$sTable . $join . ' ' . $where.$sGroupBy.') as '.$sTable;
+		}
+		else
+		{
+			$sQuery = '
+			SELECT COUNT(' . $sTable . '.' . $sIndexColumn . ') from (SELECT COUNT(' . $sTable . '.' . $sIndexColumn . ') as '.$sIndexColumn.' FROM '.$sTable . $join . ' ' . $where.$sGroupBy.') as '.$sTable;
+		}
     }
     $_query = $CI->db->query($sQuery)->result_array();
     $iTotal = $_query[0]['COUNT(' . $sTable . '.' . $sIndexColumn . ')'];

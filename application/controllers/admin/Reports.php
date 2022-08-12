@@ -98,7 +98,6 @@ class Reports extends AdminController
         $data['title'] = _l('sales_reports');
         $this->load->view('admin/reports/sales', $data);
     }
-
     /* deals reportts */
     public function deals()
     {
@@ -140,6 +139,11 @@ class Reports extends AdminController
 			$filter_data['filters2'][0]	=	'this_year';  
 			$filter_data['filters3'][0]	=	'01-01-'.date('Y');  
 			$filter_data['filters4'][0]	=	'31-12-'.date('Y');  
+			
+			$filter_data['view_by']		=	'project_start_date';
+			$filter_data['view_type']	=	'date';
+			$filter_data['date_range1']	=	'Monthly';
+			$filter_data['sel_measure']	=	_l('num_deals');
 		}
 		else if($report_12_id == 'conversion'){
 			$filter_data['filters'][0]	=	'project_start_date';  
@@ -150,6 +154,10 @@ class Reports extends AdminController
 			$filter_data['filters'][1]	=	'project_status';  
 			$filter_data['filters1'][1]	=	'is_any_of';  
 			$filter_data['filters2'][1]	=	'WON,LOSS';  
+			$pipelines = $this->pipeline_model->getPipeline();
+			$filter_data['filters'][2]	=	'pipeline_id';  
+			$filter_data['filters1'][2]	=	'is';  
+			$filter_data['filters2'][2]	=	$pipelines[0]['id']; 
 		}
 		else if($report_12_id == 'duration'){
 			$filter_data['filters'][0]	=	'project_start_date';  
@@ -175,6 +183,16 @@ class Reports extends AdminController
 		$this->session->set_userdata($filter_data);
 		redirect(admin_url('reports/add'));
 	}
+	public function summary(){
+		if(isset($_POST['submit'])){
+			$filter_data['view_by']		=	$_POST['view_by'];
+			$filter_data['view_type']	=	$_POST['view_type'];
+			$filter_data['date_range1']	=	$_POST['date_range1'];
+			$filter_data['sel_measure']	=	$_POST['sel_measure'];
+			$this->session->set_userdata($filter_data);
+		}
+		redirect(admin_url('reports/add'));
+	}
 	public function edit_deal_report($id){
 		$filters = $this->db->query("SELECT * FROM " . db_prefix() . "report_filter where report_id = '".$id."'")->result_array();
 		$filter_data = array();
@@ -194,6 +212,7 @@ class Reports extends AdminController
 	}
 	public function deal_table($clientid = '')
     {
+		$this->load->helper('report_summary');
 		$cur_id =  '';
 		if(!empty($clientid)){
 			$cur_id = '_edit_'.$clientid;
@@ -205,14 +224,43 @@ class Reports extends AdminController
 		$data['filters4']	=	$this->session->userdata('filters4'.$cur_id);
 		$fields = deal_needed_fields();
 		$needed = json_decode($fields,true);
+		if (($key = array_search('id', $needed['need_fields'])) !== false) {
+			unset($needed['need_fields'][$key]);
+		}
 		$data['need_fields']		=	$needed['need_fields'];
 		$data['need_fields_label']	=	$needed['need_fields_label'];
 		$data['need_fields_edit']	=	$needed['need_fields_edit'];
 		$data['mandatory_fields1']	=	$needed['mandatory_fields1'];
-		$data['clientid'] = '';
+		$data['clientid'] = $clientid;
         $this->app->get_table_data('report_deal', $data);
         
     }
+	public function check_view_by(){
+		if ($this->input->is_ajax_request()) {
+			$view_by	=	$_REQUEST['view_by'];
+			if($view_by == 'project_start_date' || $view_by == 'project_deadline' || $view_by == 'won_date' || $view_by == 'lost_date' || $view_by == 'project_created' || $view_by == 'project_modified'){
+				echo 'date';
+			}
+			else{
+				$fields			= deal_needed_fields();
+				$needed			= json_decode($fields,true);
+				$need_fields	= $needed['need_fields'];
+				if (in_array($view_by, $need_fields))
+				{
+					echo '';
+				}
+				else{
+					$ch_custom	= $this->db->query("SELECT *  FROM " . db_prefix() . "customfields where slug = '".$view_by."' and type = 'date_picker'")->result_array();
+					if(!empty($ch_custom)){
+						echo 'date';
+					}
+					else{
+						echo '';
+					}
+				}
+			}
+		}
+	}
 	public function add(){
 		$this->load->model('pipeline_model');
 		$data = array();
@@ -224,10 +272,13 @@ class Reports extends AdminController
 		$data['filters2']	=	$this->session->userdata('filters2');
 		$data['filters3']	=	$this->session->userdata('filters3');
 		$data['filters4']	=	$this->session->userdata('filters4');
-		$data['folders']	=	$this->db->query('SELECT * FROM ' . db_prefix() . 'folder order by folder asc')->result_array();
+		$data['folders']	=	$this->db->query('SELECT * from '.db_prefix().'folder order by folder asc')->result_array();
 		$data['id'] = $data['links'] = '';
 		$fields = deal_needed_fields();
 		$needed = json_decode($fields,true);
+		if (($key = array_search('id', $needed['need_fields'])) !== false) {
+			unset($needed['need_fields'][$key]);
+		}
 		$data['report_name']		=	$data['folder_id'] = '';
 		$data['need_fields']		=	$needed['need_fields'];
 		$data['need_fields_label']	=	$needed['need_fields_label'];
@@ -236,7 +287,367 @@ class Reports extends AdminController
 		$data['report_filter'] =  $this->load->view('admin/reports/filter', $data,true);
 		$data['report_footer'] =  $this->load->view('admin/reports/report_footer', $data,true);
 		$data['teamleaders'] = $this->staff_model->get('', [ 'active' => 1]);
+		$data['summary'] = $this->performance_summary($data);
         $this->load->view('admin/reports/deals_views', $data);
+	}
+	public function get_deal_summary(){
+		//if ($this->input->is_ajax_request()) {			
+			$deal_val = deal_values();
+			$deals =  json_decode($deal_val, true);
+			$deals['filters']	=	$this->session->userdata('filters');
+			$deals['filters1']	=	$this->session->userdata('filters1');
+			$deals['filters2']	=	$this->session->userdata('filters2');
+			$deals['filters3']	=	$this->session->userdata('filters3');
+			$deals['filters4']	=	$this->session->userdata('filters4');
+			
+			$this->load->helper('report_summary');
+			$data = $_REQUEST;
+			$fields = deal_needed_fields();
+			$needed = json_decode($fields,true);
+			if (($key = array_search('id', $needed['need_fields'])) !== false) {
+				unset($needed['need_fields'][$key]); 
+			}
+			$data['need_fields']	=	$needed['need_fields'];
+			if($data['view_by']		==	'project_start_date'){
+				$data['view_by']	=	'start_date';
+			}
+			if($data['view_by']		==	'project_deadline'){
+				$data['view_by']	=	'deadline';
+			}
+			if($data['view_by']		==	'won_date' || $data['view_by']		==	'lost_date'){
+				$data['view_by']	=	'stage_on';
+			}
+			$data['results']		=	get_qry($data['clmn'],$data['crow'],$data['view_by'],$data['measure'],$data['date_range'],$data['view_type'],$data['sum_id'],$deals);
+			if($data['date_range']	==	'Monthly' && $data['view_type'] == 'date'){
+				$req_month =  (int) $data['crow'];
+				$req_date  = '01-'.$req_month.'-'.date('Y');
+				$data['cur_record']	=	date('M',strtotime($req_date)).' '.date('Y').', '.ucfirst($data['clmn']).' deals';
+			}
+			else{
+				if($data['clmn'] == 'total_cnt_deal'){
+					$data['cur_record']	=	$data['crow'].', '._l($data['clmn']);
+
+				}else{
+					$data['cur_record']	=	$data['crow'].', '._l($data['clmn']).' '._l('deals');
+				}
+			}
+			$data['summary']		=	$this->load->view('admin/reports/summary_table', $data,true);
+			echo json_encode($data,true);
+		//}
+	}
+	public function performance_summary($filters){
+		$this->load->helper('report_summary');
+		$cur_year  = date('Y');
+		$data = array();
+		$data['rows']			=	array();
+		$data['view_by']		=	$view_by = $this->session->userdata('view_by');
+		$data['view_type']		=	$this->session->userdata('view_type');
+		$data['date_range1']	=	$this->session->userdata('date_range1');
+		$data['sel_measure']	=	$this->session->userdata('sel_measure');
+		if($view_by == 'project_start_date'){
+			$view_by = 'start_date';
+		}
+		else if($view_by == 'project_deadline'){
+			$view_by = 'deadline';
+		}
+		else if($view_by == 'won_date' || $view_by == 'lost_date'){
+			$view_by = 'stage_on';
+		}
+		
+		$data['columns']		=	array($view_by,'own','lost','open','avg_deal','total_val_deal','total_cnt_deal');
+		if($data['sel_measure'] == 'Deal Value'){
+			$data['columns']	=	array($view_by,'avg_deal','total_val_deal','total_cnt_deal');
+		}
+		if($data['sel_measure'] == 'Number of Products'){
+			$data['columns']	=	array($view_by,'open','own','total_num_prdts');
+		}
+		if($data['sel_measure'] == 'Product Value'){
+			$data['columns']	=	array($view_by,'open','own','avg_prdt_val','total_val_prdt');
+		}
+		if($view_by == 'project_status'){
+			$data['columns']	=	array($view_by,'avg_deal','total_val_deal','total_cnt_deal');
+		}
+		$i1 = 0;
+		if(!empty($data['columns'])){
+			foreach($data['columns'] as $clmn1){
+				$data['summary_cls'][$i1++]['vals'] = _l($clmn1);
+				$i1++;
+			}
+		}
+		if($data['view_type'] != 'date'){
+			$fields = get_table_fields($view_by);
+			$sum_data = summary_val($fields['tables'],$fields['fields'],$fields['qry_cond'],$data['sel_measure'],$view_by,$fields['cur_rows'],$filters);
+		}
+		else{
+			$months = array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
+			$own = $open = $lost = $tot_cnt = $tot_prt = $tot_val = $avg_deal = 0; 
+			if($data['view_type'] == 'date' && ($data['date_range1'] == 'Monthly')){
+				if(!empty($months)){
+					$j = 1;$i = 0;
+					foreach($months as $month1){
+						if($view_by == 'start_date' || $view_by == 'project_deadline' || $view_by == 'won_date' || $view_by == 'lost_date' || $view_by == 'project_created' || $view_by == 'project_modified'){
+							$j = $i+1;
+							$qry_cond   = " and MONTH(".$view_by.") = '".$j."' and YEAR(".$view_by.") = '".$cur_year."'";
+							$cur_row    = ($month1).' '.$cur_year;
+							$sum_data[$i]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);					
+							$i++;
+						}
+						else{
+							$cur_row    = ($month1).' '.$cur_year;
+							$j1 = $j;
+							if($j<10){
+								$j1 = '0'.$j;
+							}
+							$ch_value = $cur_year.'-'.$j1;
+							$qry_cond = '';
+							$customs   = $this->db->query("SELECT *  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and cv.value like '%".$ch_value."%' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
+							$cur_projects = '';
+							if(!empty($customs)){
+								foreach($customs as $custom1){
+									$cur_projects .= $custom1['relid'].',';
+								}	
+								$cur_projects = rtrim($cur_projects,",");
+								$qry_cond   = " and id in(".$cur_projects.")";
+							}
+							else{
+								$qry_cond   = " and id=''";
+							}
+							$cur_row    = ($month1).' '.$cur_year;
+							$sum_data[$i]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);					
+							$i++;
+							$j++;
+						}
+						
+						$own	=	$own + $sum_data[$i-1]['own'];
+						$open	=	$open + $sum_data[$i-1]['open'];
+						$lost	=	$lost + $sum_data[$i-1]['lost'];
+						$tot_cnt=	$tot_cnt + $sum_data[$i-1]['total_cnt_deal'];
+						$tot_val=	$tot_val + $sum_data[$i-1]['total_val_deal'];
+					}
+					$sum_data[$i] = deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$i);
+					$i++;
+					$sum_data[$i] = deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by);
+				}
+			}
+			if($data['view_type'] == 'date' && ($data['date_range1'] == 'Weekly')){			
+				$cur_month = date('M');
+				$cur_date  = date('d');
+				$num_dates = $m = 0;
+				$sum_data  = array();
+				$months_num = array('Jan'=>31,'Feb'=>28,'Mar'=>31,'Apr'=>30,'May'=>31,'Jun'=>30,'Jul'=>31,'Aug'=>31,'Sep'=>30,'Oct'=>31,'Nov'=>30,'Dec'=>31);
+				if($cur_year % 4 == 0){
+					$months_num['Feb'] = 29;
+				}
+				if(!empty($months_num)){
+					foreach($months_num as $key => $month1){
+						if($key == $cur_month){
+							$num_dates = $num_dates + (int) $cur_date;
+							break;
+						}
+						else{
+							$num_dates = $num_dates + $month1;
+						}	
+					}
+				}
+				$weeks = ceil($num_dates/7);
+				if(!empty($weeks)){
+					$w_start_date	= 1;
+					$w_end_date		= 7;
+					for($i=0;$i<$weeks;$i++){
+						$j = $i +1;
+						$end_days	= $j*7;
+						$start_days	= $end_days - 6;
+						$num_month =  0;$k = 1;
+						$qry_cond = '';
+						foreach($months_num as $key => $req_month){
+							$num_month = $num_month + $req_month;
+							if($num_month >= $start_days && $num_month <= $end_days){
+								$start_date	= date('Y-m-d',strtotime($w_start_date.'-'.$key.'-'.$cur_year));
+								$end_date   = date('Y-m-d',strtotime($req_month.'-'.$key.'-'.$cur_year));
+								if($view_by == 'start_date' || $view_by == 'project_deadline' || $view_by == 'won_date' || $view_by == 'lost_date' || $view_by == 'project_created' || $view_by == 'project_modified'){
+									//$qry_cond   .= " and ".$view_by." >= '".$start_date."' and ".$view_by." <= '".$end_date."'";
+									$qry_cond   .= " and ".$view_by." >= '".$start_date."' ";
+								}
+								else{
+									$customs   = $this->db->query("SELECT *  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and CONVERT(cv.value,date)  >='".$start_date."' and CONVERT(cv.value,date) <='".$end_date."' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
+									$cur_projects = '';
+									if(!empty($customs)){
+										foreach($customs as $custom1){
+											$cur_projects .= $custom1['relid'].',';
+										}	
+										$cur_projects = rtrim($cur_projects,",");
+										$qry_cond   .= " and id in(".$cur_projects.")";
+									}
+									else{
+										$qry_cond   .= " and id=''";
+									}
+								}
+								//$cur_row    = 'W'.($m+1).' '.$cur_year;
+								//$sum_data[$m]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);
+								//$m++;
+								$own	=	$own + $sum_data[$m-1]['own'];
+								$open	=	$open + $sum_data[$m-1]['open'];
+								$lost	=	$lost + $sum_data[$m-1]['lost'];
+								$tot_cnt=	$tot_cnt + $sum_data[$m-1]['total_cnt_deal'];
+								$tot_val=	$tot_val + $sum_data[$m-1]['total_val_deal'];
+								$k++;
+								$req_end_days = $w_end_date - $req_month;
+								$w_start_date	= 1;
+								$w_end_date		= $req_end_days;
+								
+								$req_key = array_search ($key, $months);
+								$start_date  = date('Y-m-d',strtotime($w_start_date.'-'.$months[$req_key+1].'-'.$cur_year));
+								$end_date	 = date('Y-m-d',strtotime($req_end_days.'-'.$months[$req_key+1].'-'.$cur_year));
+								if($view_by == 'start_date' || $view_by == 'project_deadline' || $view_by == 'won_date' || $view_by == 'lost_date' || $view_by == 'project_created' || $view_by == 'project_modified'){
+									
+									//$qry_cond 	 .= " and ".$view_by." >= '".$start_date."' and ".$view_by." <= '".$end_date."'";
+									$qry_cond 	 .= " and ".$view_by." <= '".$end_date."'";
+								}else{
+									$customs   = $this->db->query("SELECT *  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and CONVERT(cv.value,date)  >='".$start_date."' and CONVERT(cv.value,date) <='".$end_date."' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
+									$cur_projects = '';
+									if(!empty($customs)){
+										foreach($customs as $custom1){
+											$cur_projects .= $custom1['relid'].',';
+										}	
+										$cur_projects = rtrim($cur_projects,",");
+										$qry_cond   .= " and id in(".$cur_projects.")";
+									}
+									else{
+										$qry_cond   .= " and id=''";
+									}
+								}
+								$cur_row    = 'W'.($m+1).' '.$cur_year;
+								$sum_data[$m]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);
+								$m++;
+								$own	=	$own + $sum_data[$m-1]['own'];
+								$open	=	$open + $sum_data[$m-1]['open'];
+								$lost	=	$lost + $sum_data[$m-1]['lost'];
+								$tot_cnt=	$tot_cnt + $sum_data[$m-1]['total_cnt_deal'];
+								$tot_val=	$tot_val + $sum_data[$m-1]['total_val_deal'];
+								
+								$w_start_date	= $w_end_date +1;
+								$w_end_date		= $w_end_date +7;
+								break;
+							}
+							else{
+								if($num_month >= $start_days){
+									$start_date  = date('Y-m-d',strtotime($w_start_date.'-'.$key.'-'.$cur_year));
+									$end_date	 = date('Y-m-d',strtotime($w_end_date.'-'.$key.'-'.$cur_year));
+									if($view_by == 'start_date' || $view_by == 'project_deadline' || $view_by == 'won_date' || $view_by == 'lost_date' || $view_by == 'project_created' || $view_by == 'project_modified'){
+										$qry_cond 	 = " and ".$view_by." >= '".$start_date."' and ".$view_by." <= '".$end_date."'";
+									}
+									else{
+										$customs   = $this->db->query("SELECT *  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and CONVERT(cv.value,date)  >='".$start_date."' and CONVERT(cv.value,date) <='".$end_date."' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
+										$cur_projects = '';
+										if(!empty($customs)){
+											foreach($customs as $custom1){
+												$cur_projects .= $custom1['relid'].',';
+											}	
+											$cur_projects = rtrim($cur_projects,",");
+											$qry_cond   = " and id in(".$cur_projects.")";
+										}
+										else{
+											$qry_cond   = " and id=''";
+										}
+									}
+									$cur_row    = 'W'.($m+1).' '.$cur_year;
+									$sum_data[$m]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);
+									$m++;
+									$own	=	$own + $sum_data[$m-1]['own'];
+									$open	=	$open + $sum_data[$m-1]['open'];
+									$lost	=	$lost + $sum_data[$m-1]['lost'];
+									$tot_cnt=	$tot_cnt + $sum_data[$m-1]['total_cnt_deal'];
+									$tot_val=	$tot_val + $sum_data[$m-1]['total_val_deal'];
+									
+									$w_start_date	= $w_end_date +1;
+									$w_end_date		= $w_end_date +7;
+									
+									break;
+								}
+							}
+							$k++;
+							
+						}
+
+					}
+					$sum_data[$m] = deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$m);
+					$m++;
+					$sum_data[$m] = deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by);
+				}
+			}
+			if($data['view_type'] == 'date' && ($data['date_range1'] == 'Quarterly')){	
+				$month_period = array(31,30,30,31);
+				$j = 1;
+				for($i=0;$i<=3;$i++){
+					$k = $j+2;
+					$start_date = $cur_year.'-'.$j.'-1';
+					$end_date   = $cur_year.'-'.$k.'-'.$month_period[$i];
+					if($view_by == 'start_date' || $view_by == 'project_deadline' || $view_by == 'won_date' || $view_by == 'lost_date' || $view_by == 'project_created' || $view_by == 'project_modified'){
+						$qry_cond   = " and ".$view_by." >= '".$start_date."' and ".$view_by." <= '".$end_date."' ";
+					}
+					else{
+						$customs   = $this->db->query("SELECT *  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and CONVERT(cv.value,date)  >='".$start_date."' and CONVERT(cv.value,date) <='".$end_date."' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
+						$cur_projects = '';
+						if(!empty($customs)){
+							foreach($customs as $custom1){
+								$cur_projects .= $custom1['relid'].',';
+							}	
+							$cur_projects = rtrim($cur_projects,",");
+							$qry_cond   = " and id in(".$cur_projects.")";
+						}
+						else{
+							$qry_cond   = " and id=''";
+						}
+					}
+					$cur_row    = 'Q'.($i+1).' '.$cur_year;
+					$sum_data[$i]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);
+					$j = $j+3;
+					$own	=	$own + $sum_data[$i]['own'];
+					$open	=	$open + $sum_data[$i]['open'];
+					$lost	=	$lost + $sum_data[$i]['lost'];
+					$tot_cnt=	$tot_cnt + $sum_data[$i]['total_cnt_deal'];
+					$tot_val=	$tot_val + $sum_data[$i]['total_val_deal'];
+				}
+				$sum_data[$i] = deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$i);
+				$i++;
+				$sum_data[$i] = deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by);
+			}
+			if($data['view_type'] == 'date' && ($data['date_range1'] == 'Yearly')){	
+				$i = 0;
+				if($view_by == 'start_date' || $view_by == 'project_deadline' || $view_by == 'won_date' || $view_by == 'lost_date' || $view_by == 'project_created' || $view_by == 'project_modified'){
+					$qry_cond   = " and YEAR(".$view_by.") = '".$cur_year."'";
+				}
+				else{
+					$customs   = $this->db->query("SELECT *  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and year(CONVERT(cv.value,date)) <='".$cur_year."' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
+						$cur_projects = '';
+						if(!empty($customs)){
+							foreach($customs as $custom1){
+								$cur_projects .= $custom1['relid'].',';
+							}	
+							$cur_projects = rtrim($cur_projects,",");
+							$qry_cond   = " and id in(".$cur_projects.")";
+						}
+						else{
+							$qry_cond   = " and id=''";
+						}
+				}
+				$sum_data[$i]	= date_summary($qry_cond,$cur_year,$data['sel_measure'],$view_by,$filters);
+				$own	=	$own + $sum_data[$i]['own'];
+				$open	=	$open + $sum_data[$i]['open'];
+				$lost	=	$lost + $sum_data[$i]['lost'];
+				$tot_cnt=	$tot_cnt + $sum_data[$i]['total_cnt_deal'];
+				$tot_val=	$tot_val + $sum_data[$i]['total_val_deal'];
+				$i++;
+				$sum_data[$i] = deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,1);
+				$i++;
+				$sum_data[$i] = deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by);
+			}
+		}
+		$data['summary_cls'] = $sum_data;
+		if(isset($sum_data[0]['rows'])){
+			$data['rows'] = array_column($sum_data, 'rows');
+		}
+		return $data;
 	}
 	public function edit($id){
 		$this->load->model('pipeline_model');
@@ -259,6 +670,9 @@ class Reports extends AdminController
 		$reports1 = $this->db->query("SELECT * FROM " . db_prefix() . "report WHERE id = '".$id."' ")->row();
 		$fields = deal_needed_fields();
 		$needed = json_decode($fields,true);
+		if (($key = array_search('id', $needed['need_fields'])) !== false) {
+			unset($needed['need_fields'][$key]);
+		}
 		$data['report_name']		=	$reports1->report_name;
 		$data['folder_id']			=	$reports1->folder_id;
 		$data['need_fields']		=	$needed['need_fields'];
@@ -286,7 +700,36 @@ class Reports extends AdminController
 				$i++;
 			}
 		}
+		$data['summary'] = $this->performance_summary($data);
         $this->load->view('admin/reports/deals_views', $data);
+	}
+	public function current_share(){
+		if ($this->input->is_ajax_request()) {
+			$source_from = array();
+			extract($_REQUEST);
+			$data = array();
+			$shares = $this->db->query("SELECT * FROM " . db_prefix() ."shared where  report_id = '".$report_id."'")->result_array();
+			$all_staffs = $this->db->query("SELECT * FROM " . db_prefix() ."staff where active = '1'")->result_array();
+			
+			if(!empty($shares)){
+				$staffs = $this->db->query("SELECT * FROM " . db_prefix() ."shared_staff where  share_id = '".$shares[0]['id']."'")->result_array();				
+				$source_from = array_column($staffs, 'staff_id'); 
+				$data['shared'] = $shares[0]['share_type'];
+			}
+			$req_out = '';
+			if(!empty($all_staffs)){
+						$i = 0;
+				foreach($all_staffs as $staff1){
+					if (!empty($source_from) && in_array($staff1['staffid'], $source_from)){
+						$req_out .= ' <option value="'.$staff1['staffid'].'" selected>'.$staff1['firstname'].' '.$staff1['lastname'].'</option> ';
+					}else{
+						$req_out .= ' <option value="'.$staff1['staffid'].'" >'.$staff1['firstname'].' '.$staff1['lastname'].'</option> ';
+					}
+				}
+				$data['staff'] = $req_out;
+			}
+			echo json_encode($data,true);
+		}
 	}
 	public function share_report(){
 		if ($this->input->is_ajax_request()) {
@@ -301,9 +744,13 @@ class Reports extends AdminController
 				$ins_share = array();
 				$ins_share['share_id']		= $share_id;
 				if(!empty($teamleader12)){
+					$condition = array('share_id'=>$share_id);
+					$table = db_prefix() . 'shared_staff';
+					$this->db->where($condition);
+					$result = $this->db->delete($table);
 					foreach($teamleader12 as $teamleader11){
 						$ins_share['staff_id']		= $teamleader11;
-						$this->db->insert(db_prefix() . 'shared_staff', $ins_share);
+						$this->db->insert($table, $ins_share);
 					}
 				}
 			}
@@ -316,12 +763,15 @@ class Reports extends AdminController
 				$ins_share = array();
 				$ins_share['share_id']		= $share_id;
 				if(!empty($teamleader12)){
+					$condition = array('share_id'=>$share_id);
+					$table = db_prefix() . 'shared_staff';
+					$this->db->where($condition);
+					$result = $this->db->delete($table);
 					foreach($teamleader12 as $teamleader11){
 						$ins_share['staff_id']		= $teamleader11;
-						$this->db->insert(db_prefix() . 'shared_staff', $ins_share);
+						$this->db->insert($table, $ins_share);
 					}
 				}
-				
 			}
 			echo json_encode([
 				'success' => 'success'
@@ -350,7 +800,6 @@ class Reports extends AdminController
 				}
 			}
 		}
-		//pre($filter_data);
 		$this->session->set_userdata($filter_data);
 		set_alert('success', _l('filters_applied_successfully', _l('report')));
 		if(!empty($_REQUEST['cur_id121'])){
@@ -413,7 +862,6 @@ class Reports extends AdminController
 				}
 				
 			}else{
-				
 				if(!empty($all_val) && is_array($all_val) ){
 					foreach($all_val as $val1){
 						if(!empty($val1[$s_val]) && !empty($val1[$d_val])){
@@ -561,18 +1009,20 @@ class Reports extends AdminController
 		}
 		$filter_data['filters2'.$cur_id12][$cur_num]	=	$cur_val;
 		if($cur_val=='last_year'){
+			$last_year = date('Y')-1;
 			if(!empty($filters3)){
 				foreach($filters3 as $key12 => $filter3){
 					$filter_data['filters3'.$cur_id12][$key12]	=	$filter3;  
 				}
-				$filter_data['filters3'.$cur_id12][$key12]	=	'01-01-'.date('Y')-1;  
+				
+				echo $filter_data['filters3'.$cur_id12][$cur_num]	=	'01-01-'.$last_year;  
 			}
 			$filters4	=	$this->session->userdata('filters4'.$cur_id12);
 			if(!empty($filters4)){
 				foreach($filters4 as $key12 => $filter4){
 					$filter_data['filters4'.$cur_id12][$key12]	=	$filter4;  
 				}
-				$filter_data['filters4'.$cur_id12][$key12]	=	'31-12-'.date('Y')-1;
+				$filter_data['filters4'.$cur_id12][$cur_num]	=	'31-12-'.$last_year;
 			}
 		}
 		if($cur_val=='this_year'){
@@ -580,14 +1030,14 @@ class Reports extends AdminController
 				foreach($filters3 as $key12 => $filter3){
 					$filter_data['filters3'.$cur_id12][$key12]	=	$filter3;  
 				}
-				$filter_data['filters3'.$cur_id12][$key12]	=	'01-01-'.date('Y');  
+				$filter_data['filters3'.$cur_id12][$cur_num]	=	'01-01-'.date('Y');  
 			}
 			$filters4	=	$this->session->userdata('filters4'.$cur_id12);
 			if(!empty($filters4)){
 				foreach($filters4 as $key12 => $filter4){
 					$filter_data['filters4'.$cur_id12][$key12]	=	$filter4;  
 				}
-				$filter_data['filters4'.$cur_id12][$key12]	=	'31-12-'.date('Y');
+				$filter_data['filters4'.$cur_id12][$cur_num]	=	'31-12-'.date('Y');
 			}
 		}
 		$this->session->set_userdata($filter_data);
@@ -689,6 +1139,10 @@ class Reports extends AdminController
 		switch($cur_val){
 			case 'project_start_date':
 			case 'project_deadline':
+			case 'won_date':
+			case 'lost_date':
+			case 'project_created':
+			case 'project_modified':
 				$filters2	=	$this->session->userdata('filters2'.$cur_id12);
 				$filters3	=	$this->session->userdata('filters3'.$cur_id12);
 				$filters4	=	$this->session->userdata('filters4'.$cur_id12);
@@ -717,10 +1171,24 @@ class Reports extends AdminController
 			case 'contact_name':
 			case 'company':
 			case 'members':
+			case 'created_by':
+			case 'modified_by':
 				$filter_data['filters1'.$cur_id12][$cur_num1]	=	'is'; 
 				//$filter_data['filters2'.$cur_id12][$cur_num1]	=	'';  
 				//$filter_data['filters3'.$cur_id12][$cur_num1]	=	'';  
 				//$filter_data['filters4'.$cur_id12][$cur_num1]	=	'';
+				break;
+			case 'loss_reason':
+				$filter_data['filters1'.$cur_id12][$cur_num1]	=	'is'; 
+				$this->db->where('publishstatus', '1');
+				$reasons = $this->db->get(db_prefix() . 'deallossreasons')->result_array();
+				$filter_data['filters2'.$cur_id12][$cur_num1]	=	$reasons[0]['id'];
+				break;
+			case 'project_currency':
+				$filter_data['filters1'.$cur_id12][$cur_num1]	=	'is'; 
+				$this->db->order_by('isdefault', 'desc');
+				$currencies = $this->db->get(db_prefix() . 'currencies')->result_array();
+				$filter_data['filters2'.$cur_id12][$cur_num1]	=	$currencies[0]['name'];
 				break;
 			case 'status':
 				$all_status = $this->projects_model->get_project_statuses();
@@ -812,6 +1280,7 @@ class Reports extends AdminController
 		if(!empty($_REQUEST['cur_id12'])){
 			$cur_id12 = '_edit_'.$_REQUEST['cur_id12'];
 		}
+		$filter_data = array();
 		$filters	=	$this->session->userdata('filters'.$cur_id12);
 		$cur_num1 = $_REQUEST['req_val'];
 		if(!empty($filters)){
@@ -869,6 +1338,14 @@ class Reports extends AdminController
 				$i++;
 			}
 		}	
+		if(empty($filter_data)){
+			$filter_data['filters'.$cur_id12]  = array();
+			$filter_data['filters1'.$cur_id12] = array();
+			$filter_data['filters2'.$cur_id12] = array();
+			$filter_data['filters3'.$cur_id12] = array();
+			$filter_data['filters4'.$cur_id12] = array();
+		}
+		//pre($filter_data);
 		$this->session->set_userdata($filter_data);
 		return true;
 	}
@@ -918,6 +1395,9 @@ class Reports extends AdminController
 		$req_out = '';
 		$fields = deal_needed_fields();
 		$needed = json_decode($fields,true);
+		if (($key = array_search('id', $needed['need_fields'])) !== false) {
+			unset($needed['need_fields'][$key]);
+		}
 		$need_fields		=	$needed['need_fields'];
 		if(!empty($filters)){
 			$i1 = 1;
@@ -976,7 +1456,6 @@ class Reports extends AdminController
 		$req_out = '';
 		$all_ids =  $this->db->query('SELECT * FROM ' . db_prefix() . 'projects')->result_array();
 		switch($cur_val){
-			
 			case 'teamleader_name':
 				$selected = '';
 				$rel_data = get_relation_data('manager',$selected);
@@ -1076,13 +1555,21 @@ class Reports extends AdminController
 					break;*/
 				case 'project_start_date':
 				case 'project_deadline':
+				case 'won_date':
+				case 'lost_date':
+				case 'project_created':
+				case 'project_modified':
 					$req_out = $this->get_req_val($req_val,'date','','','','');
 					break;
+				case 'modified_by':
+				case 'created_by':
 				case 'members':
+				
 					$selected = '';
 					$rel_data = get_relation_data('staff',$selected);
 					$rel_val = get_relation_values($rel_data,'staff');
 					//$members =  $this->db->query('SELECT ' . db_prefix() . 'staff.* FROM ' . db_prefix() . 'project_members JOIN ' . db_prefix() . 'staff on ' . db_prefix() . 'staff.staffid = ' . db_prefix() . 'project_members.staff_id  group by staff_id ORDER BY staff_id')->result_array();
+					
 					if(empty($filters2[$req_val-1])){
 						$req_out = $this->get_req_val($req_val,'select','id','name','',$rel_val);
 					}else{
@@ -1122,6 +1609,17 @@ class Reports extends AdminController
 				case 'pipeline_id':
 					$pipelines = $this->pipeline_model->getPipeline();
 					$req_out = $this->get_req_val($req_val,'select','id','name','',$pipelines);
+					break;
+				case 'loss_reason_name':
+					$this->db->where('publishstatus', '1');
+					$reasons = $this->db->get(db_prefix() . 'deallossreasons')->result_array();
+					$req_out = $this->get_req_val($req_val,'select','id','name','',$reasons);
+					break;
+				case 'project_currency':
+					$filter_data['filters1'.$cur_id12][$cur_num1]	=	'is'; 
+					$this->db->order_by('isdefault', 'desc');
+					$currencies = $this->db->get(db_prefix() . 'currencies')->result_array();
+					$req_out = $this->get_req_val($req_val,'select','id','name','',$currencies);
 					break;
 				case 'name':
 					$selected = '';
@@ -1188,10 +1686,10 @@ class Reports extends AdminController
 					break;
 				case 'contact_email1':
 					$selected = '';
-					$rel_data = get_relation_data('staff',$selected);
-					$rel_val = get_relation_values($rel_data,'staff');
+					$rel_data = get_relation_data('contact',$selected);
+					$rel_val = get_relation_values($rel_data,'contact');
 					if(empty($filters2[$req_val-1])){
-						$req_out = $this->get_req_val($req_val,'select','id','name','',$rel_val);
+						$req_out = $this->get_req_val($req_val,'select','email','email','',$rel_val);
 					}else{
 						if (str_contains($filters2[$req_val-1], ',')) {
 							$req_vals1 = explode(',',$filters2[$req_val-1]);
@@ -1199,29 +1697,30 @@ class Reports extends AdminController
 						}
 						foreach($rel_data as $rel_li1){
 							if (str_contains($filters2[$req_val-1], ',')) {
-								if(in_array($rel_li1['staffid'],$req_vals1)){
+								if(in_array($rel_li1['email'],$req_vals1)){
 									$req_data[$i2] = $rel_li1;
 									$i2++;
 								}
 							}
 							else{
-								if($rel_li1['staffid']==$filters2[$req_val-1]){
+								if($rel_li1['email']==$filters2[$req_val-1]){
 									$req_data[0] = $rel_li1;
 									break;
 								}
 
 							}
 						}
-						$req_out = $this->get_req_val($req_val,'select','staffid','email','',$req_data);
+						$req_out = $this->get_req_val($req_val,'select','email','email','',$req_data);
 					}
 					break;
 				case 'contact_phone1':
 					//$req_out = $this->get_req_val($req_val,'text','','','','');
 					$selected = '';
-					$rel_data = get_relation_data('staff',$selected);
-					$rel_val = get_relation_values($rel_data,'staff');
+					$rel_data = get_relation_data('contacts',$selected);
+					$rel_val = get_relation_values($rel_data,'contacts');
+
 					if(empty($filters2[$req_val-1])){
-						$req_out = $this->get_req_val($req_val,'select','id','name','',$rel_val);
+						$req_out = $this->get_req_val($req_val,'select','phonenumber','phonenumber','',$rel_val);
 					}else{
 						if (str_contains($filters2[$req_val-1], ',')) {
 							$req_vals1 = explode(',',$filters2[$req_val-1]);
@@ -1229,20 +1728,20 @@ class Reports extends AdminController
 						}
 						foreach($rel_data as $rel_li1){
 							if (str_contains($filters2[$req_val-1], ',')) {
-								if(in_array($rel_li1['staffid'],$req_vals1)){
+								if(in_array($rel_li1['phonenumber'],$req_vals1)){
 									$req_data[$i2] = $rel_li1;
 									$i2++;
 								}
 							}
 							else{
-								if($rel_li1['staffid']==$filters2[$req_val-1]){
+								if($rel_li1['phonenumber']==$filters2[$req_val-1]){
 									$req_data[0] = $rel_li1;
 									break;
 								}
 
 							}
 						}
-						$req_out = $this->get_req_val($req_val,'select','staffid','phonenumber','',$req_data);
+						$req_out = $this->get_req_val($req_val,'select','phonenumber','phonenumber','',$req_data);
 					}
 					break;
 					case 'project_cost':
@@ -1447,9 +1946,7 @@ class Reports extends AdminController
 		$this->load->view('admin/reports/folder_deal', $data);
 	}
 	public function all_share(){
-		if (!has_permission('report', '', 'view')) {
-            access_denied('report');
-        }
+		
 		$data = array();
 		$data['title']    =  _l('shared_list');
 		$this->load->view('admin/reports/shared_list', $data);
@@ -1471,6 +1968,9 @@ class Reports extends AdminController
 		$data['folder_id']			=	$reports1->folder_id;
 		$fields = deal_needed_fields();
 		$needed = json_decode($fields,true);
+		if (($key = array_search('id', $needed['need_fields'])) !== false) {
+			unset($needed['need_fields'][$key]);
+		}
 		$data['need_fields']		=	$needed['need_fields'];
 		$data['need_fields_label']	=	$needed['need_fields_label'];
 		$data['need_fields_edit']	=	$needed['need_fields_edit'];
@@ -1524,8 +2024,8 @@ class Reports extends AdminController
         }
 		$data = array();
 		$data['id']		  =	 $id;
-		$report = $this->db->query("SELECT * FROM " . db_prefix() . "report WHERE id = '".$id."'")->row();
-		$folder = $this->db->query("SELECT * FROM " . db_prefix() . "folder WHERE id = '".$report->folder_id."' ")->row();
+		//$report = $this->db->query("SELECT * FROM " . db_prefix() . "report WHERE id = '".$id."'")->row();
+		$folder = $this->db->query("SELECT * FROM " . db_prefix() . "folder WHERE id = '".$id."' ")->row();
 		$data['title']    =  _l('view_report').' Of '.$folder->folder;
 		$this->load->view('admin/reports/report_deal', $data);
 	}

@@ -28,7 +28,7 @@
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 		<div id="overlay_deal" style="display: none;"><div class="spinner"></div></div>
-			<?php echo form_open('admin/reports/update_folder',array('id'=>'folder_edit')); ?>
+			<?php echo form_open(admin_url('reports/update_folder'),array('id'=>'folder_edit')); ?>
 				<div class="modal-header">
 					<button group="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 					<h4 class="modal-title" id="myModalLabel">
@@ -76,8 +76,10 @@ $( function() {
     $( "#sortable" ).sortable();
     $( "#sortable" ).disableSelection();
 	var frm = $('#folder_edit');
-	var name_val = $('#name').val();
+	
 	frm.submit(function (e) {
+		 document.getElementById('overlay_deal').style.display = '';
+		var name_val = $('#name').val();
 		e.preventDefault();
 		if ( name_val.match(/^[a-zA-Z0-9]+/) && name_val!='' ) {
 			$.ajax({
@@ -86,8 +88,10 @@ $( function() {
 				data: frm.serialize(),
 				success: function (data) {
 					$('.dataTable').DataTable().ajax.reload();
+					document.getElementById('overlay_deal').style.display = 'none';
 					alert_float('success', 'Folder Updated Successfully');
 				   $('#folder_edit_modal').modal('toggle');
+				   
 				},
 				error: function (data) {
 					console.log('An error occurred.');

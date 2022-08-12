@@ -110,7 +110,7 @@
 					?>
 						<div class="float-right" style="float:right">
 							<?php if($ch_admin){?>
-								<button type="button" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" data-toggle="modal" data-target="#shared_add_modal">Shared</button>
+								<button type="button" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" data-toggle="modal" data-target="#shared_add_modal" onclick="load_share('<?php echo $id;?>')">Shared</button>
 							<?php }?>
 							<button type="button" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" data-toggle="modal" data-target="#public_add_modal" onclick="load_public('<?php echo $id;?>')">Public Link</button>
 							<a href="<?php echo admin_url('reports/update_report/'.$id);?>" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" >Save</a>
@@ -120,6 +120,8 @@
 				</div>
 			</div>
 		</div>
+		
+		
 		<?php if(!empty($id)){?>
 			<div class="modal fade" id="public_add_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-keyboard="false" data-backdrop="static">
 				<div class="modal-dialog" role="document">
@@ -185,6 +187,7 @@
 			
 			<div class="modal fade" id="shared_add_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-keyboard="false" data-backdrop="static">
 				<div class="modal-dialog" role="document">
+					<div id="overlay_deal123" class="overlay_new" style="display: none;"><div class="spinner"></div></div>
 					<div class="modal-content">
 						<div class="modal-header">
 							<button group="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -231,13 +234,31 @@
 			</div>
 		<?php }?>
 		<?php echo $report_filter;?>
+		<div class="panel_s project-menu-panel" style="margin-bottom:0px;">
+			<div class="panel-body">
+				<div class="horizontal-tabs">
+					<ul class="nav nav-pills">
+						<li class="active"><a data-toggle="pill" href="#report_table"><?php echo _l('deals');?></a></li>
+						<li><a data-toggle="pill" href="#summary_table"><?php echo _l('summary');?></a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		
 		<div class="panel_s project-menu-panel">
 			<div class="panel-body">
 				<div class="col-md-12">
 					<div id="overlay_deal" style="display: none;"><div class="spinner"></div></div>
-<?php $this->load->view('admin/reports/deal_list_column'); ?>
-					<?php //echo $tab_view;?>
+					 <div class="tab-content">
+						<div id="report_table" class="tab-pane fade in active">
+								<?php $this->load->view('admin/reports/deal_list_column'); ?>
+					
 								<?php $this->load->view('admin/reports/deal_table_html'); ?>
+						</div>
+						<div id="summary_table" class="tab-pane fade">
+							<?php $this->load->view('admin/reports/deal_summary',$data); ?>
+						</div>
+					</div>
 				</div>
 				<div class="clearfix"></div>
 			</div>

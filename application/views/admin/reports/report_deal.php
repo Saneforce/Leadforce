@@ -9,7 +9,7 @@
 						<div class="panel_s">
 							<div class="panel-body">
 								<h4 class="no-margin" style="position: relative;top: -4px;">
-									<a href="<?php echo admin_url('reports/view_deal_folder');?>"><i class="fa fa-arrow-circle-left fa-6" style="font-size: 30px;padding-right: 10px;top: 4px;position: relative"></i></a>
+									<a href="<?php echo admin_url('reports/view_deal_folder');?>" title="Back"><i class="fa fa-arrow-circle-left fa-6" style="font-size: 22px;padding-right: 10px;top: 4px;position: relative"></i></a>
 									<?php echo $title; ?>
 								</h4>
 								<hr class="hr-panel-heading">
@@ -45,7 +45,7 @@
 				<div id="public_all">
 					
 				</div>
-				<div class="row" > <div class="col-md-12"><a href="javascript:void(0)" onclick="add_public_link('<?php echo $id;?>')">Add Link</a></div></div>
+				<div class="row" > <div class="col-md-12"><a href="javascript:void(0)" onclick="add_public_link('<?php echo $id;?>')"><?php echo _l('add_link');?></a></div></div>
 			</div>
 			<div class="modal-footer">
 				<button group="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
@@ -63,7 +63,7 @@
 							<span class="edit-title"><?php echo _l('public_link'); ?></span>
 						</h4>
 					</div>
-					<?php echo form_open('admin/reports/update_public_name',array('id'=>'update_public_name')); ?>
+					<?php echo form_open(admin_url('reports/update_public_name'),array('id'=>'update_public_name')); ?>
 					<div class="modal-body">
 						<input type="hidden" id="link_id" name="link_id">
 							<?php $attrs = array('autofocus'=>true, 'required'=>true); ?>

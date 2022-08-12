@@ -1,4 +1,4 @@
-<?php echo form_open('admin/reports/save_filter_report',array('id'=>'save_filter_report')); ?>
+<?php echo form_open(admin_url('reports/save_filter_report'),array('id'=>'save_filter_report')); ?>
 	<div class="panel_s project-menu-panel" style="margin-top:-1px;">
 		<div class="panel-body">
 			<div class="horizontal-tabs">
@@ -10,7 +10,6 @@
 						<?php if(!empty($filters)){
 							$i1 = 1;$i2 =0;
 							foreach($filters as $key => $filter1){
-								
 							?>
 								<div  class="col-md-12 m-bt-10">
 									<div  class="col-md-2" >

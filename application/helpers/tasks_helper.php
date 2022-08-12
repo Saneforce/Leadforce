@@ -2725,6 +2725,10 @@ function deal_needed_fields(){
 					$i++;
 					$data['need_fields'][$i] = 'contact_name';
 				}
+				else if($req_field11 == 'teamleader'){
+					$data['need_fields'][$i] = 'teamleader_name';
+					$data['need_fields_label'][$j] = 'teamleader';
+				}
 				else if($req_field11 == 'project_members[]'){
 					$data['need_fields'][$i] = 'members';
 					$data['need_fields_label'][$j] = 'project_members';
