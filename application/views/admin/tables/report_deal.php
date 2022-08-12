@@ -232,7 +232,16 @@ foreach ($rResult as $aRow) {
 
     $stage_of = '';
     if($aRow['project_status']) {
-        $stage_of = (($aRow['project_status'] == 1)?'WON':'LOSS');
+		if($aRow['project_status'] == 1){
+			$stage_of = 'WON';
+		}
+		if($aRow['project_status'] == 2){
+			$stage_of = 'LOSS';
+		}
+		if($aRow['project_status'] == 0){
+			$stage_of = 'OPEN';
+		}
+        //$stage_of = (($aRow['project_status'] == 1)?'WON':'LOSS');
     }
     $row_temp['project_status'] = $stage_of;
 

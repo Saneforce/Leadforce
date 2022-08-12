@@ -281,7 +281,7 @@ function get_flters($req_filters){
 				
 			}
 			if($filter12 == 'name' ){
-				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$cur_cond = " AND (p.id like '".$filters2[$i1]."')";
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
@@ -301,7 +301,7 @@ function get_flters($req_filters){
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
 				}
-				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$req_arrs = explode(',',$filters2[$i1]);
 					$req_arr = '';
 					if(!empty($req_arrs)){
@@ -316,7 +316,7 @@ function get_flters($req_filters){
 				}
 			}
 			if($filter12 == 'project_cost' ){
-				if($filters1[$i1]=='is_more_than' && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				if($filters1[$i1]=='is_more_than' && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$cur_cond = " AND ( p.project_cost > '".$filters2[$i1]."')";
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
@@ -339,7 +339,7 @@ function get_flters($req_filters){
 				
 			}
 			if($filter12 == 'teamleader_name' ){
-				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				if($filters1[$i1]=='is'  && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$cur_cond = " AND ( p.teamleader like '".$filters2[$i1]."')";
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
@@ -359,7 +359,7 @@ function get_flters($req_filters){
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
 				}
-				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$req_arrs = explode(',',$filters2[$i1]);
 					$req_arr = '';
 					if(!empty($req_arrs)){
@@ -418,7 +418,7 @@ function get_flters($req_filters){
 				}
 			}
 			if($filter12 == 'company' ){
-				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$cur_cond = " AND ( p.clientid in(SELECT userid FROM ".db_prefix() ."clients where userid = '".$filters2[$i1]."') )";
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
@@ -438,7 +438,7 @@ function get_flters($req_filters){
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
 				}
-				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && $filters2[$i1]!=''&& ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$req_arrs = explode(',',$filters2[$i1]);
 					$req_arr = '';
 					if(!empty($req_arrs)){
@@ -453,7 +453,7 @@ function get_flters($req_filters){
 				}
 			}
 			if($filter12 == 'tags' ){
-				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$cur_cond = " AND ( p.id in (SELECT rel_id FROM ".db_prefix() ."taggables where tag_id = '".$filters2[$i1]."' and rel_type = 'project' ) )";
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
@@ -473,7 +473,7 @@ function get_flters($req_filters){
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
 				}
-				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$req_arrs = explode(',',$filters2[$i1]);
 					$req_arr = '';
 					if(!empty($req_arrs)){
@@ -488,7 +488,7 @@ function get_flters($req_filters){
 				}
 			}
 			if($filter12 == 'members' ){
-				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$cur_cond = " AND ( p.id in (SELECT project_id FROM ".db_prefix() ."project_members where staff_id = '".$filters2[$i1]."' ) )";
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
@@ -508,7 +508,7 @@ function get_flters($req_filters){
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
 				}
-				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$req_arrs = explode(',',$filters2[$i1]);
 					$req_arr = '';
 					if(!empty($req_arrs)){
@@ -523,7 +523,7 @@ function get_flters($req_filters){
 				}
 			}
 			if($filter12 == 'loss_reason_name' ){
-				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$cur_cond = " AND ( p.loss_reason in (SELECT id FROM ".db_prefix() ."deallossreasons where id = '".$filters2[$i1]."' ) )";
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
@@ -543,7 +543,7 @@ function get_flters($req_filters){
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
 				}
-				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$req_arrs = explode(',',$filters2[$i1]);
 					$req_arr = '';
 					if(!empty($req_arrs)){
@@ -558,7 +558,7 @@ function get_flters($req_filters){
 				}
 			}
 			if($filter12 == 'project_currency' ){
-				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$cur_cond = " AND ( p.project_currency in (SELECT name FROM ".db_prefix() ."currencies where id = '".$filters2[$i1]."' ) )";
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
@@ -578,7 +578,7 @@ function get_flters($req_filters){
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
 				}
-				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$req_arrs = explode(',',$filters2[$i1]);
 					$req_arr = '';
 					if(!empty($req_arrs)){
@@ -593,7 +593,7 @@ function get_flters($req_filters){
 				}
 			}
 			if($filter12 == 'created_by' ){
-				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$cur_cond = " AND ( p.created_by  = '".$filters2[$i1]."' )";
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
@@ -613,7 +613,7 @@ function get_flters($req_filters){
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
 				}
-				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				else if($filters1[$i1]=='is_any_of' && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$req_arrs = explode(',',$filters2[$i1]);
 					$req_arr = '';
 					if(!empty($req_arrs)){
@@ -628,7 +628,7 @@ function get_flters($req_filters){
 				}
 			}
 			if($filter12 == 'modified_by' ){
-				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$cur_cond = " AND ( p.modified_by  = '".$filters2[$i1]."' )";
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
@@ -648,7 +648,7 @@ function get_flters($req_filters){
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
 				}
-				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$req_arrs = explode(',',$filters2[$i1]);
 					$req_arr = '';
 					if(!empty($req_arrs)){
@@ -663,7 +663,7 @@ function get_flters($req_filters){
 				}
 			}
 			if($filter12 == 'status' ){
-				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$cur_cond = " AND ( p.status in (SELECT id FROM ".db_prefix() ."projects_status where id = '".$filters2[$i1]."') )";
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
@@ -683,7 +683,7 @@ function get_flters($req_filters){
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
 				}
-				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				else if($filters1[$i1]=='is_any_of' && $filters2[$i1]!=''  && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$req_arrs = explode(',',$filters2[$i1]);
 					$req_arr = '';
 					if(!empty($req_arrs)){
@@ -698,7 +698,7 @@ function get_flters($req_filters){
 				}
 			}
 			if($filter12 == 'pipeline_id' ){
-				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$cur_cond = " AND ( p.pipeline_id = '".$filters2[$i1]."' )";
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
@@ -718,7 +718,7 @@ function get_flters($req_filters){
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
 				}
-				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$req_arrs = explode(',',$filters2[$i1]);
 					$req_arr = '';
 					if(!empty($req_arrs)){
@@ -733,7 +733,7 @@ function get_flters($req_filters){
 				}
 			}
 			if($filter12 == 'contact_email1' ){
-				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				if($filters1[$i1]=='is' && $filters2[$i1]!='' && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$cur_cond = " AND ( p.id in(SELECT p.project_id FROM ".db_prefix() ."project_contacts p,".db_prefix() ."contacts c where p.contacts_id = c.id and c.email = '".$filters2[$i1]."' and p.is_primary=1 and c.deleted_status ='0' and c.active = '1') )";
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
@@ -753,7 +753,7 @@ function get_flters($req_filters){
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
 				}
-				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$req_arrs = explode(',',$filters2[$i1]);
 					$req_arr = '';
 					if(!empty($req_arrs)){
@@ -768,7 +768,7 @@ function get_flters($req_filters){
 				}
 			}
 			if($filter12 == 'contact_name' ){
-				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$cur_cond = " AND ( p.id in(SELECT project_id FROM ".db_prefix() ."project_contacts where contacts_id = '".$filters2[$i1]."' and is_primary =1) )";
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
@@ -788,7 +788,7 @@ function get_flters($req_filters){
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
 				}
-				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				else if($filters1[$i1]=='is_any_of' && $filters2[$i1]!=''  && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$req_arrs = explode(',',$filters2[$i1]);
 					$req_arr = '';
 					if(!empty($req_arrs)){
@@ -803,7 +803,7 @@ function get_flters($req_filters){
 				}
 			}
 			if($filter12 == 'project_status' ){
-				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					if($filters2[$i1] == 'WON'){
 						$cur_cond = " AND ( p.stage_of = '1' )";
 						$req_cond .= $cur_cond;
@@ -828,7 +828,7 @@ function get_flters($req_filters){
 						array_push($where, $cur_cond);
 					}
 				}
-				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$req_arrs = explode(',',$filters2[$i1]);
 					$req_arr = '';
 					if(!empty($req_arrs)){
@@ -848,7 +848,7 @@ function get_flters($req_filters){
 				}
 			}
 			if($filter12 == 'contact_phone1' ){
-				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$cur_cond = " AND ( p.id in(SELECT p.project_id FROM ".db_prefix() ."project_contacts p,".db_prefix() ."contacts c where p.contacts_id = c.id and c.phonenumber = '".$filters2[$i1]."' and p.is_primary=1 and c.deleted_status ='0' and c.active = '1') )";
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
@@ -868,7 +868,7 @@ function get_flters($req_filters){
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
 				}
-				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] == 'last_year' && $filters2[$i1] == 'next_year' && $filters2[$i1] == 'this_month' && $filters2[$i1] == 'next_month' && $filters2[$i1] == 'last_month' && $filters2[$i1] == 'this_week' && $filters2[$i1] == 'last_week' && $filters2[$i1] == 'next_week' && $filters2[$i1] == 'today' && $filters2[$i1] == 'yesterday' && $filters2[$i1] == 'tomorrow' && $filters2[$i1] == 'custom_period' )){
+				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$req_arrs = explode(',',$filters2[$i1]);
 					$req_arr = '';
 					if(!empty($req_arrs)){
