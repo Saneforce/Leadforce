@@ -791,7 +791,7 @@ class Reports extends AdminController
 				if(!empty($_REQUEST['filter_'.$filter12])){
 					$req_val = implode(",",$_REQUEST['filter_'.$filter12]);
 					$filter_data['filters2'.$cur_id][$i]	=	$req_val;
-					if($req_val == 'this_year' || $req_val == 'last_year' || $req_val == 'custom_period' ){
+					if($req_val == 'this_year' || $req_val == 'last_year' || $req_val == 'next_year' || $req_val == 'this_month' || $req_val == 'next_month' || $req_val == 'last_month' || $req_val == 'this_week' || $req_val == 'last_week' || $req_val == 'next_week' || $req_val == 'today' || $req_val == 'yesterday' || $req_val == 'tomorrow' || $req_val == 'custom_period' ){
 						$filter_data['filters3'.$cur_id][$i]	=	$_REQUEST['filter_4'][$j];  
 						$filter_data['filters4'.$cur_id][$i]	=	$_REQUEST['filter_5'][$j]; 
 						$j++;
@@ -944,6 +944,20 @@ class Reports extends AdminController
 		else if($sel_val == 'date'){
 			$this_yr	=	($filters2[$req_val-1]=='this_year')?'selected':'';
 			$last_yr	=	($filters2[$req_val-1]=='last_year')?'selected':'';
+			$next_yr	=	($filters2[$req_val-1]=='next_year')?'selected':'';
+			
+			$this_mn	=	($filters2[$req_val-1]=='this_month')?'selected':'';
+			$last_mn	=	($filters2[$req_val-1]=='last_month')?'selected':'';
+			$next_mn	=	($filters2[$req_val-1]=='next_month')?'selected':'';
+			
+			$this_w		=	($filters2[$req_val-1]=='this_week')?'selected':'';
+			$last_w		=	($filters2[$req_val-1]=='last_week')?'selected':'';
+			$next_w		=	($filters2[$req_val-1]=='next_week')?'selected':'';
+			
+			$today		=	($filters2[$req_val-1]=='today')?'selected':'';
+			$yesterday	=	($filters2[$req_val-1]=='yesterday')?'selected':'';
+			$tomorrow	=	($filters2[$req_val-1]=='tomorrow')?'selected':'';
+			
 			$cus_pr		=	($filters2[$req_val-1]=='custom_period')?'selected':'';
 			$ch_val =  $filters1[$req_val-1];
 			$req_out .= '<div class="col-md-12"><div class="col-md-2" id="1_'.$req_val.'_filter">';
@@ -955,6 +969,16 @@ class Reports extends AdminController
 			$req_out .= '<div class="col-md-3" id="2_'.$req_val.'_filter"  '.$req_disp.'><select data-live-search="false" data-width="100%" class="ajax-search selectpicker" data-none-selected-text="Nothing selected" tabindex="-98" id="year_'.$req_val.'" onchange="change_2_filter(this)" name="filter_'.$filters[$req_val-1].'[]">';
 			$req_out .= '<option value="this_year" '.$this_yr.'>This Year</option>
 						<option value="last_year" '.$last_yr.' >Last Year</option>
+						<option value="next_year" '.$next_yr.' >Next Year</option>
+						<option value="this_month" '.$this_mn.'>This Month</option>
+						<option value="last_month" '.$last_mn.' >Last Month</option>
+						<option value="next_month" '.$next_mn.' >Next Month</option>
+						<option value="this_week" '.$this_w.'>This Week</option>
+						<option value="last_week" '.$last_w.' >Last Week</option>
+						<option value="next_week" '.$next_w.' >Next Week</option>
+						<option value="today" '.$today.'>Today</option>
+						<option value="yesterday" '.$yesterday.' >Yesterday</option>
+						<option value="tomorrow" '.$tomorrow.' >Tomorrow</option>
 						<option value="custom_period" '.$cus_pr.'>Custom Period</option>';
 			$req_out .= '</select></div>';
 			$req_out .= '<div class="col-md-7"><div class="col-md-5" id="'.$req_val.'_3_filter"  '.$req_disp.'><input type="text" class="form-control" id="start_date_edit_'.$req_val.'" value="'.$filters3[$req_val-1].'" name="filter_4[]"></div>';
@@ -1025,6 +1049,23 @@ class Reports extends AdminController
 				$filter_data['filters4'.$cur_id12][$cur_num]	=	'31-12-'.$last_year;
 			}
 		}
+		if($cur_val=='next_year'){
+			$next_year = date('Y')+1;
+			if(!empty($filters3)){
+				foreach($filters3 as $key12 => $filter3){
+					$filter_data['filters3'.$cur_id12][$key12]	=	$filter3;  
+				}
+				
+				echo $filter_data['filters3'.$cur_id12][$cur_num]	=	'01-01-'.$next_year;  
+			}
+			$filters4	=	$this->session->userdata('filters4'.$cur_id12);
+			if(!empty($filters4)){
+				foreach($filters4 as $key12 => $filter4){
+					$filter_data['filters4'.$cur_id12][$key12]	=	$filter4;  
+				}
+				$filter_data['filters4'.$cur_id12][$cur_num]	=	'31-12-'.$next_year;
+			}
+		}
 		if($cur_val=='this_year'){
 			if(!empty($filters3)){
 				foreach($filters3 as $key12 => $filter3){
@@ -1040,6 +1081,154 @@ class Reports extends AdminController
 				$filter_data['filters4'.$cur_id12][$cur_num]	=	'31-12-'.date('Y');
 			}
 		}
+		 elseif ($cur_val == 'today') {
+			if(!empty($filters3)){
+				foreach($filters3 as $key12 => $filter3){
+					$filter_data['filters3'.$cur_id12][$key12]	=	$filter3;  
+				}
+				$filter_data['filters3'.$cur_id12][$cur_num]	=	date('d-m-Y');  
+			}
+			$filters4	=	$this->session->userdata('filters4'.$cur_id12);
+			if(!empty($filters4)){
+				foreach($filters4 as $key12 => $filter4){
+					$filter_data['filters4'.$cur_id12][$key12]	=	$filter4;  
+				}
+				$filter_data['filters4'.$cur_id12][$cur_num]	=	date('d-m-Y');
+			}
+		} elseif ($cur_val == 'yesterday') {
+			$yesterday = date('d-m-Y',strtotime("-1 days"));
+			if(!empty($filters3)){
+				foreach($filters3 as $key12 => $filter3){
+					$filter_data['filters3'.$cur_id12][$key12]	=	$filter3;  
+				}
+				$filter_data['filters3'.$cur_id12][$cur_num]	=	$yesterday;  
+			}
+			$filters4	=	$this->session->userdata('filters4'.$cur_id12);
+			if(!empty($filters4)){
+				foreach($filters4 as $key12 => $filter4){
+					$filter_data['filters4'.$cur_id12][$key12]	=	$filter4;  
+				}
+				$filter_data['filters4'.$cur_id12][$cur_num]	=	$yesterday;
+			}
+		} 
+		elseif ($cur_val == 'tomorrow') {
+			$tomorrow = date('d-m-Y',strtotime("+1 days"));
+			if(!empty($filters3)){
+				foreach($filters3 as $key12 => $filter3){
+					$filter_data['filters3'.$cur_id12][$key12]	=	$filter3;  
+				}
+				$filter_data['filters3'.$cur_id12][$cur_num]	=	$tomorrow;  
+			}
+			$filters4	=	$this->session->userdata('filters4'.$cur_id12);
+			if(!empty($filters4)){
+				foreach($filters4 as $key12 => $filter4){
+					$filter_data['filters4'.$cur_id12][$key12]	=	$filter4;  
+				}
+				$filter_data['filters4'.$cur_id12][$cur_num]	=	$tomorrow;
+			}
+		} 
+		elseif ($cur_val == 'this_week') {
+			$str_date = date('d-m-Y',strtotime('monday this week'));
+			$end_date = date('d-m-Y',strtotime('sunday this week'));
+			if(!empty($filters3)){
+				foreach($filters3 as $key12 => $filter3){
+					$filter_data['filters3'.$cur_id12][$key12]	=	$filter3;  
+				}
+				$filter_data['filters3'.$cur_id12][$cur_num]	=	$str_date;  
+			}
+			$filters4	=	$this->session->userdata('filters4'.$cur_id12);
+			if(!empty($filters4)){
+				foreach($filters4 as $key12 => $filter4){
+					$filter_data['filters4'.$cur_id12][$key12]	=	$filter4;  
+				}
+				$filter_data['filters4'.$cur_id12][$cur_num]	=	$end_date;
+			}
+		} elseif ($cur_val == 'last_week') {
+			$str_date = date('d-m-Y',strtotime('monday this week',strtotime("-1 week +1 day")));
+			$end_date = date('d-m-Y',strtotime('sunday this week',strtotime("-1 week +1 day")));
+			if(!empty($filters3)){
+				foreach($filters3 as $key12 => $filter3){
+					$filter_data['filters3'.$cur_id12][$key12]	=	$filter3;  
+				}
+				$filter_data['filters3'.$cur_id12][$cur_num]	=	$str_date;  
+			}
+			$filters4	=	$this->session->userdata('filters4'.$cur_id12);
+			if(!empty($filters4)){
+				foreach($filters4 as $key12 => $filter4){
+					$filter_data['filters4'.$cur_id12][$key12]	=	$filter4;  
+				}
+				$filter_data['filters4'.$cur_id12][$cur_num]	=	$end_date;
+			}
+		} 
+		elseif ($cur_val == 'next_week') {
+			$str_date = date('d-m-Y',strtotime('monday this week',strtotime("+1 week +1 day")));
+			$end_date = date('d-m-Y',strtotime('sunday this week',strtotime("+1 week +1 day")));
+			if(!empty($filters3)){
+				foreach($filters3 as $key12 => $filter3){
+					$filter_data['filters3'.$cur_id12][$key12]	=	$filter3;  
+				}
+				$filter_data['filters3'.$cur_id12][$cur_num]	=	$str_date;  
+			}
+			$filters4	=	$this->session->userdata('filters4'.$cur_id12);
+			if(!empty($filters4)){
+				foreach($filters4 as $key12 => $filter4){
+					$filter_data['filters4'.$cur_id12][$key12]	=	$filter4;  
+				}
+				$filter_data['filters4'.$cur_id12][$cur_num]	=	$end_date;
+			}
+		} 
+		elseif ($cur_val == 'this_month') {
+			$str_date = date('Y-m-01');
+			$end_date = date('Y-m-t');
+			if(!empty($filters3)){
+				foreach($filters3 as $key12 => $filter3){
+					$filter_data['filters3'.$cur_id12][$key12]	=	$filter3;  
+				}
+				$filter_data['filters3'.$cur_id12][$cur_num]	=	$str_date;  
+			}
+			$filters4	=	$this->session->userdata('filters4'.$cur_id12);
+			if(!empty($filters4)){
+				foreach($filters4 as $key12 => $filter4){
+					$filter_data['filters4'.$cur_id12][$key12]	=	$filter4;  
+				}
+				$filter_data['filters4'.$cur_id12][$cur_num]	=	$end_date;
+			}
+		}
+		elseif ($cur_val == 'last_month') {
+			$str_date = date('01-m-Y',strtotime('last month'));
+			$end_date = date('t-m-Y',strtotime('last month'));
+			if(!empty($filters3)){
+				foreach($filters3 as $key12 => $filter3){
+					$filter_data['filters3'.$cur_id12][$key12]	=	$filter3;  
+				}
+				$filter_data['filters3'.$cur_id12][$cur_num]	=	$str_date;  
+			}
+			$filters4	=	$this->session->userdata('filters4'.$cur_id12);
+			if(!empty($filters4)){
+				foreach($filters4 as $key12 => $filter4){
+					$filter_data['filters4'.$cur_id12][$key12]	=	$filter4;  
+				}
+				$filter_data['filters4'.$cur_id12][$cur_num]	=	$end_date;
+			}
+		}
+		elseif ($cur_val == 'next_month') {
+			$date = date('01-m-Y');
+			$str_date = date("01-m-Y", strtotime ( '+1 month' , strtotime ( $date ) )) ;
+			$end_date = date("31-m-Y", strtotime ( '+1 month' , strtotime ( $date ) )) ;
+			if(!empty($filters3)){
+				foreach($filters3 as $key12 => $filter3){
+					$filter_data['filters3'.$cur_id12][$key12]	=	$filter3;  
+				}
+				$filter_data['filters3'.$cur_id12][$cur_num]	=	$str_date;  
+			}
+			$filters4	=	$this->session->userdata('filters4'.$cur_id12);
+			if(!empty($filters4)){
+				foreach($filters4 as $key12 => $filter4){
+					$filter_data['filters4'.$cur_id12][$key12]	=	$filter4;  
+				}
+				$filter_data['filters4'.$cur_id12][$cur_num]	=	$end_date;
+			}
+		}		
 		$this->session->set_userdata($filter_data);
 		return true;
 	}
