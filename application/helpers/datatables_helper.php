@@ -352,8 +352,8 @@ function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = [], $where 
     }
     /* Total data set length */
     if(empty($sGroupBy)){
-		if (str_contains($sTable, 'as')) {
-			$ch_column = explode('as',$sTable);
+		if (str_contains($sTable, 'as ')) {
+			$ch_column = explode('as ',$sTable);
 			$sQuery = '
 			SELECT COUNT(' . $ch_column[1] . '.' . $sIndexColumn . ")
 			FROM $sTable " . $join . ' ' . $where;
