@@ -1550,6 +1550,8 @@ class Reports extends AdminController
 		$deal_val = deal_values();
 		$data =  json_decode($deal_val, true);
 		$all_clmns = $data['all_clmns'];
+		unset($all_clmns['id']);
+		unset($all_clmns['product_count']);
 		$cus_flds = $data['cus_flds'];
 		if(!empty($filters)){
 			foreach($filters as $key12 => $filter1){
