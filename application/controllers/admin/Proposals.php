@@ -145,6 +145,8 @@ class Proposals extends AdminController
                     set_alert('success', _l('added_successfully', _l('proposal')));
                     if ($this->set_proposal_pipeline_autoload($id)) {
                         redirect(admin_url('proposals'));
+                    }elseif(isset($proposal_data['pdftemplate']) && $proposal_data['pdftemplate'] !='' && $proposal_data['pdftemplate'] !='proposalpdf') {
+                        redirect(admin_url('proposals/template/' . $id));
                     } else {
                         redirect(admin_url('proposals/list_proposals/' . $id));
                     }
@@ -161,6 +163,8 @@ class Proposals extends AdminController
                 }
                 if ($this->set_proposal_pipeline_autoload($id)) {
                     redirect(admin_url('proposals'));
+                }elseif(isset($proposal_data['pdftemplate']) && $proposal_data['pdftemplate'] !='' && $proposal_data['pdftemplate'] !='proposalpdf') {
+                    redirect(admin_url('proposals/template/' . $id));
                 } else {
                     redirect(admin_url('proposals/list_proposals/' . $id));
                 }
@@ -179,7 +183,6 @@ class Proposals extends AdminController
             $data['is_proposal'] = true;
             $title               = _l('edit', _l('proposal_lowercase'));
         }
-
         $this->load->model('taxes_model');
         $data['taxes'] = $this->taxes_model->get();
         $this->load->model('invoice_items_model');
@@ -221,10 +224,14 @@ class Proposals extends AdminController
             $data['discount_value'] = $discount_value;
             $data['discount_option'] = get_option('product_discount_option');
         }
+
+        // this line should be removed after dynamic pdf templated feature is done
+        $data['protocol'] =$_SERVER['HTTP_HOST'];
+        $_POST['pdftemplate'] ='proposalpdf';
         $data['template'] = $this->emails_model->get(['language' => 'english', 'slug' => 'proposal-send-to-customer'], 'row');
         $data['all_templates'] = $this->emails_model->get(['language' => 'english', 'slug' => 'proposal-send-to-customer'], 'result_array');
         $data['item_for'] = 'proposal';
-//pre($data['products']);
+        //pre($data['products']);
         $data['title'] = $title;
         $this->load->view('admin/proposals/proposal', $data);
     }
@@ -890,5 +897,43 @@ class Proposals extends AdminController
                 echo $duedate;
             }
         }
+    }
+
+
+    public function template($id)
+    {
+        $proposal = $this->proposals_model->get($id);
+        
+        if ($proposal->rel_type == 'customer' && !is_client_logged_in()) {
+            load_client_language($proposal->rel_id);
+        } else if($proposal->rel_type == 'lead') {
+            load_lead_language($proposal->rel_id);
+        }
+        if($this->input->post() && $this->input->post('template')){
+            $data =array();
+            if($proposal->template_contents){
+                $data =json_decode($proposal->template_contents,true);
+            }
+            $data [$this->input->post('template')] =$this->input->post('content');
+            $this->db->where('id', $proposal->id);
+            $this->db->update(db_prefix().'proposals',[
+                    'template_contents'=>json_encode($data)
+                ]
+            );
+            if($this->input->post('saveandsend') == true){
+                $this->proposals_model->send_proposal_to_email($proposal->id);
+            }
+            set_alert('success', _l('updated_successfully', _l('Template content')));
+            echo json_encode(array('success'=>true,'responseText'=>'Template content saved successfully'));
+            return;
+        }
+        $template='proposalpdf';
+        if($proposal->pdftemplate){
+            $template =$proposal->pdftemplate;
+        }
+        $data =['proposal'=>$proposal,'title'=>$proposal->subject,'contentEditable'=>true];
+        $data['template'] = $this->emails_model->get(['language' => 'english', 'slug' => 'proposal-send-to-customer'], 'row');
+        $data['all_templates'] = $this->emails_model->get(['language' => 'english', 'slug' => 'proposal-send-to-customer'], 'result_array');
+        $this->load->view('themes/' . active_clients_theme() . '/views/'.$template,$data);            
     }
 }

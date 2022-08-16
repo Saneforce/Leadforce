@@ -298,3 +298,13 @@ function get_proposals_sql_where_staff($staff_id)
 
     return $whereUser;
 }
+
+function get_proposal_pdf_templates()
+{
+    $proposal_pdf_templates =array(
+        array('id'=>'proposalpdf','name'=>"Default"),
+        array('id'=>'proposalpdf_domestic','name'=>"Domestic"),
+        array('id'=>'proposalpdf_international','name'=>"International"),
+    );
+    return $proposal_pdf_templates;
+}

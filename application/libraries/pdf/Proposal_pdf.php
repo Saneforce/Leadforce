@@ -68,7 +68,11 @@ class Proposal_pdf extends App_pdf
     {
         $customPath = APPPATH . 'views/themes/' . active_clients_theme() . '/views/my_proposalpdf.php';
         $actualPath = APPPATH . 'views/themes/' . active_clients_theme() . '/views/proposalpdf.php';
-
+        
+        if($this->proposal->pdftemplate){
+            $filename =$this->proposal->pdftemplate.'.php';
+            $actualPath = APPPATH . 'views/themes/' . active_clients_theme() . '/views/'.$filename;
+        }
         if (file_exists($customPath)) {
             $actualPath = $customPath;
         }
