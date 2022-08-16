@@ -165,7 +165,13 @@
                                  </select>
                               </div>
                             </div>
-                           </div>
+                            <?php if($protocol =='kataria.leadforce.mobi' || $protocol =='trial.leadforce.mobi' || $protocol =='localhost' ): ?>
+                              <div class="col-md-6">
+                                <?php echo render_select('pdftemplate',get_proposal_pdf_templates(),array('id','name'),'pdf_template',(!isset($proposal))?'proposalpdf':$proposal->pdftemplate,[],[],'','',false); ?>
+                              </div>
+                              
+                            <?php endif; ?>
+                            </div>
                         <?php $fc_rel_id = (isset($proposal) ? $proposal->id : false); ?>
                         <?php echo render_custom_fields('proposal',$fc_rel_id); ?>
                          <div class="form-group no-mbot">
@@ -256,8 +262,8 @@
                   <div class="btn-bottom-toolbar bottom-transaction text-right">
                   <!-- <p class="no-mbot pull-left mtop5 btn-toolbar-notice"><a href="#" style="color:blue;font-weight:bold;" id="choose_temp" for="template" class="control-label" >Choose Template</a>, Either it will send default template. -->
                                 <?php //echo _l('include_proposal_items_merge_field_help','<b>{proposal_items}</b>'); ?></p>
-                    <a href="#" id="choose_temp" for="template" class="mleft15" >Click here to Choose Template</a>
-                    <button type="button" class="btn btn-info mleft10 proposal-form-submit save-and-send transaction-submit">
+                    <a href="#" id="choose_temp" for="template" class="mleft15" <?php echo (isset($proposal) && ($proposal->pdftemplate =='' || $proposal->pdftemplate !='proposalpdf'))?'style="display:none"':'' ?>>Click here to Choose Template</a>
+                    <button type="button" class="btn btn-info mleft10 proposal-form-submit save-and-send transaction-submit" <?php echo (isset($proposal) && $proposal->pdftemplate !='proposalpdf')?'style="display:none"':'' ?>>
                         <?php echo _l('save_and_send'); ?>
                     </button>
                     <button class="btn btn-info mleft5 proposal-form-submit transaction-submit" type="button">
@@ -1072,6 +1078,16 @@ $(function () {
         return true;
     });
 });
+$( "[name='pdftemplate']" ).change(function() {
+  if($(this).val() =='proposalpdf'){
+    $('#choose_temp').show();
+    $('.save-and-send').show();
+  }else{
+    $('#choose_temp').hide();
+    $('.save-and-send').hide();
+  }
+});
+
 </script>
 <style>
 .ui-autocomplete {

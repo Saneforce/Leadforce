@@ -20,23 +20,19 @@ class Proposal extends ClientsController
             $action = $this->input->post('action');
             switch ($action) {
                 case 'proposal_pdf':
-
-                    $proposal_number = format_proposal_number($id);
-                    
-                    $companyname     = get_option('invoice_company_name');
-                    
-                    if ($companyname != '') {
-                        $proposal_number .= '-' . mb_strtoupper(slug_it($companyname), 'UTF-8');
-                    }
-                    try {
-                        $pdf = proposal_pdf($proposal);
-                    } catch (Exception $e) {
-                        echo $e->getMessage();
-                        die;
-                    }
-
-                    $pdf->Output($proposal_number . '.pdf', 'D');
-
+                        $proposal_number = format_proposal_number($id);
+                        $companyname     = get_option('invoice_company_name');
+                        
+                        if ($companyname != '') {
+                            $proposal_number .= '-' . mb_strtoupper(slug_it($companyname), 'UTF-8');
+                        }
+                        try {
+                            $pdf = proposal_pdf($proposal);
+                        } catch (Exception $e) {
+                            echo $e->getMessage();
+                            die;
+                        }
+                        $pdf->Output($proposal_number . '.pdf', 'D');
                     break;
                 case 'proposal_comment':
                     // comment is blank
