@@ -132,7 +132,13 @@
          <div class="col-md-3">
             <div class="mbot30">
                <div class="proposal-html-logo">
-                  <?php echo get_dark_company_logo(); ?>
+                  <?php 
+                  if(!empty($invoicepdf) && $invoicepdf->use_as_default == 1) {
+                  ?>
+                     <img src="<?php echo base_url($invoicepdf->inv_logo); ?>" class="img-responsive">
+                  <?php } else {
+                     echo get_dark_company_logo(); 
+                  }?>
                </div>
             </div>
          </div>

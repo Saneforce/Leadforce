@@ -89,6 +89,11 @@ class Proposal extends ClientsController
         $this->app_scripts->theme('sticky-js','assets/plugins/sticky/sticky.js');
 
         $data['comments'] = $this->proposals_model->get_comments($id);
+
+        //should be change when proposal configuration page is done
+        $this->load->model('Invoicepdf_model');
+        $data['invoicepdf'] =$this->Invoicepdf_model->get_invoice_config();
+
         add_views_tracking('proposal', $id);
         hooks()->do_action('proposal_html_viewed', $id);
         $this->app_css->remove('reset-css','customers-area-default');
