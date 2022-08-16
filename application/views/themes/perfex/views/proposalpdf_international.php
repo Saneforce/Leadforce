@@ -74,19 +74,23 @@ if(isset($proposal->items) && $proposal->items){
         <td style="border: 1px solid black;border-collapse: collapse;'.$background_color.'"><span style="font-weight:bold">Rate '.$item['currency'].'/MT</span></td>
         <td style="border: 1px solid black;border-collapse: collapse;'.$background_color.'"><span style="font-weight:bold">'.$item['price'].' </span></td>
         </tr>';
-        
         if($item['method'] ==2 || $item['method'] ==3){
             $table .='<tr>
             <td style="border: 1px solid black;border-collapse: collapse;"><span style="font-weight:bold">G.S.T.</span></td>';
             if($item['method'] ==2){
-                $table .='<td style="border: 1px solid black;border-collapse: collapse;">@ '.$item['tak'].'18 % Included</td>';
+                $table .='<td style="border: 1px solid black;border-collapse: collapse;">@ '.$item['tax'].' % Included</td>';
             }elseif($item['method'] ==2){
-                $table .='<td style="border: 1px solid black;border-collapse: collapse;">@ '.$item['tak'].'18 % Extra or as applicable at the time of despatch.</td>';
+                $table .='<td style="border: 1px solid black;border-collapse: collapse;">@ '.$item['tax'].' % Extra or as applicable at the time of despatch.</td>';
             }
+            $table .='</tr>';
+        }else{
+            $table .='<tr>
+            <td style="border: 1px solid black;border-collapse: collapse;"><span style="font-weight:bold">G.S.T.</span></td>';
+            $table .='<td style="border: 1px solid black;border-collapse: collapse;">NIL Against Direct Export.</td>';
             $table .='</tr>';
         }
         if($proposal->items[$count+1]){
-            $table .='<tr><td style="border: 1px solid black;border-collapse: collapse;"></td><td style="border: 1px solid black;border-collapse: collapse;">NIL Against Direct Export</td></tr>';
+            $table .='<tr><td style="border: 1px solid black;border-collapse: collapse;"></td><td style="border: 1px solid black;border-collapse: collapse;"></td></tr>';
         }
     }
     $table .='
