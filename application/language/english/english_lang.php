@@ -4094,3 +4094,17 @@ $lang['total_num_prdts']  =	'Total Number of Products';
 $lang['total_val_deal']  =	'Total Value Of Deals';
 $lang['total_val_prdt']  =	'Total Product Value';
 $lang['view_by'] 		 =	'View By';
+//for whatsapp module
+$lang['whatsapp'] = 'WhatsApp';
+$lang['whatsapp_templates'] = 'WhatsApp templates';
+$lang['whatsapp_settings'] = 'WhatsApp settings';
+$lang['enable_whatsapp'] = 'Enable WhatsApp';
+$lang['business_id'] = 'Business-ID';
+$lang['phone_number_id'] = 'Phone-Number-ID';
+$lang['user_access_token'] = 'User-Access-Token';
+$lang['cannot_update_settings'] = 'Cannot update settings';
+$lang['waba_id'] = 'WABA-ID';
+$lang['version'] = 'Version';
+
+
+$lang ['pdf_template'] ='PDF template';
