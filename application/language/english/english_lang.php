@@ -4068,3 +4068,18 @@ $lang['cannot_use_old_password'] ='Cannot use old password';
 $lang['minimum_character_error'] ='%s should have minimum %s characters';
 $lang['maximum_character_error'] ='%s should be maximum %s characters';
 $lang['your_account_has_been_locked'] ='Your account has been locked. Please try after %s seconds';
+
+//for whatsapp module
+$lang['whatsapp'] = 'WhatsApp';
+$lang['whatsapp_templates'] = 'WhatsApp templates';
+$lang['whatsapp_settings'] = 'WhatsApp settings';
+$lang['enable_whatsapp'] = 'Enable WhatsApp';
+$lang['business_id'] = 'Business-ID';
+$lang['phone_number_id'] = 'Phone-Number-ID';
+$lang['user_access_token'] = 'User-Access-Token';
+$lang['cannot_update_settings'] = 'Cannot update settings';
+$lang['waba_id'] = 'WABA-ID';
+$lang['version'] = 'Version';
+
+
+$lang ['pdf_template'] ='PDF template';

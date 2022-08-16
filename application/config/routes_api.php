@@ -27,3 +27,7 @@ $route['api/organizations/deal/(:num)']['get'] = 'api/organizations/getbydeal/$1
 
 //for persons
 $route['api/persons/deal/(:num)']['get'] = 'api/persons/getbydeal/$1';
+
+// for authentication
+$route['api/authentication/login/']['post'] = 'api/authentication/login';
+$route['api/authentication/forgotpassword/']['post'] = 'api/authentication/forgotpassword';
