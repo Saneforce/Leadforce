@@ -153,7 +153,7 @@ foreach($custom_fields as $cfkey=>$cfval){
 								<?php if(!empty($summary['columns'])){
 									$j = 0;
 									foreach($summary['columns'] as $clm1){?>
-										<td>
+										<td <?php if($summary['summary_cls'][$i][$summary['columns'][0]] =='Average' || $summary['summary_cls'][$i][$summary['columns'][0]] =='Total'){ echo 'class="font_wieght_bold"';}?>>
 											<?php if($j != 0 && $j != $k  && $summary['summary_cls'][$i][$summary['columns'][0]] !='Average'&& $summary['summary_cls'][$i][$summary['columns'][0]] !='Total'){
 												?>
 												<a href="javascript:void(0);" onclick="get_deal('<?php echo $clm1; ?>','<?php echo $req_row; ?>','<?php echo $summary['view_by']; ?>','<?php echo $summary['sel_measure']; ?>','<?php echo $date_range;?>','<?php echo $summary['summary_cls'][$i]['req_id'];?>')" data-toggle="modal" data-target="#summary_model" >
@@ -208,5 +208,8 @@ foreach($custom_fields as $cfkey=>$cfval){
 }
 th,td {
     white-space: nowrap;
+}
+.font_wieght_bold{
+	font-weight:595
 }
 </style>

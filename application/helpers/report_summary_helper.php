@@ -69,8 +69,11 @@ function get_counts($own,$open,$lost,$tot_val,$view_by,$cur_rows,$deal_vals,$prd
 }
 function get_decimal($val)
 {
-	
-	return !is_int($val)?number_format((float)($val), 2, '.', ''):$val;
+	if (str_contains($val, '.')) {
+		return !is_int($val)?number_format((float)($val), 2, '.', ''):$val;
+	}else{
+		return $val;
+	}
 }
 function date_summary($qry_cond,$week1,$measure,$view_by,$filters)
 {
