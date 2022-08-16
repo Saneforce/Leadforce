@@ -1032,13 +1032,34 @@ $( "#email" ).autocomplete({
       data.type = _rel_type.val();
       init_ajax_search(_rel_type.val(),_rel_id,serverData);
     }
+
+    $.validator.addMethod("checkTilldate",
+      function (value, element, param) {
+        var fit_start_time  = $("#date").val(); //2013-09-5
+        var fit_end_time    = $("#open_till").val(); //2013-09-10
+
+        if(Date.parse(fit_start_time) <= Date.parse(fit_end_time)){
+            return true;
+        }else{
+          return false;
+        }
+      },'Open Till date should be greater than proposal date'
+    );
+
    function validate_proposal_form(){
       appValidateForm($('#proposal-form'), {
         subject : 'required',
         proposal_to : 'required',
         rel_type: 'required',
         rel_id : 'required',
-        date : 'required',
+        date : {
+          required:true,
+          checkTilldate:true
+        },
+        open_till:{
+          required:true,
+          checkTilldate:true
+        },
         email: {
          required:true
        },
