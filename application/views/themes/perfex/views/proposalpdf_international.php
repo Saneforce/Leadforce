@@ -166,6 +166,7 @@ if($contentEditable){
     echo '<div class="content">';
     echo '<div class="panel_s">';
     echo '<div class="panel-body" style="width:794px;heigth:1123px;margin-left: auto;margin-right: auto;">';
+    echo '<a href="'.admin_url('proposals/proposal/'.$proposal->id).'" class="btn btn-info mleft10 pull-right">'._l('edit',_l('proposal')).'</a>';
     echo '<div style="">';
     echo $html;
     echo '</div>';
