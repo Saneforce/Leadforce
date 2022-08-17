@@ -70,7 +70,11 @@ function get_counts($own,$open,$lost,$tot_val,$view_by,$cur_rows,$deal_vals,$prd
 function get_decimal($val)
 {
 	if (str_contains($val, '.')) {
-		return !is_int($val)?number_format((float)($val), 2, '.', ''):$val;
+		if (str_contains($val, '.00')) {
+			return (int) $val;
+		}else{
+			return !is_int($val)?number_format((float)($val), 2, '.', ''):$val;
+		}
 	}else{
 		return $val;
 	}
@@ -141,15 +145,14 @@ function summary_val($tables,$fields,$qry_cond,$measure,$view_by,$cur_rows,$filt
 		$qry_cond = " p.deleted_status = '0' ".$qry_cond;
 		$deal_vals = get_deal_vals($req_fields,$fields,$tables,$qry_cond,$filters);
 		$data = get_sumary_weight_vals($deal_vals,$view_by,$cur_rows);
-		
 	}
 	else{
-		$qry_cond = "p.deleted_status = '0' ".$qry_cond;
+		$qry_cond  = "p.deleted_status = '0' ".$qry_cond;
 		$deal_vals = get_deal_vals('*,sum(p.project_cost) as tot_val',$fields,$tables,$qry_cond,$filters);
-		if($view_by != 'project_status'){
+		//if($view_by != 'project_status'){
 			$data = get_data($view_by,$cur_rows,$deal_vals);
-		}
-		else{
+		//}
+		/*else{
 			if(!empty($deal_vals)){
 				$i = 0;
 				foreach($deal_vals as $deal_val1){
@@ -157,20 +160,19 @@ function summary_val($tables,$fields,$qry_cond,$measure,$view_by,$cur_rows,$filt
 					$data[$i]['total_val_deal']	= $deal_val1['tot_val'];
 					$data[$i]['tot_cnt'] 		= $deal_val1['num_deal'];
 					$data[$i]['avg_deal']		= number_format((float)($data[$i]['total_val_deal']/$data[$i]['tot_cnt']), 2, '.', '');
-					$data[$i][$view_by] 	= $data[$i]['rows']	=	$deal_val1['stage_of'];
+					$data[$i][$view_by] 		= $data[$i]['rows']	=	$deal_val1['stage_of'];
 					$i++;
 				}
 			}
-		}
+		}*/
 	}
 	
 	return $data;
 }
 function get_flters($req_filters){
 	$where = array();
-	$req_cond = '';
+	$req_cond	=	'';
 	$filters	=	$req_filters['filters'];
-	
 	$filters1	=	$req_filters['filters1'];
 	$filters2	=	$req_filters['filters2'];
 	$filters3	=	$req_filters['filters3'];
@@ -968,8 +970,9 @@ function get_weight_vals($deal_vals,$view_by,$cur_rows){
 }
 function get_sumary_product_vals($deal_vals,$view_by,$cur_rows){
 	$CI			= & get_instance();
-	if(!empty($deal_vals)){	
-		$i = $tot_cnt = $all_tot = $own = $open = 0;
+	$data = array();
+	if(!empty($deal_vals)  && $view_by != 'project_status'){	
+		$i = $tot_cnt = $all_tot = $own = $open = $tot_avg = 0;
 		foreach($deal_vals as $deal_val1){
 			$own 	 =  $own + $deal_val1['own_price'];
 			$open 	 =  $open + $deal_val1['open_price'];
@@ -978,18 +981,23 @@ function get_sumary_product_vals($deal_vals,$view_by,$cur_rows){
 			$all_tot =  $all_tot + $deal_val1['own_price'] + $deal_val1['open_price'];
 			$tot_cnt =	$tot_cnt + $deal_val1['own_count'] + $deal_val1['open_count'];
 			$data[$i]= get_counts($deal_val1['own_price'],$deal_val1['open_price'],0,$tot_val,$view_by,$cur_rows,$deal_val1,1);
+			$tot_avg	=	$tot_avg + get_decimal($data[$i]['avg_deal']);
 			$i++;
 		}
-		$data[$i] = deal_avg($own,$open,0,$tot_cnt,$all_tot,$view_by,$i);
+		$data[$i] = $avg_deal = deal_avg($own,$open,0,$tot_cnt,$all_tot,$view_by,$i,$tot_avg);
 		$i++;
-		$data[$i] = deal_total($own,$open,0,$tot_cnt,$all_tot,$view_by);
+		$data[$i] = deal_total($own,$open,0,$tot_cnt,$tot_val,$view_by,$tot_avg);
+	}
+	else{
+		$data = get_project_status($deal_vals,$view_by);
 	}
 	return $data;
 }
 function get_sumary_weight_vals($deal_vals,$view_by,$cur_rows){
 	$CI			= & get_instance();
-	if(!empty($deal_vals)){	
-		$i = $tot_cnt = $all_tot = $own = $open = 0;
+	$data = array();
+	if(!empty($deal_vals) && $view_by != 'project_status'){	
+		$i = $tot_cnt = $all_tot = $own = $open = $tot_avg = 0;
 		foreach($deal_vals as $deal_val1){
 			$deal_val1['own_price']  = number_format((float)$deal_val1['own_price'], 2, '.', '');
 			$deal_val1['open_price'] = number_format((float)$deal_val1['open_price'], 2, '.', '');
@@ -1002,14 +1010,45 @@ function get_sumary_weight_vals($deal_vals,$view_by,$cur_rows){
 			$all_tot =  $all_tot + $tot_val;
 			$tot_cnt =	$tot_cnt + $deal_val1['own_count'] + $deal_val1['open_count'] + $deal_val1['lost_count'];
 			$data[$i]= get_counts($deal_val1['own_price'],$deal_val1['open_price'],$deal_val1['lost_price'],$tot_val,$view_by,$cur_rows,$deal_val1);
+			$tot_avg	=	$tot_avg + get_decimal($data[$i]['avg_deal']);
 			$i++;
 		}
 		$own  = number_format((float)$own, 2, '.', '');
 		$open = number_format((float)$open, 2, '.', '');
 		$lost = number_format((float)$lost, 2, '.', '');
-		$data[$i] = deal_avg($own,$open,$lost,$tot_cnt,$all_tot,$view_by,$i);
+		$data[$i] = $avg_deal = deal_avg($own,$open,$lost,$tot_cnt,$all_tot,$view_by,$i,$tot_avg);
 		$i++;
-		$data[$i] = deal_total($own,$open,$lost,$tot_cnt,$all_tot,$view_by);
+		$data[$i] = deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$tot_avg);
+	}
+	else{
+		$data = get_project_status($deal_vals,$view_by);
+	}
+	return $data;
+}
+function get_project_status($deal_vals,$view_by){
+	$data = array();
+	if(!empty($deal_vals)){
+		$i = $tot_avg = $tot_val = $tot_cnt = 0;
+		foreach($deal_vals as $deal_val1){
+			$data[$i]['total_cnt_deal'] = $deal_val1['num_deal'];
+			$data[$i]['total_val_deal']	= get_decimal($deal_val1['tot_val']);
+			$data[$i]['tot_cnt'] 		= $deal_val1['num_deal'];
+			$data[$i]['avg_deal']		= get_decimal($data[$i]['total_val_deal']/$data[$i]['tot_cnt']);
+			$data[$i][$view_by] 		= $data[$i]['rows']	=	$deal_val1['stage_of'];
+			$tot_avg = $tot_avg + $data[$i]['avg_deal'];
+			$tot_val = $tot_val + $data[$i]['total_val_deal'];
+			$tot_cnt = $tot_cnt + $data[$i]['total_cnt_deal'];
+			$i++;
+		}
+		$data[$i][$view_by] = $data[$i]['rows'] = 'Average';
+		$data[$i]['avg_deal'] = get_decimal($tot_avg/$i);
+		$data[$i]['total_cnt_deal'] = get_decimal($tot_cnt/$i);
+		$data[$i]['total_val_deal'] = get_decimal($tot_val/$i);
+		$i++;
+		$data[$i][$view_by] = $data[$i]['rows'] = 'Total';
+		$data[$i]['avg_deal'] = get_decimal($tot_avg);
+		$data[$i]['total_cnt_deal'] = get_decimal($tot_cnt);
+		$data[$i]['total_val_deal'] = get_decimal($tot_val);
 	}
 	return $data;
 }
@@ -1486,8 +1525,9 @@ function select_join_query($fields,$table,$join_table=null,$join_condition=null,
 		return false;
 }
 function get_data($view_by,$cur_rows,$deal_vals,$losts = array()){
-	if(!empty($deal_vals)){
-		$i = $own = $open = $lost = $tot_cnt = $tot_prt = $tot_val = $avg_deal = 0;
+	$data = array();
+	if(!empty($deal_vals) && $view_by != 'project_status'){
+		$i = $own = $open = $lost = $tot_cnt = $tot_prt = $tot_val = $avg_deal = $tot_avg  =0;
 		foreach($deal_vals as $deal_val1){
 			$data[$i] = get_counts($deal_val1['own_count'],$deal_val1['open_count'],$deal_val1['lost_count'],$deal_val1['tot_val'],$view_by,$cur_rows,$deal_val1);
 			$own	=	$own + $deal_val1['own_count'];
@@ -1495,12 +1535,15 @@ function get_data($view_by,$cur_rows,$deal_vals,$losts = array()){
 			$lost	=	$lost + $deal_val1['lost_count'];
 			$tot_cnt=	$tot_cnt + $deal_val1['own_count'] + $deal_val1['open_count'] + $deal_val1['lost_count'];
 			$tot_val=	$tot_val + $deal_val1['tot_val'];
+			$tot_avg	=	$tot_avg + get_decimal($data[$i]['avg_deal']);
 			$i++;
 		}
-		$data[$i] = deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$i);
+		$data[$i] = $avg_deal = deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$i,$tot_avg);
 		$i++;
-		$data[$i] = deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by);
-		
+		$data[$i] = deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$tot_avg);
+	}
+	else{
+		$data = get_project_status($deal_vals,$view_by);
 	}
 	return $data;
 }
@@ -1601,9 +1644,9 @@ function get_table_fields($view_by){
 	}
 	return $data;
 }
-function deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$num)
+function deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$num,$tot_avg)
 {
-	$data['own']	= 	$data['lost']	= 	$data['open']	= 	$data['total_cnt_deal']	= 	$data['total_num_prdts'] =  $data['total_val_deal']	= 	$data['total_val_prdt'] = $data['avg_deal']		= 	$data['avg_prdt_val'] =  0;
+	$data['own']	= 	$data['lost']	= 	$data['open']	= 	$data['total_cnt_deal']	= 	$data['total_num_prdts'] =  $data['total_val_deal']	= 	$data['total_val_prdt'] = $data['avg_deal']		= 	$data['avg_prdt_val'] = $data['avg_tot'] =  0;
 	if($tot_cnt>0){
 		$data['own']	= 	get_decimal($own/$num);
 		$data['lost']	= 	get_decimal($lost/$num);
@@ -1611,12 +1654,14 @@ function deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$num)
 		
 		$data['total_cnt_deal']	= 	$data['total_num_prdts'] =  get_decimal($tot_cnt/$num);
 		$data['total_val_deal']	= 	$data['total_val_prdt'] =  get_decimal($tot_val/$num);
-		$data['avg_deal']	=	$data['avg_prdt_val'] = get_decimal($tot_val/$num);
+		//$data['avg_deal']	=	$data['avg_prdt_val'] = get_decimal($tot_val/$num);
+		$data['avg_deal']	=	$data['avg_prdt_val'] = get_decimal($tot_avg/$num);
+		$data['avg_tot'] =  $data['avg_deal'] + $data['avg_tot'];
 	}
 	$data[$view_by]	= 	$data['rows']	=	'Average';
 	return $data;
 }
-function deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by)
+function deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$tot_avg)
 {
 	$data['own']	= 	get_decimal($own);
 	$data['lost']	= 	get_decimal($lost);
@@ -1626,7 +1671,8 @@ function deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by)
 	$data['total_val_deal']	= 	$data['total_val_prdt'] =  get_decimal($tot_val);
 	$data['avg_deal']		= 	$data['avg_prdt_val'] =  0;
 	if($tot_cnt>0){
-		$data['avg_deal']	=	$data['avg_prdt_val'] = get_decimal($tot_val/$tot_cnt);
+		//$data['avg_deal']	=	$data['avg_prdt_val'] = get_decimal($tot_val/$tot_cnt);
+		$data['avg_deal']	=	$data['avg_prdt_val'] = get_decimal($tot_avg);
 	}
 	$data[$view_by]	= 	$data['rows']	=	'Total';
 	return $data;
