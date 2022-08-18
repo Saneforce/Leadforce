@@ -2868,12 +2868,18 @@ function get_tasks_all_fields()
 
 function task_relatedto_list()
 {
-	$relatedto =[
-		'project' => _l('project'),
-		'customer' => _l('client'),
-		'lead' => _l('lead'),
-		'contact' => _l('contact'),
-	];
-
+	$relatedto =array();
+	if(has_permission('projects', '','view')){
+		$relatedto ['project'] =_l('project');
+	}
+	if(has_permission('customers', '','view')){
+		$relatedto ['customer'] =_l('customer');
+	}
+	if(has_permission('leads', '','view')){
+		$relatedto ['lead'] =_l('projecleadt');
+	}
+	if(has_permission('contacts', '','view')){
+		$relatedto ['contacts'] =_l('contact');
+	}
 	return $relatedto;
 }
