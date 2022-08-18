@@ -77,7 +77,7 @@ if(isset($proposal->items) && $proposal->items){
             <td style="border: 1px solid black;border-collapse: collapse;">G.S.T.</td>';
             if($item['method'] ==2){
                 $table .='<td style="border: 1px solid black;border-collapse: collapse;">@ '.$item['tax'].' % Included</td>';
-            }elseif($item['method'] ==2){
+            }elseif($item['method'] ==3){
                 $table .='<td style="border: 1px solid black;border-collapse: collapse;">@ '.$item['tax'].' % Extra or as applicable at the time of despatch.</td>';
             }
             $table .='</tr>';

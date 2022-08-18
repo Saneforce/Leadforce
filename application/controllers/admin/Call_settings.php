@@ -388,7 +388,17 @@ class Call_settings extends AdminController
             $task = $this->callsettings_model->getTaskDetails($_POST['deal_id']);
             $data['deal_id'] = $task->rel_id;
             $data['status'] = $task->status;
+            $data['rel_id'] = $task->rel_id;
+            $data['rel_type'] = $task->rel_type;
             //pre($data);
+        }elseif($_POST['deal_id']>0 || $_POST['type'] =='deal'){
+            $data['rel_id'] = $post['deal_id'];
+            $data['rel_type'] = 'project';
+            $data['contacts_id'] = $post['contact_id'];
+        }else{
+            $data['rel_id'] = $post['contact_id'];
+            $data['rel_type'] = 'contact';
+            $data['contacts_id'] = '';
         }
         if($_POST['type'] == 'contact') {
             $task = $this->callsettings_model->getTaskDetails($_POST['deal_id']);
@@ -416,6 +426,13 @@ class Call_settings extends AdminController
         $html = '';
         $cnt = 0;
         $pid = '';
+        if($this->input->post('listOwn')){
+            $contact =$this->clients_model->get_contact($_POST['contact']);
+            if($contact){
+                $html .= '<option value="">'.$contact->firstname." ".$contact->lastname.'</option>';
+            }
+            
+        }
         foreach($deals as $deal) {
             $primary = '';
             if($deal['is_primary'] == 1) {
@@ -427,9 +444,11 @@ class Call_settings extends AdminController
         }
         
         //pre($deals);
-        if($deals) {
+        if($deals || $this->input->post('listOwn')) {
             if($cnt == 1) {
                 $result['pid'] = $pid;
+            }elseif($cnt == 0) {
+                $result['pid'] = '';
             }
             $result['status'] = 'success';
             $result['result'] = $html;
@@ -446,6 +465,7 @@ class Call_settings extends AdminController
 
     public function getCallHistory() {
         $id = $_POST['id'];
+        
         $callhis = $this->callsettings_model->getCallHistory($id);
         //pre($callhis);
         $html = '<table class="table table-bordered">
@@ -479,7 +499,6 @@ class Call_settings extends AdminController
         $result['status'] = 'success';
         $result['result'] = $html;
         echo json_encode($result);
-        exit;
         //pre($callhis);
     }
 }

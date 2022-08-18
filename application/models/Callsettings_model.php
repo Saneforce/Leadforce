@@ -151,15 +151,17 @@ class Callsettings_model extends App_Model {
     {
         $data = array();
         $data['name'] = 'Call';
-        $data['rel_id'] = $post['deal_id'];
-        $data['contacts_id'] = $post['contact_id'];
         $data['call_request_id'] = $post['req'];
         $data['call_code'] = $post['code'];
         $data['call_msg'] = $post['msg'];
-        $data['rel_type'] = 'project';
+        
         $data['tasktype'] = 1;
         $data['priority'] = 2;
 
+        $data['rel_id'] = $post['rel_id'];
+        $data['rel_type'] = $post['rel_type'];
+        $data['contacts_id'] = $post['contact_id'];
+       
         $startdate = date('Y-m-d H:i:s');
         $data['startdate']             = $startdate;
         $data['dateadded']             = $startdate;
@@ -243,8 +245,9 @@ class Callsettings_model extends App_Model {
     }
 
     public function getCallHistory($id) {
-        $this->db->select('tblcall_history.*, (select phone from tblagents where agent_id = tblcall_history.agent) as agent_no');
-        $this->db->where('task_id',$id);
+        $this->db->select(db_prefix() .'call_history.*,'.db_prefix() . 'agents.phone as agent_no');
+        $this->db->join(db_prefix() . 'agents', db_prefix() .'agents.agent_id = '.db_prefix() . 'call_history.agent','left');
+        $this->db->where(db_prefix() . 'call_history.task_id',$id);
         $chistory = $this->db->get(db_prefix() . 'call_history')->result_array();
         return $chistory;
     }

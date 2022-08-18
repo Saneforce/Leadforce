@@ -1448,8 +1448,6 @@ class Tasks_model extends App_Model
                 $data['milestone'] = 0;
             }
         }
-
-
         if (empty($data['rel_type'])) {
             $data['rel_id']   = null;
             $data['rel_type'] = null;
@@ -3037,16 +3035,16 @@ class Tasks_model extends App_Model
         array_push($join, 'LEFT JOIN '.db_prefix().'projects_status  as '.db_prefix().'projects_status ON '.db_prefix().'projects_status.id = ' .db_prefix() . 'projects.status');
         array_push($join, 'LEFT JOIN '.db_prefix().'pipeline  as '.db_prefix().'pipeline ON '.db_prefix().'pipeline.id = ' .db_prefix() . 'projects.pipeline_id');
         array_push($join, 'LEFT JOIN '.db_prefix().'clients  as '.db_prefix().'clients ON '.db_prefix().'clients.userid = ' .db_prefix() . 'projects.clientid');
-        array_push($join, 'LEFT JOIN '.db_prefix().'contacts  as '.db_prefix().'contacts ON '.db_prefix().'contacts.id = ' .db_prefix() . 'tasks.contacts_id');
-        // include_once(APPPATH . 'views/admin/tables/includes/tasks_filter.php');
-        // include_once(APPPATH . 'views/admin/tables/includes/tasks_wo_status_filter.php');
+        array_push($join, 'LEFT JOIN '.db_prefix().'contacts  as '.db_prefix().'contacts ON ('.db_prefix().'contacts.id = ' .db_prefix() . 'tasks.contacts_id  OR (' .db_prefix() . 'tasks.rel_type ="contact" AND '.db_prefix().'contacts.id = ' .db_prefix() . 'tasks.rel_id) )');
+        include_once(APPPATH . 'views/admin/tables/includes/tasks_filter.php');
+        include_once(APPPATH . 'views/admin/tables/includes/tasks_wo_status_filter.php');
         //pre($wherewo);
-        // array_push($where, 'AND CASE WHEN rel_type="project" AND rel_id IN (SELECT project_id FROM ' . db_prefix() . 'project_settings WHERE project_id=rel_id AND name="hide_tasks_on_main_tasks_table" AND value=1) THEN rel_type != "project" ELSE 1=1 END');
-        // array_push($where, ' AND rel_type != "invoice" AND rel_type != "estimate" AND rel_type != "proposal"');
+        array_push($where, 'AND CASE WHEN rel_type="project" AND rel_id IN (SELECT project_id FROM ' . db_prefix() . 'project_settings WHERE project_id=rel_id AND name="hide_tasks_on_main_tasks_table" AND value=1) THEN rel_type != "project" ELSE 1=1 END');
+        array_push($where, ' AND rel_type != "invoice" AND rel_type != "estimate" AND rel_type != "proposal"');
         
         
-        // array_push($wherewo, 'AND CASE WHEN rel_type="project" AND rel_id IN (SELECT project_id FROM ' . db_prefix() . 'project_settings WHERE project_id=rel_id AND name="hide_tasks_on_main_tasks_table" AND value=1) THEN rel_type != "project" ELSE 1=1 END');
-        // array_push($wherewo, ' AND rel_type != "invoice" AND rel_type != "estimate" AND rel_type != "proposal"');
+        array_push($wherewo, 'AND CASE WHEN rel_type="project" AND rel_id IN (SELECT project_id FROM ' . db_prefix() . 'project_settings WHERE project_id=rel_id AND name="hide_tasks_on_main_tasks_table" AND value=1) THEN rel_type != "project" ELSE 1=1 END');
+        array_push($wherewo, ' AND rel_type != "invoice" AND rel_type != "estimate" AND rel_type != "proposal"');
         
         
         // ROle based records
@@ -3226,13 +3224,7 @@ class Tasks_model extends App_Model
         }
 
         //validate rel type
-        $rel_types =array(
-            'project'=>_l('project'),
-            'invoice'=>_l('invoice'),
-            'customer'=>_l('customer'),
-            'lead'=>_l('lead'),
-            'proposal'=>_l('proposal'),
-        );
+        $rel_types =task_relatedto_list();
         if(!$data['rel_type'] || !isset($rel_types[$data['rel_type']])){
             return array('name'=>'rel_type','error'=>'Invalid activity related to');
         }

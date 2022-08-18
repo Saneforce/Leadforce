@@ -1517,7 +1517,7 @@ function callfromperson(contact, phone) {
     $.ajax({
         type: "POST",
         url: url,
-        data: {contact:contact,phone:phone},
+        data: {contact:contact,phone:phone,listOwn:true},
         dataType: 'json',
         success: function(msg){
             if(msg.status == 'success') {

@@ -532,8 +532,6 @@ class Tasks extends AdminController
         if (!has_permission('tasks', '', 'edit') && !has_permission('tasks', '', 'create')) {
             ajax_access_denied();
         }
-
-        
         // $updateactiv['tasktype'] = 1; 
         // $this->db->where('tasktype', 0);
         // $this->db->update(db_prefix() . 'tasks', $updateactiv);
@@ -551,7 +549,7 @@ class Tasks extends AdminController
         }
 		
 		if(isset($_GET['rel_type']) && !empty($_GET['rel_type']) && $_GET['rel_type'] == 'project_task'){
-			$_GET['rel_type'] = 'project';
+			// $_GET['rel_type'] = 'project';
 			if(!empty($_GET['rel_id'])){
 				$project_task = $this->tasks_model->get($_GET['rel_id']);
 				$_GET['rel_id'] = $project_task->rel_id;

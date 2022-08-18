@@ -2865,3 +2865,15 @@ function get_tasks_all_fields()
 	);
 	return $aColumns_temp;
 }
+
+function task_relatedto_list()
+{
+	$relatedto =[
+		'project' => _l('project'),
+		'customer' => _l('client'),
+		'lead' => _l('lead'),
+		'contact' => _l('contact'),
+	];
+
+	return $relatedto;
+}

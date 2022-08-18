@@ -4,11 +4,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 $filter = [];
 
-
-$task_statuses = $this->ci->tasks_model->get_statuses();
+$CI = &get_instance();
+$task_statuses = $CI->tasks_model->get_statuses();
 $_statuses     = [];
 foreach ($task_statuses as $status) {
-    if ($this->ci->input->post('task_status_' . $status['id'])) {
+    if ($CI->input->post('task_status_' . $status['id'])) {
         array_push($_statuses, $status['id']);
     }
 }
@@ -59,68 +59,68 @@ if($whereclause) {
     array_push($filter, $whereclause);
 }
 
-if ($this->ci->input->post('my_tasks')) {
+if ($CI->input->post('my_tasks')) {
     array_push($filter, ' AND (' . db_prefix() . 'tasks.id IN (SELECT taskid FROM ' . db_prefix() . 'task_assigned WHERE staffid = ' . get_staff_user_id() . '))');
 }
-if ($this->ci->input->post('not_assigned')) {
+if ($CI->input->post('not_assigned')) {
     array_push($filter, 'AND ' . db_prefix() . 'tasks.id NOT IN (SELECT taskid FROM ' . db_prefix() . 'task_assigned)');
 }
-if ($this->ci->input->post('due_date_passed')) {
+if ($CI->input->post('due_date_passed')) {
     array_push($filter, 'AND (duedate < "' . date('Y-m-d') . '" AND duedate IS NOT NULL) AND '.db_prefix() .'tasks.status != ' . Tasks_model::STATUS_COMPLETE);
 }
-if ($this->ci->input->post('recurring_tasks')) {
+if ($CI->input->post('recurring_tasks')) {
     array_push($filter, 'AND recurring = 1');
 }
-if ($this->ci->input->post('today_tasks')) {
+if ($CI->input->post('today_tasks')) {
     array_push($filter, 'AND date(startdate) = "' . date('Y-m-d') . '" ');
 }
-if ($this->ci->input->post('tomorrow_tasks')) {
+if ($CI->input->post('tomorrow_tasks')) {
     array_push($filter, 'AND date(startdate) = "' . date("Y-m-d", strtotime("+1 day")) . '"');
 }
-if ($this->ci->input->post('yesterday_tasks')) {
+if ($CI->input->post('yesterday_tasks')) {
     array_push($filter, 'AND date(startdate) = "' . date("Y-m-d", strtotime("-1 day")) . '"');
 }
-if ($this->ci->input->post('thisweek_tasks')) {
+if ($CI->input->post('thisweek_tasks')) {
     array_push($filter, 'AND (date(startdate) >= "' . date("Y-m-d", strtotime('monday this week')) . '" AND date(startdate) <= "' . date("Y-m-d", strtotime('sunday this week')) . '")');
 }
-if ($this->ci->input->post('lastweek_tasks')) {
+if ($CI->input->post('lastweek_tasks')) {
     array_push($filter, 'AND (date(startdate) >= "' . date("Y-m-d", strtotime('monday this week',strtotime("-1 week +1 day"))) . '" AND date(startdate) <= "' . date("Y-m-d", strtotime('sunday this week',strtotime("-1 week +1 day"))) . '")');
 }
-if ($this->ci->input->post('nextweek_tasks')) {
+if ($CI->input->post('nextweek_tasks')) {
     array_push($filter, 'AND (date(startdate) >= "' . date("Y-m-d", strtotime('monday this week',strtotime("+1 week -1 day"))) . '" AND date(startdate) <= "' . date("Y-m-d", strtotime('sunday this week',strtotime("+1 week -1 day"))) . '")');
 }
-if ($this->ci->input->post('thismonth_tasks')) {
+if ($CI->input->post('thismonth_tasks')) {
     array_push($filter, 'AND (date(startdate) >= "' . date("Y-m-01") . '" AND date(startdate) <= "' . date("Y-m-t") . '")');
 }
-if ($this->ci->input->post('lastmonth_tasks')) {
+if ($CI->input->post('lastmonth_tasks')) {
     array_push($filter, 'AND (date(startdate) >= "' . date("Y-m-01",strtotime("-1 month")) . '" AND date(startdate) <= "' . date("Y-m-t",strtotime("-1 month")) . '")');
 }
-if ($this->ci->input->post('nextmonth_tasks')) {
+if ($CI->input->post('nextmonth_tasks')) {
     array_push($filter, 'AND (date(startdate) >= "' . date("Y-m-01",strtotime("+1 month")) . '" AND date(startdate) <= "' . date("Y-m-t",strtotime("+1 month")) . '")');
 }
-if ($this->ci->input->post('custom_tasks')) {
-    array_push($filter, 'AND (date(startdate) >= "' . date("Y-m-d", strtotime($this->ci->input->post('custom_date_start_tasks'))) . '" AND date(startdate) <= "' . date("Y-m-d", strtotime($this->ci->input->post('custom_date_end_tasks'))) . '")');
+if ($CI->input->post('custom_tasks')) {
+    array_push($filter, 'AND (date(startdate) >= "' . date("Y-m-d", strtotime($CI->input->post('custom_date_start_tasks'))) . '" AND date(startdate) <= "' . date("Y-m-d", strtotime($CI->input->post('custom_date_end_tasks'))) . '")');
 }
-if ($this->ci->input->post('my_following_tasks')) {
+if ($CI->input->post('my_following_tasks')) {
     array_push($filter, 'AND (' . db_prefix() . 'tasks.id IN (SELECT taskid FROM ' . db_prefix() . 'task_followers WHERE staffid = ' . get_staff_user_id() . '))');
 }
-if ($this->ci->input->post('billable')) {
+if ($CI->input->post('billable')) {
     array_push($filter, 'AND billable = 1');
 }
-if ($this->ci->input->post('billed')) {
+if ($CI->input->post('billed')) {
     array_push($filter, 'AND billed = 1');
 }
-if ($this->ci->input->post('not_billed')) {
+if ($CI->input->post('not_billed')) {
     array_push($filter, 'AND billable =1 AND billed=0');
 }
-if ($this->ci->input->post('upcoming_tasks')) {
+if ($CI->input->post('upcoming_tasks')) {
     array_push($filter, 'AND (date(startdate) > "' . date('Y-m-d') . '") AND '.db_prefix() .'tasks.status != ' . Tasks_model::STATUS_COMPLETE);
 }
 
-$assignees  = $this->ci->misc_model->get_tasks_distinct_assignees();
+$assignees  = $CI->misc_model->get_tasks_distinct_assignees();
 $_assignees = [];
 foreach ($assignees as $__assignee) {
-    if ($this->ci->input->post('task_assigned_' . $__assignee['assigneeid'])) {
+    if ($CI->input->post('task_assigned_' . $__assignee['assigneeid'])) {
         array_push($_assignees, $__assignee['assigneeid']);
     }
 }
@@ -129,10 +129,10 @@ if (count($_assignees) > 0) {
 }
 
 
-$tasktypes  = $this->ci->misc_model->get_tasks_distinct_tasktype();
+$tasktypes  = $CI->misc_model->get_tasks_distinct_tasktype();
 $_tasktypes = [];
 foreach ($tasktypes as $__tasktypes) {
-    if ($this->ci->input->post('task_tasktype_' . $__tasktypes['id'])) {
+    if ($CI->input->post('task_tasktype_' . $__tasktypes['id'])) {
         array_push($_tasktypes, $__tasktypes['id']);
     }
 }

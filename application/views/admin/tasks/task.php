@@ -327,7 +327,7 @@ p#rel_id-error {
                   </div>
                </div>
                <?php
-               if(!$rel_type||($rel_type && $rel_type != 'project' && $rel_type != 'customer')) {
+               if(!$this->input->get('rel_type')||($this->input->get('rel_type') && $this->input->get('rel_type') != 'project' && $this->input->get('rel_type') != 'customer' && $this->input->get('rel_type') != 'lead' && $rel_type != 'contact')) {
                   $style="display:block;";
                } else {
                   $style="display:none;";
@@ -336,44 +336,11 @@ p#rel_id-error {
                      <div class="form-group reltype">
                         <label for="rel_type" class="control-label"><?php echo _l('task_related_to'); ?></label>
                         <select name="rel_type" class="selectpicker" id="rel_type" data-width="100%" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
-                        <?php if($rel_type) { ?> 
-                          <option value=""></option> 
+                          <option value=""></option>
+                        <?php if(!$rel_type){$rel_type ='project';} ?>
+                        <?php foreach(task_relatedto_list() as $relatedto_id => $relatedto_name){ ?>
+                           <option value="<?php echo $relatedto_id ?>"<?php if(isset($task) || $rel_type){if($rel_type == $relatedto_id){echo 'selected="true"';}} ?>><?php echo $relatedto_name; ?></option>
                         <?php } ?>
-                           <option value="project"
-                              <?php if(isset($task) || $this->input->get('rel_type')){if($rel_type == 'project'){echo 'selected';}} ?>><?php echo _l('project'); ?></option>
-
-                              <option value="invoice" <?php if(isset($task) || $this->input->get('rel_type')){if($rel_type == 'invoice'){echo 'selected';}} ?>>
-                              <?php echo _l('invoice'); ?>
-                           </option>
-                            <option value="project"
-                              <?php if(isset($task) || $this->input->get('rel_type')){if($rel_type == 'project'){echo 'selected';}} ?>><?php echo _l('project'); ?></option>
-
-                              <option value="invoice" <?php if(isset($task) || $this->input->get('rel_type')){if($rel_type == 'invoice'){echo 'selected';}} ?>>
-                              <?php echo _l('invoice'); ?>
-                           </option>
-                           <option value="customer"
-                              <?php if(isset($task) || $this->input->get('rel_type')){if($rel_type == 'customer'){echo 'selected';}} ?>>
-                              <?php echo _l('client'); ?>
-                           </option>
-                           
-                           <!-- <option value="estimate" <?php if(isset($task) || $this->input->get('rel_type')){if($rel_type == 'estimate'){echo 'selected';}} ?>>
-                              <?php echo _l('estimate'); ?>
-                           </option>
-                           <option value="contract" <?php if(isset($task) || $this->input->get('rel_type')){if($rel_type == 'contract'){echo 'selected';}} ?>>
-                              <?php echo _l('contract'); ?>
-                           </option> 
-                           <option value="ticket" <?php if(isset($task) || $this->input->get('rel_type')){if($rel_type == 'ticket'){echo 'selected';}} ?>>
-                              <?php echo _l('ticket'); ?>
-                           </option>
-                           <option value="expense" <?php if(isset($task) || $this->input->get('rel_type')){if($rel_type == 'expense'){echo 'selected';}} ?>>
-                              <?php echo _l('expense'); ?>
-                           </option>-->
-                           <option value="lead" <?php if(isset($task) || $this->input->get('rel_type')){if($rel_type == 'lead'){echo 'selected';}} ?>>
-                              <?php echo _l('lead'); ?>
-                           </option>
-                           <option value="proposal" <?php if(isset($task) || $this->input->get('rel_type')){if($rel_type == 'proposal'){echo 'selected';}} ?>>
-                              <?php echo _l('proposal'); ?>
-                           </option>
                         </select>
                      </div>
                   </div>
@@ -393,18 +360,16 @@ p#rel_id-error {
                                $rel_data = get_relation_data($rel_type,$rel_id);
                                $rel_val = get_relation_values($rel_data,$rel_type);
                               ?>
-                           <input type="hidden"  name="rel_id" value="<?php echo $rel_val['id']; ?>" />
-                           <select id="rel_id" class="ajax-sesarch" data-width="100%" data-live-search="true" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
+                           <select id="rel_id" name="rel_id" class="ajax-sesarch" data-width="100%" data-live-search="true" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
                               <?php echo '<option value="'.$rel_val['id'].'" selected>'.$rel_val['name'].'</option>'; ?>
                            </select>
                            <?php } ?>
                         </div>
                      </div>
                   </div>
-                  <?php if($rel_type == '' || $rel_type == 'project' || $rel_type == 'customer') { ?> 
-				  <?php if(!empty($need_fields) && (in_array("clientid", $need_fields) )){?>
+				  <?php if($rel_type =='project' && $rel_id){$style="";}else{$style="display:none;";} if(!empty($need_fields) && (in_array("clientid", $need_fields) )){?>
 					  <div class="col-md-6">
-						 <div class="form-group" id="">
+						 <div class="form-group" id="project_details_company_wrapper" style="<?php echo $style; ?>">
 							<label class="control-label"><?php echo _l('project_customer'); ?></label>
 							<div id="project_details_company"> <?php echo (isset($project_details_company) ? $project_details_company : ''); 
 								if($rel_type =='customer'){
@@ -418,12 +383,12 @@ p#rel_id-error {
 					  </div>
 				  <?php }if(!empty($need_fields) && (in_array("project_contacts[]", $need_fields) )){?>
                   <div class="col-md-6">
-                     <div class="form-group" id="">
+                     <div class="form-group" id="project_contacts_text_wrapper" style="<?php echo $style; ?>">
                         <label class="control-label"><?php echo _l('project_contacts'); ?></label>
                         <div id="project_contacts_text"> <?php  echo (isset($project_contacts_text) ? $project_contacts_text : ''); ?></div>
                      </div>
                   </div>
-                  <?php }} ?>
+                  <?php } ?>
                </div>
                <?php
                   if(isset($task)
@@ -623,7 +588,10 @@ p#rel_id-error {
     init_selectpicker();
     task_rel_select();
 
-   
+    $('body').on('change','#rel_type',function(){
+      $("#project_details_company_wrapper").hide();
+      $("#project_contacts_text_wrapper").hide();
+    });
       
     $('body').on('change','#rel_id',function(){
      
@@ -645,6 +613,8 @@ p#rel_id-error {
          }
          $("#project_contacts_text").html(project.project_contacts_text);
          $("#project_contacts_text select").selectpicker('refresh');
+         $("#project_details_company_wrapper").show();
+         $("#project_contacts_text_wrapper").show();
          $("#project_details_company").html(project.project_company_text);
          $("#project_details_company select").selectpicker('refresh');
          if(project.deadline) {
