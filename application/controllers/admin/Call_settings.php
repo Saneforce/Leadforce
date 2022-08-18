@@ -390,15 +390,16 @@ class Call_settings extends AdminController
             $data['status'] = $task->status;
             $data['rel_id'] = $task->rel_id;
             $data['rel_type'] = $task->rel_type;
+            $data['contact_id'] = $task->contacts_id;
             //pre($data);
         }elseif($_POST['deal_id']>0 || $_POST['type'] =='deal'){
             $data['rel_id'] = $post['deal_id'];
             $data['rel_type'] = 'project';
-            $data['contacts_id'] = $post['contact_id'];
+            $data['contact_id'] = $post['contact_id'];
         }else{
             $data['rel_id'] = $post['contact_id'];
             $data['rel_type'] = 'contact';
-            $data['contacts_id'] = '';
+            $data['contact_id'] = $post['contact_id'];
         }
         if($_POST['type'] == 'contact') {
             $task = $this->callsettings_model->getTaskDetails($_POST['deal_id']);
@@ -406,7 +407,7 @@ class Call_settings extends AdminController
             //pre($task);
         }
         $result = $this->callsettings_model->addtask($data);
-		//echo $this->db->last_query();exit;
+		// echo $this->db->last_query();exit;
         if($result) {
             $resArray['status'] = 'success';
             $resArray['message'] = $data['msg'];

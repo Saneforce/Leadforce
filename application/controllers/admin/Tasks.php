@@ -564,6 +564,11 @@ class Tasks extends AdminController
         }
         if ($this->input->post()) {
             $data                = $this->input->post();
+
+            if($data['rel_type'] =='contact'){
+                $data['contacts_id'] =$data['rel_id'];
+            }
+            
             $data['description'] = $this->input->post('description', false);
 			
             $validation =$this->tasks_model->validate_task_form_data($data,$id);
