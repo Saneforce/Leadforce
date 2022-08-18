@@ -5,10 +5,42 @@ function content_editable($name,$contentEditable){
     if($contentEditable)
         return ' contenteditable="true" data-content-name="'.$name.'"';
 }
+$toname =$proposal->proposal_to;
+if($proposal->rel_type =='project'){
+    $project_details =$this->projects_model->get($proposal->rel_id);
+    if($project_details)
+        $toname =$project_details->client_data->company;
+}elseif($proposal->rel_type =='customer'){
+    $client_details =$this->clients_model->get($proposal->rel_id);
+    if($client_details)
+        $toname =$client_details->company;
+}
+$address_array =array("<b>".$toname."</b>");
+if($proposal->address)
+    $address_array[] =$proposal->address;
+if($proposal->city)
+    $address_array[] =$proposal->city;
+if($proposal->state)
+    $address_array[] =$proposal->state;
+if($proposal->zip)
+    $address_array[] =$proposal->zip;
+if($proposal->country){
+    $this->db->where('country_id',$proposal->country);
+    $country =$this->db->get(db_prefix().'countries')->row();
+    if($country)
+        $address_array[] =$country->short_name;
+}
+    
+if($proposal->phone)
+    $address_array[] =$proposal->phone;
+if($proposal->email)
+    $address_array[] =$proposal->email;
+    
+$address =implode(',<br>',$address_array).'.'; 
 $earlier = new DateTime($proposal->date);
 $later = new DateTime($proposal->open_till);
-$abs_diff = $later->diff($earlier)->format("%a");
-
+$abs_diff = $later->diff($earlier)->format("%a");  
+ 
 function get_content_from_proposal($name,$proposal)
 {
     $default_content =array(
@@ -55,7 +87,6 @@ function callback_proposalpdfnewheader($data)
 
 hooks()->add_action('pdf_header','callback_proposalpdfnewheader');
 $proposal_date =_d($proposal->date);
-$address =format_proposal_info($proposal, 'pdf');
 
 $table ='';
 if(isset($proposal->items) && $proposal->items){
