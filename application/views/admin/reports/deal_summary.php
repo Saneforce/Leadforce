@@ -163,11 +163,14 @@ foreach($custom_fields as $cfkey=>$cfval){
 												if($summary['summary_cls'][$i][$clm1] == 0){
 													echo _l('open');
 												}
-												if($summary['summary_cls'][$i][$clm1] == 1){
+												else if($summary['summary_cls'][$i][$clm1] == 1){
 													echo _l('own');
 												}
-												if($summary['summary_cls'][$i][$clm1] == 2){
+												else if($summary['summary_cls'][$i][$clm1] == 2){
 													echo _l('lost');
+												}
+												else{
+													echo $summary['summary_cls'][$i][$clm1];
 												}
 											}
 											else{

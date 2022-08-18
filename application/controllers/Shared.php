@@ -21,83 +21,15 @@ class Shared extends App_Controller
 		}
 		$data = array();
 		$data['id'] = $links[0]['report_id'];
-		$fields = get_option('deal_fields');
-		$data['need_fields'] = $data['need_fields_edit'] =  $data['mandatory_fields1'] = array('name');
-		$data['need_fields_label'] = array('project_name');
-		$i = $j = 1;
-		if(!empty($fields1) && $fields1 != 'null'){
-			$i1 =0;
-			$req_fields2 = json_decode($fields1);
-			if(!empty($req_fields2)){
-				foreach($req_fields2 as $req_field2){
-					$data['mandatory_fields1'][$i1] = $req_field2;
-					$i1++;
-				}
-			}
+		$fields = deal_needed_fields();
+		$needed = json_decode($fields,true);
+		if (($key = array_search('id', $needed['need_fields'])) !== false) {
+			unset($needed['need_fields'][$key]);
 		}
-		if(!empty($fields) && $fields != 'null'){
-			$req_fields = json_decode($fields);
-			
-			if(!empty($req_fields)){
-				foreach($req_fields as $req_field11){
-					$data['need_fields_edit'][$i] = $req_field11;
-					if($req_field11 == 'clientid'){
-						$data['need_fields'][$i] = 'company';
-						$data['need_fields_label'][$j] = 'project_customer';
-					}
-					else if($req_field11 == 'primary_contact'){
-						$data['need_fields_label'][$j] = 'project_primary_contacts';
-						$data['need_fields'][$i] = 'contact_email1';
-						$i++;
-						$data['need_fields'][$i] = 'contact_phone1';
-						$i++;
-						$data['need_fields'][$i] = 'contact_name';
-					}
-					else if($req_field11 == 'teamleader'){
-						$data['need_fields'][$i] = 'teamleader_name';
-						$data['need_fields_label'][$j] = 'teamleader';
-					}
-					else if($req_field11 == 'project_members[]'){
-						$data['need_fields'][$i] = 'members';
-						$data['need_fields_label'][$j] = 'project_members';
-					}
-					else if($req_field11 == 'project_contacts[]'){
-						$data['need_fields'][$i] = 'project_contacts[]';
-						$data['need_fields_label'][$j] = 'project_contacts';
-					}
-					else if($req_field11 == 'project_cost'){
-						$data['need_fields'][$i] = 'project_cost';
-						$data['need_fields_label'][$j] = 'project_total_cost';
-					}
-					else if($req_field11 == 'pipeline_id'){
-						$data['need_fields'][$i] = 'pipeline_id';
-						$data['need_fields_label'][$j] = 'pipeline';
-					}
-					else{
-						
-						$data['need_fields_label'][$j] = $req_field11;
-						$data['need_fields'][$i] = $req_field11;
-						if($req_field11 == 'status'){
-							$i++;
-							$data['need_fields_label'][$j] = 'project_status';
-							$data['need_fields'][$i] = 'project_status';
-						}
-					}
-					$i++;
-					$j++;
-				}
-				
-			}
-		}
-		$data['need_fields'][$i] = 'id';
-		$i++;
-		$data['need_fields'][$i] = 'product_qty';
-		$i++;
-		$data['need_fields'][$i] = 'product_amt';
-		$i++;
-		$data['need_fields'][$i] = 'projects_budget';
-		$i++;
-		$data['need_fields'][$i] = 'customers_hyperlink';
+		$data['need_fields']		=	$needed['need_fields'];
+		$data['need_fields_label']	=	$needed['need_fields_label'];
+		$data['need_fields_edit']	=	$needed['need_fields_edit'];
+		$data['mandatory_fields1']	=	$needed['mandatory_fields1'];
 		$data['clientid'] = '';
 		$this->load->view('admin/reports/public',$data);
     }
@@ -116,83 +48,15 @@ class Shared extends App_Controller
 			}
 		}
 		$data['id'] = $id;
-		$fields = get_option('deal_fields');
-		$data['need_fields'] = $data['need_fields_edit'] =  $data['mandatory_fields1'] = array('name');
-		$data['need_fields_label'] = array('project_name');
-		$i = $j = 1;
-		if(!empty($fields1) && $fields1 != 'null'){
-			$i1 =0;
-			$req_fields2 = json_decode($fields1);
-			if(!empty($req_fields2)){
-				foreach($req_fields2 as $req_field2){
-					$data['mandatory_fields1'][$i1] = $req_field2;
-					$i1++;
-				}
-			}
+		$fields = deal_needed_fields();
+		$needed = json_decode($fields,true);
+		if (($key = array_search('id', $needed['need_fields'])) !== false) {
+			unset($needed['need_fields'][$key]);
 		}
-		if(!empty($fields) && $fields != 'null'){
-			$req_fields = json_decode($fields);
-			
-			if(!empty($req_fields)){
-				foreach($req_fields as $req_field11){
-					$data['need_fields_edit'][$i] = $req_field11;
-					if($req_field11 == 'clientid'){
-						$data['need_fields'][$i] = 'company';
-						$data['need_fields_label'][$j] = 'project_customer';
-					}
-					else if($req_field11 == 'primary_contact'){
-						$data['need_fields_label'][$j] = 'project_primary_contacts';
-						$data['need_fields'][$i] = 'contact_email1';
-						$i++;
-						$data['need_fields'][$i] = 'contact_phone1';
-						$i++;
-						$data['need_fields'][$i] = 'contact_name';
-					}
-					else if($req_field11 == 'teamleader'){
-						$data['need_fields'][$i] = 'teamleader_name';
-						$data['need_fields_label'][$j] = 'teamleader';
-					}
-					else if($req_field11 == 'project_members[]'){
-						$data['need_fields'][$i] = 'members';
-						$data['need_fields_label'][$j] = 'project_members';
-					}
-					else if($req_field11 == 'project_contacts[]'){
-						$data['need_fields'][$i] = 'project_contacts[]';
-						$data['need_fields_label'][$j] = 'project_contacts';
-					}
-					else if($req_field11 == 'project_cost'){
-						$data['need_fields'][$i] = 'project_cost';
-						$data['need_fields_label'][$j] = 'project_total_cost';
-					}
-					else if($req_field11 == 'pipeline_id'){
-						$data['need_fields'][$i] = 'pipeline_id';
-						$data['need_fields_label'][$j] = 'pipeline';
-					}
-					else{
-						
-						$data['need_fields_label'][$j] = $req_field11;
-						$data['need_fields'][$i] = $req_field11;
-						if($req_field11 == 'status'){
-							$i++;
-							$data['need_fields_label'][$j] = 'project_status';
-							$data['need_fields'][$i] = 'project_status';
-						}
-					}
-					$i++;
-					$j++;
-				}
-				
-			}
-		}
-		$data['need_fields'][$i] = 'id';
-		$i++;
-		$data['need_fields'][$i] = 'product_qty';
-		$i++;
-		$data['need_fields'][$i] = 'product_amt';
-		$i++;
-		$data['need_fields'][$i] = 'projects_budget';
-		$i++;
-		$data['need_fields'][$i] = 'customers_hyperlink';
+		$data['need_fields']		=	$needed['need_fields'];
+		$data['need_fields_label']	=	$needed['need_fields_label'];
+		$data['need_fields_edit']	=	$needed['need_fields_edit'];
+		$data['mandatory_fields1']	=	$needed['mandatory_fields1'];
 		$data['clientid'] = '';
         $this->app->get_table_data('report_deal_public', $data);
         

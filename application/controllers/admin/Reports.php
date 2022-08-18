@@ -380,7 +380,7 @@ class Reports extends AdminController
 		}
 		else{
 			$months = array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
-			$own = $open = $lost = $tot_cnt = $tot_prt = $tot_val = $avg_deal = 0; 
+			$own = $open = $lost = $tot_cnt = $tot_prt = $tot_val = $avg_deal = $tot_avg = 0; 
 			if($data['view_type'] == 'date' && ($data['date_range1'] == 'Monthly')){
 				if(!empty($months)){
 					$j = 1;$i = 0;
@@ -413,26 +413,27 @@ class Reports extends AdminController
 								$qry_cond   = " and id=''";
 							}
 							$cur_row    = ($month1).' '.$cur_year;
-							$sum_data[$i]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);					
+							$sum_data[$i]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);
+							
 							$i++;
 							$j++;
 						}
-						
+						$tot_avg = $tot_avg + $sum_data[$i-1]['avg_deal'];
 						$own	=	$own + $sum_data[$i-1]['own'];
 						$open	=	$open + $sum_data[$i-1]['open'];
 						$lost	=	$lost + $sum_data[$i-1]['lost'];
 						$tot_cnt=	$tot_cnt + $sum_data[$i-1]['total_cnt_deal'];
 						$tot_val=	$tot_val + $sum_data[$i-1]['total_val_deal'];
 					}
-					$sum_data[$i] = deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$i);
+					$sum_data[$i] = deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$i,$tot_avg);
 					$i++;
-					$sum_data[$i] = deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by);
+					$sum_data[$i] = deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$tot_avg);
 				}
 			}
 			if($data['view_type'] == 'date' && ($data['date_range1'] == 'Weekly')){			
 				$cur_month = date('M');
 				$cur_date  = date('d');
-				$num_dates = $m = 0;
+				$num_dates = $m = $tot_avg = 0;
 				$sum_data  = array();
 				$months_num = array('Jan'=>31,'Feb'=>28,'Mar'=>31,'Apr'=>30,'May'=>31,'Jun'=>30,'Jul'=>31,'Aug'=>31,'Sep'=>30,'Oct'=>31,'Nov'=>30,'Dec'=>31);
 				if($cur_year % 4 == 0){
@@ -489,7 +490,6 @@ class Reports extends AdminController
 								$open	=	$open + $sum_data[$m-1]['open'];
 								$lost	=	$lost + $sum_data[$m-1]['lost'];
 								$tot_cnt=	$tot_cnt + $sum_data[$m-1]['total_cnt_deal'];
-								$tot_val=	$tot_val + $sum_data[$m-1]['total_val_deal'];
 								$k++;
 								$req_end_days = $w_end_date - $req_month;
 								$w_start_date	= 1;
@@ -524,6 +524,7 @@ class Reports extends AdminController
 								$lost	=	$lost + $sum_data[$m-1]['lost'];
 								$tot_cnt=	$tot_cnt + $sum_data[$m-1]['total_cnt_deal'];
 								$tot_val=	$tot_val + $sum_data[$m-1]['total_val_deal'];
+								$tot_avg = $tot_avg + $sum_data[$m-1]['avg_deal'];
 								
 								$w_start_date	= $w_end_date +1;
 								$w_end_date		= $w_end_date +7;
@@ -558,6 +559,7 @@ class Reports extends AdminController
 									$lost	=	$lost + $sum_data[$m-1]['lost'];
 									$tot_cnt=	$tot_cnt + $sum_data[$m-1]['total_cnt_deal'];
 									$tot_val=	$tot_val + $sum_data[$m-1]['total_val_deal'];
+									$tot_avg = $tot_avg + $sum_data[$m-1]['avg_deal'];
 									
 									$w_start_date	= $w_end_date +1;
 									$w_end_date		= $w_end_date +7;
@@ -570,9 +572,9 @@ class Reports extends AdminController
 						}
 
 					}
-					$sum_data[$m] = deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$m);
+					$sum_data[$m] = deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$m,$tot_avg);
 					$m++;
-					$sum_data[$m] = deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by);
+					$sum_data[$m] = deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$tot_avg);
 				}
 			}
 			if($data['view_type'] == 'date' && ($data['date_range1'] == 'Quarterly')){	
@@ -602,15 +604,16 @@ class Reports extends AdminController
 					$cur_row    = 'Q'.($i+1).' '.$cur_year;
 					$sum_data[$i]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);
 					$j = $j+3;
+					$tot_avg = $tot_avg + $sum_data[$i]['avg_deal'];
 					$own	=	$own + $sum_data[$i]['own'];
 					$open	=	$open + $sum_data[$i]['open'];
 					$lost	=	$lost + $sum_data[$i]['lost'];
 					$tot_cnt=	$tot_cnt + $sum_data[$i]['total_cnt_deal'];
 					$tot_val=	$tot_val + $sum_data[$i]['total_val_deal'];
 				}
-				$sum_data[$i] = deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$i);
+				$sum_data[$i] = deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$i,$tot_avg);
 				$i++;
-				$sum_data[$i] = deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by);
+				$sum_data[$i] = deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$tot_avg);
 			}
 			if($data['view_type'] == 'date' && ($data['date_range1'] == 'Yearly')){	
 				$i = 0;
@@ -636,11 +639,11 @@ class Reports extends AdminController
 				$open	=	$open + $sum_data[$i]['open'];
 				$lost	=	$lost + $sum_data[$i]['lost'];
 				$tot_cnt=	$tot_cnt + $sum_data[$i]['total_cnt_deal'];
-				$tot_val=	$tot_val + $sum_data[$i]['total_val_deal'];
+				$tot_val=	$tot_val + $sum_data[$i]['total_val_deal'];$tot_avg=   $tot_avg + $sum_data[$i]['avg_deal'];				
 				$i++;
-				$sum_data[$i] = deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,1);
+				$sum_data[$i] = deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,1,$tot_avg);
 				$i++;
-				$sum_data[$i] = deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by);
+				$sum_data[$i] = deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$tot_avg );
 			}
 		}
 		$data['summary_cls'] = $sum_data;
