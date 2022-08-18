@@ -6,16 +6,19 @@ function content_editable($name,$contentEditable){
         return ' contenteditable="true" data-content-name="'.$name.'"';
 }
 
+$CI =&get_instance();
+
 $toname =$proposal->proposal_to;
 if($proposal->rel_type =='project'){
-    $project_details =$this->projects_model->get($proposal->rel_id);
+    $project_details =$CI->projects_model->get($proposal->rel_id);
     if($project_details)
         $toname =$project_details->client_data->company;
 }elseif($proposal->rel_type =='customer'){
-    $client_details =$this->clients_model->get($proposal->rel_id);
+    $client_details =$CI->clients_model->get($proposal->rel_id);
     if($client_details)
         $toname =$client_details->company;
 }
+
 $address_array =array("<b>".$toname."</b>");
 if($proposal->address)
     $address_array[] =$proposal->address;
@@ -26,8 +29,8 @@ if($proposal->state)
 if($proposal->zip)
     $address_array[] =$proposal->zip;
 if($proposal->country){
-    $this->db->where('country_id',$proposal->country);
-    $country =$this->db->get(db_prefix().'countries')->row();
+    $CI->db->where('country_id',$proposal->country);
+    $country =$CI->db->get(db_prefix().'countries')->row();
     if($country)
         $address_array[] =$country->short_name;
 }
