@@ -2873,13 +2873,13 @@ function task_relatedto_list()
 		$relatedto ['project'] =_l('project');
 	}
 	if(has_permission('customers', '','view')){
-		$relatedto ['customer'] =_l('customer');
+		$relatedto ['customer'] =_l('client');
 	}
 	if(has_permission('leads', '','view')){
-		$relatedto ['lead'] =_l('projecleadt');
+		$relatedto ['lead'] =_l('lead');
 	}
 	if(has_permission('contacts', '','view')){
-		$relatedto ['contacts'] =_l('contact');
+		$relatedto ['contact'] =_l('contact');
 	}
 	return $relatedto;
 }
