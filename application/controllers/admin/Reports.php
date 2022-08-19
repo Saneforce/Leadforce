@@ -834,16 +834,27 @@ class Reports extends AdminController
 		$req_mul	= ($filters1[$req_val-1]=='is_any_of')?'multiple':'';
 		$req_clas	= ($filters1[$req_val-1]=='is_empty' || $filters1[$req_val-1]=='is_not_empty')?'w_88':'';
 		$req_marg	= ($filters1[$req_val-1]=='is_empty' || $filters1[$req_val-1]=='is_not_empty')?'-5px':'-25px;';
+		if($sel_val == 'select'){ 
+			if (str_contains($filters2[$req_val-1], ',')) {
+				$req_out .= '<input type="hidden" value="'.$filters2[$req_val-1].'" id="year_val_'.$req_val.'">';
+			}
+			else{
+				$req_out .= '<input type="hidden" value="" id="year_val_'.$req_val.'">';
+			}
+		}
+		else{
+			$req_out .= '<input type="hidden" value="" id="year_val_'.$req_val.'">';
+		}
 		if($sel_val == 'select' && $key == ''){
 			$req_out .= '<div class="col-md-12"><div class="col-md-5 '.$req_clas.'" id="1_'.$req_val.'_filter">';
-			$req_out .= '<select data-live-search="false" data-width="100%" class="ajax-search selectpicker" id="filter_option_'.$req_val.'" tabindex="-98" onchange="check_filter(this)">';
+			$req_out .= '<select data-live-search="false" data-width="100%" class="ajax-search selectpicker" id="filter_option_'.$req_val.'" tabindex="-98" onchange="check_filter(this)" >';
 			$req_out .= '<option value="is" '.$is_sel.'>Is</option>';
 			$req_out .= '<option value="is_not" '.$is_not.'>Is Not</option>';
 			$req_out .= '<option value="is_any_of" '.$is_any.'>Is Any Of</option>';
 			$req_out .= '<option value="is_empty" '.$is_emp.'>Is Empty</option>';
 			$req_out .= '<option value="is_not_empty" '.$is_nemp.'>Is Not Empty</option>';
 			$req_out .= '</select></div>';
-			$req_out .= '<div class="col-md-6" id="2_'.$req_val.'_filter" '.$req_disp.'><div class="col-md-12"><select data-live-search="true" data-width="100%" class="ajax-search selectpicker" data-none-selected-text="Nothing selected" tabindex="-98" id="year_'.$req_val.'" '.$req_mul.'  name="filter_'.$filters[$req_val-1].'[]">';
+			$req_out .= '<div class="col-md-6" id="2_'.$req_val.'_filter" '.$req_disp.'><div class="col-md-12"><select data-live-search="true" data-width="100%" class="ajax-search selectpicker" data-none-selected-text="Nothing selected" tabindex="-98" data-action-box="true" id="year_'.$req_val.'" '.$req_mul.'  name="filter_'.$filters[$req_val-1].'[]" >';
 			if (str_contains($d_val, ',')) {
 				
 				$d_all_vals = explode(',',$d_val);
@@ -857,9 +868,9 @@ class Reports extends AdminController
 						$display_val = rtrim($display_val," ");
 						if (str_contains($filters2[$req_val-1], ',')) { 
 							$ch_filters = explode(',',$filters2[$req_val-1]);
-							$ch_sel = (in_array($val1[$s_val], $ch_filters))?"selected":"";
+							//$ch_sel = (in_array($val1[$s_val], $ch_filters))?"selected":"";
+							$ch_sel = '';
 						}
-						
 						$req_out .= '<option value="'.$val1[$s_val].'" '.$ch_sel.'>'.$display_val.'</option>';
 					}
 				}
@@ -871,8 +882,10 @@ class Reports extends AdminController
 							$ch_sel = ($filters2[$req_val-1]==$val1[$s_val])?"selected":"";
 							if (str_contains($filters2[$req_val-1], ',')) { 
 								$ch_filters = explode(',',$filters2[$req_val-1]);
-								$ch_sel = (in_array($val1[$s_val], $ch_filters))?"selected":"";
+								//$ch_sel = (in_array($val1[$s_val], $ch_filters))?"selected":"";
+								$ch_sel = '';
 							}
+							
 							$req_out .= '<option value="'.$val1[$s_val].'" '.$ch_sel.'>'.$val1[$d_val].'</option>';
 						}
 						
@@ -900,10 +913,12 @@ class Reports extends AdminController
 					foreach($all_val as $key => $val1){
 						if (str_contains($filters2[$req_val-1], ',')) {
 							$ch_vals = explode(',',$filters2[$req_val-1]);
-							$ch_sel = (in_array($key, $ch_vals))?"selected":"";
+							//$ch_sel = (in_array($key, $ch_vals))?"selected":"";
+							$ch_sel = '';
 						}else{
 							$ch_sel = ($filters2[$req_val-1]==$key)?"selected":"";
 						}
+						
 						$req_out .= '<option value="'.$key.'" '.$ch_sel.'>'.$val1.'</option>';
 					}
 				}
@@ -1819,7 +1834,6 @@ class Reports extends AdminController
 					$selected = '';
 					$rel_data = get_relation_data('project',$selected);
 					$req_data = array();
-					//pre($rel_data);
 					$rel_val = get_relation_values($rel_data,'project');
 					if(empty($filters2[$req_val-1])){
 						$req_out = $this->get_req_val($req_val,'select','id','name','',$rel_val);
