@@ -805,11 +805,15 @@ class Reports extends AdminController
 		}
 		$this->session->set_userdata($filter_data);
 		set_alert('success', _l('filters_applied_successfully', _l('report')));
+		$filter_tab = '';
+		if($_REQUEST['filter_tab'] == 2){
+			$filter_tab = '?filter_tab='.$_REQUEST['filter_tab'];
+		}
 		if(!empty($_REQUEST['cur_id121'])){
-			redirect(admin_url('reports/edit/'.$_REQUEST['cur_id121']));
+			redirect(admin_url('reports/edit/'.$_REQUEST['cur_id121'].$filter_tab));
 		}
 		else{
-			redirect(admin_url('reports/add'));
+			redirect(admin_url('reports/add'.$filter_tab));
 		}
 	}
 	public function get_req_val($req_val,$sel_val,$s_val,$d_val,$key,$all_val){

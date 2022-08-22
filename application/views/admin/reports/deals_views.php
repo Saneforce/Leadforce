@@ -238,8 +238,13 @@
 			<div class="panel-body">
 				<div class="horizontal-tabs">
 					<ul class="nav nav-pills">
-						<li class="active"><a data-toggle="pill" href="#report_table"><?php echo _l('deals');?></a></li>
-						<li><a data-toggle="pill" href="#summary_table"><?php echo _l('summary');?></a></li>
+						<li class="<?php if(empty($_GET['filter_tab']) || $_GET['filter_tab'] == 1){ echo 'active';}?>">
+							<a data-toggle="pill" href="#summary_table" onclick="tab_summary('1');"><?php echo _l('summary');?></a>
+						</li>
+						<li class="<?php if(!empty($_GET['filter_tab']) && $_GET['filter_tab'] == 2){ echo 'active';}?>">
+							<a data-toggle="pill" href="#report_table" onclick="tab_summary('2');"><?php echo _l('deals');?></a>
+						</li>
+						
 					</ul>
 				</div>
 			</div>
@@ -250,12 +255,12 @@
 				<div class="col-md-12">
 					<div id="overlay_deal" style="display: none;"><div class="spinner"></div></div>
 					 <div class="tab-content">
-						<div id="report_table" class="tab-pane fade in active">
+						<div id="report_table" class="tab_summary tab-pane fade <?php if(!empty($_GET['filter_tab']) && $_GET['filter_tab'] == 2){ echo 'in active';}?>" >
 								<?php $this->load->view('admin/reports/deal_list_column'); ?>
 					
 								<?php $this->load->view('admin/reports/deal_table_html'); ?>
 						</div>
-						<div id="summary_table" class="tab-pane fade">
+						<div id="summary_table" class="tab_summary tab-pane fade <?php if(empty($_GET['filter_tab']) || $_GET['filter_tab'] == 1){ echo 'in active';}?> ">
 							<?php $this->load->view('admin/reports/deal_summary',$data); ?>
 						</div>
 					</div>

@@ -774,6 +774,9 @@ function ch_staff(a){
 		$('#error_staff').html('');
 	}
 }
+function tab_summary(a){
+	$('#filter_tab').val(a);
+}
 $(function(){
      var ProjectsServerParams = {};
      $.each($('._hidden_inputs._filters input'),function(){
