@@ -115,7 +115,7 @@ class Projects extends AdminController
 		$needed_fields = json_decode($deal_fields,true);
 		$data['need_fields'] = $needed_fields['need_fields'];
 		$data['need_fields_label'] = $needed_fields['need_fields_label'];
-
+		$data['need_fields_edit']	=	$needed_fields['need_fields_edit'];
 		//$data['client_contacts']     = $this->clients_model->get_deals_contacts_list('', ['active' => 1]);
 		$data['client_contacts']     = $this->clients_model->getAllContacts_active();
 		$allcurrency = $this->projects_model->get_allcurrency();
