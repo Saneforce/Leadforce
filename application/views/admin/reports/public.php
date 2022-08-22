@@ -99,11 +99,24 @@ $table_data = hooks()->apply_filters('projects_table_columns', $table_data);
     },
 		dom: 'lBfrtip',
    buttons: [
-       'excelHtml5',
-       'csvHtml5',
-       'pdfHtml5',
-       'print'
+   {
+       'extend': 'excelHtml5',
+   },
+   {
+       'extend': 'csvHtml5',
+   },
+   {
+       'extend': 'print',
+   },
+   {
+       'extend': 'pdfHtml5',
+	   orientation : 'landscape',
+                pageSize : 'A2',
+                text : '<i class="fa fa-file-pdf-o"> PDF</i>',
+                titleAttr : 'PDF',
+   }
     ],
+	
         select: false,
         colReorder: false,
 		  'processing': true,
