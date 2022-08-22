@@ -195,7 +195,8 @@ class Clients_model extends App_Model {
 
         // New filter action
         $data = hooks()->apply_filters('before_client_added', $data);
-
+		if(isset($data['progress']))
+			unset($data['progress']);
         $this->db->insert(db_prefix() . 'clients', $data);
 
         $userid = $this->db->insert_id();
