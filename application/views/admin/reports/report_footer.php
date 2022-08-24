@@ -627,9 +627,9 @@ function change_filter(a){
 			for(var i=1;i<=cur_num;i++){
 				var a1 = 'filter_'+i;
 				var b1 = $('#filter_'+i).val();
-				change_filter1(a1,b1)
+				change_filter1(a1,b1);
 			}
-				
+			init_selectpicker();
 		}
 	});
 }
@@ -678,10 +678,22 @@ function change_filter1(a,b){
 					  }
 				});
 				appDatepicker();
-			}			
-			//$('#year_'+req_val+' option').attr('selected', false);
-			$('#year_'+req_val).selectpicker('refresh');
-			//$('#filter_option_'+req_val+' option').attr('selected', false);
+			}
+		
+			var year_val = $('#year_val_'+req_val).val(); 
+				if(year_val!='' && year_val.indexOf(',') != -1){
+					var myArray = year_val.split(",");
+					$('#year_'+req_val).selectpicker('val', myArray); 
+					
+				}else if(year_val!=''){
+					$('#year_'+req_val).selectpicker('val',year_val);
+				}
+				
+			 $('#year_'+req_val).selectpicker('refresh');
+			 init_selectpicker();
+			$('#year_'+req_val).selectpicker({
+				liveSearch: true
+			 });
 			$('#filter_option_'+req_val).selectpicker('refresh');
 			if(cur_val=='name'){
 				init_ajax_search('project', '#year_'+req_val+'.ajax-search');
@@ -761,6 +773,9 @@ function ch_staff(a){
 	if(a.value != ''){
 		$('#error_staff').html('');
 	}
+}
+function tab_summary(a){
+	$('#filter_tab').val(a);
 }
 $(function(){
      var ProjectsServerParams = {};

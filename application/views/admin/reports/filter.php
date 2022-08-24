@@ -6,6 +6,7 @@
 					<?php $filters = (empty($filters)?array():$filters);?>
 					<input type="hidden" id="cur_num" value="<?php echo count($filters);?>">
 					<input type="hidden" name="cur_id121" value="<?php echo $id;?>">
+					<input type="hidden" name="filter_tab" value="1" id="filter_tab">
 					<div class="row" id="ch_ids">
 						<?php if(!empty($filters)){
 							$i1 = 1;$i2 =0;
