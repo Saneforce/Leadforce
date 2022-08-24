@@ -34,13 +34,10 @@ class Projects extends AdminController
             $this->index_list();
         }else{
         if($pre_url == 'gantt'){
-            // $this->gantt();
             redirect(admin_url($pre_current_url));
         }elseif($pre_url == 'kanban_noscroll'){
-            // $this->kanban_noscroll();
             redirect(admin_url($pre_current_url));
         }elseif($pre_url == 'kanbans'){
-            // $this->kanbans();
             redirect(admin_url($pre_current_url));
         }elseif($pre_url == 'index'){
             redirect(admin_url($pre_current_url));
@@ -53,7 +50,6 @@ class Projects extends AdminController
     }
     public function index_list()
     {
-		//$this->db->query("SET sql_mode=(SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''));");
         if(!isset($_GET['gsearch'])) {
             $this->session->unset_userdata('pipelines');
             $this->session->unset_userdata('member');
@@ -117,7 +113,6 @@ class Projects extends AdminController
 		$data['need_fields_label'] = $needed_fields['need_fields_label'];
 		$data['need_fields_edit']	=	$needed_fields['need_fields_edit'];
 		$data['mandatory_fields1']	=	$needed_fields['mandatory_fields1'];
-		//$data['client_contacts']     = $this->clients_model->get_deals_contacts_list('', ['active' => 1]);
 		$data['client_contacts']     = $this->clients_model->getAllContacts_active();
 		$allcurrency = $this->projects_model->get_allcurrency();
         $data['allcurrency'] = $allcurrency;
@@ -195,14 +190,7 @@ class Projects extends AdminController
         echo json_encode([
             'message' => $message,
         ]);
-        // if($result) {
-        //     $message = "Deal name already exist!, if you still want to create the deal you can ignore this message.";
-        // } else {
-        //     $message = "no";
-        // }
-        // echo json_encode([
-        //     'message' => $message,
-        // ]);
+        
         exit;
     }
 
@@ -216,7 +204,6 @@ class Projects extends AdminController
 		
 		$check_field = array();
 		if(!empty($fields) && $fields != 'null'){
-			//array_unshift($fields,"name");
 			$check_field = json_decode($fields);
 		}
 
@@ -257,7 +244,6 @@ class Projects extends AdminController
             }
 			
 			if(empty($data['pipeline_id'])){
-				//if(empty($check_field) || !in_array("pipeline_id", $check_field)){
 					if(!empty(get_option('default_pipeline'))){
 						$data['pipeline_id'] = get_option('default_pipeline');
 					}
@@ -270,7 +256,6 @@ class Projects extends AdminController
 							redirect(admin_url('projects/project'));
 						}
 					}
-				//}
 			}
 			if(empty($data['status'])){
 				
@@ -298,10 +283,7 @@ class Projects extends AdminController
                 if (!has_permission('projects', '', 'create')) {
                     access_denied('Projects');
                 }
-                // if (!array_key_exists("project_members",$data))
-                // {
-                //     $data['project_members'] = $data['teamleader'];
-                // }
+               
                 $products = array();
                 if(isset($data['product']) && !empty($data['product'])) {
                     $products['product'] = $data['product'];
@@ -320,7 +302,6 @@ class Projects extends AdminController
                 unset($data['qty']);
                 unset($data['total']);
 				$data['progress'] = $this->projects_model->getprogressstatus($data['status']);
-                //pr($data); exit;
                 $data['created_by'] =get_staff_user_id();
                 $id = $this->projects_model->add($data);
                 if ($id) {
@@ -383,7 +364,6 @@ class Projects extends AdminController
 		$data['need_fields'] = $data['mandatory_fields'] = $data['important_fields'] = $data['important_messages'] = array();
 		if(!empty($fields) && $fields != 'null'){
 			$data['need_fields'] = array();
-			//array_unshift($fields,"name");
 			$data['need_fields'] = json_decode($fields);
 		}
 		if(!empty($fields1) && $fields1 != 'null'){
@@ -401,7 +381,6 @@ class Projects extends AdminController
 			$data['client_contacts']     = $this->clients_model->get_deals_contacts_list($data['project']->clientid, ['active' => 1]);
 			
 		}
-        //pre($data['client_contacts']);
         $data['settings'] = $this->projects_model->get_settings();
         
         $data['staff']    = $this->pipeline_model->getPipelineTeammembers((isset($data['project'])?$data['project']->pipeline_id:0));
@@ -419,9 +398,7 @@ class Projects extends AdminController
         $data['allcurrency'] = $allcurrency;
         $currency = $this->currencies_model->get_base_currency();
         $data['basecurrency'] = $currency->name;
-        //$data['products'] = $this->products_model->getprod_price($currency->name);
         $data['products'] = $this->invoice_items_model->get_items($currency->name);
-        //echo "<pre>"; print_r($data['staff']); exit;
         $data['title'] = $title;
         $data['ownerHierarchy'] = '';
         if($data['project']) {
@@ -430,7 +407,6 @@ class Projects extends AdminController
         $data['my_staffids'] = $this->staff_model->get_my_staffids();
         $data['viewIds'] = $this->staff_model->getFollowersViewList();
 		
-        //pre($data['viewIds']);
         $this->load->view('admin/projects/project', $data);
     }
 
@@ -447,7 +423,6 @@ class Projects extends AdminController
 
     public function savedealproducts() {
         $data = $this->input->post();
-        //pre($data);
         $products = array();
         if(isset($data['product']) && !empty($data['product'])) {
             $products['product'] = $data['product'];
@@ -475,7 +450,6 @@ class Projects extends AdminController
             if($data['method'] == 2 || $data['method'] == 3) {
                 $products['tax'] = $data['tax'];
             }
-            //pre($data);
             $this->load->model('currencies_model');
             if($_POST['currency']) {
                 $cur = $_POST['currency'];
@@ -483,7 +457,6 @@ class Projects extends AdminController
                 $currency = $this->currencies_model->get_base_currency();
                 $cur = $currency->name;
             }
-            //$currency = $this->currencies_model->get_base_currency();
             $success = $this->products_model->save_deals_products($products, $data['project_id'], $cur); 
             if ($success) {
                 set_alert('success', _l('updated_successfully', _l('project')));
@@ -582,7 +555,6 @@ class Projects extends AdminController
 
             $products = $this->products_model->getdeals_products($id, $project->project_currency);
 			
-            //pre($products);
             $data['products'] = $this->products_model->getitem_price($project->project_currency);
             $data['productscnt'] = count($products);
             $data['dealproducts'] = $products;
@@ -633,10 +605,7 @@ class Projects extends AdminController
 
             $data['project_total_logged_time'] = $this->projects_model->total_logged_time($id);
             $data['staff']        = $this->staff_model->get('', ['action_for' => 'Active']);
-            //$data['staff']     = $this->staff_model->getstaff('', ['active' => 1], $data['project']->teamleader, $data['project']->pipeline_id);
-            // $data['client_contacts']     = $this->clients_model->get_contacts($project->clientid, ['active' => 1]);
             $data['client_contacts']     = $this->clients_model->get_deals_contacts($data['project']->clientid, ['active' => 1]);
-            //pre($data['client_contacts']);
             $percent           = $this->projects_model->calc_progress($id);
             $data['bodyclass'] = '';
 
@@ -690,7 +659,6 @@ class Projects extends AdminController
 				if(!empty($fields) && $fields != 'null'){
 					$req_fields = json_decode($fields);
 					$i = 18;
-					//pre($req_fields);
 					if(!empty($req_fields)){
 						
 						foreach($req_fields as $req_field11){
@@ -720,7 +688,6 @@ class Projects extends AdminController
 						}
 					}
 				}
-				//pre($data['need_fields']);
 			}
             if ($group == 'project_overview') {
                 $data['members'] = $this->projects_model->get_project_members($id);
@@ -729,7 +696,6 @@ class Projects extends AdminController
                 $data['teamleader'] = $this->staff_model->get($data['project']->teamleader);
                 
 
-                //pre($data['contacts']);
                 foreach ($data['members'] as $key => $member) {
                     $data['members'][$key]['total_logged_time'] = 0;
                     $member_timesheets                          = $this->tasks_model->get_unique_member_logged_task_ids($member['staff_id'], ' AND task_id IN (SELECT id FROM ' . db_prefix() . 'tasks WHERE rel_type="project" AND rel_id="' . $id . '")');
@@ -846,7 +812,6 @@ class Projects extends AdminController
 				$data['cur_project_id'] = $id;
 				$data['ch_contact'] = $ch_contact = $this->projects_model->get_primary_contact($id);
 				$data['all_dels'] = array();
-				//if(get_option('deal_map') == 'if more than one open deal – allow to map manually'){
 					$all_deals1 = $this->projects_model->get_project($id);
 					if(!empty($all_deals1)){
 						$data['all_dels']['project_id'] = $all_deals1->id;
@@ -935,7 +900,6 @@ class Projects extends AdminController
                 $other_projects_where .= ' AND ' . db_prefix() . 'projects.id IN (SELECT project_id FROM ' . db_prefix() . 'project_members WHERE staff_id=' . get_staff_user_id() . ')';
             }
             $data['contacts'] = $this->projects_model->get_project_contacts($id);
-            //$data['pipeline'] = $this->pipeline_model->getpipelinebyId($data['project']->pipeline_id);
             $data['pipelines'] = $this->pipeline_model->getPipeline();
             $data['teamleaders']    = $this->pipeline_model->getPipelineTeamleaders((isset($data['project'])?$data['project']->pipeline_id:0));
             if (strpos($other_projects_where, '()') !== false) {
@@ -950,8 +914,6 @@ class Projects extends AdminController
             $orgclientid = $data['project']->client_data->userid;
             $orgname = $data['project']->client_data->company;
             $orgcontacts = $this->clients_model->get_contacts($orgclientid);
-           // pr($orgcontacts); exit;
-		  // pre($data['need_fields']);
             $primarycontact = "";
             foreach($orgcontacts as $val) {
                 if($val['is_primary'] > 0) {
@@ -959,7 +921,6 @@ class Projects extends AdminController
                 }
             }
             $data['primarycont'] =  $primarycontact;
-           //pre($data['pipeline']);
             $this->load->view('admin/projects/view', $data);
         } else {
             access_denied('Project View');
@@ -1053,11 +1014,7 @@ class Projects extends AdminController
     public function kanban_noscroll()
     {
         $this->set_session_url();
-        // if(!isset($_GET['gsearch'])) {
-        //     $this->session->unset_userdata('pipelines');
-        //     $this->session->unset_userdata('member');
-        //     $this->session->unset_userdata('gsearch');
-        // }
+       
         $data['title'] = _l('project_gant');
 
 
@@ -1082,12 +1039,8 @@ class Projects extends AdminController
                 if(!empty($lowlevel)) {
                     $low_hie = ' OR staffid IN ('.implode(',', $lowlevel).')';
                 }
-                //pre($lowlevel);
-                //echo 'SELECT *, staffid as staff_id FROM ' . db_prefix() . 'staff WHERE staffid = "'.get_staff_user_id().'" AND staffid IN ('.implode(',', $lowlevel).')'; exit;
                 $staffdetails =  $this->db->query('SELECT *, staffid as staff_id FROM ' . db_prefix() . 'staff WHERE staffid = "'.get_staff_user_id().'" '.$low_hie)->result_array();
-                //echo $this->db->last_query(); exit;
                 $data['project_members'] =  $staffdetails;
-                //pre($data['project_members']);
             } else {
                 if(isset($_GET['pipelines']) && $_GET['pipelines'] != '')
                     $data['project_members'] = $this->pipeline_model->getPipelineFilterTeammembers($_GET['pipelines']);
@@ -1101,19 +1054,13 @@ class Projects extends AdminController
         ]);
         
         $data['pipelines'] = $this->pipeline_model->getPipeline();
-       // pre($data);
-        // $this->load->view('admin/projects/gantt', $data);
+       
         $this->load->view('admin/projects/kanbans', $data);
     }
     public function kanbans()
     {
-        //pre($_SESSION);
         $this->set_session_url();
-        // if(!isset($_GET['gsearch'])) {
-        //     $this->session->unset_userdata('pipelines');
-        //     $this->session->unset_userdata('member');
-        //     $this->session->unset_userdata('gsearch');
-        // }
+       
         $data['title'] = _l('project_gant');
 
 
@@ -1154,28 +1101,20 @@ class Projects extends AdminController
             'member' => $selectedMember,
         ]);
         $data['pipelines'] = $this->pipeline_model->getPipeline();
-        // $this->load->view('admin/projects/gantt', $data);
         $this->load->view('admin/projects/kanban_noscroll', $data);
     }
 
     public function kanbans_forecast()
     {
-        //pre($_SESSION);
         $this->set_session_url();
-        // if(!isset($_GET['gsearch'])) {
-        //     $this->session->unset_userdata('pipelines');
-        //     $this->session->unset_userdata('member');
-        //     $this->session->unset_userdata('gsearch');
-        // }
+        
         $data['title'] = _l('project_gant');
 
 
         if(isset($_REQUEST['nav']) && !empty($_REQUEST['nav'])) {
             $_SESSION['nav'] = $_REQUEST['nav'];
         } else {
-            // if(!isset($_SESSION['nav'])) {
-            //     $_SESSION['nav'] = 0;
-            // }
+            
             unset($_SESSION['nav']);
         }
         if(isset($_REQUEST['forecast_showby'])) {
@@ -1245,7 +1184,6 @@ class Projects extends AdminController
             'member' => $selectedMember,
         ]);
         $data['pipelines'] = $this->pipeline_model->getPipeline();
-        // $this->load->view('admin/projects/gantt', $data);
         $this->load->view('admin/projects/kanban_forecast', $data);
     }
 
@@ -1279,7 +1217,6 @@ class Projects extends AdminController
     {
         $gsearch   = $this->input->post('globalsearch');
         $my_staffids = $this->staff_model->get_my_staffids();
-        //pre($my_staffids);
         $data = array();
         if(!is_admin(get_staff_user_id())) {
             if($my_staffids) {
@@ -1289,7 +1226,6 @@ class Projects extends AdminController
             }
         } else {
             $data['projects'] = $this->projects_model->get('',[
-            //   'active' => 1,
                 "name like '%".$gsearch."%'" => "",
             ]);
         }
@@ -1316,19 +1252,12 @@ class Projects extends AdminController
                 FROM tblcontacts
                 LEFT JOIN tblclients ON tblclients.userid=tblcontacts.userid LEFT JOIN tblcustomfieldsvalues as ctable_0 ON tblcontacts.id = ctable_0.relid AND ctable_0.fieldto="contacts" AND ctable_0.fieldid=7'.$where;
 
-                // $where_summary_inactiveperson_qry = 'SELECT  tblcontacts.*
-                //             FROM tblcontacts
-                //             LEFT JOIN tblclients ON tblclients.userid=tblcontacts.userid 
-                //             WHERE  (tblcontacts.addedfrom in (' . implode(',',$my_staffids) . ') OR tblcontacts.userid IN (select userid from tblcontacts where id IN (select contacts_id from tbltasks where id IN (SELECT taskid FROM `tbltask_assigned` WHERE staffid in (' . implode(',',$my_staffids) . ')))) OR (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')  AND tblprojects.clientid != "")) OR  (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects where ' . db_prefix() . 'projects.teamleader in (' . implode(',',$my_staffids) . ') AND tblprojects.clientid != "" ))) AND (tblcontacts.firstname like "%'.$gsearch.'%" OR tblcontacts.email like "%'.$gsearch.'%" OR tblcontacts.phonenumber like "%'.$gsearch.'%")  AND tblcontacts.deleted_status=0 ';
             } else {
                 $where = ' WHERE ('.db_prefix().'contacts.addedfrom = "'.get_staff_user_id().'" OR (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id = "'.get_staff_user_id().'"  AND tblprojects.clientid != "")) OR  (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects where ' . db_prefix() . 'projects.teamleader = "'.get_staff_user_id().'" AND tblprojects.clientid != "" )))   AND (tblcontacts.firstname like "%'.$gsearch.'%" OR tblcontacts.email like "%'.$gsearch.'%" OR tblcontacts.phonenumber like "%'.$gsearch.'%")  AND tblcontacts.deleted_status=0 AND tblclients.deleted_status=0 '.$likeqry;
                 $where_summary_inactiveperson_qry = 'SELECT  tblcontacts.*
                 FROM tblcontacts
                 LEFT JOIN tblclients ON tblclients.userid=tblcontacts.userid LEFT JOIN tblcustomfieldsvalues as ctable_0 ON tblcontacts.id = ctable_0.relid AND ctable_0.fieldto="contacts" AND ctable_0.fieldid=7'.$where;
-                // $where_summary_inactiveperson_qry = 'SELECT  tblcontacts.*
-                //         FROM tblcontacts
-                //         LEFT JOIN tblclients ON tblclients.userid=tblcontacts.userid 
-                //         WHERE  (tblcontacts.addedfrom = "'.get_staff_user_id().'" OR tblcontacts.userid IN (select userid from tblcontacts where id IN (select contacts_id from tbltasks where id IN (SELECT taskid FROM `tbltask_assigned` WHERE staffid = "'.get_staff_user_id().'"))) OR (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id = "'.get_staff_user_id().'"  AND tblprojects.clientid != "")) OR  (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects where ' . db_prefix() . 'projects.teamleader = "'.get_staff_user_id().'" AND tblprojects.clientid != "" ))) AND (tblcontacts.firstname like "%'.$gsearch.'%" OR tblcontacts.email like "%'.$gsearch.'%" OR tblcontacts.phonenumber like "%'.$gsearch.'%") AND tblcontacts.active=1  AND tblcontacts.deleted_status=0 ';
+               
                         
             }
             $data['contacts'] = $this->db->query($where_summary_inactiveperson_qry)->result_array();
@@ -1422,7 +1351,6 @@ class Projects extends AdminController
         }
 		if (!empty($this->session->userdata('pipelines'))) {
 			$pipeline = $this->session->userdata('pipelines');
-			// $data['statuses'] = $this->pipeline_model->getPipelineleadstatus($pipeline);
 			$data['statuses'] = $this->pipeline_model->getPipelineprojectsstatus($pipeline);
 		}
 		else {
@@ -1440,7 +1368,6 @@ class Projects extends AdminController
         }
 		if (!empty($this->session->userdata('pipelines'))) {
 			$pipeline = $this->session->userdata('pipelines');
-			// $data['statuses'] = $this->pipeline_model->getPipelineleadstatus($pipeline);
 			$data['statuses'] = $this->pipeline_model->getPipelineprojectsstatus($pipeline);
 		}
 		else {
@@ -1458,7 +1385,6 @@ class Projects extends AdminController
         }
 		if (!empty($this->session->userdata('pipelines'))) {
 			$pipeline = $this->session->userdata('pipelines');
-			// $data['statuses'] = $this->pipeline_model->getPipelineleadstatus($pipeline);
 			$data['statuses'] = $this->pipeline_model->getPipelineprojectsstatus($pipeline);
 		}
 		else {
@@ -2245,7 +2171,6 @@ class Projects extends AdminController
                 } else {
                     $selected = '';
                 }
-                // $project_contacts_text .= '<br /><a href="'.admin_url('profile/'.$contact["contacts_id"]).'"> '.get_contact_full_name($contact['contacts_id']).'</a>';
                 $project_contacts_text .= '<option  value="'.$contact['contacts_id'].'" '.$selected.'>'.get_contact_full_name($contact['contacts_id']).'</option>';
                 $i++;
             }
@@ -2302,11 +2227,6 @@ class Projects extends AdminController
 		foreach($attachements as $attachement1){
 			$ch_content = $attachement1;
 			$file = $req_files[$i] = 'uploads/emails/'.$attachement1;
-			//file_put_contents($file, $ch_content);
-			/*$file = $req_files[$i] = $attachement1['name'];
-			$txt = fopen('uploads/'.$file, "w") or die("Unable to open file!");
-			fwrite($txt,$ch_content);
-			fclose($txt);*/
 			$i++;
 		}
 		if(count($attachements)>1){
@@ -2362,9 +2282,6 @@ class Projects extends AdminController
 			foreach($attachements as $attachement12){
 				$msg_id = $project->message_id;
 				if(!empty($project->mail_by) && $project->mail_by=='outlook'){
-					//$list_attach_ids = json_decode($project->attachment_id);
-					//echo $list_attach_ids[$j1];
-					//pre($attachement12);
 					$downoad_url = admin_url('outlook_mail/download_attachment_single_project/'.$project->id.'/'.$j1);
 				}else{
 					if($project->uid!=0){
@@ -2455,7 +2372,6 @@ class Projects extends AdminController
 				}
 			}
 			
-			//$output .= '<div class="col-md-12" style="margin-top:-100px"><div class="col-md-12"><div style="padding:0px 0px 33px 0px"><button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#forward-modal" onclick="add_content('.$add_content.')"><i class="fa fa-forward" ></i> Forward</button><button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#reply-modal" onclick="add_to('.$add_content.')" style="margin-right:10px;"><i class="fa fa-reply" ></i> Reply</button><button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#reply-modal" onclick="add_reply_all('.$add_content.')" style="margin-right:10px;"><i class="fa fa-reply" ></i> Reply All</button></div></div><div class="col-md-12"  style="margin-top:20px;">';
 			$output .= '<div class="col-md-12" ><div class="col-md-12"><div style="padding:0px 0px 33px 0px"><button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#forward-modal" onclick="add_content('.$add_content.')"><i class="fa fa-forward" ></i> Forward</button><button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#reply-modal" onclick="add_to('.$add_content.')" style="margin-right:10px;"><i class="fa fa-reply" ></i> Reply</button><button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#reply-modal" onclick="add_reply_all('.$add_content.')" style="margin-right:10px;"><i class="fa fa-reply" ></i> Reply All</button></div></div><div class="col-md-12"  style="margin-top:20px;">';
 		}
 		else{
@@ -2550,7 +2466,6 @@ class Projects extends AdminController
         exit;
     }
 	public function send_outlook($project_id){
-	//	$project_id = $_REQUEST['project_id'];
 		$outlook_data = outlook_credential();
 		$cur_token = get_outlook_token();
 		$token		= $cur_token->token;
@@ -2707,9 +2622,7 @@ class Projects extends AdminController
 				if (!empty($attachments)) {
 					$list_attachment = $this->list_attachment($messages['Id']);
 					$source_from2 = array_column($list_attachment, 'Id'); 
-					//$source_from2['ContentId'] = array_column($list_attachment, 'ContentId'); 
-					//$source_from2['ContentBytes'] = array_column($list_attachment, 'ContentBytes'); 
-					//$source_from2['Name'] = array_column($list_attachment, 'Name'); 
+					
 				}
 				if(get_option('link_deal')=='yes' && !empty($data['rel_id'])){
 					if(isset($data['task_mark_complete_id']) && !empty($data['task_mark_complete_id'])){
@@ -2744,7 +2657,6 @@ class Projects extends AdminController
 							$i = $j2 = 0;
 							$cur_project12 = $this->projects_model->get_project($ch_project_id);
 							$messages = $this->last_sent_item();
-							//pre($messages);
 							$req_msg[$i]['project_id']	= $ch_project_id;
 							$req_msg[$i]['task_id']		= $id;
 							$req_msg[$i]['staff_id'] 	= $cur_project12->teamleader;
@@ -2837,10 +2749,8 @@ class Projects extends AdminController
 					$outlookApiUrl1 = $outlook_data["api_url"] . "/me/mailFolders/".$folder1['Id']."/messages" ;
 					$response1 = runCurl($outlookApiUrl1, null, $headers);
 					$response1 = explode("\n", trim($response1));
-					//pre($response1);
 					$response1 = $response1[count($response1) - 1];
 					$response1 = json_decode($response1, true);
-					//pre($response1);
 					return $response1['value'][0];
 					break;
 				}
@@ -2879,12 +2789,10 @@ class Projects extends AdminController
 		$contacts = $this->db->get(db_prefix() . 'contacts')->row();
 		
 		if(!empty($data['description'])){
-		//if ($contacts) {
 			$this->db->where('contacts_id', $contacts->id);
 			$this->db->limit(1);
 			$project = $this->db->get(db_prefix() . 'project_contacts')->row();
 			$data['rel_id'] = $project_id;
-			//if ($project) {
 				
 			   if(!empty($contacts->id)){
 					$data['contacts_id'] = $contacts->id;
@@ -3035,11 +2943,9 @@ class Projects extends AdminController
 		$this->db->where('email', $this->input->post('toemail'));
 		$contacts = $this->db->get(db_prefix() . 'contacts')->row();
 		if(!empty($data['description'])){
-		//if ($contacts) {
 			$this->db->where('contacts_id', $contacts->id);
 			$this->db->limit(1);
 			$project = $this->db->get(db_prefix() . 'project_contacts')->row();
-			//if ($project) {
 				if(!empty($project->project_id)){
 						$data['rel_id'] = $project->project_id;
 				   }else{
@@ -3329,7 +3235,6 @@ class Projects extends AdminController
 								unlink($req_file12);
 							}
 						}
-						//imap_num_recent();
                         $this->load->library('imap');
 						$draft = $this->input->post('cur_draft_id', false);
 						if(!empty($draft)){
@@ -3481,12 +3386,10 @@ class Projects extends AdminController
             $data['tags'] = $this->input->post('tags', false);
             $this->db->where('email', $this->input->post('toemail'));
             $contacts = $this->db->get(db_prefix() . 'contacts')->row();
-            //if ($contacts) {
 				if(!empty($data['description'])){
                 $this->db->where('contacts_id', $contacts->id);
                 $this->db->limit(1);
                 $project = $this->db->get(db_prefix() . 'project_contacts')->row();
-               // if ($project) {
 				   if(!empty($project->project_id)){
 						$data['rel_id'] = $project->project_id;
 				   }else{
@@ -3525,15 +3428,6 @@ class Projects extends AdminController
 								$this->email->attach( $req_file123);
 							}
 						}
-						/*$m_file = explode(',',$_REQUEST['m_file']);
-						$file_count = count($_FILES['attachment']['name']);
-						for($j=0;$j<$file_count;$j++){
-							if(!empty($_FILES['attachment']['name'][$j]) && (empty($m_file[0]) || !in_array($j, $m_file))){
-								$newFilePath = $req_files[$j] = FCPATH.'uploads/'.$_FILES['attachment']['name'][$j];
-								move_uploaded_file($_FILES['attachment']['tmp_name'][$j], $newFilePath);
-								$this->email->attach( $newFilePath);
-							}
-						}*/
 					} 
 
                     if ($ch_data = $this->email->send()) {
@@ -3542,18 +3436,13 @@ class Projects extends AdminController
 								unlink($req_file12);
 							}
 						}
-						//imap_num_recent();
                         $this->load->library('imap');
                         //Initialize the connection:
                         $imap = $this->imap->check_imap($imapconf);
 						//Get the required datas:
                         if ($imap) {
                             $uid = $this->imap->get_company_latest_email_addresses($imapconf);
-                            if($uid == 'Cannot Read') {
-								//$message = "Don't have access to read Sent Folder. Please enable the read permission to Sent folder in your mail server.";
-								//set_alert('warning', $message);
-                            	//redirect($redirect_url);
-							}
+                           
 							$data['source_from'] = $uid;
                         } else {
                             $message       = 'Cannot Connect IMAP Server.';
@@ -3611,11 +3500,9 @@ class Projects extends AdminController
             $this->db->where('email', $this->input->post('toemail'));
             $contacts = $this->db->get(db_prefix() . 'contacts')->row();
 			if(!empty($data['description'])){
-            //if ($contacts) {
                 $this->db->where('contacts_id', $contacts->id);
                 $this->db->limit(1);
                 $project = $this->db->get(db_prefix() . 'project_contacts')->row();
-                //if ($project) {
                    if(!empty($project->project_id)){
 						$data['rel_id'] = $project->project_id;
 				   }else{
@@ -3639,7 +3526,6 @@ class Projects extends AdminController
                     $this->email->to($list);
                     $this->email->cc($this->input->post('ccemail', false));
                     $this->email->bcc($this->input->post('bccemail', false));
-                    //$this->email->reply_to($smtpconf['username'], 'Replay me');
                     $this->email->reply_to($list);
                     $this->email->subject($this->input->post('name', false));
                     $this->email->message($this->input->post('description', false));
@@ -3655,23 +3541,10 @@ class Projects extends AdminController
 								$this->email->attach( $req_file123);
 							}
 						}
-						/*$m_file = explode(',',$_REQUEST['m_file']);
-						$file_count = count($_FILES['attachment']['name']);
-						for($j=0;$j<$file_count;$j++){
-							if(!empty($_FILES['attachment']['name'][$j]) && (empty($m_file[0]) || !in_array($j, $m_file))){
-								$newFilePath = $req_files[$j] = FCPATH.'uploads/'.$_FILES['attachment']['name'][$j];
-								move_uploaded_file($_FILES['attachment']['tmp_name'][$j], $newFilePath);
-								$this->email->attach( $newFilePath);
-							}
-						}*/
+						
 					}
                     if ($ch_data = $this->email->send()) {
-						/*if(!empty($req_files)){
-							foreach($req_files as $req_file12){
-								unlink($req_file12);
-							}
-						}*/
-						//imap_num_recent();
+						
                         $this->load->library('imap');
                         //Initialize the connection:
                         $imap = $this->imap->check_imap($imapconf);
@@ -3680,9 +3553,7 @@ class Projects extends AdminController
                             $uid = $this->imap->get_company_latest_email_addresses($imapconf);
 							if($uid == 'Cannot Read') {
 								$messages = get_mail_message($_POST,$imapconf);
-								//$message = "Don't have access to read Sent Folder. Please enable the read permission to Sent folder in your mail server.";
-								//set_alert('warning', $message);
-                            	//redirect($redirect_url);
+								
 							}else{
 								if(!empty($req_files)){
 									foreach($req_files as $req_file12){
@@ -3702,12 +3573,7 @@ class Projects extends AdminController
                         set_alert('warning', $message);
                         redirect($redirect_url);
                     }
-                /*} else {
-                    $message       = 'Cannot create Activity.';
-                    set_alert('warning', $message);
-                    redirect($redirect_url);
-                }*/
-            //} 
+               
 			}else{
 				 $message       = 'Please enter message';
                 set_alert('warning', $message);
@@ -3756,7 +3622,6 @@ class Projects extends AdminController
             $success = false;
             set_alert('success', 'New Activity Log Added Successfully');
             log_activity('New Activity Log Added', 'Name: ' . $data['name'] . ']');
-		    //set_alert('success', $message);
 		    
 			}
 			else{
@@ -3814,7 +3679,6 @@ class Projects extends AdminController
         }
 		if (!empty($this->session->userdata('pipelines'))) {
 			$pipeline = $this->session->userdata('pipelines');
-			// $data['statuses'] = $this->pipeline_model->getPipelineleadstatus($pipeline);
 			$data['statuses'] = $this->pipeline_model->getPipelineprojectsstatus($pipeline);
 		}
 		else {

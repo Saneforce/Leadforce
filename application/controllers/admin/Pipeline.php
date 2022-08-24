@@ -72,7 +72,7 @@ class Pipeline extends AdminController
 					
 					// Team Leaders
 					$teamleaders = NULL;
-					$staff_leader1 =  $this->db->query('SELECT * FROM ' . db_prefix() . 'staff WHERE role = 1')->result_array();
+					$staff_leader1 =  $this->db->query('SELECT staffid FROM ' . db_prefix() . 'staff WHERE role = 1')->result_array();
 					if(!empty($staff_leader1)) {
 						foreach($staff_leader1 as $teamlead) {
 							$teamleaders .= $teamlead['staffid'].',';
@@ -94,7 +94,7 @@ class Pipeline extends AdminController
 					
 					// Team Members
 					$teammembers = NULL;
-					$staff_member1 =  $this->db->query('SELECT * FROM ' . db_prefix() . 'staff WHERE role = 1')->result_array();
+					$staff_member1 =  $this->db->query('SELECT staffid FROM ' . db_prefix() . 'staff WHERE role = 1')->result_array();
 					
 					if(!empty($staff_member1)) {
 						foreach($staff_member1 as $teammemb) {
@@ -102,7 +102,7 @@ class Pipeline extends AdminController
 						}
 						//$teammembers = rtrim($teammembers,',');
 					}
-					$staff_member =  $this->db->query('SELECT * FROM ' . db_prefix() . 'staff WHERE role = 3')->result_array();
+					$staff_member =  $this->db->query('SELECT staffid FROM ' . db_prefix() . 'staff WHERE role = 3')->result_array();
 					
 					if(!empty($staff_member)) {
 						foreach($staff_member as $teammemb) {

@@ -15,7 +15,7 @@ class Shared extends App_Controller
 
     public function index($shared)
     {
-        $links = $this->db->query("SELECT * FROM " . db_prefix() . "report_public WHERE share_link = '".$shared."' ")->result_array();
+        $links = $this->db->query("SELECT id,report_id,link_name,share_link FROM " . db_prefix() . "report_public WHERE share_link = '".$shared."' ")->result_array();
 		if(empty($links) || empty($shared)){
 			 access_denied('reports');
 		}
