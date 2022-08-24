@@ -3039,10 +3039,10 @@ class Tasks_model extends App_Model
         array_push($join, 'LEFT JOIN '.db_prefix().'pipeline  as '.db_prefix().'pipeline ON '.db_prefix().'pipeline.id = ' .db_prefix() . 'projects.pipeline_id');
         array_push($join, 'LEFT JOIN '.db_prefix().'clients  as '.db_prefix().'clients ON '.db_prefix().'clients.userid = ' .db_prefix() . 'projects.clientid');
        array_push($join, 'LEFT JOIN '.db_prefix().'contacts  as '.db_prefix().'contacts ON ('.db_prefix().'contacts.id = ' .db_prefix() . 'tasks.contacts_id  OR (' .db_prefix() . 'tasks.rel_type ="contact" AND '.db_prefix().'contacts.id = ' .db_prefix() . 'tasks.rel_id) )');
-         include_once(APPPATH . 'views/admin/tables/includes/tasks_filter.php');
-         include_once(APPPATH . 'views/admin/tables/includes/tasks_wo_status_filter.php');
-         array_push($where, 'AND CASE WHEN rel_type="project" AND rel_id IN (SELECT project_id FROM ' . db_prefix() . 'project_settings WHERE project_id=rel_id AND name="hide_tasks_on_main_tasks_table" AND value=1) THEN rel_type != "project" ELSE 1=1 END');
-         array_push($where, ' AND rel_type != "invoice" AND rel_type != "estimate" AND rel_type != "proposal"');
+         //include_once(APPPATH . 'views/admin/tables/includes/tasks_filter.php');
+         //include_once(APPPATH . 'views/admin/tables/includes/tasks_wo_status_filter.php');
+       //  array_push($where, 'AND CASE WHEN rel_type="project" AND rel_id IN (SELECT project_id FROM ' . db_prefix() . 'project_settings WHERE project_id=rel_id AND name="hide_tasks_on_main_tasks_table" AND value=1) THEN rel_type != "project" ELSE 1=1 END');
+        // array_push($where, ' AND rel_type != "invoice" AND rel_type != "estimate" AND rel_type != "proposal"');
         
         
         
