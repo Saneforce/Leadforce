@@ -1028,7 +1028,7 @@ function get_files($project_id)
 function get_deal_deails($deal_id){
 	$CI   = &get_instance();
 	$req_project_id = $req_project_name = '';
-	$project12 = $CI->db->query('SELECT * FROM '.db_prefix().'projects  where id = '.$deal_id.' limit 0,1')->row();
+	$project12 = $CI->db->query('SELECT id,name FROM '.db_prefix().'projects  where id = '.$deal_id.' limit 0,1')->row();
 	if ($project12 ) {
 		$req_project_name = $project12->name;
 		$req_project_id = $project12->id;
@@ -1045,24 +1045,21 @@ function get_deal_name($to_mail,$ch_deal){
 	 $staff_id = get_staff_user_id();
 	 if ($contacts12) {
 		 if($ch_deal!='' && $ch_deal == 'first open deal'){
-			//$project12 = $CI->db->query('SELECT *,p.name as p_name FROM ' . db_prefix() . 'project_contacts pc,'.db_prefix().'projects p where pc.contacts_id ='.$contacts12->id.' and p.stage_of = 0 and p.id = pc.project_id and p.teamleader = '.$staff_id.' order by p.id asc limit 0,1')->row();
-			$project12 = $CI->db->query('SELECT *,p.name as p_name FROM ' . db_prefix() . 'project_contacts pc,'.db_prefix().'projects p where pc.contacts_id ='.$contacts12->id.' and p.stage_of = 0 and p.id = pc.project_id  order by p.id asc limit 0,1')->row();
+			$project12 = $CI->db->query('SELECT pc.project_id,p.name as p_name FROM ' . db_prefix() . 'project_contacts pc,'.db_prefix().'projects p where pc.contacts_id ='.$contacts12->id.' and p.stage_of = 0 and p.id = pc.project_id  order by p.id asc limit 0,1')->row();
 			if ($project12 ) {
 				$req_project_name = $project12->p_name;
 				$req_project_id = $project12->project_id;
 			}
 		}
 		else if($ch_deal!='' && $ch_deal == 'last open deal'){
-			//$project12 = $CI->db->query('SELECT *,p.name as p_name FROM ' . db_prefix() . 'project_contacts pc,'.db_prefix().'projects p where pc.contacts_id ='.$contacts12->id.' and p.stage_of = 0 and p.id = pc.project_id and p.teamleader = '.$staff_id.' order by p.id desc limit 0,1')->row();
-			$project12 = $CI->db->query('SELECT *,p.name as p_name FROM ' . db_prefix() . 'project_contacts pc,'.db_prefix().'projects p where pc.contacts_id ='.$contacts12->id.' and p.stage_of = 0 and p.id = pc.project_id order by p.id desc limit 0,1')->row();
+			$project12 = $CI->db->query('SELECT pc.project_id,p.name as p_name FROM ' . db_prefix() . 'project_contacts pc,'.db_prefix().'projects p where pc.contacts_id ='.$contacts12->id.' and p.stage_of = 0 and p.id = pc.project_id order by p.id desc limit 0,1')->row();
 			if ($project12 ){
 				$req_project_name = $project12->p_name;
 				$req_project_id = $project12->project_id;
 			}
 		}
 		else if($ch_deal!='' && $ch_deal == 'more activities available in open deal'){
-			//$project12 = $CI->db->query('SELECT *,p.name as p_name FROM ' . db_prefix() . 'project_contacts pc,'.db_prefix().'projects p where pc.contacts_id ='.$contacts12->id.' and p.stage_of = 0 and p.id = pc.project_id and p.teamleader = '.$staff_id.' order by p.id asc ')->result_array();
-			$project12 = $CI->db->query('SELECT *,p.name as p_name FROM ' . db_prefix() . 'project_contacts pc,'.db_prefix().'projects p where pc.contacts_id ='.$contacts12->id.' and p.stage_of = 0 and p.id = pc.project_id order by p.id asc ')->result_array();
+			$project12 = $CI->db->query('SELECT pc.project_id,p.name as p_name FROM ' . db_prefix() . 'project_contacts pc,'.db_prefix().'projects p where pc.contacts_id ='.$contacts12->id.' and p.stage_of = 0 and p.id = pc.project_id order by p.id asc ')->result_array();
 			if (!empty($project12) && $req_project_id=='') {
 				foreach($project12 as $project121){
 					$CI->db->select("count(*) tot_activitiy",'project_id');
@@ -1079,8 +1076,7 @@ function get_deal_name($to_mail,$ch_deal){
 			
 		}
 		else{
-			//$project12 = $CI->db->query('SELECT *,p.name as p_name FROM ' . db_prefix() . 'project_contacts pc,'.db_prefix().'projects p where pc.contacts_id ='.$contacts12->id.' and p.stage_of = 0 and p.id = pc.project_id and p.teamleader = '.$staff_id.' order by p.id asc limit 0,1')->row();
-			$project12 = $CI->db->query('SELECT *,p.name as p_name FROM ' . db_prefix() . 'project_contacts pc,'.db_prefix().'projects p where pc.contacts_id ='.$contacts12->id.' and p.stage_of = 0 and p.id = pc.project_id order by p.id asc limit 0,1')->row();
+			$project12 = $CI->db->query('SELECT pc.project_id,p.name as p_name FROM ' . db_prefix() . 'project_contacts pc,'.db_prefix().'projects p where pc.contacts_id ='.$contacts12->id.' and p.stage_of = 0 and p.id = pc.project_id order by p.id asc limit 0,1')->row();
 			if ($project12 ) {
 				$req_project_name = $project12->p_name;
 				$req_project_id = $project12->project_id;
@@ -1101,19 +1097,19 @@ function get_deal_id($to_mail,$ch_deal){
 	 $staff_id = get_staff_user_id();
 	 if ($contacts12) {
 		 if($ch_deal!='' && $ch_deal == 'first open deal'){
-			$project12 = $CI->db->query('SELECT * FROM ' . db_prefix() . 'project_contacts pc,'.db_prefix().'projects p where pc.contacts_id ='.$contacts12->id.' and p.stage_of = 0 and p.id = pc.project_id  and p.teamleader = '.$staff_id.' order by p.id asc limit 0,1')->row();
+			$project12 = $CI->db->query('SELECT pc.project_id FROM ' . db_prefix() . 'project_contacts pc,'.db_prefix().'projects p where pc.contacts_id ='.$contacts12->id.' and p.stage_of = 0 and p.id = pc.project_id  and p.teamleader = '.$staff_id.' order by p.id asc limit 0,1')->row();
 			if ($project12 ) {
 				$req_project_id = $project12->project_id;
 			}
 		}
 		else if($ch_deal!='' && $ch_deal == 'last open deal'){
-			$project12 = $CI->db->query('SELECT * FROM ' . db_prefix() . 'project_contacts pc,'.db_prefix().'projects p where pc.contacts_id ='.$contacts12->id.' and p.stage_of = 0 and p.id = pc.project_id  and p.teamleader = '.$staff_id.' order by p.id desc limit 0,1')->row();
+			$project12 = $CI->db->query('SELECT pc.project_id FROM ' . db_prefix() . 'project_contacts pc,'.db_prefix().'projects p where pc.contacts_id ='.$contacts12->id.' and p.stage_of = 0 and p.id = pc.project_id  and p.teamleader = '.$staff_id.' order by p.id desc limit 0,1')->row();
 			if ($project12 ){
 				$req_project_id = $project12->project_id;
 			}
 		}
 		else if($ch_deal!='' && $ch_deal == 'more activities available in open deal'){
-			$project12 = $CI->db->query('SELECT * FROM ' . db_prefix() . 'project_contacts pc,'.db_prefix().'projects p where pc.contacts_id ='.$contacts12->id.' and p.stage_of = 0 and p.id = pc.project_id  and p.teamleader = '.$staff_id.' order by p.id asc ')->result_array();
+			$project12 = $CI->db->query('SELECT pc.project_id FROM ' . db_prefix() . 'project_contacts pc,'.db_prefix().'projects p where pc.contacts_id ='.$contacts12->id.' and p.stage_of = 0 and p.id = pc.project_id  and p.teamleader = '.$staff_id.' order by p.id asc ')->result_array();
 			if (!empty($project12) && $req_project_id=='') {
 				foreach($project12 as $project121){
 					$CI->db->select("count(*) tot_activitiy",'project_id');
@@ -1129,7 +1125,7 @@ function get_deal_id($to_mail,$ch_deal){
 			
 		}
 		else{
-			$project12 = $CI->db->query('SELECT * FROM ' . db_prefix() . 'project_contacts pc,'.db_prefix().'projects p where pc.contacts_id ='.$contacts12->id.' and p.stage_of = 0 and p.id = pc.project_id  and p.teamleader = '.$staff_id.' order by p.id asc limit 0,1')->row();
+			$project12 = $CI->db->query('SELECT pc.project_id FROM ' . db_prefix() . 'project_contacts pc,'.db_prefix().'projects p where pc.contacts_id ='.$contacts12->id.' and p.stage_of = 0 and p.id = pc.project_id  and p.teamleader = '.$staff_id.' order by p.id asc limit 0,1')->row();
 			if ($project12 ) {
 				$req_project_id = $project12->project_id;
 			}
@@ -1175,7 +1171,7 @@ function get_deal_id_contactuser($from_mail,$ch_deal){
 	 $req_res = array();
 	 $CI->db->reconnect();
 	 if($ch_deal!='' && $ch_deal == 'first open deal'){
-		$project12 = $CI->db->query("SELECT *,c.id c_id FROM " . db_prefix() . "project_contacts pc,".db_prefix()."projects p,".db_prefix()."contacts c where c.email = '".$from_mail."' and pc.contacts_id =c.id and p.stage_of = 0 and p.id = pc.project_id order by p.id asc limit 0,1")->row();
+		$project12 = $CI->db->query("SELECT pc.project_id,c.id c_id FROM " . db_prefix() . "project_contacts pc,".db_prefix()."projects p,".db_prefix()."contacts c where c.email = '".$from_mail."' and pc.contacts_id =c.id and p.stage_of = 0 and p.id = pc.project_id order by p.id asc limit 0,1")->row();
 		if ($project12 ) {
 			$req_res['project_id'] = $project12->project_id;
 			$req_res['contact_id'] = $project12->c_id;
@@ -1184,13 +1180,13 @@ function get_deal_id_contactuser($from_mail,$ch_deal){
 		}
 	}
 	else if($ch_deal!='' && $ch_deal == 'last open deal'){
-		$project12 = $CI->db->query("SELECT *,c.id c_id FROM " . db_prefix() . "project_contacts pc,".db_prefix()."projects p,".db_prefix()."contacts c where c.email = '".$from_mail."' and pc.contacts_id = c.id and p.stage_of = 0 and p.id = pc.project_id order by p.id desc limit 0,1")->row();
+		$project12 = $CI->db->query("SELECT pc.project_id,c.id c_id FROM " . db_prefix() . "project_contacts pc,".db_prefix()."projects p,".db_prefix()."contacts c where c.email = '".$from_mail."' and pc.contacts_id = c.id and p.stage_of = 0 and p.id = pc.project_id order by p.id desc limit 0,1")->row();
 		if ($project12 ){
 			$req_res['project_id'] = $project12->project_id;
 			$req_res['contact_id'] = $project12->c_id;
 		}
 	}else if($ch_deal!='' && $ch_deal == 'more activities available in open deal'){
-		$project12 = $CI->db->query("SELECT *,c.id c_id FROM " . db_prefix() ."project_contacts pc,".db_prefix()."projects p,".db_prefix()."contacts c where c.email = '".$from_mail."' and pc.contacts_id =c.id and p.stage_of = 0 and p.id = pc.project_id order by p.id ")->result_array();
+		$project12 = $CI->db->query("SELECT pc.project_id,c.id c_id FROM " . db_prefix() ."project_contacts pc,".db_prefix()."projects p,".db_prefix()."contacts c where c.email = '".$from_mail."' and pc.contacts_id =c.id and p.stage_of = 0 and p.id = pc.project_id order by p.id ")->result_array();
 		if (!empty($project12) && $req_project_id=='') {
 			foreach($project12 as $project121){
 				$CI->db->reconnect();
@@ -1208,7 +1204,7 @@ function get_deal_id_contactuser($from_mail,$ch_deal){
 		
 	}
 	else{
-		$project12 = $CI->db->query("SELECT *,c.id c_id FROM " . db_prefix() . "project_contacts pc,".db_prefix()."projects p,".db_prefix()."contacts c where c.email = '".$from_mail."' and pc.contacts_id =c.id and p.stage_of = 0 and p.id = pc.project_id order by p.id asc limit 0,1")->row();
+		$project12 = $CI->db->query("SELECT pc.project_id,c.id c_id FROM " . db_prefix() . "project_contacts pc,".db_prefix()."projects p,".db_prefix()."contacts c where c.email = '".$from_mail."' and pc.contacts_id =c.id and p.stage_of = 0 and p.id = pc.project_id order by p.id asc limit 0,1")->row();
 		if ($project12 ) {
 			$req_res['project_id'] = $project12->project_id;
 			$req_res['contact_id'] = $project12->c_id;
@@ -1291,7 +1287,6 @@ function get_mail_message($messages,$imapconf){
 	$req_messages['size']				= 0;
 	$req_messages['body']['html']		= $messages['description'];
 	$req_messages['body']['plain']		= strip_tags($messages['description']);
-	//$req_messages['attachments']		= array();
 	$req_messages['to']					= array($req_messages['to']);
 	$req_messages['reply_to']			= array($req_messages['reply_to']);
 	$req_messages['cc']					= array($req_messages['cc']);
@@ -1309,7 +1304,6 @@ function add_target($status){
 	}
 	$ins_data = $ins_deal = $ins_interval =  $ins_user = $ins_manager = array();
 	extract($_POST);
-	//echo '<pre>';print_r($custom_fields);exit;
 	$ins_data['assign'] 		= $assign;
 	$ins_data['tracking_metric']= $tracking_metic;
 	$ins_data['interval'] 		= $interval;
@@ -1331,7 +1325,6 @@ function add_target($status){
 			foreach($pipeline_stage as $pipeline_stage12){
 				$ins_stage[$i]['stage_id'] = $pipeline_stage12;
 				$ins_stage[$i]['target_id'] = $target_id;
-				//$ins_stage[$i]['s_search'] = $stage_res[0]['pipeline'];
 				$i++;
 			}
 			$table = db_prefix() . 'target_stage';
@@ -1346,7 +1339,6 @@ function add_target($status){
 		foreach($select_deal as $select_deal1){
 			$ins_deal[$i]['pipeline'] = $select_deal1;
 			$ins_deal[$i]['target_id'] = $target_id;
-			//$ins_deal[$i]['s_search'] = $pipe_res[0]['pipeline'];
 			$i++;
 		}
 		$table = db_prefix() . 'target_pipeline';
@@ -1361,7 +1353,6 @@ function add_target($status){
 			$ins_manager[$i]['manager'] = $select_manager1;
 			$ins_manager[$i]['target_id'] = $target_id;
 			$ins_manager[$i]['assign_user'] = $assign_user_wise1;
-			//$ins_manager[$i]['s_search'] = $manager_res[0]['contact_name'];
 			$i++;
 		}
 		$table = db_prefix() . 'target_manager';
@@ -1374,7 +1365,6 @@ function add_target($status){
 		foreach($select_user as $select_user1){
 			$ins_user[$i]['user'] = $select_user1;
 			$ins_user[$i]['target_id'] = $target_id;
-			//$ins_user[$i]['s_search'] = $user_res[0]['contact_name'];
 			$i++;
 		}
 		$table = db_prefix() . 'target_user';
@@ -1396,7 +1386,6 @@ function add_target($status){
 				}
 				$ins_interval[$i]['interval_type'] = $tracking_metic;
 				$ins_interval[$i]['interval'] = $interval11;
-				//$ins_interval[$i]['interval_value'] = $intreval_value2[$i];
 				if(!empty($intreval_value2[$i])){
 					$ins_interval[$i]['interval_value'] = $intreval_value2[$i];
 				}else{
@@ -1430,7 +1419,6 @@ function add_target($status){
 			foreach($intervals as $interval1){
 				$ins_interval[$i]['interval_type'] = $tracking_metic;
 				$ins_interval[$i]['interval'] = $interval1;
-				//$ins_interval[$i]['interval_value'] = $intreval_value[$i];
 				if(!empty($intreval_value[$i])){
 					$ins_interval[$i]['interval_value'] = $intreval_value[$i];
 				}else{
@@ -1463,7 +1451,6 @@ function edit_target($status,$target_id){
 	$ins_data['assign'] 		= $assign;
 	$ins_data['tracking_metric'] = $tracking_metic;
 	$ins_data['interval'] 		= $interval;
-	//$ins_data['target_type'] 	= $goal_val;
 	$ins_data['target_status'] 	= $status;
 	$ins_data['start_date']		= date('Y-m-d',strtotime($start_date));
 	if(!empty($end_date)){
@@ -1478,7 +1465,6 @@ function edit_target($status,$target_id){
 	$condition = array('id'=>$target_id);
 	
 	$CI->db->update($table, $ins_data, $condition);
-	//if($goal_val == 'progressed'){
 	if(!empty($pipeline_stage)){
 		$i = 0;
 		$condition = array('target_id'=>$target_id);
@@ -1490,13 +1476,12 @@ function edit_target($status,$target_id){
 		foreach($pipeline_stage as $pipeline_stage12){
 			$ins_stage[$i]['stage_id'] = $pipeline_stage12;
 			$ins_stage[$i]['target_id'] = $target_id;
-			//$ins_stage[$i]['s_search'] = $stage_res[0]['pipeline'];
 			$i++;
 		}
 		$table = db_prefix() . 'target_stage';
 		$CI->db->insert_batch($table, $ins_stage);
 	}
-	//}
+	
 	if(!empty($select_deal)){
 		$i = 0;
 		$condition = array('target_id'=>$target_id);
@@ -1506,7 +1491,6 @@ function edit_target($status,$target_id){
 		foreach($select_deal as $select_deal1){
 			$ins_deal[$i]['pipeline'] = $select_deal1;
 			$ins_deal[$i]['target_id'] = $target_id;
-			//$ins_deal[$i]['s_search'] = $pipe_res[0]['pipeline'];
 			$i++;
 		}
 		
@@ -1524,7 +1508,6 @@ function edit_target($status,$target_id){
 			$ins_manager[$i]['manager'] = $select_manager1;
 			$ins_manager[$i]['target_id'] = $target_id;
 			$ins_manager[$i]['assign_user'] = $assign_user_wise1;
-			//$ins_manager[$i]['s_search'] = $manager_res[0]['contact_name'];
 			$i++;
 		}
 		$CI->db->insert_batch($table, $ins_manager);
@@ -1540,7 +1523,6 @@ function edit_target($status,$target_id){
 		foreach($select_user as $select_user1){
 			$ins_user[$i]['user'] = $select_user1;
 			$ins_user[$i]['target_id'] = $target_id;
-			//$ins_user[$i]['s_search'] = $user_res[0]['contact_name'];
 			$i++;
 		}
 		$CI->db->insert_batch($table, $ins_user);
@@ -1571,7 +1553,6 @@ function edit_target($status,$target_id){
 				}
 				$ins_interval[$i]['interval_type'] = $tracking_metic;
 				$ins_interval[$i]['interval'] = $interval11;
-				//$ins_interval[$i]['interval_value'] = $intreval_value2[$i];
 				if(!empty($intreval_value2[$i])){
 					$ins_interval[$i]['interval_value'] = $intreval_value2[$i];
 				}else{
@@ -1605,7 +1586,6 @@ function edit_target($status,$target_id){
 			foreach($intervals1 as $interval1){
 				$ins_interval[$i]['interval_type'] = $tracking_metic;
 				$ins_interval[$i]['interval'] = $interval1;
-				//$ins_interval[$i]['interval_value'] = $intreval_value[$i];
 				if(!empty($intreval_value2[$i])){
 					$ins_interval[$i]['interval_value'] = $intreval_value2[$i];
 				}else{
@@ -1708,7 +1688,6 @@ function get_reminder_data($post_data){
 				$setting_data['act_date_time'] = $post_data['activity_daily'];
 			}
 			if($post_data['activity_mail'] == 'monthly'){
-				//$setting_data['act_date_time'] = $post_data['activity_monthly'].','.$post_data['activity_monthy_t'];
 				$setting_data['act_date_time'] = $post_data['activity_monthly'];
 				$setting_data['act_month'] = $post_data['activity_month_f'];
 			}
@@ -1729,7 +1708,6 @@ function get_reminder_data($post_data){
 				$setting_data['pr_date_time'] = $post_data['proposal_daily'];
 			}
 			if($post_data['proposal_mail'] == 'monthly'){
-				//$setting_data['pr_date_time'] = $post_data['proposal_monthly'].','.$post_data['proposal_monthy_t'];
 				$setting_data['pr_date_time'] = $post_data['proposal_monthly'];
 				$setting_data['pr_month'] = $post_data['proposal_month_f'];
 			}
@@ -1750,7 +1728,6 @@ function get_reminder_data($post_data){
 				$setting_data['tar_date_time'] = $post_data['target_daily'];
 			}
 			if($post_data['target_mail'] == 'monthly'){
-				//$setting_data['tar_date_time'] = $post_data['target_monthy'].','.$post_data['target_monthy_t'];
 				$setting_data['tar_date_time'] = $post_data['target_monthy'];
 				$setting_data['tar_month'] = $post_data['target_month_f'];
 			}
@@ -1817,20 +1794,9 @@ function check_task_activity($cur_date,$staff_id,$alert_type)
 	$req_date = date("Y-m-d");
 	$req_time = date("Y-m-d H:i:s");
 	$CI   = &get_instance();
-	///echo $req_time;
-	//echo '<br>'.$cur_date;exit;
-	//if(strtotime($req_time) == strtotime($cur_date)){
-	/*	$already = $CI->db->query("SELECT * FROM " . db_prefix() . "check_remind WHERE remind_type = 'activity' and staff_id ='".$staff_id."' and remind_date ='".$req_date."' and alert_type='".$alert_type."'")->result_array();
-		if(!empty($already)){
-			$already = array_column($already, 'type_id');
-			$type_ids = implode(',',$already);
-			$res = $CI->db->query("SELECT t.* FROM " . db_prefix() . "tasks t," . db_prefix() . "task_assigned ta WHERE ta.taskid= t.id and ta.staffid = '".$staff_id."' and t.startdate='".$cur_date."' and t.id NOT IN (".$type_ids.") order by t.id desc")->result_array();
-		}
-		else{*/
 			
-			$res = $CI->db->query("SELECT t.* FROM " . db_prefix() . "tasks t," . db_prefix() . "task_assigned ta WHERE	 ta.taskid= t.id and ta.staffid = '".$staff_id."' and t.startdate='".$cur_date."' and t.status!= '5' order by t.id desc")->result_array();
+	$res = $CI->db->query("SELECT t.* FROM " . db_prefix() . "tasks t," . db_prefix() . "task_assigned ta WHERE	 ta.taskid= t.id and ta.staffid = '".$staff_id."' and t.startdate='".$cur_date."' and t.status!= '5' order by t.id desc")->result_array();
 			
-		//}
 	return $res;
 }
 function ins_remind($staffid,$remind_type,$type_id,$remind_date,$alert_type){
@@ -1877,44 +1843,11 @@ function check_activity_mail($cur_date,$act_mail,$act_date_time,$act_day,$act_mo
 	$req_date1 = $req_date2 = $req_time ='';
 	$req_time = date('H:i',strtotime($act_date_time));
 	if($act_mail == 'monthly'){
-		//$req_date = explode(',',$act_date_time);
 		$req_date1 = date('d-m',strtotime($act_date_time));
 	}
 	
 	$cur_d_m = date('d-m');
-	//$req_time = $cur_time;
-	//$already = $CI->db->query("SELECT * FROM " . db_prefix() . "check_remind WHERE remind_type = 'activity' and staff_id ='".$staff_id."' and remind_date ='".$req_date."' and alert_type='".$alert_type."'")->result_array();
 	if(($act_mail == 'weekly' && $act_day == $cur_day && strtotime($req_time) == strtotime($cur_time)) || ($act_mail == 'daily' && strtotime($req_time) == strtotime($cur_time) ) ||($act_mail == 'monthly' && strtotime($req_date1) == strtotime($cur_d_m) && strtotime($req_time) == strtotime($cur_time) )){
-		/*if(!empty($already)){
-			$already = array_column($already, 'type_id');
-			$type_ids = implode(',',$already);
-			if($act_mail == 'daily'){
-				$res = $CI->db->query("SELECT t.* FROM " . db_prefix() . "tasks t," . db_prefix() . "task_assigned ta WHERE ta.taskid= t.id and ta.staffid = '".$staff_id."' and DATE_FORMAT(t.startdate,'%Y-%m-%d') ='".$cur_date."' and t.id NOT IN (".$type_ids.") order by t.id desc")->result_array();
-			}
-			else if($act_mail == 'weekly'){
-				$ch_days = '';
-				for($i=0;$i<7;$i++){
-					$ch_days = "'".date('Y-m-d', strtotime('+'.$i.' days'))."',".$ch_days;
-				}
-				$ch_days = rtrim($ch_days,",");
-				
-				$res = $CI->db->query("SELECT t.* FROM " . db_prefix() . "tasks t," . db_prefix() . "task_assigned ta WHERE ta.taskid= t.id and ta.staffid = '".$staff_id."' and t.startdate in(".$ch_days.") and t.id NOT IN (".$type_ids.") order by t.id desc")->result_array();
-			}
-			else if($act_mail == 'monthly'){
-				$cur_m = date('m');
-				$cur_y = date('Y');
-				$next_m = date('m',strtotime('first day of +1 month'));
-				$next_y = date('Y',strtotime('first day of +1 month'));
-				
-				if($act_month == 'current_month'){
-					$res = $CI->db->query("SELECT t.* FROM " . db_prefix() . "tasks t," . db_prefix() . "task_assigned ta WHERE ta.taskid= t.id and ta.staffid = '".$staff_id."' and MONTH(t.startdate) = '".$cur_m."' and Year(t.startdate) = '".$cur_y."'  and t.id NOT IN (".$type_ids.") order by t.id desc")->result_array();
-				}
-				else{
-					$res = $CI->db->query("SELECT t.* FROM " . db_prefix() . "tasks t," . db_prefix() . "task_assigned ta WHERE ta.taskid= t.id and ta.staffid = '".$staff_id."' and ((MONTH(t.startdate) = '".$next_m."' and Year(t.startdate) = '".$next_y."') or (MONTH(t.startdate) = '".$cur_m."' and Year(t.startdate) = '".$cur_y."') )and t.id NOT IN (".$type_ids.") order by t.id desc")->result_array();
-				}
-			}
-		}
-		else{*/
 			if($act_mail == 'daily'){
 				$res = $CI->db->query("SELECT t.* FROM " . db_prefix() . "tasks t," . db_prefix() . "task_assigned ta WHERE	 ta.taskid= t.id and ta.staffid = '".$staff_id."' and DATE_FORMAT(t.startdate,'%Y-%m-%d') ='".$cur_date."' and t.status!= '5' order by t.id desc")->result_array();
 				
@@ -1941,7 +1874,6 @@ function check_activity_mail($cur_date,$act_mail,$act_date_time,$act_day,$act_mo
 					$res = $CI->db->query("SELECT t.* FROM " . db_prefix() . "tasks t," . db_prefix() . "task_assigned ta WHERE ta.taskid= t.id and ta.staffid = '".$staff_id."' and ((MONTH(t.startdate) = '".$next_m."' and Year(t.startdate) = '".$next_y."') or (MONTH(t.startdate) = '".$cur_m."' and Year(t.startdate) = '".$cur_y."') ) and t.status!= '5' order by t.id desc")->result_array();
 				}
 			}
-		//}
 	}
 	
 	return $res;
@@ -1954,7 +1886,6 @@ function check_proposal_mail($pr_mail,$pr_date_time,$pr_day,$pr_month,$staff_id=
 	$req_date1 = $req_time ='';
 	$req_time = date('H:i',strtotime($pr_date_time));
 	if($pr_mail == 'monthly'){
-		//$req_date = explode(',',$pr_date_time);
 		$req_date1 = date('d-m',strtotime($pr_date_time));
 	}
 	$cur_d_m = date('d-m');
@@ -1965,37 +1896,6 @@ function check_proposal_mail($pr_mail,$pr_date_time,$pr_day,$pr_month,$staff_id=
 	if(($pr_mail == 'weekly' && $pr_day == $cur_day && strtotime($req_time) == strtotime($cur_time)) || ($pr_mail == 'daily' && strtotime($req_time) == strtotime($cur_time) ) ||($pr_mail == 'monthly' && strtotime($req_date1) == strtotime($cur_d_m) && strtotime($req_time) == strtotime($cur_time) )){
 		$req_date = date("Y-m-d");
 		
-		/*$already = $CI->db->query("SELECT * FROM " . db_prefix() . "check_remind WHERE remind_type = 'proposal' and staff_id = '".$staff_id."' and remind_date ='".$req_date."'")->result_array();
-		
-		if(!empty($already)){
-			$already = array_column($already, 'type_id');
-			$type_ids = implode(',',$already);
-			if($pr_mail == 'daily'){
-				$res = $CI->db->query("SELECT * FROM " . db_prefix() . "proposals WHERE  addedfrom = '".$staff_id."' and open_till ='".$cur_date."' and id NOT IN (".$type_ids.") order by id desc")->result_array();
-			}
-			else if($pr_mail == 'weekly'){
-				$ch_days = '';
-				for($i=0;$i<7;$i++){
-					$ch_days = "'".date('Y-m-d', strtotime('+'.$i.' days'))."',".$ch_days;
-				}
-				$ch_days = rtrim($ch_days,",");
-				$res = $CI->db->query("SELECT * FROM " . db_prefix() . "proposals WHERE  addedfrom = '".$staff_id."' and  DATE_FORMAT(open_till,'%Y-%m-%d') in(".$ch_days.") and id NOT IN (".$type_ids.") order by id desc")->result_array();
-			}
-			else if($pr_mail == 'monthly'){
-				$cur_m = date('m');
-				$cur_y = date('Y');
-				$next_m = date('m',strtotime('first day of +1 month'));
-				$next_y = date('Y',strtotime('first day of +1 month'));
-				
-				if($pr_month == 'current_month'){
-					$res = $CI->db->query("SELECT * FROM " . db_prefix() . "proposals WHERE addedfrom = '".$staff_id."' and MONTH(open_till) = '".$cur_m."' and Year(open_till) = '".$cur_y."' and id NOT IN (".$type_ids.")  order by id desc")->result_array();
-				}
-				else{
-					$res = $CI->db->query("SELECT * FROM " . db_prefix() . "proposals WHERE addedfrom = '".$staff_id."' and ((MONTH(open_till) = '".$next_m."' and Year(open_till) = '".$next_y."') or (MONTH(open_till) = '".$cur_m."' and Year(open_till) = '".$cur_y."') ) and id NOT IN (".$type_ids.") order by id desc")->result_array();
-				}
-			}
-		}
-		else{*/
 			if($pr_mail == 'daily'){
 				$res = $CI->db->query("SELECT * FROM " . db_prefix() . "proposals WHERE  addedfrom = '".$staff_id."' and open_till ='".$cur_date."' and status!='3'  order by id desc")->result_array();
 			}
@@ -2021,7 +1921,6 @@ function check_proposal_mail($pr_mail,$pr_date_time,$pr_day,$pr_month,$staff_id=
 					$res = $CI->db->query("SELECT * FROM " . db_prefix() . "proposals WHERE addedfrom = '".$staff_id."' and ((MONTH(open_till) = '".$next_m."' and Year(open_till) = '".$next_y."') or (MONTH(open_till) = '".$cur_m."' and Year(open_till) = '".$cur_y."') ) and status!='3' order by id desc")->result_array();
 				}
 			}
-		//}
 	}
 	return $res;
 }
@@ -2032,50 +1931,15 @@ function check_targets_mail($tar_mail,$tar_date_time,$tar_day,$tar_month,$staff_
 	$req_date1 = $req_time ='';
 	$req_time = date('H:i',strtotime($tar_date_time));
 	if($tar_mail == 'monthly'){
-		//$req_date = explode(',',$tar_date_time);
 		$req_date1 = date('d-m',strtotime($tar_date_time));
 	}
 	
 	$cur_d_m = date('d-m');
-	//$cur_time = $req_time;
 	$CI   = &get_instance();
 	$req_res = array();
 	if(($tar_mail == 'weekly' && $tar_day == $cur_day  && strtotime($req_time) == strtotime($cur_time)) || ($tar_mail == 'daily' && strtotime($req_time) == strtotime($cur_time) ) ||($tar_mail == 'monthly' && strtotime($req_date1) == strtotime($cur_d_m) && strtotime($req_time) == strtotime($cur_time) )){
 		$req_date = date("Y-m-d");
-		/*$already = $CI->db->query("SELECT * FROM " . db_prefix() . "check_remind WHERE remind_type = 'target' and staff_id = '".$staff_id."' and remind_date ='".$req_date."' and alert_type='mail'")->result_array();
 		
-		if(!empty($already)){
-			$already = array_column($already, 'type_id');
-			$type_ids = implode(',',$already);
-			if($tar_mail == 'daily'){
-				$res = $CI->db->query("SELECT t.* FROM " . db_prefix() . "target t," . db_prefix() . "target_user tu WHERE tu.target_id= t.id and tu.user = '".$staff_id."' and t.start_date='".$cur_date."' and t.id NOT IN (".$type_ids.") order by t.id desc")->result_array();
-				$res1 = $CI->db->query("SELECT t.* FROM " . db_prefix() . "target t," . db_prefix() . "target_manager tm WHERE tm.target_id= t.id and tm.manager = '".$staff_id."' and t.id NOT IN (".$type_ids.")  order by t.id desc")->result_array();
-			}
-			else if($tar_mail == 'weekly'){
-				$ch_days = '';
-				for($i=0;$i<7;$i++){
-					$ch_days = "'".date('Y-m-d', strtotime('+'.$i.' days'))."',".$ch_days;
-				}
-				$ch_days = rtrim($ch_days,",");
-				$res = $CI->db->query("SELECT t.* FROM " . db_prefix() . "target t," . db_prefix() . "target_user tu WHERE tu.target_id= t.id and tu.user = '".$staff_id."' and t.start_date='".$cur_date."' and t.id NOT IN (".$type_ids.") and DATE_FORMAT(t.start_date,'%Y-%m-%d') in(".$ch_days.") order by t.id desc")->result_array();
-				$res1 = $CI->db->query("SELECT t.* FROM " . db_prefix() . "target t," . db_prefix() . "target_manager tm WHERE tm.target_id= t.id and tm.manager = '".$staff_id."' and t.start_date='".$cur_date."' and t.id NOT IN (".$type_ids.") and DATE_FORMAT(t.start_date,'%Y-%m-%d') in(".$ch_days.") order by t.id desc")->result_array();
-			}
-			else if($tar_mail == 'monthly'){
-				$cur_m = date('m');
-				$cur_y = date('Y');
-				$next_m = date('m',strtotime('first day of +1 month'));
-				$next_y = date('Y',strtotime('first day of +1 month'));
-				
-				if($tar_month == 'current_month'){
-					$res = $CI->db->query("SELECT t.* FROM " . db_prefix() . "target t," . db_prefix() . "target_user tu WHERE tu.target_id= t.id and tu.user = '".$staff_id."' and MONTH(t.start_date) = '".$cur_m."' and Year(t.start_date) = '".$cur_y."'  order by t.id desc")->result_array();
-					$res1 = $CI->db->query("SELECT t.* FROM " . db_prefix() . "target t," . db_prefix() . "target_manager tm WHERE tm.target_id= t.id and tm.manager = '".$staff_id."' and MONTH(t.start_date)='".$cur_m."' and Year(t.start_date) = '".$cur_y."' and t.id NOT IN (".$type_ids.") order by t.id desc")->result_array();
-				}
-				else{
-					$res = $CI->db->query("SELECT t.* FROM " . db_prefix() . "target t," . db_prefix() . "target_user tu WHERE tu.target_id= t.id and tu.user = '".$staff_id."' and ((MONTH(t.start_date) = '".$next_m."' and Year(t.start_date) = '".$next_y."') or (MONTH(t.start_date) = '".$cur_m."' and Year(t.start_date) = '".$cur_y."') ) and t.id NOT IN (".$type_ids.") order by t.id desc")->result_array();
-				}
-			}
-		}
-		else{*/
 			if($tar_mail == 'daily'){
 				$res = $CI->db->query("SELECT t.* FROM " . db_prefix() . "target t," . db_prefix() . "target_user tu WHERE	 tu.target_id= t.id and tu.user = '".$staff_id."' and t.start_date='".$cur_date."' order by t.id desc")->result_array();
 				
@@ -2100,7 +1964,6 @@ function check_targets_mail($tar_mail,$tar_date_time,$tar_day,$tar_month,$staff_
 					$res = $CI->db->query("SELECT t.* FROM " . db_prefix() . "target t," . db_prefix() . "target_user tu WHERE tu.target_id= t.id and tu.user = '".$staff_id."' and ((MONTH(t.start_date) = '".$next_m."' and Year(t.start_date) = '".$next_y."') or (MONTH(t.start_date) = '".$cur_m."' and Year(t.start_date) = '".$cur_y."') ) order by t.id desc")->result_array();
 				}
 			}
-		//}
 		$i = 0;
 		if(!empty($res)){
 			foreach($res as $req_out){
@@ -2226,7 +2089,7 @@ function get_act_msg($req_msg,$act_1){
 	}
 	if(!empty($act_1['rel_id'])){
 								
-		$res = $CI->db->query("SELECT * FROM " . db_prefix() . "projects WHERE id = '".$act_1['rel_id']."'")->row();
+		$res = $CI->db->query("SELECT name,clientid FROM " . db_prefix() . "projects WHERE id = '".$act_1['rel_id']."'")->row();
 		
 		$cur_deal = '';
 		if(!empty($res->name)){
@@ -2235,7 +2098,7 @@ function get_act_msg($req_msg,$act_1){
 		
 		$req_msg = str_replace("{task_deal}",$cur_deal,$req_msg);
 		if(!empty($res->clientid)){
-			$res = $CI->db->query("SELECT * FROM " . db_prefix() . "clients WHERE userid = '".$res->clientid."'")->row();
+			$res = $CI->db->query("SELECT company FROM " . db_prefix() . "clients WHERE userid = '".$res->clientid."'")->row();
 			$cur_org = '';
 			if(!empty($res->company)){
 				$cur_org = $res->company;
@@ -2374,7 +2237,7 @@ function get_tar_msg($req_msg,$tar){
 		}
 	}
 	if(!empty($tar['id'])){
-		$manager_res = $CI->db->query("SELECT  * FROM " . db_prefix() ."target_interval WHERE target_id = '".$tar['id']."' group by target_id")->row();
+		$manager_res = $CI->db->query("SELECT  s_search FROM " . db_prefix() ."target_interval WHERE target_id = '".$tar['id']."' group by target_id")->row();
 		if(!empty($manager_res->s_search)){
 			$req_msg = str_replace("{count_value}",$manager_res->s_search,$req_msg);
 		}
@@ -2388,7 +2251,7 @@ function get_tar_msg($req_msg,$tar){
 		$target_user1 = array_column($target_user1, 'pipeline'); 
 		if(!empty($target_user1)){
 			$search_manager = implode(', ', $target_user1);
-			$manager_res = $CI->db->query("SELECT  * FROM " . db_prefix() ."pipeline WHERE id in( ".$search_manager.")")->result_array();
+			$manager_res = $CI->db->query("SELECT  name FROM " . db_prefix() ."pipeline WHERE id in( ".$search_manager.")")->result_array();
 			$target_user1 = array_column($manager_res, 'name'); 
 			$search_manager = implode(', ', $target_user1);
 			$req_msg = str_replace("{pipeline}", $search_manager,$req_msg);
@@ -2425,11 +2288,7 @@ function get_tar_msg($req_msg,$tar){
 	return $req_msg;
 }
 function outlook_credential(){
-	//$client_id 		= '35ad8426-f3d9-482b-8d5f-9d423dc7a4e2';
-	//$client_id 		= '64c3934f-388b-44cd-859c-236905b8f847';
 	$client_id 		= '7eaa4912-3d74-4317-87be-3a9d37e69b3c';
-	//$secret_val 	= '_1C8Q~YxziWVKUbPWPX3Wjwei2l7_~FMyJ.4xcl8';
-	//$secret_val 	= 'XuM8Q~NwrY1qkkFVcOU.puyC03jl8AzybiS~WcWc';
 	$secret_val 	= 'R4z8Q~63AL~HfY4Ua5Ql7PVueNRK~IddHSSSYcDa';
 	$redirect_uri 	= base_url().'admin/outlook_mail/index';
 	$scopes 		= array("offline_access", "openid","https://outlook.office.com/mail.read","https://outlook.office.com/mail.send","https://outlook.office.com/mail.readwrite");
@@ -2477,8 +2336,6 @@ function runCurl($url, $post = null, $headers = null,$custom = null) {
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
     if($http_code >= 400) {
-		// echo "Error executing request to Office365 api with error code=$http_code<br/><br/>\n\n";
-        //echo "<pre>"; print_r($response); echo "</pre>";
 		 return '';
     }
     return $response;
@@ -2793,7 +2650,7 @@ function deal_needed_fields(){
 function get_public($report_id){
 	$CI   = &get_instance();
 	$req_out = '';
-	$links = $CI->db->query("SELECT * FROM " . db_prefix() . "report_public WHERE report_id = '".$report_id."' ")->result_array();
+	$links = $CI->db->query("SELECT id,report_id,link_name,share_link FROM " . db_prefix() . "report_public WHERE report_id = '".$report_id."' ")->result_array();
 	if(!empty($links)){
 		foreach($links as $link12){
 			$req_id = "'".$link12['id']."'";
@@ -2834,16 +2691,12 @@ function get_tasks_need_fields(){
 			}
 		}
 	}
-	//$data['need_fields'] = array('project_name','id','tasktype','priority','assignees','task_name','description','tags','company','project_contacts','teamleader','status','project_status','startdate');
-	//$fields = get_option('deal_fields');
-	//$data['need_fields'] = array('project_name','id','tasktype','priority','assignees','task_name','description','tags','company','project_contacts','teamleader','status','project_status','startdate');
 	return $data;
 }
 
 function get_tasks_all_fields()
 {
 	$aColumns_temp = array(
-		//'id'=>db_prefix() . 'tasks.id as id',
 		'task_name'=>db_prefix() . 'tasks.name as task_name',
 		'project_name'=>db_prefix() . 'projects.name as project_name',
 		'project_status'=>db_prefix() . 'projects_status.name as project_status',
