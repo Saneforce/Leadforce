@@ -1,25 +1,5 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
 ob_start();
-?>
-<?php /* ?>
-
-<?php */ ?>
-
-<?php /* ?>
-
-
-<li id="top_search" class="dropdown" data-toggle="tooltip" data-placement="bottom" data-title="<?php echo _l('search_by_tags'); ?>">
-   <input type="search" id="search_input" class="form-control" placeholder="<?php echo _l('top_search_placeholder'); ?>">
-   <div id="search_results">
-   </div>
-   <ul class="dropdown-menu search-results animated fadeIn no-mtop search-history" id="search-history">
-   </ul>
-</li>
-<li id="top_search_button">
-   <button class="btn"><i class="fa fa-search"></i></button>
-</li>
-<?php */ ?>
-<?php
 $top_search_area = ob_get_contents();
 ob_end_clean();
 ?>
@@ -32,7 +12,6 @@ ob_end_clean();
         <a href="<?php echo site_url(); ?>" class="logo img-responsive">
             <img src="<?php echo base_url('uploads/company/logo1.png'); ?>" class="img-responsive" alt="<?php echo html_escape(get_option('companyname')); ?>">
         </a>
-      <?php //get_company_logo(get_admin_uri().'/') ?>
    </div>
    <ul class="header-search  navbar-left">
       <li class="icon header-search timer-button" data-placement="bottom" >
@@ -52,10 +31,8 @@ ob_end_clean();
          $isActive = false;
          $keycount = 0;
          ?>
-      <?php //pre($sidebar_menu);
+      <?php
       foreach($sidebar_menu as $key => $item){
-		  
-         // pre($_GET);
          $uri = $this->uri->segment(3);
          if(isset($uri) && $uri == 'view_contact') {
             $fetch = 'all_contacts';
@@ -100,7 +77,7 @@ ob_end_clean();
          </a>
 		 <?php 
 		 $staffid = get_staff_user_id();
-		  $cur_sql = "SELECT id FROM ".db_prefix()."shared LEFT JOIN ".db_prefix()."report ON ".db_prefix()."shared.report_id = ".db_prefix()."report.id WHERE ".db_prefix()."shared.share_type = 'Everyone' OR ".db_prefix()."shared.id in(SELECT share_id FROM ".db_prefix()."shared_staff where staff_id = '".$staffid."')";
+		  $cur_sql = "SELECT ".db_prefix()."shared.id FROM ".db_prefix()."shared LEFT JOIN ".db_prefix()."report ON ".db_prefix()."shared.report_id = ".db_prefix()."report.id WHERE ".db_prefix()."shared.share_type = 'Everyone' OR ".db_prefix()."shared.id in(SELECT share_id FROM ".db_prefix()."shared_staff where staff_id = '".$staffid."')";
 		 $ch_shared = $this->db->query($cur_sql)->result_array();
 		 ?>
          <?php if(count($item['children']) > 0){ ?>
