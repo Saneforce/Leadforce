@@ -169,7 +169,7 @@ function get_flters($req_filters){
 		$s_group_by = '';
 		$table = db_prefix().'filter';
 		foreach($filters as $filter12){
-			$deal_vals 	= $CI->db->query("SELECT * FROM ".$table." where filter_name = '".$filter12."' and filter_type= '".$filters1[$i1]."' and filter = 'deal' ")->result_array();
+			$deal_vals 	= $CI->db->query("SELECT filter_name,filter_cond,filter_type,date_field,filter FROM ".$table." where filter_name = '".$filter12."' and filter_type= '".$filters1[$i1]."' and filter = 'deal' ")->result_array();
 			if(!empty($deal_vals)){
 				$cur_cond = $deal_vals[0]['filter_cond'];
 				
@@ -528,11 +528,10 @@ function check_year_week($view_by){
 						$start_date	= date('Y-m-d',strtotime($w_start_date.'-'.$key.'-'.$cur_year));
 						$end_date   = date('Y-m-d',strtotime($req_month.'-'.$key.'-'.$cur_year));
 						if($view_by == 'start_date' || $view_by == 'project_deadline' || $view_by == 'won_date' || $view_by == 'lost_date' || $view_by == 'project_created' || $view_by == 'project_modified'){
-							//$qry_cond   .= " and ".$view_by." >= '".$start_date."' and ".$view_by." <= '".$end_date."'";
 							$qry_cond   .= " and ".$view_by." >= '".$start_date."'";
 						}
 						else{
-							$customs   = $CI->db->query("SELECT *  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and CONVERT(cv.value,date)  >='".$start_date."' and CONVERT(cv.value,date) <='".$end_date."' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
+							$customs   = $CI->db->query("SELECT relid  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and CONVERT(cv.value,date)  >='".$start_date."' and CONVERT(cv.value,date) <='".$end_date."' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
 							$cur_projects = '';
 							if(!empty($customs)){
 								foreach($customs as $custom1){
@@ -554,10 +553,9 @@ function check_year_week($view_by){
 						$end_date	    = date('Y-m-d',strtotime($req_end_days.'-'.$months[$req_key+1].'-'.$cur_year));
 						if($view_by == 'start_date' || $view_by == 'project_deadline' || $view_by == 'won_date' || $view_by == 'lost_date' || $view_by == 'project_created' || $view_by == 'project_modified'){
 									
-							//$qry_cond 	 .= " and ".$view_by." >= '".$start_date."' and ".$view_by." <= '".$end_date."'";
 							$qry_cond 	 .= "  and ".$view_by." <= '".$end_date."'";
 						}else{
-							$customs   = $CI->db->query("SELECT *  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and CONVERT(cv.value,date)  >='".$start_date."' and CONVERT(cv.value,date) <='".$end_date."' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
+							$customs   = $CI->db->query("SELECT relid  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and CONVERT(cv.value,date)  >='".$start_date."' and CONVERT(cv.value,date) <='".$end_date."' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
 							$cur_projects = '';
 							if(!empty($customs)){
 								foreach($customs as $custom1){
@@ -584,7 +582,7 @@ function check_year_week($view_by){
 								$qry_cond 	 .= " and ".$view_by." >= '".$start_date."' and ".$view_by." <= '".$end_date."'";
 							}
 							else{
-								$customs   = $CI->db->query("SELECT *  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and CONVERT(cv.value,date)  >='".$start_date."' and CONVERT(cv.value,date) <='".$end_date."' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
+								$customs   = $CI->db->query("SELECT relid  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and CONVERT(cv.value,date)  >='".$start_date."' and CONVERT(cv.value,date) <='".$end_date."' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
 								$cur_projects = '';
 								if(!empty($customs)){
 									foreach($customs as $custom1){
@@ -676,7 +674,7 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 		if(!empty($qry_cond)){
 			$req_cond .= $qry_cond;
 		}
-		$ress = $CI->db->query("SELECT * FROM " . db_prefix() . "projects p where p.deleted_status = '0' ".$req_cond)->result_array();	
+		$ress = $CI->db->query("SELECT id FROM " . db_prefix() . "projects p where p.deleted_status = '0' ".$req_cond)->result_array();	
 		
 		if(!empty($ress)){
 			foreach($ress as $res1){
@@ -746,7 +744,7 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 			$where[db_prefix().'projects.teamleader']   =  $sum_id;
 			break;
 		case'tags':
-			$sql = " select * from ".db_prefix()."tags t,".db_prefix()."taggables ta where t.name = '".$crow."' and ta.tag_id = t.id and ta.rel_type='project'";
+			$sql = " select rel_id from ".db_prefix()."tags t,".db_prefix()."taggables ta where t.name = '".$crow."' and ta.tag_id = t.id and ta.rel_type='project'";
 			$query = $CI->db->query($sql);
 			$results = $query->result_array();
 			$tags_ids = array();
@@ -771,7 +769,7 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 			$where[db_prefix().'projects.stage_of']   =  $crow;
 			break;
 		case'contact_name':
-			$sql = " select * from ".db_prefix()."contacts c,".db_prefix()."project_contacts pc where c.id = '".$sum_id."' and pc.contacts_id = c.id";
+			$sql = " select project_id from ".db_prefix()."contacts c,".db_prefix()."project_contacts pc where c.id = '".$sum_id."' and pc.contacts_id = c.id";
 			$query = $CI->db->query($sql);
 			$results = $query->result_array();
 			$projects = array();
@@ -785,7 +783,7 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 			}
 			break;
 		case'contact_email1':
-			$sql = " select * from ".db_prefix()."contacts c,".db_prefix()."project_contacts pc where c.email = '".$crow."' and pc.is_primary = '1' and pc.contacts_id = c.id";
+			$sql = " select project_id from ".db_prefix()."contacts c,".db_prefix()."project_contacts pc where c.email = '".$crow."' and pc.is_primary = '1' and pc.contacts_id = c.id";
 			$query = $CI->db->query($sql);
 			$results = $query->result_array();
 			$projects = array();
@@ -799,7 +797,7 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 			}
 			break;
 		case'contact_phone1':
-			$sql = " select * from ".db_prefix()."contacts c,".db_prefix()."project_contacts pc where c.phonenumber = '".$crow."' and pc.is_primary = '1' and pc.contacts_id = c.id";
+			$sql = " select project_id from ".db_prefix()."contacts c,".db_prefix()."project_contacts pc where c.phonenumber = '".$crow."' and pc.is_primary = '1' and pc.contacts_id = c.id";
 			$query = $CI->db->query($sql);
 			$results = $query->result_array();
 			$projects = array();
@@ -814,7 +812,7 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 			
 			break;
 		case'members':
-			$sql = " select * from ".db_prefix()."project_members pm,".db_prefix()."staff s where s.staffid = '".$sum_id."' and pm.staff_id = s.staffid";
+			$sql = " select project_id from ".db_prefix()."project_members pm,".db_prefix()."staff s where s.staffid = '".$sum_id."' and pm.staff_id = s.staffid";
 			$query = $CI->db->query($sql);
 			$results = $query->result_array();
 			$projects = array();
@@ -840,7 +838,7 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 			$where[db_prefix().'projects.modified_by']   =  $sum_id;
 			break;
 		default:
-			$sql = " select * from ".db_prefix()."customfieldsvalues where fieldid = '".$sum_id."' ";
+			$sql = " select relid from ".db_prefix()."customfieldsvalues where fieldid = '".$sum_id."' ";
 			$query = $CI->db->query($sql);
 			$results = $query->result_array();
 			$projects = array();
@@ -1056,7 +1054,6 @@ function deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$num,$tot_avg)
 		
 		$data['total_cnt_deal']	= 	$data['total_num_prdts'] =  get_decimal($tot_cnt/$num);
 		$data['total_val_deal']	= 	$data['total_val_prdt'] =  get_decimal($tot_val/$num);
-		//$data['avg_deal']	=	$data['avg_prdt_val'] = get_decimal($tot_val/$num);
 		$data['avg_deal']	=	$data['avg_prdt_val'] = get_decimal($tot_avg/$num);
 		$data['avg_tot'] =  $data['avg_deal'] + $data['avg_tot'];
 	}
@@ -1073,7 +1070,6 @@ function deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$tot_avg)
 	$data['total_val_deal']	= 	$data['total_val_prdt'] =  get_decimal($tot_val);
 	$data['avg_deal']		= 	$data['avg_prdt_val'] =  0;
 	if($tot_cnt>0){
-		//$data['avg_deal']	=	$data['avg_prdt_val'] = get_decimal($tot_val/$tot_cnt);
 		$data['avg_deal']	=	$data['avg_prdt_val'] = get_decimal($tot_avg);
 	}
 	$data[$view_by]	= 	$data['rows']	=	'Total';
