@@ -204,8 +204,9 @@
 										class="control-label"><small class="req text-danger">* </small><?php echo _l('share_with'); ?></label>
 										 <div class="input-group input-group-select ">
 										 <?php 
-										 $persons[0] = array('id'=>'Everyone','name'=>'Everyone');
-										 $persons[1] = array('id'=>'Selected Person','name'=>'Selected Person');
+										 $persons[0] = array('id'=>'','name'=>'Select');
+										 $persons[1] = array('id'=>'Everyone','name'=>'Everyone');
+										 $persons[2] = array('id'=>'Selected Person','name'=>'Selected Person');
 										 echo render_select('shared',$persons,array('id',array('name')),false,$share_types,array('aria-describedby'=>'project_contacts-error','style'=>'height:21px;','onchange'=>'shared1(this)','required'=>true),array(),'cur_class','',false);?>
 										 <div class="input-group-addon" >
 											</div>

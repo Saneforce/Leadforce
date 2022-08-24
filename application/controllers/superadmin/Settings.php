@@ -40,7 +40,7 @@ class Settings extends CI_Controller
 	{
 		$data = array();
 		$requestData= $_REQUEST;
-		$company_sql = $this->base->executeQuery('SELECT * FROM tblcompany ORDER BY id ASC');
+		$company_sql = $this->base->executeQuery('SELECT id,name,shortcode,email,phone,password,address,demodata,status,created_on,created_by,updated_on,updated_by FROM tblcompany ORDER BY id ASC');
 		$company_res = $company_sql->result_array();
 		$company_count = count($company_res);
 		$columns = array( 
@@ -50,7 +50,7 @@ class Settings extends CI_Controller
 		);
 		if( !empty($requestData['search']['value']) )
 		{
-			$query  = "SELECT * FROM tblcompany WHERE (id LIKE '".$requestData['search']['value']."%'";
+			$query  = "SELECT id,name,shortcode,email,phone,password,address,demodata,status,created_on,created_by,updated_on,updated_by FROM tblcompany WHERE (id LIKE '".$requestData['search']['value']."%'";
 			$query .= " OR name LIKE '%".$requestData['search']['value']."%'";
 			$query .= " OR status LIKE '%".$requestData['search']['value']."%')";
 			$query .= " ORDER BY id ASC";
@@ -60,7 +60,7 @@ class Settings extends CI_Controller
 			$company_count = count($companys);
 		}
 		else {
-			$company_sql = $this->base->executeQuery("SELECT * FROM tblcompany ORDER BY id ASC LIMIT ".$requestData['start'].",".$requestData['length']."");
+			$company_sql = $this->base->executeQuery("SELECT id,name,shortcode,email,phone,password,address,demodata,status,created_on,created_by,updated_on,updated_by FROM tblcompany ORDER BY id ASC LIMIT ".$requestData['start'].",".$requestData['length']."");
 			$companys = $company_sql->result_array();
 		}
 		$i = $requestData['start']+1;
@@ -105,12 +105,11 @@ class Settings extends CI_Controller
 		$fields = $_POST;
 		if (!empty($fields))
 		{
-			//echo "<pre>"; print_r($fields); exit;
 			$this->base->getAll('tblsuperadmin', array('id' => $loggeduserid));
 			$fields['created_by'] = $loggeduserid;
 			$this->base->getAll('tblsuperadmin', array('id' => $loggeduserid));
 			$slug = strtolower($fields['shortcode']);
-			$slug_exist = $this->base->executeQuery('SELECT * FROM tblcompany where shortcode = "'.$slug.'"');
+			$slug_exist = $this->base->executeQuery('SELECT id,name,shortcode,email,phone,password,address,demodata,status,created_on,created_by,updated_on,updated_by FROM tblcompany where shortcode = "'.$slug.'"');
 			$slug_res = $slug_exist->result_array();
 			$slug_count = count($slug_res);
 			
@@ -163,7 +162,7 @@ class Settings extends CI_Controller
 			redirect(site_url('superadmin/login'));
 		}
 		
-		$company_query = $this->base->executeQuery("SELECT * FROM tblcompany WHERE id = ".$id);
+		$company_query = $this->base->executeQuery("SELECT id,name,shortcode,email,phone,password,address,demodata,status,created_on,created_by,updated_on,updated_by FROM tblcompany WHERE id = ".$id);
 		$companydetails = $company_query->row_array();
 		$data['companydetails'] = $companydetails;
 		

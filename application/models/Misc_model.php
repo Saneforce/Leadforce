@@ -495,7 +495,7 @@ class Misc_model extends App_Model
 	
 	public function get_tasks_distinct_tasktype()
     {
-        return $this->db->query('SELECT * FROM ' . db_prefix() . 'tasktype where status = "Active"')->result_array();
+        return $this->db->query('SELECT id,name,status,created_date,created_by,updated_date,updated_by FROM ' . db_prefix() . 'tasktype where status = "Active"')->result_array();
     }
 
     public function get_google_calendar_ids()

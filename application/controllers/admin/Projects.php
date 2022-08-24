@@ -1218,23 +1218,24 @@ class Projects extends AdminController
         $gsearch   = $this->input->post('globalsearch');
         $my_staffids = $this->staff_model->get_my_staffids();
         $data = array();
+		$project_fields = "id,name,description,status,pipeline_id,clientid,teamleader,billing_type,start_date,deadline,project_created,created_by,project_modified,modified_by,date_finished,progress,progress_from_tasks,project_cost,project_rate_per_hour,estimated_hours,addedfrom,stage_of,stage_on,loss_reason,loss_remark,deleted_status,project_currency,imported_id,lead_id";
         if(!is_admin(get_staff_user_id())) {
             if($my_staffids) {
-                $data['projects'] = $this->db->query('SELECT * FROM tblprojects where ((teamleader in (' . implode(',',$my_staffids) . ')) OR id IN (select project_id from tblproject_members where staff_id in (' . implode(',',$my_staffids) . '))) AND name like "%'.$gsearch.'%" ')->result_array();
+                $data['projects'] = $this->db->query('SELECT '.$project_fields.' FROM tblprojects where ((teamleader in (' . implode(',',$my_staffids) . ')) OR id IN (select project_id from tblproject_members where staff_id in (' . implode(',',$my_staffids) . '))) AND name like "%'.$gsearch.'%" ')->result_array();
             } else {
-                $data['projects'] = $this->db->query('SELECT * FROM tblprojects where ((teamleader = "'.get_staff_user_id().'") OR id IN (select project_id from tblproject_members where staff_id="'.get_staff_user_id().'")) AND name like "%'.$gsearch.'%" ')->result_array();
+                $data['projects'] = $this->db->query('SELECT '.$project_fields.' FROM tblprojects where ((teamleader = "'.get_staff_user_id().'") OR id IN (select project_id from tblproject_members where staff_id="'.get_staff_user_id().'")) AND name like "%'.$gsearch.'%" ')->result_array();
             }
         } else {
             $data['projects'] = $this->projects_model->get('',[
                 "name like '%".$gsearch."%'" => "",
             ]);
         }
-        
+         $client_fields = "userid,company,vat,phonenumber,country,city,zip,state,address,website,datecreated,active,leadid,billing_street,billing_city,billing_state,billing_zip,billing_country,shipping_street,shipping_city,shipping_state,shipping_zip,shipping_country,longitude,latitude,default_language,default_currency,show_primary_contact,stripe_id,registration_confirmed,addedfrom,deleted_status";
         if(!is_admin(get_staff_user_id())) {
             if($my_staffids) {
-                $data['clients'] = $this->db->query('SELECT * FROM tblclients where ((addedfrom in (' . implode(',',$my_staffids) . ')) OR userid IN (select clientid from tblprojects where id IN (select project_id from tblproject_members where staff_id in (' . implode(',',$my_staffids) . '))) OR userid IN ( select clientid from tblprojects where teamleader in (' . implode(',',$my_staffids) . '))) AND active = 1 AND (company like "%'.$gsearch.'%" OR phonenumber like "%'.$gsearch.'%")')->result_array();
+                $data['clients'] = $this->db->query('SELECT '.$client_fields.' FROM tblclients where ((addedfrom in (' . implode(',',$my_staffids) . ')) OR userid IN (select clientid from tblprojects where id IN (select project_id from tblproject_members where staff_id in (' . implode(',',$my_staffids) . '))) OR userid IN ( select clientid from tblprojects where teamleader in (' . implode(',',$my_staffids) . '))) AND active = 1 AND (company like "%'.$gsearch.'%" OR phonenumber like "%'.$gsearch.'%")')->result_array();
             } else {
-                $data['clients'] = $this->db->query('SELECT * FROM tblclients where ((addedfrom="'.get_staff_user_id().'") OR userid IN (select clientid from tblprojects where id IN (select project_id from tblproject_members where staff_id="'.get_staff_user_id().'")) OR userid IN ( select clientid from tblprojects where teamleader = "'.get_staff_user_id().'")) AND active = 1 AND (company like "%'.$gsearch.'%" OR phonenumber like "%'.$gsearch.'%")')->result_array();
+                $data['clients'] = $this->db->query('SELECT '.$client_fields.' FROM tblclients where ((addedfrom="'.get_staff_user_id().'") OR userid IN (select clientid from tblprojects where id IN (select project_id from tblproject_members where staff_id="'.get_staff_user_id().'")) OR userid IN ( select clientid from tblprojects where teamleader = "'.get_staff_user_id().'")) AND active = 1 AND (company like "%'.$gsearch.'%" OR phonenumber like "%'.$gsearch.'%")')->result_array();
             }
             
         } else {

@@ -160,7 +160,7 @@ class Roles_model extends App_Model {
     }
 
     public function is_feature_enable($feature = '') {
-        $mpa = $this->db->query('SELECT * FROM `' . db_prefix() . 'modules_permissions`  where active = "0" and features = "'.$feature.'"')->row_array();
+        $mpa = $this->db->query('SELECT id,features,features_label,active FROM `' . db_prefix() . 'modules_permissions`  where active = "0" and features = "'.$feature.'"')->row_array();
         return isset($mpa['id']) ? false : true;
     }
     

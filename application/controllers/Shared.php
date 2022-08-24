@@ -35,7 +35,7 @@ class Shared extends App_Controller
     }
 	public function deal_edit_table($id = '')
     {
-		$filters = $this->db->query("SELECT * FROM " . db_prefix() . "report_filter where report_id = '".$id."'")->result_array();
+		$filters = $this->db->query("SELECT filter_1,filter_2,filter_3,filter_4,filter_5 FROM " . db_prefix() . "report_filter where report_id = '".$id."'")->result_array();
 		if(!empty($filters)){
 			$i = 0;
 			foreach($filters as $filter12){

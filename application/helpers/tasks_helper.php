@@ -1757,7 +1757,7 @@ function get_reminder_settings($user_id){
 function check_get_msg($cur_type,$cur_lang){
 	$req_date = date("Y-m-d");
 	$CI   = &get_instance();
-	$res = $CI->db->query("SELECT * FROM " . db_prefix() . "emailtemplates WHERE type = '".$cur_type."' and language ='".$cur_lang."'")->row();
+	$res = $CI->db->query("SELECT emailtemplateid ,type,slug,language,name,subject,message,fromname,fromemail,plaintext,active,order FROM " . db_prefix() . "emailtemplates WHERE type = '".$cur_type."' and language ='".$cur_lang."'")->row();
 	
 	return $res;
 }
@@ -1794,8 +1794,8 @@ function check_task_activity($cur_date,$staff_id,$alert_type)
 	$req_date = date("Y-m-d");
 	$req_time = date("Y-m-d H:i:s");
 	$CI   = &get_instance();
-			
-	$res = $CI->db->query("SELECT t.* FROM " . db_prefix() . "tasks t," . db_prefix() . "task_assigned ta WHERE	 ta.taskid= t.id and ta.staffid = '".$staff_id."' and t.startdate='".$cur_date."' and t.status!= '5' order by t.id desc")->result_array();
+	$task_fields = "t.id,t.name,t.tasktype,t.description,t.priority,t.dateadded,t.datemodified,t.startdate,t.duedate,t.datefinished,t.addedfrom,t.is_added_from_contact,t.status,t.send_reminder,t.recurring_type,t.repeat_every,t.recurring,t.is_recurring_from,t.cycles,t.total_cycles,t.custom_recurring,t.last_recurring_date,t.rel_id,t.rel_type,t.is_public,t.contacts_id,t.billable,t.billed,t.invoice_id,t.hourly_rate,t.milestone,t.kanban_order,t.milestone_order,t.visible_to_client,t.deadline_notified,t.source_from,t.imported_id,t.call_request_id,t.call_code,t.call_msg";		
+	$res = $CI->db->query("SELECT ".$task_fields." FROM " . db_prefix() . "tasks t," . db_prefix() . "task_assigned ta WHERE	 ta.taskid= t.id and ta.staffid = '".$staff_id."' and t.startdate='".$cur_date."' and t.status!= '5' order by t.id desc")->result_array();
 			
 	return $res;
 }
@@ -1845,11 +1845,11 @@ function check_activity_mail($cur_date,$act_mail,$act_date_time,$act_day,$act_mo
 	if($act_mail == 'monthly'){
 		$req_date1 = date('d-m',strtotime($act_date_time));
 	}
-	
+	$task_fields = "t.id,t.name,t.tasktype,t.description,t.priority,t.dateadded,t.datemodified,t.startdate,t.duedate,t.datefinished,t.addedfrom,t.is_added_from_contact,t.status,t.send_reminder,t.recurring_type,t.repeat_every,t.recurring,t.is_recurring_from,t.cycles,t.total_cycles,t.custom_recurring,t.last_recurring_date,t.rel_id,t.rel_type,t.is_public,t.contacts_id,t.billable,t.billed,t.invoice_id,t.hourly_rate,t.milestone,t.kanban_order,t.milestone_order,t.visible_to_client,t.deadline_notified,t.source_from,t.imported_id,t.call_request_id,t.call_code,t.call_msg";
 	$cur_d_m = date('d-m');
 	if(($act_mail == 'weekly' && $act_day == $cur_day && strtotime($req_time) == strtotime($cur_time)) || ($act_mail == 'daily' && strtotime($req_time) == strtotime($cur_time) ) ||($act_mail == 'monthly' && strtotime($req_date1) == strtotime($cur_d_m) && strtotime($req_time) == strtotime($cur_time) )){
 			if($act_mail == 'daily'){
-				$res = $CI->db->query("SELECT t.* FROM " . db_prefix() . "tasks t," . db_prefix() . "task_assigned ta WHERE	 ta.taskid= t.id and ta.staffid = '".$staff_id."' and DATE_FORMAT(t.startdate,'%Y-%m-%d') ='".$cur_date."' and t.status!= '5' order by t.id desc")->result_array();
+				$res = $CI->db->query("SELECT ".$task_fields." FROM " . db_prefix() . "tasks t," . db_prefix() . "task_assigned ta WHERE	 ta.taskid= t.id and ta.staffid = '".$staff_id."' and DATE_FORMAT(t.startdate,'%Y-%m-%d') ='".$cur_date."' and t.status!= '5' order by t.id desc")->result_array();
 				
 			}
 			else if($act_mail == 'weekly'){
@@ -1859,7 +1859,7 @@ function check_activity_mail($cur_date,$act_mail,$act_date_time,$act_day,$act_mo
 				}
 				$ch_days = rtrim($ch_days,",");
 				
-				$res = $CI->db->query("SELECT t.* FROM " . db_prefix() . "tasks t," . db_prefix() . "task_assigned ta WHERE ta.taskid= t.id and ta.staffid = '".$staff_id."' and DATE_FORMAT(t.startdate,'%Y-%m-%d') in(".$ch_days.") and t.status!= '5'  order by t.id desc")->result_array();
+				$res = $CI->db->query("SELECT ".$task_fields." FROM " . db_prefix() . "tasks t," . db_prefix() . "task_assigned ta WHERE ta.taskid= t.id and ta.staffid = '".$staff_id."' and DATE_FORMAT(t.startdate,'%Y-%m-%d') in(".$ch_days.") and t.status!= '5'  order by t.id desc")->result_array();
 			}
 			else if($act_mail == 'monthly'){
 				$cur_m = date('m');
@@ -1868,10 +1868,10 @@ function check_activity_mail($cur_date,$act_mail,$act_date_time,$act_day,$act_mo
 				$next_y = date('Y',strtotime('first day of +1 month'));
 				
 				if($act_month == 'current_month'){
-					$res = $CI->db->query("SELECT t.* FROM " . db_prefix() . "tasks t," . db_prefix() . "task_assigned ta WHERE ta.taskid= t.id and ta.staffid = '".$staff_id."' and MONTH(t.startdate) = '".$cur_m."' and Year(t.startdate) = '".$cur_y."' and t.status!= '5'  order by t.id desc")->result_array();
+					$res = $CI->db->query("SELECT ".$task_fields." FROM " . db_prefix() . "tasks t," . db_prefix() . "task_assigned ta WHERE ta.taskid= t.id and ta.staffid = '".$staff_id."' and MONTH(t.startdate) = '".$cur_m."' and Year(t.startdate) = '".$cur_y."' and t.status!= '5'  order by t.id desc")->result_array();
 				}
 				else{
-					$res = $CI->db->query("SELECT t.* FROM " . db_prefix() . "tasks t," . db_prefix() . "task_assigned ta WHERE ta.taskid= t.id and ta.staffid = '".$staff_id."' and ((MONTH(t.startdate) = '".$next_m."' and Year(t.startdate) = '".$next_y."') or (MONTH(t.startdate) = '".$cur_m."' and Year(t.startdate) = '".$cur_y."') ) and t.status!= '5' order by t.id desc")->result_array();
+					$res = $CI->db->query("SELECT ".$task_fields." FROM " . db_prefix() . "tasks t," . db_prefix() . "task_assigned ta WHERE ta.taskid= t.id and ta.staffid = '".$staff_id."' and ((MONTH(t.startdate) = '".$next_m."' and Year(t.startdate) = '".$next_y."') or (MONTH(t.startdate) = '".$cur_m."' and Year(t.startdate) = '".$cur_y."') ) and t.status!= '5' order by t.id desc")->result_array();
 				}
 			}
 	}
@@ -1890,14 +1890,14 @@ function check_proposal_mail($pr_mail,$pr_date_time,$pr_day,$pr_month,$staff_id=
 	}
 	$cur_d_m = date('d-m');
 	
-	
+	$proposal_fields = "id,subject,content,addedfrom,datecreated,total,subtotal,total_tax,adjustment,discount_percent,discount_total,discount_type,show_quantity_as,currency,open_till,date,rel_id,rel_type,assigned,hash,proposal_to,country,zip,state,city,address,email,phone,allow_comments,status,estimate_id,invoice_id,date_converted,pipeline_order,is_expiry_notified,acceptance_firstname,acceptance_lastname,acceptance_email,acceptance_date,acceptance_ip,signature,template_contents,pdftemplate";
 	$CI   = &get_instance();
 	$req_res = array();
 	if(($pr_mail == 'weekly' && $pr_day == $cur_day && strtotime($req_time) == strtotime($cur_time)) || ($pr_mail == 'daily' && strtotime($req_time) == strtotime($cur_time) ) ||($pr_mail == 'monthly' && strtotime($req_date1) == strtotime($cur_d_m) && strtotime($req_time) == strtotime($cur_time) )){
 		$req_date = date("Y-m-d");
 		
 			if($pr_mail == 'daily'){
-				$res = $CI->db->query("SELECT * FROM " . db_prefix() . "proposals WHERE  addedfrom = '".$staff_id."' and open_till ='".$cur_date."' and status!='3'  order by id desc")->result_array();
+				$res = $CI->db->query("SELECT ".$proposal_fields." FROM " . db_prefix() . "proposals WHERE  addedfrom = '".$staff_id."' and open_till ='".$cur_date."' and status!='3'  order by id desc")->result_array();
 			}
 			else if($pr_mail == 'weekly'){
 				$ch_days = '';
@@ -1905,7 +1905,7 @@ function check_proposal_mail($pr_mail,$pr_date_time,$pr_day,$pr_month,$staff_id=
 					$ch_days = "'".date('Y-m-d', strtotime('+'.$i.' days'))."',".$ch_days;
 				}
 				$ch_days = rtrim($ch_days,",");
-				$res = $CI->db->query("SELECT * FROM " . db_prefix() . "proposals WHERE  addedfrom = '".$staff_id."' and  DATE_FORMAT(open_till,'%Y-%m-%d') in(".$ch_days.") and status!='3' order by id desc")->result_array();
+				$res = $CI->db->query("SELECT ".$proposal_fields." FROM " . db_prefix() . "proposals WHERE  addedfrom = '".$staff_id."' and  DATE_FORMAT(open_till,'%Y-%m-%d') in(".$ch_days.") and status!='3' order by id desc")->result_array();
 			}
 			else if($pr_mail == 'monthly'){
 				$cur_m = date('m');
@@ -1914,11 +1914,11 @@ function check_proposal_mail($pr_mail,$pr_date_time,$pr_day,$pr_month,$staff_id=
 				$next_y = date('Y',strtotime('first day of +1 month'));
 				
 				if($pr_month == 'current_month'){
-					$res = $CI->db->query("SELECT * FROM " . db_prefix() . "proposals WHERE addedfrom = '".$staff_id."' and MONTH(open_till) = '".$cur_m."' and Year(open_till) = '".$cur_y."' and status!='3'  order by id desc")->result_array();
+					$res = $CI->db->query("SELECT ".$proposal_fields." FROM " . db_prefix() . "proposals WHERE addedfrom = '".$staff_id."' and MONTH(open_till) = '".$cur_m."' and Year(open_till) = '".$cur_y."' and status!='3'  order by id desc")->result_array();
 				}
 				else{
 					
-					$res = $CI->db->query("SELECT * FROM " . db_prefix() . "proposals WHERE addedfrom = '".$staff_id."' and ((MONTH(open_till) = '".$next_m."' and Year(open_till) = '".$next_y."') or (MONTH(open_till) = '".$cur_m."' and Year(open_till) = '".$cur_y."') ) and status!='3' order by id desc")->result_array();
+					$res = $CI->db->query("SELECT ".$proposal_fields." FROM " . db_prefix() . "proposals WHERE addedfrom = '".$staff_id."' and ((MONTH(open_till) = '".$next_m."' and Year(open_till) = '".$next_y."') or (MONTH(open_till) = '".$cur_m."' and Year(open_till) = '".$cur_y."') ) and status!='3' order by id desc")->result_array();
 				}
 			}
 	}
@@ -1941,14 +1941,14 @@ function check_targets_mail($tar_mail,$tar_date_time,$tar_day,$tar_month,$staff_
 		$req_date = date("Y-m-d");
 		
 			if($tar_mail == 'daily'){
-				$res = $CI->db->query("SELECT t.* FROM " . db_prefix() . "target t," . db_prefix() . "target_user tu WHERE	 tu.target_id= t.id and tu.user = '".$staff_id."' and t.start_date='".$cur_date."' order by t.id desc")->result_array();
+				$res = $CI->db->query("SELECT t.id,t.assign,t.tracking_metric,t.interval,t.start_date,t.end_date,t.target_type,t.target_status,t.create_date FROM " . db_prefix() . "target t," . db_prefix() . "target_user tu WHERE	 tu.target_id= t.id and tu.user = '".$staff_id."' and t.start_date='".$cur_date."' order by t.id desc")->result_array();
 				
-				$res1 = $CI->db->query("SELECT t.* FROM " . db_prefix() . "target t," . db_prefix() . "target_manager tm WHERE tm.target_id= t.id and tm.manager = '".$staff_id."' and t.start_date='".$cur_date."' order by t.id desc")->result_array();
+				$res1 = $CI->db->query("SELECT t.id,t.assign,t.tracking_metric,t.interval,t.start_date,t.end_date,t.target_type,t.target_status,t.create_date FROM " . db_prefix() . "target t," . db_prefix() . "target_manager tm WHERE tm.target_id= t.id and tm.manager = '".$staff_id."' and t.start_date='".$cur_date."' order by t.id desc")->result_array();
 				
 			}
 			else if($tar_mail == 'weekly'){
-				$res = $CI->db->query("SELECT t.* FROM " . db_prefix() . "target t," . db_prefix() . "target_user tu WHERE tu.target_id= t.id and tu.user = '".$staff_id."' and t.start_date='".$cur_date."'  and DATE_FORMAT(t.start_date,'%Y-%m-%d') in(".$ch_days.") order by t.id desc")->result_array();
-				$res1 = $CI->db->query("SELECT t.* FROM " . db_prefix() . "target t," . db_prefix() . "target_manager tm WHERE tm.target_id= t.id and tm.manager = '".$staff_id."' and t.start_date='".$cur_date."'  and DATE_FORMAT(t.start_date,'%Y-%m-%d') in(".$ch_days.") order by t.id desc")->result_array();
+				$res = $CI->db->query("SELECT t.id,t.assign,t.tracking_metric,t.interval,t.start_date,t.end_date,t.target_type,t.target_status,t.create_date FROM " . db_prefix() . "target t," . db_prefix() . "target_user tu WHERE tu.target_id= t.id and tu.user = '".$staff_id."' and t.start_date='".$cur_date."'  and DATE_FORMAT(t.start_date,'%Y-%m-%d') in(".$ch_days.") order by t.id desc")->result_array();
+				$res1 = $CI->db->query("SELECT t.id,t.assign,t.tracking_metric,t.interval,t.start_date,t.end_date,t.target_type,t.target_status,t.create_date FROM " . db_prefix() . "target t," . db_prefix() . "target_manager tm WHERE tm.target_id= t.id and tm.manager = '".$staff_id."' and t.start_date='".$cur_date."'  and DATE_FORMAT(t.start_date,'%Y-%m-%d') in(".$ch_days.") order by t.id desc")->result_array();
 			}
 			else if($tar_mail == 'monthly'){
 				$cur_m = date('m');
@@ -1957,11 +1957,11 @@ function check_targets_mail($tar_mail,$tar_date_time,$tar_day,$tar_month,$staff_
 				$next_y = date('Y',strtotime('first day of +1 month'));
 				
 				if($tar_month == 'current_month'){
-					$res = $CI->db->query("SELECT t.* FROM " . db_prefix() . "target t," . db_prefix() . "target_user tu WHERE tu.target_id= t.id and tu.user = '".$staff_id."' and MONTH(t.start_date) = '".$cur_m."' and Year(t.start_date) = '".$cur_y."'  order by t.id desc")->result_array();
-					$res1 = $CI->db->query("SELECT t.* FROM " . db_prefix() . "target t," . db_prefix() . "target_manager tm WHERE tm.target_id= t.id and tm.manager = '".$staff_id."' and MONTH(t.start_date)='".$cur_m."' and Year(t.start_date) = '".$cur_y."' order by t.id desc")->result_array();
+					$res = $CI->db->query("SELECT t.id,t.assign,t.tracking_metric,t.interval,t.start_date,t.end_date,t.target_type,t.target_status,t.create_date FROM " . db_prefix() . "target t," . db_prefix() . "target_user tu WHERE tu.target_id= t.id and tu.user = '".$staff_id."' and MONTH(t.start_date) = '".$cur_m."' and Year(t.start_date) = '".$cur_y."'  order by t.id desc")->result_array();
+					$res1 = $CI->db->query("SELECT t.id,t.assign,t.tracking_metric,t.interval,t.start_date,t.end_date,t.target_type,t.target_status,t.create_date FROM " . db_prefix() . "target t," . db_prefix() . "target_manager tm WHERE tm.target_id= t.id and tm.manager = '".$staff_id."' and MONTH(t.start_date)='".$cur_m."' and Year(t.start_date) = '".$cur_y."' order by t.id desc")->result_array();
 				}
 				else{
-					$res = $CI->db->query("SELECT t.* FROM " . db_prefix() . "target t," . db_prefix() . "target_user tu WHERE tu.target_id= t.id and tu.user = '".$staff_id."' and ((MONTH(t.start_date) = '".$next_m."' and Year(t.start_date) = '".$next_y."') or (MONTH(t.start_date) = '".$cur_m."' and Year(t.start_date) = '".$cur_y."') ) order by t.id desc")->result_array();
+					$res = $CI->db->query("SELECT t.id,t.assign,t.tracking_metric,t.interval,t.start_date,t.end_date,t.target_type,t.target_status,t.create_date FROM " . db_prefix() . "target t," . db_prefix() . "target_user tu WHERE tu.target_id= t.id and tu.user = '".$staff_id."' and ((MONTH(t.start_date) = '".$next_m."' and Year(t.start_date) = '".$next_y."') or (MONTH(t.start_date) = '".$cur_m."' and Year(t.start_date) = '".$cur_y."') ) order by t.id desc")->result_array();
 				}
 			}
 		$i = 0;
@@ -2026,7 +2026,7 @@ function get_act_msg($req_msg,$act_1){
 		$req_msg = str_replace("{task_subject}",$act_1['name'],$req_msg);
 	}
 	if(!empty($act_1['tasktype'])){
-		$res = $CI->db->query("SELECT * FROM " . db_prefix() . "tasktype WHERE id = '".$act_1['tasktype']."'")->row();
+		$res = $CI->db->query("SELECT id,name,status,created_date,created_by,updated_date,updated_by FROM " . db_prefix() . "tasktype WHERE id = '".$act_1['tasktype']."'")->row();
 		$cur_type = '';
 		if(!empty($res->name)){
 			$cur_type = $res->name;
@@ -2067,8 +2067,9 @@ function get_act_msg($req_msg,$act_1){
 		$req_msg = str_replace("{task_date}",'',$req_msg);
 		$req_msg = str_replace("{task_time}",'',$req_msg);
 	}
+	$contact_fields = "id,userid,userids,is_primary,firstname,lastname,email,phonenumber,alternative_emails,alternative_phonenumber,title,datecreated,password,new_pass_key,new_pass_key_requested,email_verified_at,email_verification_key,email_verification_sent_at,last_ip,last_login,last_password_change,active,profile_image,direction,invoice_emails,estimate_emails,credit_note_emails,contract_emails,task_emails,project_emails,ticket_emails,deleted_status,addedfrom";
 	if(!empty($act_1['contacts_id'])){
-		$res = $CI->db->query("SELECT * FROM " . db_prefix() . "contacts WHERE id = '".$act_1['contacts_id']."'")->row();
+		$res = $CI->db->query("SELECT ".$contact_fields." FROM " . db_prefix() . "contacts WHERE id = '".$act_1['contacts_id']."'")->row();
 		$req_val = get_task_assignees($act_1['contacts_id']);
 		$cur_contact = '';
 		if(!empty($res->firstname)){
@@ -2263,7 +2264,7 @@ function get_tar_msg($req_msg,$tar){
 		$CI->db->where('target_id', $tar['id']);
 		$target_user1 = $CI->db->get(db_prefix().'target_stage')->row();
 		if(!empty($target_user1)){
-			$manager_res = $CI->db->query("SELECT  * FROM " . db_prefix() ."projects_status WHERE id ='".$target_user1->stage_id."'")->row();
+			$manager_res = $CI->db->query("SELECT  id,name,statusorder,color,progress,isdefault,status,created_date,updated_date,created_by,updated_by,filter_default FROM " . db_prefix() ."projects_status WHERE id ='".$target_user1->stage_id."'")->row();
 			
 			$req_msg = str_replace("{pipeline_stage}", $manager_res->name,$req_msg);
 		}else{

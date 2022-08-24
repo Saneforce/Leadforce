@@ -25,20 +25,13 @@ class Products_model extends App_Model {
     }
 
     public function getpricebyid($name = '') {
-        $res = $this->db->query('SELECT * FROM ' . db_prefix() . 'item_price where item_id = "'.$_POST['value'].'" and currency = "'.$name.'"')->result_array();
-        //pre($res[0]['tax']);
+        $res = $this->db->query('SELECT id,tax,price,item_id,currency FROM ' . db_prefix() . 'item_price where item_id = "'.$_POST['value'].'" and currency = "'.$name.'"')->result_array();
         if($res[0]['tax'] > 0) {
-            //$this->db->select('unit_price.*,tblproducts.tax as prodtax');
-            $this->db->select('item_price.*,' . db_prefix() . 'taxes.taxrate as prodtax');
-        // $this->db->where(db_prefix() . 'unit_price.productid', $_POST['value']);
+            $this->db->select('item_price.id,item_price.item_id,item_price.tax,item_price.price,item_price.id,currency' . db_prefix() . 'taxes.taxrate as prodtax');
             $this->db->where(db_prefix() . 'item_price.item_id', $_POST['value']);
-        // $this->db->where(db_prefix() . 'unit_price.currency', $name);
             $this->db->where(db_prefix() . 'item_price.currency', $name);
-            //$this->db->where('method', 3);
-            //$this->db->join(db_prefix() . 'products', db_prefix() . 'products.id=' . db_prefix() . 'unit_price.productid');
             $this->db->join(db_prefix() . 'items', db_prefix() . 'items.id=' . db_prefix() . 'item_price.item_id');
             $this->db->join(db_prefix() . 'taxes', db_prefix() . 'taxes.id=' . db_prefix() . 'item_price.tax');
-       // $products = $this->db->get(db_prefix() . 'unit_price')->result_array();
             $products = $this->db->get(db_prefix() . 'item_price')->result_array();
         } else {
             $this->db->select('item_price.*');
@@ -48,9 +41,7 @@ class Products_model extends App_Model {
             $products = $this->db->get(db_prefix() . 'item_price')->result_array();
             $products[0]['prodtax']  = 0;
         }
-        //echo $this->db->last_query(); exit;
         return $products;
-        //return $this->db->query('SELECT * FROM ' . db_prefix() . 'unit_price where productid = "'.$_POST['value'].'" and currency = "'.$name.'"')->result_array();
     }
 
     public function get($id = '', $where = []) {
@@ -698,16 +689,12 @@ class Products_model extends App_Model {
     }
 
     public function getVariationfield($currency) {
-        return $this->db->query('SELECT a.* FROM ' . db_prefix() . 'variations as a, ' . db_prefix() . 'variation_price as b where a.productid = b.productid and b.variationid = a.id and b.currency = "'.$currency.'" and a.productid = "'.$_POST['value'].'"')->result_array();
+        return $this->db->query('SELECT a.id,a.productid,a.name FROM ' . db_prefix() . 'variations as a, ' . db_prefix() . 'variation_price as b where a.productid = b.productid and b.variationid = a.id and b.currency = "'.$currency.'" and a.productid = "'.$_POST['value'].'"')->result_array();
     }
 
     public function getVariationfieldbyid($currency, $id) {
-        // $this->db->select('*');
-        // $this->db->where('currency', $currency);
-        // $this->db->where('productid', $id);
-        // return $this->db->get(db_prefix() . 'variation_price')->result_array();
-        
-        return $this->db->query('SELECT a.* FROM ' . db_prefix() . 'variations as a, ' . db_prefix() . 'variation_price as b where a.productid = b.productid and b.variationid = a.id and b.currency = "'.$currency.'" and a.productid = "'.$id.'"')->result_array();
+       
+        return $this->db->query('SELECT a.id,a.productid,a.name FROM ' . db_prefix() . 'variations as a, ' . db_prefix() . 'variation_price as b where a.productid = b.productid and b.variationid = a.id and b.currency = "'.$currency.'" and a.productid = "'.$id.'"')->result_array();
     }
 
     public function getvariationpricebyid($currency) {
@@ -2031,8 +2018,9 @@ class Products_model extends App_Model {
     }
 
     public function get_staff_members_that_can_access_customer($id) {
+		$staff_fields = "staffid,email,firstname,lastname,facebook,linkedin,phonenumber,skype,password,datecreated,profile_image,last_ip,last_login,last_activity,last_password_change,new_pass_key,new_pass_key_requested,admin,role,designation,reporting_to,emp_id,action_for,active,default_language,direction,media_path_slug,is_not_staff,hourly_rate,two_factor_auth_enabled,two_factor_auth_code,two_factor_auth_code_requested,email_signature,deavite_re_assign,deavite_follow,deavite_follow_ids,login_fails,login_locked_on";
 
-        return $this->db->query('SELECT * FROM ' . db_prefix() . 'staff
+        return $this->db->query('SELECT '.$staff_fields.' FROM ' . db_prefix() . 'staff
             WHERE (
                     admin=1
                     OR staffid IN (SELECT staff_id FROM ' . db_prefix() . "customer_admins WHERE customer_id='.$id.')
@@ -2117,9 +2105,6 @@ class Products_model extends App_Model {
             $this->db->update(db_prefix() . 'contacts', [
                 'is_primary' => 0,
             ]);
-            // // $contacts_clients['is_primary'] = 1;
-            // $this->db->where('userid', $customer_id);
-            // $this->db->update(db_prefix() . 'contacts_clients', ['is_primary' => 0,]);
         } else {
             $data['is_primary'] = 0;
         }
@@ -2149,14 +2134,6 @@ class Products_model extends App_Model {
 
         $this->db->insert(db_prefix() . 'contacts', $data);
         $contact_id = $this->db->insert_id();
-
-        // if (isset($data['userids']) && !empty($data['userids'])) {
-        //     $contacts_clients['contactid'] = $contact_id;
-        //     foreach (explode(',', $data['userids']) as $keycu => $valuecu) {
-        //         $contacts_clients['userid'] = $valuecu;
-        //         $this->db->insert(db_prefix() . 'contacts_clients', $contacts_clients);
-        //     }
-        // }
 
         if ($contact_id) {
             if (isset($custom_fields)) {
@@ -2218,25 +2195,6 @@ class Products_model extends App_Model {
                 }
             }
 
-            // if ($send_welcome_email == true) {
-            //     send_mail_template('customer_created_welcome_mail', $data['email'], $data['userid'], $contact_id, $password_before_hash);
-            // }
-
-            // if ($send_set_password_email) {
-            //     $this->authentication_model->set_password_email($data['email'], 0);
-            // }
-
-            // if (defined('CONTACT_REGISTERING')) {
-            //     $this->send_verification_email($contact_id);
-            // } else {
-            //     // User already verified because is added from admin area, try to transfer any tickets
-            //     $this->load->model('tickets_model');
-            //     $this->tickets_model->transfer_email_tickets_to_contact($data['email'], $contact_id);
-            // }
-
-            //log_activity('Contact Created [ID: ' . $contact_id . ']');
-
-            //hooks()->do_action('contact_created', $contact_id);
 
             return $contact_id;
         }
@@ -2323,7 +2281,8 @@ class Products_model extends App_Model {
     }
 
     public function getAllContacts() {
-        $sql = 'SELECT * FROM tblcontacts where deleted_status=0 group by firstname';
+		$contact_fields = "id,userid,userids,is_primary,firstname,lastname,email,phonenumber,alternative_emails,alternative_phonenumber,title,datecreated,password,new_pass_key,new_pass_key_requested,email_verified_at,email_verification_key,email_verification_sent_at,last_ip,last_login,last_password_change,active,profile_image,direction,invoice_emails,estimate_emails,credit_note_emails,contract_emails,task_emails,project_emails,ticket_emails,deleted_status,addedfrom";
+        $sql = 'SELECT '.$contact_fields.' FROM tblcontacts where deleted_status=0 group by firstname';
         $query = $this->db->query($sql);
         return $result = $query->result_array();
     }

@@ -1808,8 +1808,9 @@ class Clients_model extends App_Model {
     }
 
     public function get_staff_members_that_can_access_customer($id) {
+		$staff_fields = "staffid,email,firstname,lastname,facebook,linkedin,phonenumber,skype,password,datecreated,profile_image,last_ip,last_login,last_activity,last_password_change,new_pass_key,new_pass_key_requested,admin,role,designation,reporting_to,emp_id,action_for,active,default_language,direction,media_path_slug,is_not_staff,hourly_rate,two_factor_auth_enabled,two_factor_auth_code,two_factor_auth_code_requested,email_signature,deavite_re_assign,deavite_follow,deavite_follow_ids,login_fails,login_locked_on";
 
-        return $this->db->query('SELECT * FROM ' . db_prefix() . 'staff
+        return $this->db->query('SELECT  '.$staff_fields.' FROM ' . db_prefix() . 'staff
             WHERE (
                     admin=1
                     OR staffid IN (SELECT staff_id FROM ' . db_prefix() . "customer_admins WHERE customer_id='.$id.')
@@ -2194,10 +2195,6 @@ class Clients_model extends App_Model {
         }
 
         if ($affectedRows > 0) {
-            //hooks()->do_action('after_client_updated', $id);
-
-            //log_activity('Customer Info Updated [ID: ' . $id . ']');
-
             return true;
         }
 
@@ -2206,12 +2203,14 @@ class Clients_model extends App_Model {
 
 
     public function getAllContacts() {
-        $sql = 'SELECT * FROM tblcontacts where deleted_status=0 group by firstname';
+		$contact_fields = "id,userid,userids,is_primary,firstname,lastname,email,phonenumber,alternative_emails,alternative_phonenumber,title,datecreated,password,new_pass_key,new_pass_key_requested,email_verified_at,email_verification_key,email_verification_sent_at,last_ip,last_login,last_password_change,active,profile_image,direction,invoice_emails,estimate_emails,credit_note_emails,contract_emails,task_emails,project_emails,ticket_emails,deleted_status,addedfrom";
+        $sql = 'SELECT ".$contact_fields." FROM tblcontacts where deleted_status=0 group by firstname';
         $query = $this->db->query($sql);
         return $result = $query->result_array();
     }
 	 public function getAllContacts_active() {
-        $sql = 'SELECT * FROM tblcontacts where deleted_status=0 and active = 1 group by firstname';
+		$contact_fields = "id,userid,userids,is_primary,firstname,lastname,email,phonenumber,alternative_emails,alternative_phonenumber,title,datecreated,password,new_pass_key,new_pass_key_requested,email_verified_at,email_verification_key,email_verification_sent_at,last_ip,last_login,last_password_change,active,profile_image,direction,invoice_emails,estimate_emails,credit_note_emails,contract_emails,task_emails,project_emails,ticket_emails,deleted_status,addedfrom"; 
+        $sql = 'SELECT '.$contact_fields.' FROM tblcontacts where deleted_status=0 and active = 1 group by firstname';
         $query = $this->db->query($sql);
         return $result = $query->result_array();
     }

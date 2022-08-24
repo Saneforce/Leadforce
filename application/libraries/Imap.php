@@ -2795,38 +2795,26 @@ class Imap
 		$req_uid = $uids;
 		$CI          = & get_instance();
 		$CI->db->reconnect();
-		//$sQuery = "select t.source_from as source_from from ".db_prefix()."localmailstorage l,".db_prefix()."tasks t where l.task_id = t.id and t.source_from != '' ";
-		//$rResults1 = $CI->db->query($sQuery)->result_array();
+		
 		
 		$sQuery = "select uid as source_from from ".db_prefix()."localmailstorage  where  staff_id = '".$staffid."' ";
 		$rResults1 = $CI->db->query($sQuery)->result_array();
-		//echo '<pre>';print_r($rResults1);exit;
 		$source_from = array();
 		$source_from = array_column($rResults1, 'source_from'); 
-		//echo '<pre>';print_r($source_from);exit;
 		$rResults = array_diff($req_uid, $source_from);
-		//$rResults =   $req_uid;
-		//echo '<pre>';print_r($rResults);exit;
-		//$sQuery1 = "select * from ".db_prefix()."imapuid where staff_id = '".$staffid."'";
+		
 		$sQuery1 = "select uid from ".db_prefix()."imapuid where folder='INBOX' and staff_id = '".$staffid."'";
 		$CI->db->reconnect();
 		$rResults12 = $CI->db->query($sQuery1)->result_array();
 		$source_from1 = array();
 		$source_from1 = array_column($rResults12, 'uid'); 
-		/*if(!empty($rResults12)){
-			$j1 = 0;
-			foreach($rResults12 as $rResult12){
-				$source_from1[$j1]  = $rResult12['uid'];
-				$j1++;
-			}
-		}*/
 		$rResults = array_diff($rResults, $source_from1);
-		
+		$staff_fields = "staffid,email,firstname,lastname,facebook,linkedin,phonenumber,skype,password,datecreated,profile_image,last_ip,last_login,last_activity,last_password_change,new_pass_key,new_pass_key_requested,admin,role,designation,reporting_to,emp_id,action_for,active,default_language,direction,media_path_slug,is_not_staff,hourly_rate,two_factor_auth_enabled,two_factor_auth_code,two_factor_auth_code_requested,email_signature,deavite_re_assign,deavite_follow,deavite_follow_ids,login_fails,login_locked_on";
 		$i = $j1 = 0;
 		$req_msg = array();
 		if(!empty($rResults)){
 			$CI->db->reconnect();
-			$sQuery12 = "select * from ".db_prefix()."staff where staffid = '".$staffid."'";
+			$sQuery12 = "select ".$staff_fields." from ".db_prefix()."staff where staffid = '".$staffid."'";
 			$assignee_admin = $CI->db->query($sQuery12)->row();
 			foreach($rResults as $uid1){
 				
@@ -2849,7 +2837,8 @@ class Imap
 					$ins_data['contacts_id'] = $req_project_id->contact_id;
 					$ins_data['source_from'] = $uid1;
 					$CI->db->reconnect();
-					$sQuery13 = "select * from ".db_prefix()."tasks where source_from = '".$uid1."'";
+					$task_fields = "id,name,tasktype,description,priority,dateadded,datemodified,startdate,duedate,datefinished,addedfrom,is_added_from_contact,status,send_reminder,recurring_type,repeat_every,recurring,is_recurring_from,cycles,total_cycles,custom_recurring,last_recurring_date,rel_id,rel_type,is_public,contacts_id,billable,billed,invoice_id,hourly_rate,milestone,kanban_order,milestone_order,visible_to_client,deadline_notified,source_from,imported_id,call_request_id,call_code,call_msg";
+					$sQuery13 = "select ".$task_fields." from ".db_prefix()."tasks where source_from = '".$uid1."'";
 					$tasks_data = $CI->db->query($sQuery13)->row();
 					$data_assignee 			 = $assignee_admin->staffid;
 					if(empty($tasks_data)){
@@ -2917,11 +2906,8 @@ class Imap
 					$CI->db->reconnect();
 					$table = db_prefix() . 'localmailstorage';
 					$CI->db->insert($table,$req_msg[$i]);
-					//echo '<pre>';print_r($req_msg);exit;
 					$i++;
-					/*if($i==$limit){
-						break;
-					}*/
+					
 				}
 				$uid_data[$j1]['folder']	= 'INBOX';
 				$uid_data[$j1]['uid']		= $uid1;
@@ -2931,91 +2917,8 @@ class Imap
 				$CI->db->reconnect();
 				$CI->db->insert(db_prefix() . 'imapuid', $uid_data);
 			}
-			//$CI->db->reconnect();
-			//$CI->db->insert_batch(db_prefix() . 'imapuid', $uid_data);
-			//return $req_msg;
 		}
-		/*$this->select_folder('[Gmail]/Sent Mail');
-		$uids1 = $this->search();
-		$req_uid1 = $uids1;
-		$rResults12 = array_diff($req_uid1, $source_from);
-		$rResults12 = array_diff($rResults12, $source_from1);
-		//echo '<pre>';print_r($rResults12);exit;
-		if(!empty($rResults12)){
-			
-			foreach($rResults12 as $uid12){
-				$uid_data = array('uid'=>$uid12,'staff_id'=>$staffid);
-				$CI->db->insert(db_prefix() . 'imapuid', $uid_data);
-				$messages1 = $this->get_message($uid12);
-				$req_project_id = get_deal_id($messages1['from']['email'],get_option('deal_map'));
-				
-				$req_project_id = json_decode($req_project_id);
-				$ins_data1 = array();
-				if(!empty($req_project_id) && !empty($messages1['uid']) && !empty($messages1['id'])){
-					$ins_data1['description'] = $messages1['body']['plain'];
-					$ins_data1['billable']	 = 1;
-					$ins_data1['tasktype']	 = 2;
-					$ins_data1['name']		 = $messages1['subject'];
-					$ins_data1['priority']	 = 2;
-					$ins_data1['startdate']	 = date('d-m-Y');
-					$ins_data1['rel_type']	 = 'project';
-					$ins_data1['rel_id']     = $req_project_id['project_id'];
-					$ins_data1['contacts_id']= $req_project_id['contact_id'];
-					$ins_data1['source_from']= $uid12;
-					$data_assignee 			 = $assignee_admin->staffid;
-					$sQuery13 = "select * from ".db_prefix()."tasks where source_from = '".$uid1."'";
-					$tasks_data = $CI->db->query($sQuery13)->row();
-					$data_assignee 			 = $assignee_admin->staffid;
-					if(empty($tasks_data)){
-						$id   = $CI->tasks_model->add($ins_data);
-						$assignData = [
-								'taskid'  => $id,
-								'staffid' => $data_assignee,
-								];
-						$CI->db->insert(db_prefix() . 'task_assigned', $assignData);
-					}
-					else{
-						$id = $tasks_data->id;
-					}
-					
-					$req_msg[$i]['project_id']	= $req_project_id;
-					$req_msg[$i]['task_id']		= $rResult11['id'];
-					$req_msg[$i]['mailid']		= $messages1['id'];
-					$req_msg[$i]['uid'] 		= $messages1['uid'];
-					$req_msg[$i]['contacts_id']	= $ins_data1['contacts_id'];
-					$req_msg[$i]['staff_id'] 	= $staffid;
-					$req_msg[$i]['from_email'] 	= $messages1['from']['email'];
-					$req_msg[$i]['from_name'] 	= $messages1['from']['name'];
-					$req_msg[$i]['mail_to']		= json_encode($messages1['to']);
-					$req_msg[$i]['cc']			= json_encode($messages1['cc']);
-					$req_msg[$i]['bcc']			= json_encode($messages1['bcc']);
-					$req_msg[$i]['reply_to']	= json_encode($messages1['reply_to']);
-					$req_msg[$i]['message_id']	= $messages1['message_id'];
-					$req_msg[$i]['in_reply_to']	= $messages1['in_reply_to'];
-					$req_msg[$i]['mail_references']	= json_encode($messages1['references']);
-					$req_msg[$i]['date']		= $messages1['date'];
-					$req_msg[$i]['udate']		= $messages1['udate'];
-					$req_msg[$i]['subject']		= $messages1['subject'];
-					$req_msg[$i]['recent']		= $messages1['recent'];
-					$req_msg[$i]['priority']	= $messages1['priority'];
-					$req_msg[$i]['mail_read']	= $messages1['read'];
-					$req_msg[$i]['answered']	= $messages1['answered'];
-					$req_msg[$i]['flagged']		= $messages1['flagged'];
-					$req_msg[$i]['deleted']		= $messages1['deleted'];
-					$req_msg[$i]['draft']		= $messages1['draft'];
-					$req_msg[$i]['size']		= $messages1['size'];
-					$req_msg[$i]['attachements']= json_encode($messages1['attachments']);
-					$req_msg[$i]['body_html']	= $messages1['body']['html'];
-					$req_msg[$i]['body_plain']	= $messages1['body']['plain'];
-					$req_msg[$i]['folder']		= 'Sent_mail';
-					//echo '<pre>';print_r($req_msg);exit;
-					$i++;
-				}
-				
-				
-			}
-			//return $req_msg;
-		}*/
+		
 		if(!empty($req_msg)){
 			return true;
 		}

@@ -691,7 +691,7 @@ class Tasks_model extends App_Model
                 }
                 
                 if ($ticket_to_task && isset($data['rel_type']) && $data['rel_type'] == 'ticket') {
-                    $ticket_attachments = $this->db->query('SELECT * FROM ' . db_prefix() . 'ticket_attachments WHERE ticketid=' . $data['rel_id'] . ' OR (ticketid=' . $data['rel_id'] . ' AND replyid IN (SELECT id FROM ' . db_prefix() . 'ticket_replies WHERE ticketid=' . $data['rel_id'] . '))')->result_array();
+                    $ticket_attachments = $this->db->query('SELECT id,ticketid,replyid,file_name,filetype,dateadded FROM ' . db_prefix() . 'ticket_attachments WHERE ticketid=' . $data['rel_id'] . ' OR (ticketid=' . $data['rel_id'] . ' AND replyid IN (SELECT id FROM ' . db_prefix() . 'ticket_replies WHERE ticketid=' . $data['rel_id'] . '))')->result_array();
 
                     if (count($ticket_attachments) > 0) {
                         $task_path = get_upload_path_by_type('task') . $insert_id . '/';
@@ -903,7 +903,7 @@ class Tasks_model extends App_Model
                 }
                 
                 if ($ticket_to_task && isset($data['rel_type']) && $data['rel_type'] == 'ticket') {
-                    $ticket_attachments = $this->db->query('SELECT * FROM ' . db_prefix() . 'ticket_attachments WHERE ticketid=' . $data['rel_id'] . ' OR (ticketid=' . $data['rel_id'] . ' AND replyid IN (SELECT id FROM ' . db_prefix() . 'ticket_replies WHERE ticketid=' . $data['rel_id'] . '))')->result_array();
+                    $ticket_attachments = $this->db->query('SELECT id,ticketid,replyid,file_name,filetype,dateadded FROM ' . db_prefix() . 'ticket_attachments WHERE ticketid=' . $data['rel_id'] . ' OR (ticketid=' . $data['rel_id'] . ' AND replyid IN (SELECT id FROM ' . db_prefix() . 'ticket_replies WHERE ticketid=' . $data['rel_id'] . '))')->result_array();
 
                     if (count($ticket_attachments) > 0) {
                         $task_path = get_upload_path_by_type('task') . $insert_id . '/';
@@ -1116,7 +1116,7 @@ class Tasks_model extends App_Model
                 }
                 
                 if ($ticket_to_task && isset($data['rel_type']) && $data['rel_type'] == 'ticket') {
-                    $ticket_attachments = $this->db->query('SELECT * FROM ' . db_prefix() . 'ticket_attachments WHERE ticketid=' . $data['rel_id'] . ' OR (ticketid=' . $data['rel_id'] . ' AND replyid IN (SELECT id FROM ' . db_prefix() . 'ticket_replies WHERE ticketid=' . $data['rel_id'] . '))')->result_array();
+                    $ticket_attachments = $this->db->query('SELECT id,ticketid,replyid,file_name,filetype,dateadded FROM ' . db_prefix() . 'ticket_attachments WHERE ticketid=' . $data['rel_id'] . ' OR (ticketid=' . $data['rel_id'] . ' AND replyid IN (SELECT id FROM ' . db_prefix() . 'ticket_replies WHERE ticketid=' . $data['rel_id'] . '))')->result_array();
 
                     if (count($ticket_attachments) > 0) {
                         $task_path = get_upload_path_by_type('task') . $insert_id . '/';
@@ -1448,6 +1448,8 @@ class Tasks_model extends App_Model
                 $data['milestone'] = 0;
             }
         }
+
+
         if (empty($data['rel_type'])) {
             $data['rel_id']   = null;
             $data['rel_type'] = null;
@@ -2989,7 +2991,8 @@ class Tasks_model extends App_Model
 
     public function get_staff_members_that_can_access_task($task_id)
     {
-        return $this->db->query('SELECT * FROM ' . db_prefix() . 'staff
+		$staff_fields = "staffid,email,firstname,lastname,facebook,linkedin,phonenumber,skype,password,datecreated,profile_image,last_ip,last_login,last_activity,last_password_change,new_pass_key,new_pass_key_requested,admin,role,designation,reporting_to,emp_id,action_for,active,default_language,direction,media_path_slug,is_not_staff,hourly_rate,two_factor_auth_enabled,two_factor_auth_code,two_factor_auth_code_requested,email_signature,deavite_re_assign,deavite_follow,deavite_follow_ids,login_fails,login_locked_on";
+        return $this->db->query('SELECT '.$staff_fields.' FROM ' . db_prefix() . 'staff
             WHERE (
                     admin=1
                     OR staffid IN (SELECT staffid FROM ' . db_prefix() . "task_assigned WHERE taskid='.$task_id.')
@@ -3035,16 +3038,12 @@ class Tasks_model extends App_Model
         array_push($join, 'LEFT JOIN '.db_prefix().'projects_status  as '.db_prefix().'projects_status ON '.db_prefix().'projects_status.id = ' .db_prefix() . 'projects.status');
         array_push($join, 'LEFT JOIN '.db_prefix().'pipeline  as '.db_prefix().'pipeline ON '.db_prefix().'pipeline.id = ' .db_prefix() . 'projects.pipeline_id');
         array_push($join, 'LEFT JOIN '.db_prefix().'clients  as '.db_prefix().'clients ON '.db_prefix().'clients.userid = ' .db_prefix() . 'projects.clientid');
-        array_push($join, 'LEFT JOIN '.db_prefix().'contacts  as '.db_prefix().'contacts ON ('.db_prefix().'contacts.id = ' .db_prefix() . 'tasks.contacts_id  OR (' .db_prefix() . 'tasks.rel_type ="contact" AND '.db_prefix().'contacts.id = ' .db_prefix() . 'tasks.rel_id) )');
-        include_once(APPPATH . 'views/admin/tables/includes/tasks_filter.php');
-        include_once(APPPATH . 'views/admin/tables/includes/tasks_wo_status_filter.php');
-        //pre($wherewo);
-        array_push($where, 'AND CASE WHEN rel_type="project" AND rel_id IN (SELECT project_id FROM ' . db_prefix() . 'project_settings WHERE project_id=rel_id AND name="hide_tasks_on_main_tasks_table" AND value=1) THEN rel_type != "project" ELSE 1=1 END');
-        array_push($where, ' AND rel_type != "invoice" AND rel_type != "estimate" AND rel_type != "proposal"');
+       array_push($join, 'LEFT JOIN '.db_prefix().'contacts  as '.db_prefix().'contacts ON ('.db_prefix().'contacts.id = ' .db_prefix() . 'tasks.contacts_id  OR (' .db_prefix() . 'tasks.rel_type ="contact" AND '.db_prefix().'contacts.id = ' .db_prefix() . 'tasks.rel_id) )');
+         include_once(APPPATH . 'views/admin/tables/includes/tasks_filter.php');
+         include_once(APPPATH . 'views/admin/tables/includes/tasks_wo_status_filter.php');
+         array_push($where, 'AND CASE WHEN rel_type="project" AND rel_id IN (SELECT project_id FROM ' . db_prefix() . 'project_settings WHERE project_id=rel_id AND name="hide_tasks_on_main_tasks_table" AND value=1) THEN rel_type != "project" ELSE 1=1 END');
+         array_push($where, ' AND rel_type != "invoice" AND rel_type != "estimate" AND rel_type != "proposal"');
         
-        
-        array_push($wherewo, 'AND CASE WHEN rel_type="project" AND rel_id IN (SELECT project_id FROM ' . db_prefix() . 'project_settings WHERE project_id=rel_id AND name="hide_tasks_on_main_tasks_table" AND value=1) THEN rel_type != "project" ELSE 1=1 END');
-        array_push($wherewo, ' AND rel_type != "invoice" AND rel_type != "estimate" AND rel_type != "proposal"');
         
         
         // ROle based records
@@ -3224,7 +3223,7 @@ class Tasks_model extends App_Model
         }
 
         //validate rel type
-        $rel_types =task_relatedto_list();
+        $rel_types = task_relatedto_list();
         if(!$data['rel_type'] || !isset($rel_types[$data['rel_type']])){
             return array('name'=>'rel_type','error'=>'Invalid activity related to');
         }

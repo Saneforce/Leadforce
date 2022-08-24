@@ -389,7 +389,7 @@ class Invoice_items_model extends App_Model
     }
 	public function get_category()
     {
-        $this->db->select('*');
+        $this->db->select('id,cat_name,status,created_date');
         $items = $this->db->get(db_prefix() . 'item_category')->result_array();
         return $items;
     }
@@ -407,7 +407,7 @@ class Invoice_items_model extends App_Model
         return $this->db->query('SELECT a.id as id, a.name as name,b.price as price   FROM ' . db_prefix() . 'items as a JOIN ' . db_prefix() . 'item_price as b ON b.item_id=a.id  where  a.id = b.item_id and b.currency = "'.$name.'"')->result_array();
     }
 	public function get_items_unit_prices($id = '') {
-        return $this->db->query('SELECT * FROM ' . db_prefix() . 'item_price where item_id = "'.$id.'"')->result_array();
+        return $this->db->query('SELECT id,item_id,tax,price,currency FROM ' . db_prefix() . 'item_price where item_id = "'.$id.'"')->result_array();
     }
 	public function getitem_price($name = '') {
 		$cur_val = $_REQUEST['value'];

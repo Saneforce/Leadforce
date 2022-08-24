@@ -79,7 +79,7 @@ class Pipeline extends AdminController
 						}
 						
 					}
-					$staff_leader =  $this->db->query('SELECT * FROM ' . db_prefix() . 'staff WHERE role = 2')->result_array();
+					$staff_leader =  $this->db->query('SELECT staffid FROM ' . db_prefix() . 'staff WHERE role = 2')->result_array();
 					if(!empty($staff_leader)) {
 						foreach($staff_leader as $teamlead) {
 							$teamleaders .= $teamlead['staffid'].',';

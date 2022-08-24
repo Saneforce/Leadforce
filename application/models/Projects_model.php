@@ -169,7 +169,7 @@ class Projects_model extends App_Model
     }
     public function get_allcurrency()
     {
-        return $this->db->query('SELECT * FROM ' . db_prefix() . 'currencies')->result_array();
+        return $this->db->query('SELECT id,symbol,name,decimal_separator,thousand_separator,placement,isdefault FROM ' . db_prefix() . 'currencies')->result_array();
     }
     public function get_currency($id)
     {
@@ -4541,25 +4541,28 @@ public function reply_messages($id){
 }
  public function deal_values($to_email,$staff_id='')
 {
+	$project_fields = "p.id,p.name,p.description,p.status,p.pipeline_id,p.clientid,p.teamleader,p.billing_type,p.start_date,p.deadline,p.project_created,p.created_by,p.project_modified,p.modified_by,p.date_finished,p.progress,p.progress_from_tasks,p.project_cost,p.project_rate_per_hour,p.estimated_hours,p.addedfrom,p.stage_of,p.stage_on,p.loss_reason,p.loss_remark,p.deleted_status,p.project_currency,p.imported_id,p.lead_id";
 	if(empty($staff_id)){
-		return $this->db->query("SELECT p.* FROM " . db_prefix() . "contacts c,".db_prefix()."project_contacts pc,".db_prefix()."projects p where c.email = '".$to_email."' and pc.contacts_id = c.id and p.id = pc.project_id")->result_array();
+		return $this->db->query("SELECT ".$project_fields." FROM " . db_prefix() . "contacts c,".db_prefix()."project_contacts pc,".db_prefix()."projects p where c.email = '".$to_email."' and pc.contacts_id = c.id and p.id = pc.project_id")->result_array();
 	}
 	else{
-		return $this->db->query("SELECT p.* FROM " . db_prefix() . "contacts c,".db_prefix()."project_contacts pc,".db_prefix()."projects p where c.email = '".$to_email."' and pc.contacts_id = c.id and p.id = pc.project_id and p.teamleader = '".$staff_id."'")->result_array();
+		return $this->db->query("SELECT ".$project_fields." FROM " . db_prefix() . "contacts c,".db_prefix()."project_contacts pc,".db_prefix()."projects p where c.email = '".$to_email."' and pc.contacts_id = c.id and p.id = pc.project_id and p.teamleader = '".$staff_id."'")->result_array();
 	}
 }
 public function all_deal_values($staff_id='')
 {
+	$project_fields = "id,name,description,status,pipeline_id,clientid,teamleader,billing_type,start_date,deadline,project_created,created_by,project_modified,modified_by,date_finished,progress,progress_from_tasks,project_cost,project_rate_per_hour,estimated_hours,addedfrom,stage_of,stage_on,loss_reason,loss_remark,deleted_status,project_currency,imported_id,lead_id";
 	if(empty($staff_id)){
-		return $this->db->query("SELECT * FROM ".db_prefix()."projects order by id desc")->result_array();
+		return $this->db->query("SELECT ".$project_fields." FROM ".db_prefix()."projects order by id desc")->result_array();
 	}
 	else{
-		return $this->db->query("SELECT * FROM ".db_prefix()."projects  where teamleader = '".$staff_id."' order by id desc")->result_array();
+		return $this->db->query("SELECT ".$project_fields." FROM ".db_prefix()."projects  where teamleader = '".$staff_id."' order by id desc")->result_array();
 	}
 }
 public function all_activiites()
 {
-	return $this->db->query("SELECT * FROM ".db_prefix()."tasks order by id desc")->result_array();
+	$task_fields = "id,name,tasktype,description,priority,dateadded,datemodified,startdate,duedate,datefinished,addedfrom,is_added_from_contact,status,send_reminder,recurring_type,repeat_every,recurring,is_recurring_from,cycles,total_cycles,custom_recurring,last_recurring_date,rel_id,rel_type,is_public,contacts_id,billable,billed,invoice_id,hourly_rate,milestone,kanban_order,milestone_order,visible_to_client,deadline_notified,source_from,imported_id,call_request_id,call_code,call_msg";
+	return $this->db->query("SELECT ".$task_fields." FROM ".db_prefix()."tasks order by id desc")->result_array();
 }
 	public function get_all_staffs()
     {
@@ -4739,11 +4742,9 @@ public function all_activiites()
 			$staff_id = array();
 			foreach($req_ids as $req_id12){
 				foreach($data['project_members'] as $project_member1){
-					//if (!in_array($project_member1, $staff_id)){
 						$staff_id[] = $project_member1;
 						$ins_data = array('project_id'=>$req_id12,'staff_id'=>$project_member1);
 						$this->db->insert('project_members',$ins_data);
-					//}
 				}
 			}
 			unset($data['project_members']);
@@ -4768,7 +4769,7 @@ public function all_activiites()
 		$target_ids = explode(',',$req_ids);
 		if(!empty($target_ids)){
 			foreach($target_ids as $target12){
-				$result1 = "select * from tblcustomfieldsvalues where relid ='".$target12."' and fieldto = 'projects' and fieldid = '".$upd_id."' ";
+				$result1 = "select id,relid,fieldid,fieldto,value from tblcustomfieldsvalues where relid ='".$target12."' and fieldto = 'projects' and fieldid = '".$upd_id."' ";
 				$qyt = $this->db->query($result1)->result();	
 				if(empty($qyt)){
 					$ins_data = array();

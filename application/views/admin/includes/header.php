@@ -100,7 +100,7 @@ ob_end_clean();
          </a>
 		 <?php 
 		 $staffid = get_staff_user_id();
-		  $cur_sql = "SELECT * FROM tblshared LEFT JOIN ".db_prefix()."report ON ".db_prefix()."shared.report_id = ".db_prefix()."report.id WHERE ".db_prefix()."shared.share_type = 'Everyone' OR ".db_prefix()."shared.id in(SELECT share_id FROM ".db_prefix()."shared_staff where staff_id = '".$staffid."')";
+		  $cur_sql = "SELECT id FROM ".db_prefix()."shared LEFT JOIN ".db_prefix()."report ON ".db_prefix()."shared.report_id = ".db_prefix()."report.id WHERE ".db_prefix()."shared.share_type = 'Everyone' OR ".db_prefix()."shared.id in(SELECT share_id FROM ".db_prefix()."shared_staff where staff_id = '".$staffid."')";
 		 $ch_shared = $this->db->query($cur_sql)->result_array();
 		 ?>
          <?php if(count($item['children']) > 0){ ?>
