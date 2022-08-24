@@ -149,28 +149,14 @@ function summary_val($tables,$fields,$qry_cond,$measure,$view_by,$cur_rows,$filt
 	else{
 		$qry_cond  = "p.deleted_status = '0' ".$qry_cond;
 		$deal_vals = get_deal_vals('*,sum(p.project_cost) as tot_val',$fields,$tables,$qry_cond,$filters);
-		//if($view_by != 'project_status'){
-			$data = get_data($view_by,$cur_rows,$deal_vals);
-		//}
-		/*else{
-			if(!empty($deal_vals)){
-				$i = 0;
-				foreach($deal_vals as $deal_val1){
-					$data[$i]['total_cnt_deal'] = $deal_val1['num_deal'];
-					$data[$i]['total_val_deal']	= $deal_val1['tot_val'];
-					$data[$i]['tot_cnt'] 		= $deal_val1['num_deal'];
-					$data[$i]['avg_deal']		= number_format((float)($data[$i]['total_val_deal']/$data[$i]['tot_cnt']), 2, '.', '');
-					$data[$i][$view_by] 		= $data[$i]['rows']	=	$deal_val1['stage_of'];
-					$i++;
-				}
-			}
-		}*/
+		$data = get_data($view_by,$cur_rows,$deal_vals);
 	}
 	
 	return $data;
 }
 function get_flters($req_filters){
-	$where = array();
+	$CI			= 	& get_instance();
+	$where 		= 	array();
 	$req_cond	=	'';
 	$filters	=	$req_filters['filters'];
 	$filters1	=	$req_filters['filters1'];
@@ -181,493 +167,50 @@ function get_flters($req_filters){
 	{
 		$i1 = 0;
 		$s_group_by = '';
+		$table = db_prefix().'filter';
 		foreach($filters as $filter12){
-			if($filter12 == 'won_date' ){
-				if($filters1[$i1]=='is'){
-					$cur_cond = " AND p.stage_on >='".date('Y-m-d',strtotime($filters3[$i1]))."' AND p.stage_on <='".date('Y-m-d',strtotime($filters4[$i1]))."' and p.stage_of = '1' ";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_empty'){
-					$cur_cond = " AND (p.stage_on IS NULL and p.stage_of = '1'  )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not_empty'){
-					$cur_cond = " AND (p.stage_on IS NOT NULL and p.stage_of = '1'  )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-			}
-			if($filter12 == 'lost_date' ){
-				if($filters1[$i1]=='is'){
-					$cur_cond = " AND p.stage_on >='".date('Y-m-d',strtotime($filters3[$i1]))."' AND p.stage_on <='".date('Y-m-d',strtotime($filters4[$i1]))."' and p.stage_of = '2' ";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_empty'){
-					$cur_cond = " AND (p.stage_on IS NULL and p.stage_of = '2'  )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not_empty'){
-					$cur_cond = " AND (p.stage_on IS NOT NULL and p.stage_of = '2'  )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-			}
-			if($filter12 == 'project_created' ){
-				if($filters1[$i1]=='is'){
-					$cur_cond = " AND p.project_created >='".date('Y-m-d',strtotime($filters3[$i1]))."' AND p.project_created <='".date('Y-m-d',strtotime($filters4[$i1]))."' ";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_empty'){
-					$cur_cond = " AND (p.project_created IS NULL  )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not_empty'){
-					$cur_cond = " AND (p.project_created IS NOT NULL )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-			}
-			if($filter12 == 'project_modified' ){
-				if($filters1[$i1]=='is'){
-					$cur_cond = " AND p.project_modified >='".date('Y-m-d',strtotime($filters3[$i1]))."' AND p.project_modified <='".date('Y-m-d',strtotime($filters4[$i1]))."' ";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_empty'){
-					$cur_cond = " AND (p.project_modified IS NULL  )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not_empty'){
-					$cur_cond = " AND (p.project_modified IS NOT NULL )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-			}
-			if($filter12 == 'project_start_date' ){
-				if($filters1[$i1]=='is'){
-					$cur_cond = " AND p.start_date >='".date('Y-m-d',strtotime($filters3[$i1]))."' AND p.start_date <='".date('Y-m-d',strtotime($filters4[$i1]))."'";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_empty'){
-					$cur_cond = " AND (p.start_date IS NULL )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not_empty'){
-					$cur_cond = " AND (p.start_date IS NOT NULL )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-			}
-			if($filter12 == 'project_deadline'){
-				if($filters1[$i1]=='is'){
-					$cur_cond = " AND p.deadline>='".date('Y-m-d',strtotime($filters3[$i1]))."' AND p.deadline <='".date('Y-m-d',strtotime($filters4[$i1]))."'";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_empty'){
-					$cur_cond = " AND (p.deadline IS NULL )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters21[$i1]=='is_not_empty'){
-					$cur_cond = " AND (p.deadline IS NOT NULL )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
+			$deal_vals 	= $CI->db->query("SELECT * FROM ".$table." where filter_name = '".$filter12."' and filter_type= '".$filters1[$i1]."' and filter = 'deal' ")->result_array();
+			if(!empty($deal_vals)){
+				$cur_cond = $deal_vals[0]['filter_cond'];
 				
-			}
-			if($filter12 == 'name' ){
-				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
-					$cur_cond = " AND (p.id like '".$filters2[$i1]."')";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_empty' ){
-					$cur_cond = " AND ( p.name ='')";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not_empty'){
-					$cur_cond = " AND ( p.name !='')";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not'){
-					$cur_cond = " AND ( p.id !='".$filters2[$i1]."')";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
-					$req_arrs = explode(',',$filters2[$i1]);
-					$req_arr = '';
-					if(!empty($req_arrs)){
-						foreach($req_arrs as $req_arr1){
-							$req_arr .= "'".$req_arr1."',";
-						}
+				$cur_cond = str_replace('db_prefix()', db_prefix(), $cur_cond);
+				if($filters1[$i1]=='is' && $deal_vals[0]['date_field'] ==0){
+					if($filters2[$i1]!='' && !str_contains($filters2[$i1], ',') &&  ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
+						$cur_cond = str_replace('$$cond1', $filters2[$i1], $cur_cond);
 					}
-					$req_arr = rtrim($req_arr,",");
-					$cur_cond = " AND ( p.id in(".$req_arr."))";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-			}
-			if($filter12 == 'project_cost' ){
-				if($filters1[$i1]=='is_more_than' && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
-					$cur_cond = " AND ( p.project_cost > '".$filters2[$i1]."')";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_empty'){
-					$cur_cond = " AND ( p.project_cost ='')";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not_empty'){
-					$cur_cond = " AND ( p.project_cost !='')";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_less_than'  && $filters2[$i1]!=''){
-					$cur_cond = " AND ( p.project_cost < '".$filters2[$i1]."')";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				
-			}
-			if($filter12 == 'teamleader_name' ){
-				if($filters1[$i1]=='is'  && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
-					$cur_cond = " AND ( p.teamleader like '".$filters2[$i1]."')";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_empty'){
-					$cur_cond = " AND ( p.teamleader = '')";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not_empty'){
-					$cur_cond = " AND ( p.teamleader != '')";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not'){
-					$cur_cond = " AND ( p.teamleader != '".$filters2[$i1]."')";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
-					$req_arrs = explode(',',$filters2[$i1]);
-					$req_arr = '';
-					if(!empty($req_arrs)){
-						foreach($req_arrs as $req_arr1){
-							$req_arr .= "'".$req_arr1."',";
-						}
+					else{
+						$cur_cond = '';
 					}
-					$req_arr = rtrim($req_arr,",");
-					$cur_cond = " AND ( p.teamleader in(".$req_arr.")";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
 				}
-			}
-			if($filter12 == 'product_qty' ){
-				if($filters1[$i1]=='is_more_than' && $filters2[$i1]!=''){
-					$cur_cond = " AND ( p.id in(SELECT projectid FROM ".db_prefix() ."project_products group by projectid having sum(quantity) > '".$filters2[$i1]."'))";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_empty'){
-					$cur_cond = " AND ( p.id in(SELECT projectid FROM ".db_prefix() ."project_products group by projectid having sum(quantity) = '0') or p.id not in (SELECT projectid FROM ".db_prefix() ."project_products group by projectid having sum(quantity) > '0'))";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not_empty'){
-					$cur_cond = " AND ( p.id in(SELECT projectid FROM ".db_prefix() ."project_products group by projectid having  sum(quantity) >'0'))";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_less_than'  && $filters2[$i1]!=''){
-					$cur_cond = " AND ( p.id in(SELECT projectid FROM ".db_prefix() ."project_products group by projectid having  sum(quantity) < '".$filters2[$i1]."'))";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-			}
-			if($filter12 == 'product_amt' ){
-				if($filters1[$i1]=='is_more_than' && $filters2[$i1]!=''){
-					$cur_cond = " AND ( p.id in(SELECT projectid FROM ".db_prefix() ."project_products group by projectid having sum(price) > '".$filters2[$i1]."'))";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_empty'){
-					$cur_cond = " AND ( p.id in(SELECT projectid FROM ".db_prefix() ."project_products group by projectid having sum(price) = '0' or sum(price) = '') or p.id not in (SELECT projectid FROM ".db_prefix() ."project_products group by projectid having sum(price) > '0') or p.id in (SELECT projectid FROM tblproject_products group by projectid having projectid = '') )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not_empty'){
-					$cur_cond = " AND ( p.id in(SELECT projectid FROM ".db_prefix() ."project_products group by projectid having sum(price) > '0') )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_less_than'  && $filters2[$i1]!=''){
-					$cur_cond = " AND ( p.id in(SELECT projectid FROM ".db_prefix() ."project_products group by projectid having sum(price) < '".$filters2[$i1]."') )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-			}
-			if($filter12 == 'company' ){
-				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
-					$cur_cond = " AND ( p.clientid in(SELECT userid FROM ".db_prefix() ."clients where userid = '".$filters2[$i1]."') )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_empty'){
-					$cur_cond = " AND ( p.clientid = '0' or p.clientid = ''  )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not_empty'){
-					$cur_cond = " AND ( p.clientid != '0' or p.clientid != ''  )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not'){
-					$cur_cond = " AND ( p.clientid in (SELECT userid FROM ".db_prefix() ."clients where userid != '".$filters2[$i1]."') )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && $filters2[$i1]!=''&& ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
-					$req_arrs = explode(',',$filters2[$i1]);
-					$req_arr = '';
-					if(!empty($req_arrs)){
-						foreach($req_arrs as $req_arr1){
-							$req_arr .= "'".$req_arr1."',";
+				if($filters1[$i1]=='is_any_of'){
+					if($filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
+						$req_arrs = explode(',',$filters2[$i1]);
+						$req_arr = '';
+						if(!empty($req_arrs)){
+							foreach($req_arrs as $req_arr1){
+								$req_arr .= "'".$req_arr1."',";
+							}
 						}
+						$req_arr = rtrim($req_arr,",");
+						$cur_cond = str_replace('$$in_cond', $req_arr, $cur_cond);
 					}
-					$req_arr = rtrim($req_arr,",");
-					$cur_cond = " AND ( p.clientid in(SELECT userid FROM ".db_prefix() ."clients where userid in(".$req_arr.") ) )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-			}
-			if($filter12 == 'tags' ){
-				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
-					$cur_cond = " AND ( p.id in (SELECT rel_id FROM ".db_prefix() ."taggables where tag_id = '".$filters2[$i1]."' and rel_type = 'project' ) )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_empty'){
-					$cur_cond = " AND ( p.id not in (SELECT rel_id FROM ".db_prefix() ."taggables where tag_id = '".$filters2[$i1]."' and rel_type = 'project' ) )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not_empty'){
-					$cur_cond = " AND ( p.id in (SELECT rel_id FROM ".db_prefix() ."taggables where tag_id = '".$filters2[$i1]."' and rel_type = 'project' ) )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not'){
-					$cur_cond = " AND ( p.id in (SELECT rel_id FROM ".db_prefix() ."taggables where tag_id != '".$filters2[$i1]."' and rel_type = 'project' ) )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
-					$req_arrs = explode(',',$filters2[$i1]);
-					$req_arr = '';
-					if(!empty($req_arrs)){
-						foreach($req_arrs as $req_arr1){
-							$req_arr .= "'".$req_arr1."',";
-						}
+					else{
+						$cur_cond = '';
 					}
-					$req_arr = rtrim($req_arr,",");
-					$cur_cond = " AND ( p.id in (SELECT rel_id FROM ".db_prefix() ."taggables where tag_id in(".$req_arr.") and rel_type = 'project'  ) )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
 				}
+				if (str_contains($cur_cond, '$$date1')) {
+					$date1 = "'".date('Y-m-d',strtotime($filters3[$i1]))."'";
+					$cur_cond = str_replace('$$date1', $date1, $cur_cond);
+				}
+				if (str_contains($cur_cond, '$$date2')) {
+					$date2 = "'".date('Y-m-d',strtotime($filters4[$i1]))."'";
+					
+					$cur_cond = str_replace('$$date2', $date2, $cur_cond);
+				}
+				$req_cond .= $cur_cond;
+				array_push($where, $cur_cond);
 			}
-			if($filter12 == 'members' ){
-				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
-					$cur_cond = " AND ( p.id in (SELECT project_id FROM ".db_prefix() ."project_members where staff_id = '".$filters2[$i1]."' ) )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_empty'){
-					$cur_cond = " AND ( p.id not in (SELECT project_id FROM ".db_prefix() ."project_members) )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not_empty'){
-					$cur_cond = " AND ( p.id in (SELECT project_id FROM ".db_prefix() ."project_members ) )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not'){
-					$cur_cond = " AND ( p.id in (SELECT project_id FROM ".db_prefix() ."project_members where staff_id != '".$filters2[$i1]."'  ) )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
-					$req_arrs = explode(',',$filters2[$i1]);
-					$req_arr = '';
-					if(!empty($req_arrs)){
-						foreach($req_arrs as $req_arr1){
-							$req_arr .= "'".$req_arr1."',";
-						}
-					}
-					$req_arr = rtrim($req_arr,",");
-					$cur_cond = " AND ( p.id in (SELECT project_id FROM ".db_prefix() ."project_members where staff_id in(".$req_arr.")) )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-			}
-			if($filter12 == 'loss_reason_name' ){
-				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
-					$cur_cond = " AND ( p.loss_reason in (SELECT id FROM ".db_prefix() ."deallossreasons where id = '".$filters2[$i1]."' ) )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_empty'){
-					$cur_cond = " AND ( p.loss_reason = 0 or p.loss_reason = '') )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not_empty'){
-					$cur_cond = " AND (  p.loss_reason != 0 or p.loss_reason != '' )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not'){
-					$cur_cond = " AND ( p.loss_reason in (SELECT id FROM ".db_prefix() ."deallossreasons where id != '".$filters2[$i1]."'  ) )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
-					$req_arrs = explode(',',$filters2[$i1]);
-					$req_arr = '';
-					if(!empty($req_arrs)){
-						foreach($req_arrs as $req_arr1){
-							$req_arr .= "'".$req_arr1."',";
-						}
-					}
-					$req_arr = rtrim($req_arr,",");
-					$cur_cond = " AND ( p.loss_reason in (SELECT id FROM ".db_prefix() ."deallossreasons where id in(".$req_arr.")) )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-			}
-			if($filter12 == 'project_currency' ){
-				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
-					$cur_cond = " AND ( p.project_currency in (SELECT name FROM ".db_prefix() ."currencies where id = '".$filters2[$i1]."' ) )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_empty'){
-					$cur_cond = " AND ( p.project_currency = '' )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not_empty'){
-					$cur_cond = " AND ( p.project_currency != '' )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not' ){
-					$cur_cond = " AND ( p.project_currency in (SELECT name FROM ".db_prefix() ."currencies where id != '".$filters2[$i1]."'  ) )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
-					$req_arrs = explode(',',$filters2[$i1]);
-					$req_arr = '';
-					if(!empty($req_arrs)){
-						foreach($req_arrs as $req_arr1){
-							$req_arr .= "'".$req_arr1."',";
-						}
-					}
-					$req_arr = rtrim($req_arr,",");
-					$cur_cond = " AND ( p.project_currency in (SELECT name FROM ".db_prefix() ."currencies where id in(".$req_arr.")) )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-			}
-			if($filter12 == 'created_by' ){
-				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
-					$cur_cond = " AND ( p.created_by  = '".$filters2[$i1]."' )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_empty'){
-					$cur_cond = " AND ( p.created_by ='' or p.created_by = '0')";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not_empty'){
-					$cur_cond = " AND ( p.created_by != '0' and p.created_by != '')";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not'){
-					$cur_cond = " AND ( p.created_by != '".$filters2[$i1]."')";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_any_of' && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
-					$req_arrs = explode(',',$filters2[$i1]);
-					$req_arr = '';
-					if(!empty($req_arrs)){
-						foreach($req_arrs as $req_arr1){
-							$req_arr .= "'".$req_arr1."',";
-						}
-					}
-					$req_arr = rtrim($req_arr,",");
-					$cur_cond = " AND ( p.created_by in(".$req_arr.") )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-			}
-			if($filter12 == 'modified_by' ){
-				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
-					$cur_cond = " AND ( p.modified_by  = '".$filters2[$i1]."' )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_empty'){
-					$cur_cond = " AND ( p.modified_by ='' or p.modified_by = '0')";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not_empty'){
-					$cur_cond = " AND ( p.modified_by != '0' and p.modified_by != '')";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not'){
-					$cur_cond = " AND ( p.modified_by != '".$filters2[$i1]."')";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
-					$req_arrs = explode(',',$filters2[$i1]);
-					$req_arr = '';
-					if(!empty($req_arrs)){
-						foreach($req_arrs as $req_arr1){
-							$req_arr .= "'".$req_arr1."',";
-						}
-					}
-					$req_arr = rtrim($req_arr,",");
-					$cur_cond = " AND ( p.modified_by in(".$req_arr.") )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-			}
-			if($filter12 == 'status' ){
+			else if($filter12 == 'status' ){
 				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					$cur_cond = " AND ( p.status in (SELECT id FROM ".db_prefix() ."projects_status where id = '".$filters2[$i1]."') )";
 					$req_cond .= $cur_cond;
@@ -702,112 +245,7 @@ function get_flters($req_filters){
 					array_push($where, $cur_cond);
 				}
 			}
-			if($filter12 == 'pipeline_id' ){
-				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
-					$cur_cond = " AND ( p.pipeline_id = '".$filters2[$i1]."' )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_empty'){
-					$cur_cond = " AND ( p.pipeline_id = '' )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not_empty'){
-					$cur_cond = " AND ( p.pipeline_id != '' )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not'){
-					$cur_cond = " AND ( p.pipeline_id != '".$filters2[$i1]."' )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
-					$req_arrs = explode(',',$filters2[$i1]);
-					$req_arr = '';
-					if(!empty($req_arrs)){
-						foreach($req_arrs as $req_arr1){
-							$req_arr .= "'".$req_arr1."',";
-						}
-					}
-					$req_arr = rtrim($req_arr,",");
-					$cur_cond = " AND ( p.pipeline_id in(".$req_arr.") )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-			}
-			if($filter12 == 'contact_email1' ){
-				if($filters1[$i1]=='is' && $filters2[$i1]!='' && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
-					$cur_cond = " AND ( p.id in(SELECT p.project_id FROM ".db_prefix() ."project_contacts p,".db_prefix() ."contacts c where p.contacts_id = c.id and c.email = '".$filters2[$i1]."' and p.is_primary=1 and c.deleted_status ='0' and c.active = '1') )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_empty'){
-					$cur_cond = " AND ( p.id in(SELECT p.project_id FROM ".db_prefix() ."project_contacts p,".db_prefix() ."contacts c where p.contacts_id = c.id and c.email = '' and p.is_primary=1  and c.deleted_status ='0' and c.active = '1') )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not_empty'){
-					$cur_cond = " AND ( p.id in(SELECT project_id FROM ".db_prefix() ."project_contacts pc,".db_prefix()."contacts c  where pc.contacts_id != '' and pc.is_primary=1 and c.id = pc.contacts_id and c.email!='' and c.deleted_status ='0' and c.active = '1') )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not'){
-					$cur_cond = " AND ( p.id in(SELECT project_id FROM ".db_prefix() ."project_contacts p,".db_prefix() ."contacts c where p.contacts_id = c.id and c.email != '".$filters2[$i1]."' and p.is_primary=1 and c.deleted_status ='0' and c.active = '1') )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
-					$req_arrs = explode(',',$filters2[$i1]);
-					$req_arr = '';
-					if(!empty($req_arrs)){
-						foreach($req_arrs as $req_arr1){
-							$req_arr .= "'".$req_arr1."',";
-						}
-					}
-					$req_arr = rtrim($req_arr,",");
-					$cur_cond = " AND ( p.id in(SELECT p.project_id FROM ".db_prefix() ."project_contacts p,".db_prefix() ."contacts c where c.email in(".$req_arr.") and p.contacts_id = c.id  and p.is_primary=1 and c.deleted_status ='0' and c.active = '1') )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-			}
-			if($filter12 == 'contact_name' ){
-				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
-					$cur_cond = " AND ( p.id in(SELECT project_id FROM ".db_prefix() ."project_contacts where contacts_id = '".$filters2[$i1]."' and is_primary =1) )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_empty'){
-					$cur_cond = " AND ( p.id not in(SELECT project_id FROM ".db_prefix() ."project_contacts) )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not_empty'){
-					$cur_cond = " AND ( p.id in(SELECT project_id FROM ".db_prefix() ."project_contacts where contacts_id!=''  and is_primary = 1) )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not'){
-					$cur_cond = " AND ( p.id in(SELECT project_id FROM ".db_prefix() ."project_contacts where contacts_id != '".$filters2[$i1]."' and is_primary=1) )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_any_of' && $filters2[$i1]!=''  && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
-					$req_arrs = explode(',',$filters2[$i1]);
-					$req_arr = '';
-					if(!empty($req_arrs)){
-						foreach($req_arrs as $req_arr1){
-							$req_arr .= "'".$req_arr1."',";
-						}
-					}
-					$req_arr = rtrim($req_arr,",");
-					$cur_cond = " AND ( p.id in(SELECT project_id FROM ".db_prefix() ."project_contacts where contacts_id in(".$req_arr.") and is_primary=1) )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-			}
-			if($filter12 == 'project_status' ){
+			else if($filter12 == 'project_status' ){
 				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
 					if($filters2[$i1] == 'WON'){
 						$cur_cond = " AND ( p.stage_of = '1' )";
@@ -852,42 +290,7 @@ function get_flters($req_filters){
 					array_push($where, $cur_cond);
 				}
 			}
-			if($filter12 == 'contact_phone1' ){
-				if($filters1[$i1]=='is'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
-					$cur_cond = " AND ( p.id in(SELECT p.project_id FROM ".db_prefix() ."project_contacts p,".db_prefix() ."contacts c where p.contacts_id = c.id and c.phonenumber = '".$filters2[$i1]."' and p.is_primary=1 and c.deleted_status ='0' and c.active = '1') )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_empty'){
-					$cur_cond = " AND ( p.id in(SELECT p.project_id FROM ".db_prefix() ."project_contacts p,".db_prefix() ."contacts c where p.contacts_id = c.id and c.phonenumber = '' and p.is_primary=1 and c.deleted_status ='0' and c.active = '1') )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not_empty'){
-					$cur_cond = " AND ( p.id in(SELECT project_id FROM ".db_prefix() ."project_contacts pc,".db_prefix()."contacts c  where pc.contacts_id != '' and pc.is_primary=1 and c.id = pc.contacts_id and c.phonenumber!='' and c.deleted_status ='0' and c.active = '1') )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not'){
-					$cur_cond = " AND ( p.id in(SELECT project_id FROM ".db_prefix() ."project_contacts p,".db_prefix() ."contacts c where p.contacts_id = c.id and c.phonenumber != '".$filters2[$i1]."' and p.is_primary=1 and c.deleted_status ='0' and c.active = '1') )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!='' && ( $filters2[$i1] != 'this_year' && $filters2[$i1] != 'last_year' && $filters2[$i1] != 'next_year' && $filters2[$i1] != 'this_month' && $filters2[$i1] != 'next_month' && $filters2[$i1] != 'last_month' && $filters2[$i1] != 'this_week' && $filters2[$i1] != 'last_week' && $filters2[$i1] != 'next_week' && $filters2[$i1] != 'today' && $filters2[$i1] != 'yesterday' && $filters2[$i1] != 'tomorrow' && $filters2[$i1] != 'custom_period' )){
-					$req_arrs = explode(',',$filters2[$i1]);
-					$req_arr = '';
-					if(!empty($req_arrs)){
-						foreach($req_arrs as $req_arr1){
-							$req_arr .= "'".$req_arr1."',";
-						}
-					}
-					$req_arr = rtrim($req_arr,",");
-					$cur_cond = " AND ( p.id in(SELECT p.project_id FROM ".db_prefix() ."project_contacts p,".db_prefix() ."contacts c where c.phonenumber in(".$req_arr.") and p.contacts_id = c.id  and p.is_primary=1 and c.deleted_status ='0' and c.active = '1') )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-			}
-			if($filter12 != 'project_start_date' && $filter12 != 'project_deadline' && $filter12 != 'name' && $filter12 != 'project_cost' && $filter12 != 'teamleader_name' && $filter12 != 'product_qty' && $filter12 != 'product_amt' && $filter12 != 'company' && $filter12 != 'tags' && $filter12 != 'members' && $filter12 != 'status' && $filter12 != 'pipeline_id' && $filter12 != 'contact_email1' && $filter12 != 'contact_name' && $filter12 != 'project_status' && $filter12 != 'contact_phone1' && $filter12 != 'won_date' && $filter12 != 'lost_date' && $filter12 != 'loss_reason_name' && $filter12 != 'project_currency'  && $filter12 != 'project_created' && $filter12 != 'modified_by' && $filter12 != 'created_by' && $filter12 != 'project_created'){
+			else{
 				if($filters1[$i1]=='is'){
 					if(empty($filters3[$i1])){
 						$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  > '".$filters2[$i1]."') )";
@@ -939,7 +342,6 @@ function get_flters($req_filters){
 				}
 			}
 			$i1++;
-			
 		}
 	}
 	return $req_cond;
@@ -981,10 +383,10 @@ function get_sumary_product_vals($deal_vals,$view_by,$cur_rows){
 			$all_tot =  $all_tot + $deal_val1['own_price'] + $deal_val1['open_price'];
 			$tot_cnt =	$tot_cnt + $deal_val1['own_count'] + $deal_val1['open_count'];
 			$data[$i]= get_counts($deal_val1['own_price'],$deal_val1['open_price'],0,$tot_val,$view_by,$cur_rows,$deal_val1,1);
-			$tot_avg	=	$tot_avg + get_decimal($data[$i]['avg_deal']);
+			$tot_avg =	$tot_avg + get_decimal($data[$i]['avg_deal']);
 			$i++;
 		}
-		$data[$i] = $avg_deal = deal_avg($own,$open,0,$tot_cnt,$all_tot,$view_by,$i,$tot_avg);
+		$data[$i] = deal_avg($own,$open,0,$tot_cnt,$all_tot,$view_by,$i,$tot_avg);
 		$i++;
 		$data[$i] = deal_total($own,$open,0,$tot_cnt,$tot_val,$view_by,$tot_avg);
 	}
@@ -999,9 +401,9 @@ function get_sumary_weight_vals($deal_vals,$view_by,$cur_rows){
 	if(!empty($deal_vals) && $view_by != 'project_status'){	
 		$i = $tot_cnt = $all_tot = $own = $open = $tot_avg = 0;
 		foreach($deal_vals as $deal_val1){
-			$deal_val1['own_price']  = number_format((float)$deal_val1['own_price'], 2, '.', '');
-			$deal_val1['open_price'] = number_format((float)$deal_val1['open_price'], 2, '.', '');
-			$deal_val1['lost_price'] = number_format((float)$deal_val1['lost_price'], 2, '.', '');
+			$deal_val1['own_price']  = get_decimal($deal_val1['own_price']);
+			$deal_val1['open_price'] = get_decimal($deal_val1['open_price']);
+			$deal_val1['lost_price'] = get_decimal($deal_val1['lost_price']);
 			$own 	 =  $own + $deal_val1['own_price'];
 			$open 	 =  $open + $deal_val1['open_price'];
 			$lost 	 =  $open + $deal_val1['lost_price'];
@@ -1013,10 +415,10 @@ function get_sumary_weight_vals($deal_vals,$view_by,$cur_rows){
 			$tot_avg	=	$tot_avg + get_decimal($data[$i]['avg_deal']);
 			$i++;
 		}
-		$own  = number_format((float)$own, 2, '.', '');
-		$open = number_format((float)$open, 2, '.', '');
-		$lost = number_format((float)$lost, 2, '.', '');
-		$data[$i] = $avg_deal = deal_avg($own,$open,$lost,$tot_cnt,$all_tot,$view_by,$i,$tot_avg);
+		$own  = get_decimal($own);
+		$open = get_decimal($open);
+		$lost = get_decimal($lost);
+		$data[$i] = deal_avg($own,$open,$lost,$tot_cnt,$all_tot,$view_by,$i,$tot_avg);
 		$i++;
 		$data[$i] = deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$tot_avg);
 	}
