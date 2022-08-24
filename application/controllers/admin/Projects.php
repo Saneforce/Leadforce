@@ -2495,7 +2495,6 @@ class Projects extends AdminController
 		$data['rel_type'] = $this->input->post('rel_type', false);
 		$data['tags'] = $this->input->post('tags', false);
 	   $ch_project_id = $project_id;
-		
 		$toemail = explode(",", $_POST["toemail"]);
 		if(!empty($toemail)){
 			$toemail = $toemail[0];
@@ -2602,11 +2601,9 @@ class Projects extends AdminController
 					)
 				)
 			);
-			
 			$source_from1 = $source_from2 = array();
 			if (!empty($attachments)) {
 				$source_from1 = array_column($attachments, 'Name'); 
-				
 			}
 			$request = json_encode($request);
 			$headers = array(
@@ -2623,7 +2620,6 @@ class Projects extends AdminController
 				if (!empty($attachments)) {
 					$list_attachment = $this->list_attachment($messages['Id']);
 					$source_from2 = array_column($list_attachment, 'Id'); 
-					
 				}
 				if(get_option('link_deal')=='yes' && !empty($data['rel_id'])){
 					if(isset($data['task_mark_complete_id']) && !empty($data['task_mark_complete_id'])){
@@ -2721,6 +2717,10 @@ class Projects extends AdminController
 						set_alert('success', 'Mail Send Successfully');
 						redirect($redirect_url1);
 				}
+			}
+			else{
+				set_alert('danger', 'Cannot Send Mail');
+						redirect($redirect_url1);
 			}
 			
 		}
