@@ -283,7 +283,7 @@ else {
             
         }elseif($rel_type == 'contact') {
             array_push($where, ' AND ((rel_type="contact" AND rel_id ='.$rel_id.') OR (contacts_id IN (' . $rel_id . ') ))');
-        }elseif($rel_type == 'project_call') {
+        }elseif($rel_type == 'project_call' || (isset($_GET['call']) && $_GET['call'] =='bycall')) {
             array_push($where, 'AND rel_id="' . $rel_id . '" AND rel_type="project" AND call_request_id != ""');
         }else{
             if($my_staffids){
