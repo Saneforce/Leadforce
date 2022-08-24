@@ -158,7 +158,7 @@ function get_relation_data($type, $rel_id = '')
 			}
 			else if(in_array('clientid',$need_fields)){
 				if ($CI->input->post('customer_id')) {
-				    $where_projects .= 'AND clientid=' . $CI->input->post('customer_id')."( or clientid  = '')";
+				    $where_projects .= 'AND clientid=' . $CI->input->post('customer_id')." or (  clientid  = '')";
 				}
 			}
             $search = $CI->misc_model->_search_projects($q, 0, $where_projects);

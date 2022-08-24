@@ -994,7 +994,7 @@ class Products extends AdminController
         //$data = $this->products_model->getprod_price($cur);
         $result = array();
         $getProds = $this->products_model->getdealprods();
-        $result['productscnt'] = count($getProds);
+        $result['productscnt'] = (!empty($getProds))?count($getProds):0;
         $discount_value = 0;
         $cur = '';
         $methode = 1;
