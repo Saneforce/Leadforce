@@ -69,6 +69,7 @@ class Authenticationapi_model extends App_Model
             if ($staff == true) {
                 $table = db_prefix() . 'staff';
                 $_id   = 'staffid';
+                $this->db3->where('action_for', 'Active');
             }
             $this->db3->select("*,CONCAT(md5(staffid), md5('####'), md5(email)) as access_token");
             $this->db3->where('email', $email);
