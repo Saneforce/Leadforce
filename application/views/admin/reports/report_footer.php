@@ -778,6 +778,8 @@ function tab_summary(a){
 	$('#filter_tab').val(a);
 }
 $(function(){
+	 $( "#sortable" ).sortable();
+    $( "#sortable" ).disableSelection();
      var ProjectsServerParams = {};
      $.each($('._hidden_inputs._filters input'),function(){
          ProjectsServerParams[$(this).attr('name')] = '[name="'+$(this).attr('name')+'"]';
