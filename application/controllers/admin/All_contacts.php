@@ -26,7 +26,6 @@ class All_contacts extends AdminController
 		$data['need_fields'] = $data['mandatory_fields'] = array();
 		$data['need_fields'] = array('firstname','email','company','priority','phonenumber','title','active');
 		if(!empty($fields)  && $fields != 'null'){
-			//$data['need_fields'] = json_decode($fields);
 			$req_fields = json_decode($fields);
 			$i = 7;
 			if(!empty($req_fields)){

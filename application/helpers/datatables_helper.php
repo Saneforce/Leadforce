@@ -177,11 +177,6 @@ function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = [], $where 
         $sWhere = substr_replace($sWhere, '', -3);
         $sWhere .= ')';
 
-         /* if($__post['last_order_identifier']=='kb-pipelines' && (isset($__post['search'])) && $__post['search']['value'] != '') {
-            $search_value = $__post['search']['value'];
-            $search_value = trim($search_value);
-            $sWhere = "WHERE name like '%" . $search_value . "%' OR DATE_FORMAT(created_date,'%d-%m-%Y') LIKE '%".$search_value."%'";
-        } */
     } else {
         // Check for custom filtering
         $searchFound = 0;
@@ -332,9 +327,7 @@ function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = [], $where 
     " . $wherewo . "
     $sGroupBy
     ";
-//echo $sQuery; exit;
     $rResult = $CI->db->query($sQuery)->result_array();
-//pre($rResult);
     $rResult = hooks()->apply_filters('datatables_sql_query_results', $rResult, [
         'table' => $sTable,
         'limit' => $sLimit,

@@ -6,10 +6,6 @@ $this->ci->load->model('gdpr_model');
 $this->ci->load->model('Clients_model');
 
 $clist = $this->ci->Clients_model->get_clients_list();
-
-//pre($_REQUEST);
-
-
 $consentContacts = get_option('gdpr_enable_consent_for_contacts');
 
 
@@ -49,8 +45,6 @@ foreach ($custom_fields as $key => $field) {
 $contacts_list_column_order = (array)json_decode(get_option('contacts_list_column_order'));
 $aColumns = array();
 $aColumns_temp = array_merge($aColumns_temp,$cus);
-// $aColumns[] = db_prefix().'clients.userid as userid';
- //pre($aColumns_temp);
 $idkey = 0;
 $req_fields = array_column($custom_fields, 'slug'); 
 $req_cnt = count($req_fields);
@@ -75,14 +69,9 @@ foreach($contacts_list_column_order as $ckey=>$cval){
 				$aColumns[] =$aColumns_temp[$ckey];
 			}
          }
-      //pr($aColumns);
 }
-//pre($aColumns);
 $where = [];
 
-if (!has_permission('customers', '', 'view')) {
-    array_push($where, 'AND ' . db_prefix() . 'contacts.userid IN (SELECT customer_id FROM ' . db_prefix() . 'customer_admins WHERE staff_id=' . get_staff_user_id() . ')');
-}
 
 if ($this->ci->input->post('custom_view')) {
     $filter = $this->ci->input->post('custom_view');
@@ -94,7 +83,6 @@ $alphabets = array();
 if(!empty($_SESSION['alpha'])){
 $alphabets = array_filter($_SESSION['alpha']);
 }
-//pre($alphabets);
 $likeqry = '';
 $alphaCnt = count($alphabets);
 $all = '';
@@ -112,8 +100,6 @@ if($alphaCnt > 0) {
         }
     }
 }
-//echo $likeqry; exit;
-
 
 // Fix for big queries. Some hosting have max_join_limit
 if (count($custom_fields) > 4) {
@@ -122,10 +108,8 @@ if (count($custom_fields) > 4) {
 $my_staffids = $this->ci->staff_model->get_my_staffids();
 $view_ids = $this->ci->staff_model->getFollowersViewList();
 if (!is_admin() && empty($where)) {
-    //pre($_GET);
     if($_GET['contacts'] && $_GET['contacts'] != 'all') {
         array_push($where, '  AND tblcontacts.id = "'.$_GET['contacts'].'" ');
-        //array_push($where,  ' AND ('.db_prefix().'contacts.addedfrom="'.get_staff_user_id().'" OR ('.db_prefix().'contacts.userid IN (select userid from tblclients where '.db_prefix().'clients.addedfrom="'.get_staff_user_id().'")) OR tblcontacts.id IN (select contacts_id from tblproject_contacts where project_id IN (select project_id from tblproject_contacts where project_id IN (select project_id from tblproject_members where staff_id = "'.get_staff_user_id().'") AND contacts_id = "'.$_GET['contacts'].'" ) ) OR tblcontacts.id IN (select contacts_id from tblproject_contacts where project_id IN (select tblprojects.id from tblprojects where tblprojects.teamleader = "'.get_staff_user_id().'") AND contacts_id = "'.$_GET['contacts'].'" ) ) AND tblcontacts.id = "'.$_GET['contacts'].'"');
     } else {
         if($my_staffids){
             array_push($where, ' AND ('.db_prefix().'contacts.addedfrom IN (' . implode(',',$my_staffids) . ') OR (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')  AND tblprojects.clientid != "")) OR  (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects where ' . db_prefix() . 'projects.teamleader in (' . implode(',',$my_staffids) . ') AND tblprojects.clientid != "" )))');
@@ -134,7 +118,7 @@ if (!is_admin() && empty($where)) {
     
 }
 
-//array_push($where, '  AND tblcontacts.deleted_status=0 AND tblclients.deleted_status=0 ');
+
 array_push($where, '  AND tblcontacts.deleted_status=0 ');
 
 if($likeqry) {
@@ -144,7 +128,6 @@ if($likeqry) {
 
 
 
-//pre($aColumns);
 $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [db_prefix() . 'contacts.id as id', db_prefix() . 'contacts.userid as userid', 'is_primary', '(SELECT count(*) FROM ' . db_prefix() . 'contacts c WHERE c.userid=' . db_prefix() . 'contacts.userid) as total_contacts', db_prefix() . 'clients.registration_confirmed as registration_confirmed','tblclients.addedfrom as addedfrom'],db_prefix() . 'contacts.id');
 $allow_to_call = $this->ci->callsettings_model->accessToCall();
 $output  = $result['output'];

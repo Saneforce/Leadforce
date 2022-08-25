@@ -588,7 +588,7 @@ class Clients extends AdminController
 
     public function form_contact($customer_id=0, $contact_id = '')
     {
-        if (!has_permission('customers', '', 'view')) {
+        if (!has_permission('contacts', '', 'view')) {
             if (!is_customer_admin($customer_id)) {
                 echo _l('access_denied');
                 die;
@@ -602,7 +602,7 @@ class Clients extends AdminController
 
             unset($data['contactid']);
             if ($contact_id == '') {
-                if (!has_permission('customers', '', 'create')) {
+                if (!has_permission('contacts', '', 'create')) {
                     if (!is_customer_admin($customer_id)) {
                         header('HTTP/1.0 400 Bad error');
                         echo json_encode([
@@ -614,21 +614,11 @@ class Clients extends AdminController
                 }
                 $data['userid'] = $data['userids'] = $data['clientid'];
                 unset($data['clientid']);
-                // if(isset($data['clientid'])) {
-                //     if(is_array($data['clientid']) && count($data['clientid']) > 0){
-                //         $data['userids'] = implode(',', $data['clientid']);
-                //          $data['userid'] =  isset($data['clientid'][0])?$data['clientid'][0]:0;
-                //     }
-                //     unset($data['clientid']);
-                // }
-                // assign Deals
+               
                 if (isset($data['deals'])) {
                     $deals = $data['deals'];
                     unset($data['deals']);
                 }
-                // pr($deals);
-                // pr($_POST);
-                // pre($data);
                 $data['addedfrom'] = get_staff_user_id();
                 $id      = $this->clients_model->add_contact($data, $customer_id);
                 $message = $card = '';
