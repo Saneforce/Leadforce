@@ -189,6 +189,23 @@ function get_flters($req_filters){
 						$cur_cond = '';
 					}
 				}
+				if($filters1[$i1]=='is_more_than' && $deal_vals[0]['date_field'] ==0){
+					if($check_cond){
+						$cur_cond = str_replace('$$cond1', $filters2[$i1], $cur_cond);
+					}
+					else{
+						$cur_cond = '';
+					}
+				}
+				
+				if($filters1[$i1]=='is_less_than' && $deal_vals[0]['date_field'] ==0){
+					if($check_cond){
+						$cur_cond = str_replace('$$cond1', $filters2[$i1], $cur_cond);
+					}
+					else{
+						$cur_cond = '';
+					}
+				}
 				if($filters1[$i1]=='is_any_of'){
 					if($check_cond){
 						$req_arrs = explode(',',$filters2[$i1]);
