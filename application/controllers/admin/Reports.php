@@ -2138,15 +2138,9 @@ class Reports extends AdminController
 		$this->db->where($cond);
 		$this->db->delete(db_prefix() . 'report_public');
 		$req_out = '';
-		$links = $this->db->query("SELECT id,report_id,link_name,share_link FROM " . db_prefix() . "report_public WHERE report_id = '".$report_id."' ")->result_array();
-		if(!empty($links)){
-			foreach($links as $link12){
-				$req_id = '"'.$report_id.'"';
-				$req_out .= '<div class="form-group" app-field-wrapper="name" id="ch_name"><label for="name" class="control-label"> Share Link</label><input type="text" id="name" name="name" class="form-control" value="'.admin_url('reports/shared/'.$link12['share_link']).'"  readonly style="width:90%;float:left;"><a href="javascript:void(0);" " style="margin-left:10px;float:left"><i class="fa fa-trash fa-2x" style="color:red"></i></a></div>
-						';
-			}
-		}
+		$req_out = get_public($report_id);
 		echo $req_out;
+		
 	}
 	public function public_link(){
 		$report_id = $_REQUEST['req_val'];
