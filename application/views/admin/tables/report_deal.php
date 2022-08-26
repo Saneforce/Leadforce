@@ -215,7 +215,7 @@ foreach ($rResult as $aRow) {
 			$stage_of = 'WON';
 		}
 		if($aRow['project_status'] == 2){
-			$stage_of = 'LOSS';
+			$stage_of = 'LOST';
 		}
 		if($aRow['project_status'] == 0){
 			$stage_of = 'OPEN';
@@ -242,7 +242,7 @@ foreach ($rResult as $aRow) {
 		
 	}
 	if($aRow['project_status']==2){
-		$row_temp['lost_date']   = _d($aRow['stage_on']);
+		$row_temp['lost_date']   = _d($aRow['lost_date']);
 	}
     $row_temp['project_created']  = _d($aRow['project_created']);
     $row_temp['project_modified']  = _d($aRow['project_modified']);

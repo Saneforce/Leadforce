@@ -284,7 +284,7 @@ function get_flters($req_filters){
 							array_push($where, $cur_cond);
 						}
 					}
-					else if($filters1[$i1]=='is_any_of'  && $check_cond){
+					else if($filters1[$i1]=='is_any_of'  ){
 						$req_arrs = explode(',',$filters2[$i1]);
 						$req_arr = '';
 						if(!empty($req_arrs)){

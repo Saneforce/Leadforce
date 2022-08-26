@@ -17,10 +17,7 @@ class Shared extends App_Controller
     {
 		$data = array();
         $links = $this->db->query("SELECT id,report_id,link_name,share_link FROM " . db_prefix() . "report_public WHERE share_link = '".$shared."' ")->result_array();
-		if(empty($links) || empty($shared)){
-			$this->load->view('admin/reports/public',$data);
-			exit;
-		}
+		
 		
 		$data['id'] = $links[0]['report_id'];
 		$fields = deal_needed_fields();

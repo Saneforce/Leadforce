@@ -193,7 +193,7 @@ class Reports extends AdminController
 				$filter_data['filters2'][1]	=	$pipelines[0]['id']; 
 				$filter_data['filters'][2]	=	'project_status';  
 				$filter_data['filters1'][2]	=	'is_any_of';  
-				$filter_data['filters2'][2]	=	'WON,LOSS'; 
+				$filter_data['filters2'][2]	=	'WON,LOST'; 
 			}
 		}
 		else if($report_12_id == 'progress'){
@@ -1891,7 +1891,7 @@ class Reports extends AdminController
 					
 					break;
 				case 'project_status':
-					$all_status = array('WON'=>'WON','LOSS'=>'LOSS');
+					$all_status = array('WON'=>'WON','LOSS'=>'LOST');
 					$req_out = $this->get_req_val($req_val,'select','','','key',$all_status);
 					
 					break;

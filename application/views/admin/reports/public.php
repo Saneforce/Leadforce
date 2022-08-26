@@ -62,9 +62,9 @@ $table_data = hooks()->apply_filters('projects_table_columns', $table_data);
  <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.4.1/js/buttons.print.min.js"></script>
 	</head>
 	<body>
-		<div class="container" <?php if(empty($data)){?>style="overflow-x:hidden" <?php }?>>
+		<div class="container" <?php if(empty($id)){?>style="overflow-x:hidden" <?php }?>>
 			<div class="row">
-				<?php if(!empty($data)){?>
+				<?php if(!empty($id)){?>
 					<div class="col-md-12">
 						<div class="col-md-6"></div>
 							<div class="col-md-6">
