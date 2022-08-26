@@ -180,8 +180,33 @@ class Reports extends AdminController
 			$filter_data['filters3'][0]	=	'01-01-'.date('Y');  
 			$filter_data['filters4'][0]	=	'31-12-'.date('Y');  
 		}
+		else if($report_12_id == 'activity_performance'){
+			$filter_data['activity_filters'][0]		=	'dateadded';  
+			$filter_data['activity_filters1'][0]	=	'is';  
+			$filter_data['activity_filters2'][0]	=	'this_year';  
+			$filter_data['activity_filters3'][0]	=	'01-'.date('m').'-'.date('Y');  
+			$filter_data['activity_filters4'][0]	=	date('t').'-'.date('m').'-'.date('Y');  
+		}
+		else if($report_12_id == 'email_performance'){
+			$filter_data['activity_filters'][0]	=	'project_start_date';  
+			$filter_data['activity_filters1'][0]	=	'is';  
+			$filter_data['activity_filters2'][0]	=	'this_year';  
+			$filter_data['activity_filters3'][0]	=	'01-01-'.date('Y');  
+			$filter_data['activity_filters4'][0]	=	'31-12-'.date('Y');  
+		}
+		else if($report_12_id == 'call_performance'){
+			$filter_data['filters'][0]	=	'project_start_date';  
+			$filter_data['filters1'][0]	=	'is';  
+			$filter_data['filters2'][0]	=	'this_year';  
+			$filter_data['filters3'][0]	=	'01-01-'.date('Y');  
+			$filter_data['filters4'][0]	=	'31-12-'.date('Y');  
+		}
 		$this->session->set_userdata($filter_data);
-		redirect(admin_url('reports/add'));
+		if($report_12_id == 'activity_performance' || $report_12_id == 'email_performance' || $report_12_id == 'call_performance'){
+			redirect(admin_url('activity_reports/add'));
+		}else{
+			redirect(admin_url('reports/add'));
+		}
 	}
 	public function summary(){
 		if(isset($_POST['submit'])){
@@ -225,6 +250,12 @@ class Reports extends AdminController
 		$fields = deal_needed_fields();
 		$needed = json_decode($fields,true);
 		if (($key = array_search('id', $needed['need_fields'])) !== false) {
+			unset($needed['need_fields'][$key]);
+		}
+		if (($key = array_search('project_created', $needed['need_fields'])) !== false ) {
+			unset($needed['need_fields'][$key]);
+		}
+		if (($key = array_search('product_count', $needed['need_fields'])) !== false ) {
 			unset($needed['need_fields'][$key]);
 		}
 		$data['need_fields']		=	$needed['need_fields'];
@@ -279,6 +310,12 @@ class Reports extends AdminController
 		if (($key = array_search('id', $needed['need_fields'])) !== false) {
 			unset($needed['need_fields'][$key]);
 		}
+		if (($key = array_search('project_created', $needed['need_fields'])) !== false ) {
+			unset($needed['need_fields'][$key]);
+		}
+		if (($key = array_search('product_count', $needed['need_fields'])) !== false ) {
+			unset($needed['need_fields'][$key]);
+		}
 		$data['report_name']		=	$data['folder_id'] = '';
 		$data['need_fields']		=	$needed['need_fields'];
 		$data['need_fields_label']	=	$needed['need_fields_label'];
@@ -306,6 +343,12 @@ class Reports extends AdminController
 			$needed = json_decode($fields,true);
 			if (($key = array_search('id', $needed['need_fields'])) !== false) {
 				unset($needed['need_fields'][$key]); 
+			}
+			if (($key = array_search('project_created', $needed['need_fields'])) !== false ) {
+				unset($needed['need_fields'][$key]);
+			}
+			if (($key = array_search('product_count', $needed['need_fields'])) !== false ) {
+				unset($needed['need_fields'][$key]);
 			}
 			$data['need_fields']	=	$needed['need_fields'];
 			if($data['view_by']		==	'project_start_date'){
@@ -667,6 +710,12 @@ class Reports extends AdminController
 		$fields = deal_needed_fields();
 		$needed = json_decode($fields,true);
 		if (($key = array_search('id', $needed['need_fields'])) !== false) {
+			unset($needed['need_fields'][$key]);
+		}
+		if (($key = array_search('project_created', $needed['need_fields'])) !== false ) {
+			unset($needed['need_fields'][$key]);
+		}
+		if (($key = array_search('product_count', $needed['need_fields'])) !== false ) {
 			unset($needed['need_fields'][$key]);
 		}
 		$data['report_name']		=	$reports1->report_name;
@@ -1539,6 +1588,8 @@ class Reports extends AdminController
 		$all_clmns = $data['all_clmns'];
 		unset($all_clmns['id']);
 		unset($all_clmns['product_count']);
+		unset($all_clmns['project_created']);
+		
 		$cus_flds = $data['cus_flds'];
 		if(!empty($filters)){
 			foreach($filters as $key12 => $filter1){
@@ -1566,10 +1617,17 @@ class Reports extends AdminController
 		$all_clmns = $data['all_clmns'];
 		$cus_flds = $data['cus_flds'];
 		$filters	=	$this->session->userdata('filters'.$cur_id12);
+
 		$req_out = '';
 		$fields = deal_needed_fields();
 		$needed = json_decode($fields,true);
-		if (($key = array_search('id', $needed['need_fields'])) !== false) {
+		if (($key = array_search('id', $needed['need_fields'])) !== false ) {
+			unset($needed['need_fields'][$key]);
+		}
+		if (($key = array_search('project_created', $needed['need_fields'])) !== false ) {
+			unset($needed['need_fields'][$key]);
+		}
+		if (($key = array_search('product_count', $needed['need_fields'])) !== false ) {
 			unset($needed['need_fields'][$key]);
 		}
 		$need_fields		=	$needed['need_fields'];
@@ -2137,6 +2195,12 @@ class Reports extends AdminController
 		$fields = deal_needed_fields();
 		$needed = json_decode($fields,true);
 		if (($key = array_search('id', $needed['need_fields'])) !== false) {
+			unset($needed['need_fields'][$key]);
+		}
+		if (($key = array_search('project_created', $needed['need_fields'])) !== false ) {
+			unset($needed['need_fields'][$key]);
+		}
+		if (($key = array_search('product_count', $needed['need_fields'])) !== false ) {
 			unset($needed['need_fields'][$key]);
 		}
 		$data['need_fields']		=	$needed['need_fields'];
