@@ -162,6 +162,11 @@ function filter_cond($filter){
 }
 function get_flters($req_filters){
 	$CI			= 	& get_instance();
+	$fields = deal_needed_fields();
+	$needed = array();
+	if(!empty($fields) && $fields != 'null'){
+		$needed = json_decode($fields,true);
+	}
 	$where 		= 	array();
 	$req_cond	=	'';
 	$filters	=	$req_filters['filters'];
@@ -175,22 +180,71 @@ function get_flters($req_filters){
 		$s_group_by = '';
 		$table = db_prefix().'filter';
 		foreach($filters as $filter12){
-			$deal_vals 	= $CI->db->query("SELECT filter_name,filter_cond,filter_type,date_field,filter FROM ".$table." where filter_name = '".$filter12."' and filter_type= '".$filters1[$i1]."' and filter = 'deal' ")->result_array();
-			if(!empty($deal_vals)){
-				$cur_cond = $deal_vals[0]['filter_cond'];
-				
-				$cur_cond = str_replace('db_prefix()', db_prefix(), $cur_cond);
-				$check_cond = filter_cond($filters2[$i1]);
-				if(($filters1[$i1]=='is' || $filters1[$i1]=='is_more_than' || $filters1[$i1]=='is_less_than') && $deal_vals[0]['date_field'] ==0){
-					if($check_cond){
-						$cur_cond = str_replace('$$cond1', $filters2[$i1], $cur_cond);
+			if (!empty($needed['need_fields']) && in_array($filter12, $needed['need_fields'])){
+				$deal_vals 	= $CI->db->query("SELECT filter_name,filter_cond,filter_type,date_field,filter FROM ".$table." where filter_name = '".$filter12."' and filter_type= '".$filters1[$i1]."' and filter = 'deal' ")->result_array();
+				if(!empty($deal_vals)){
+					$cur_cond = $deal_vals[0]['filter_cond'];
+					
+					$cur_cond = str_replace('db_prefix()', db_prefix(), $cur_cond);
+					$check_cond = filter_cond($filters2[$i1]);
+					if(($filters1[$i1]=='is' || $filters1[$i1]=='is_more_than' || $filters1[$i1]=='is_less_than') && $deal_vals[0]['date_field'] ==0){
+						if($check_cond){
+							$cur_cond = str_replace('$$cond1', $filters2[$i1], $cur_cond);
+						}
+						else{
+							$cur_cond = '';
+						}
 					}
-					else{
-						$cur_cond = '';
+					if($filters1[$i1]=='is_any_of'){
+						if($check_cond){
+							$req_arrs = explode(',',$filters2[$i1]);
+							$req_arr = '';
+							if(!empty($req_arrs)){
+								foreach($req_arrs as $req_arr1){
+									$req_arr .= "'".$req_arr1."',";
+								}
+							}
+							$req_arr = rtrim($req_arr,",");
+							$cur_cond = str_replace('$$in_cond', $req_arr, $cur_cond);
+						}
+						else{
+							$cur_cond = '';
+						}
 					}
+					if (str_contains($cur_cond, '$$date1')) {
+						$date1 = "'".date('Y-m-d',strtotime($filters3[$i1]))."'";
+						$cur_cond = str_replace('$$date1', $date1, $cur_cond);
+					}
+					if (str_contains($cur_cond, '$$date2')) {
+						$date2 = "'".date('Y-m-d',strtotime($filters4[$i1]))."'";
+						
+						$cur_cond = str_replace('$$date2', $date2, $cur_cond);
+					}
+					$req_cond .= $cur_cond;
+					array_push($where, $cur_cond);
 				}
-				if($filters1[$i1]=='is_any_of'){
-					if($check_cond){
+				else if($filter12 == 'status' ){
+					if($filters1[$i1]=='is'  && $check_cond){
+						$cur_cond = " AND ( p.status in (SELECT id FROM ".db_prefix() ."projects_status where id = '".$filters2[$i1]."') )";
+						$req_cond .= $cur_cond;
+						array_push($where, $cur_cond);
+					}
+					else if($filters1[$i1]=='is_empty'){
+						$cur_cond = " AND ( p.status not in (SELECT id FROM ".db_prefix() ."projects_status) )";
+						$req_cond .= $cur_cond;
+						array_push($where, $cur_cond);
+					}
+					else if($filters1[$i1]=='is_not_empty'){
+						$cur_cond = " AND ( p.status in (SELECT id FROM ".db_prefix() ."projects_status) )";
+						$req_cond .= $cur_cond;
+						array_push($where, $cur_cond);
+					}
+					else if($filters1[$i1]=='is_not'){
+						$cur_cond = " AND ( p.status in (SELECT id FROM ".db_prefix() ."projects_status where id != '".$filters2[$i1]."') )";
+						$req_cond .= $cur_cond;
+						array_push($where, $cur_cond);
+					}
+					else if($filters1[$i1]=='is_any_of' && $check_cond){
 						$req_arrs = explode(',',$filters2[$i1]);
 						$req_arr = '';
 						if(!empty($req_arrs)){
@@ -199,156 +253,109 @@ function get_flters($req_filters){
 							}
 						}
 						$req_arr = rtrim($req_arr,",");
-						$cur_cond = str_replace('$$in_cond', $req_arr, $cur_cond);
-					}
-					else{
-						$cur_cond = '';
+						$cur_cond = " AND ( p.status in (SELECT id FROM ".db_prefix() ."projects_status where id in(".$req_arr.")) )";
+						$req_cond .= $cur_cond;
+						array_push($where, $cur_cond);
 					}
 				}
-				if (str_contains($cur_cond, '$$date1')) {
-					$date1 = "'".date('Y-m-d',strtotime($filters3[$i1]))."'";
-					$cur_cond = str_replace('$$date1', $date1, $cur_cond);
-				}
-				if (str_contains($cur_cond, '$$date2')) {
-					$date2 = "'".date('Y-m-d',strtotime($filters4[$i1]))."'";
+				else if($filter12 == 'project_status' ){
+					if($filters1[$i1]=='is'  && $check_cond){
+						if($filters2[$i1] == 'WON'){
+							$cur_cond = " AND ( p.stage_of = '1' )";
+							$req_cond .= $cur_cond;
+							array_push($where, $cur_cond);
+						}
+						if($filters2[$i1] == 'LOSS'){
+							$cur_cond = " AND ( p.stage_of = '2' )";
+							$req_cond .= $cur_cond;
+							array_push($where, $cur_cond);
+						}
+					}
 					
-					$cur_cond = str_replace('$$date2', $date2, $cur_cond);
-				}
-				$req_cond .= $cur_cond;
-				array_push($where, $cur_cond);
-			}
-			else if($filter12 == 'status' ){
-				if($filters1[$i1]=='is'  && $check_cond){
-					$cur_cond = " AND ( p.status in (SELECT id FROM ".db_prefix() ."projects_status where id = '".$filters2[$i1]."') )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_empty'){
-					$cur_cond = " AND ( p.status not in (SELECT id FROM ".db_prefix() ."projects_status) )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not_empty'){
-					$cur_cond = " AND ( p.status in (SELECT id FROM ".db_prefix() ."projects_status) )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not'){
-					$cur_cond = " AND ( p.status in (SELECT id FROM ".db_prefix() ."projects_status where id != '".$filters2[$i1]."') )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_any_of' && $check_cond){
-					$req_arrs = explode(',',$filters2[$i1]);
-					$req_arr = '';
-					if(!empty($req_arrs)){
-						foreach($req_arrs as $req_arr1){
-							$req_arr .= "'".$req_arr1."',";
+					else if($filters1[$i1]=='is_not'){
+						if($filters2[$i1] == 'WON'){
+							$cur_cond = " AND ( p.stage_of != '1' )";
+							$req_cond .= $cur_cond;
+							array_push($where, $cur_cond);
+						}
+						if($filters2[$i1] == 'LOSS'){
+							$cur_cond = " AND ( p.stage_of != '2' )";
+							$req_cond .= $cur_cond;
+							array_push($where, $cur_cond);
 						}
 					}
-					$req_arr = rtrim($req_arr,",");
-					$cur_cond = " AND ( p.status in (SELECT id FROM ".db_prefix() ."projects_status where id in(".$req_arr.")) )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-			}
-			else if($filter12 == 'project_status' ){
-				if($filters1[$i1]=='is'  && $check_cond){
-					if($filters2[$i1] == 'WON'){
-						$cur_cond = " AND ( p.stage_of = '1' )";
-						$req_cond .= $cur_cond;
-						array_push($where, $cur_cond);
-					}
-					if($filters2[$i1] == 'LOSS'){
-						$cur_cond = " AND ( p.stage_of = '2' )";
-						$req_cond .= $cur_cond;
-						array_push($where, $cur_cond);
-					}
-				}
-				
-				else if($filters1[$i1]=='is_not'){
-					if($filters2[$i1] == 'WON'){
-						$cur_cond = " AND ( p.stage_of != '1' )";
-						$req_cond .= $cur_cond;
-						array_push($where, $cur_cond);
-					}
-					if($filters2[$i1] == 'LOSS'){
-						$cur_cond = " AND ( p.stage_of != '2' )";
-						$req_cond .= $cur_cond;
-						array_push($where, $cur_cond);
-					}
-				}
-				else if($filters1[$i1]=='is_any_of'  && $check_cond){
-					$req_arrs = explode(',',$filters2[$i1]);
-					$req_arr = '';
-					if(!empty($req_arrs)){
-						foreach($req_arrs as $req_arr1){
-							if($req_arr1 == 'WON'){
-								$req_arr .= "'1',";
-							}
-							if($req_arr1 == 'LOSS'){
-								$req_arr .= "'2',";
+					else if($filters1[$i1]=='is_any_of'  && $check_cond){
+						$req_arrs = explode(',',$filters2[$i1]);
+						$req_arr = '';
+						if(!empty($req_arrs)){
+							foreach($req_arrs as $req_arr1){
+								if($req_arr1 == 'WON'){
+									$req_arr .= "'1',";
+								}
+								if($req_arr1 == 'LOSS'){
+									$req_arr .= "'2',";
+								}
 							}
 						}
+						$req_arr = rtrim($req_arr,",");
+						$cur_cond = " AND ( p.stage_of in(".$req_arr.") )";
+						$req_cond .= $cur_cond;
+						array_push($where, $cur_cond);
 					}
-					$req_arr = rtrim($req_arr,",");
-					$cur_cond = " AND ( p.stage_of in(".$req_arr.") )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
 				}
-			}
-			else{
-				if($filters1[$i1]=='is'){
-					if(empty($filters3[$i1])){
+				else{
+					if($filters1[$i1]=='is'){
+						if(empty($filters3[$i1])){
+							$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  > '".$filters2[$i1]."') )";
+							$req_cond .= $cur_cond;
+							array_push($where, $cur_cond);
+						}else{
+							$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  > '".date('Y-m-d',strtotime($filters3[$i1]))."' AND value < '".date('Y-m-d',strtotime($filters4[$i1]))."') )";
+							$req_cond .= $cur_cond;
+							array_push($where, $cur_cond);
+						}
+					}
+					else if($filters1[$i1]=='is_empty'){
+						$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  = '' or value = '0' or value = '0000-00-00') )";
+						$req_cond .= $cur_cond;
+						array_push($where, $cur_cond);
+					}
+					else if($filters1[$i1]=='is_not_empty'){
+						$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  != '' AND value != '0' AND value != '0000-00-00') )";
+						$req_cond .= $cur_cond;
+						array_push($where, $cur_cond);
+					}
+					else if($filters1[$i1]=='is_not'){
+						$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  != '".$filters2[$i1]."') )";
+						$req_cond .= $cur_cond;
+						array_push($where, $cur_cond);
+					}
+					else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!=''){
+						$req_arrs = explode(',',$filters2[$i1]);
+						$req_arr = '';
+						if(!empty($req_arrs)){
+							foreach($req_arrs as $req_arr1){
+								$req_arr .= "'".$req_arr1."',";
+							}
+						}
+						$req_arr = rtrim($req_arr,",");
+						$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  in(".$req_arr.")) )";
+						$req_cond .= $cur_cond;
+						array_push($where, $cur_cond);
+					}
+					else if($filters1[$i1]=='is_more_than' && $filters2[$i1]!=''){
 						$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  > '".$filters2[$i1]."') )";
 						$req_cond .= $cur_cond;
 						array_push($where, $cur_cond);
-					}else{
-						$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  > '".date('Y-m-d',strtotime($filters3[$i1]))."' AND value < '".date('Y-m-d',strtotime($filters4[$i1]))."') )";
+					}
+					else if($filters1[$i1]=='is_less_than'  && $filters2[$i1]!=''){
+						$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  < '".$filters2[$i1]."') )";
 						$req_cond .= $cur_cond;
 						array_push($where, $cur_cond);
 					}
 				}
-				else if($filters1[$i1]=='is_empty'){
-					$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  = '' or value = '0' or value = '0000-00-00') )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not_empty'){
-					$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  != '' AND value != '0' AND value != '0000-00-00') )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_not'){
-					$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  != '".$filters2[$i1]."') )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!=''){
-					$req_arrs = explode(',',$filters2[$i1]);
-					$req_arr = '';
-					if(!empty($req_arrs)){
-						foreach($req_arrs as $req_arr1){
-							$req_arr .= "'".$req_arr1."',";
-						}
-					}
-					$req_arr = rtrim($req_arr,",");
-					$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  in(".$req_arr.")) )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_more_than' && $filters2[$i1]!=''){
-					$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  > '".$filters2[$i1]."') )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
-				else if($filters1[$i1]=='is_less_than'  && $filters2[$i1]!=''){
-					$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  < '".$filters2[$i1]."') )";
-					$req_cond .= $cur_cond;
-					array_push($where, $cur_cond);
-				}
+				$i1++;
 			}
-			$i1++;
 		}
 	}
 	return $req_cond;

@@ -133,10 +133,11 @@ class Reports extends AdminController
     }
 	public function add_report(){
 		extract($_REQUEST);
-		$fields = get_option('deal_fields');
-		$need_fields = array();
+		$fields = deal_needed_fields();
+		$needed = array();
 		if(!empty($fields) && $fields != 'null'){
-			$need_fields = json_decode($fields);
+			$needed = json_decode($fields,true);
+			$need_fields = $needed['need_fields'];
 		}
 		if($report_12_id == 'performance'){
 			if (in_array('project_start_date', $need_fields)){
@@ -322,15 +323,34 @@ class Reports extends AdminController
 		$data['title'] = _l('add_report');
 		$deal_val = deal_values();
 		$data =  json_decode($deal_val, true);
-		$data['filters']	=	$this->session->userdata('filters');
+		$fields = deal_needed_fields();
+		$needed = array();
+		if(!empty($fields) && $fields != 'null'){
+			$needed = json_decode($fields,true);
+		}
+		
+		$data['filters']	=	$filters = $this->session->userdata('filters');
 		$data['filters1']	=	$this->session->userdata('filters1');
 		$data['filters2']	=	$this->session->userdata('filters2');
 		$data['filters3']	=	$this->session->userdata('filters3');
 		$data['filters4']	=	$this->session->userdata('filters4');
+		if(!empty($filters)){
+			$i = 0;
+			foreach($filters as $filter1){
+				if (!empty($needed['need_fields']) && !in_array($filter1, $needed['need_fields'])){
+					unset($data['filters'][$i]);
+					unset($data['filters1'][$i]);
+					unset($data['filters2'][$i]);
+					unset($data['filters3'][$i]);
+					unset($data['filters4'][$i]);
+				}
+				$i++;
+			}
+		}
+		
 		$data['folders']	=	$this->db->query('SELECT id,folder from '.db_prefix().'folder order by folder asc')->result_array();
 		$data['id'] = $data['links'] = '';
-		$fields = deal_needed_fields();
-		$needed = json_decode($fields,true);
+		
 		if (($key = array_search('id', $needed['need_fields'])) !== false) {
 			unset($needed['need_fields'][$key]);
 		}
@@ -720,19 +740,36 @@ class Reports extends AdminController
 		$data['title'] = _l('add_report');
 		$deal_val = deal_values();
 		$data =  json_decode($deal_val, true);
+		$fields = deal_needed_fields();
+		$needed = array();
+		if(!empty($fields) && $fields != 'null'){
+			$needed = json_decode($fields,true);
+		}
 		$data['id'] = $id;
-		$data['filters']	=	$this->session->userdata('filters_edit_'.$id);
+		$data['filters']	=	$filters = $this->session->userdata('filters_edit_'.$id);
 		$data['filters1']	=	$this->session->userdata('filters1_edit_'.$id);
 		$data['filters2']	=	$this->session->userdata('filters2_edit_'.$id);
 		$data['filters3']	=	$this->session->userdata('filters3_edit_'.$id);
 		$data['filters4']	=	$this->session->userdata('filters4_edit_'.$id);
+		if(!empty($filters)){
+			$i = 0;
+			foreach($filters as $filter1){
+				if (!empty($needed['need_fields']) && !in_array($filter1, $needed['need_fields'])){
+					unset($data['filters'][$i]);
+					unset($data['filters1'][$i]);
+					unset($data['filters2'][$i]);
+					unset($data['filters3'][$i]);
+					unset($data['filters4'][$i]);
+				}
+				$i++;
+			}
+		}
 		$data['folders']	=	$this->db->query('SELECT id,folder FROM ' . db_prefix() . 'folder order by folder asc')->result_array();
 		$data['teamleaders'] = $this->staff_model->get('', [ 'active' => 1]);
 		$data['links'] = $this->db->query("SELECT report_id,link_name,link_name FROM " . db_prefix() . "report_public WHERE report_id = '".$id."' ")->result_array();
 		
 		$reports1 = $this->db->query("SELECT report_name,folder_id FROM " . db_prefix() . "report WHERE id = '".$id."' ")->row();
-		$fields = deal_needed_fields();
-		$needed = json_decode($fields,true);
+		
 		if (($key = array_search('id', $needed['need_fields'])) !== false) {
 			unset($needed['need_fields'][$key]);
 		}
