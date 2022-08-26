@@ -181,24 +181,7 @@ function get_flters($req_filters){
 				
 				$cur_cond = str_replace('db_prefix()', db_prefix(), $cur_cond);
 				$check_cond = filter_cond($filters2[$i1]);
-				if($filters1[$i1]=='is' && $deal_vals[0]['date_field'] ==0){
-					if($check_cond){
-						$cur_cond = str_replace('$$cond1', $filters2[$i1], $cur_cond);
-					}
-					else{
-						$cur_cond = '';
-					}
-				}
-				if($filters1[$i1]=='is_more_than' && $deal_vals[0]['date_field'] ==0){
-					if($check_cond){
-						$cur_cond = str_replace('$$cond1', $filters2[$i1], $cur_cond);
-					}
-					else{
-						$cur_cond = '';
-					}
-				}
-				
-				if($filters1[$i1]=='is_less_than' && $deal_vals[0]['date_field'] ==0){
+				if(($filters1[$i1]=='is' || $filters1[$i1]=='is_more_than' || $filters1[$i1]=='is_less_than') && $deal_vals[0]['date_field'] ==0){
 					if($check_cond){
 						$cur_cond = str_replace('$$cond1', $filters2[$i1], $cur_cond);
 					}
