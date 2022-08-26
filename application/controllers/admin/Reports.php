@@ -133,52 +133,76 @@ class Reports extends AdminController
     }
 	public function add_report(){
 		extract($_REQUEST);
+		$fields = get_option('deal_fields');
+		$need_fields = array();
+		if(!empty($fields) && $fields != 'null'){
+			$need_fields = json_decode($fields);
+		}
 		if($report_12_id == 'performance'){
-			$filter_data['filters'][0]	=	'project_start_date';  
-			$filter_data['filters1'][0]	=	'is';  
-			$filter_data['filters2'][0]	=	'this_year';  
-			$filter_data['filters3'][0]	=	'01-01-'.date('Y');  
-			$filter_data['filters4'][0]	=	'31-12-'.date('Y');  
-			
-			$filter_data['view_by']		=	'project_start_date';
-			$filter_data['view_type']	=	'date';
-			$filter_data['date_range1']	=	'Monthly';
-			$filter_data['sel_measure']	=	_l('num_deals');
+			if (in_array('project_start_date', $need_fields)){
+				$filter_data['filters'][0]	=	'project_start_date';  
+				$filter_data['filters1'][0]	=	'is';  
+				$filter_data['filters2'][0]	=	'this_year';  
+				$filter_data['filters3'][0]	=	'01-01-'.date('Y');  
+				$filter_data['filters4'][0]	=	'31-12-'.date('Y');  
+				
+				$filter_data['view_by']		=	'project_start_date';
+				$filter_data['view_type']	=	'date';
+				$filter_data['date_range1']	=	'Monthly';
+				$filter_data['sel_measure']	=	_l('num_deals');
+			}
 		}
 		else if($report_12_id == 'conversion'){
-			$filter_data['filters'][0]	=	'project_start_date';  
-			$filter_data['filters1'][0]	=	'is';  
-			$filter_data['filters2'][0]	=	'this_year';  
-			$filter_data['filters3'][0]	=	'01-01-'.date('Y');  
-			$filter_data['filters4'][0]	=	'31-12-'.date('Y');  
-			$filter_data['filters'][1]	=	'project_status';  
-			$filter_data['filters1'][1]	=	'is_any_of';  
-			$filter_data['filters2'][1]	=	'WON,LOSS';  
-			$pipelines = $this->pipeline_model->getPipeline();
-			$filter_data['filters'][2]	=	'pipeline_id';  
-			$filter_data['filters1'][2]	=	'is';  
-			$filter_data['filters2'][2]	=	$pipelines[0]['id']; 
+			$i = 0 ;
+			if (in_array('project_start_date', $need_fields)){
+				$filter_data['filters'][$i]		=	'project_start_date';  
+				$filter_data['filters1'][$i]	=	'is';  
+				$filter_data['filters2'][$i]	=	'this_year';  
+				$filter_data['filters3'][$i]	=	'01-01-'.date('Y');  
+				$filter_data['filters4'][$i]	=	'31-12-'.date('Y');
+				$i++;
+			}
+			if (in_array('project_status', $need_fields)){
+				$filter_data['filters'][$i]		=	'project_status';  
+				$filter_data['filters1'][$i]	=	'is_any_of';  
+				$filter_data['filters2'][$i]	=	'WON,LOSS';  
+				$i++;
+			}
+			if (in_array('pipeline_id', $need_fields)){
+				$pipelines = $this->pipeline_model->getPipeline();
+				$filter_data['filters'][$i]	=	'pipeline_id';  
+				$filter_data['filters1'][$i]	=	'is';  
+				$filter_data['filters2'][$i]	=	$pipelines[0]['id']; 
+			}
 		}
 		else if($report_12_id == 'duration'){
-			$filter_data['filters'][0]	=	'project_start_date';  
-			$filter_data['filters1'][0]	=	'is';  
-			$filter_data['filters2'][0]	=	'this_year';  
-			$filter_data['filters3'][0]	=	'01-01-'.date('Y');  
-			$filter_data['filters4'][0]	=	'31-12-'.date('Y');  
-			$pipelines = $this->pipeline_model->getPipeline();
-			$filter_data['filters'][1]	=	'pipeline_id';  
-			$filter_data['filters1'][1]	=	'is';  
-			$filter_data['filters2'][1]	=	$pipelines[0]['id']; 
-			$filter_data['filters'][2]	=	'project_status';  
-			$filter_data['filters1'][2]	=	'is_any_of';  
-			$filter_data['filters2'][2]	=	'WON,LOSS'; 
+			$i = 0;
+			if (in_array('project_start_date', $need_fields)){
+				$filter_data['filters'][$i]		=	'project_start_date';  
+				$filter_data['filters1'][$i]	=	'is';  
+				$filter_data['filters2'][$i]	=	'this_year';  
+				$filter_data['filters3'][$i]	=	'01-01-'.date('Y');  
+				$filter_data['filters4'][$i]	=	'31-12-'.date('Y'); 
+				$i++;
+			}
+			if (in_array('pipeline_id', $need_fields)){
+				$pipelines = $this->pipeline_model->getPipeline();
+				$filter_data['filters'][1]	=	'pipeline_id';  
+				$filter_data['filters1'][1]	=	'is';  
+				$filter_data['filters2'][1]	=	$pipelines[0]['id']; 
+				$filter_data['filters'][2]	=	'project_status';  
+				$filter_data['filters1'][2]	=	'is_any_of';  
+				$filter_data['filters2'][2]	=	'WON,LOSS'; 
+			}
 		}
 		else if($report_12_id == 'progress'){
-			$filter_data['filters'][0]	=	'project_start_date';  
-			$filter_data['filters1'][0]	=	'is';  
-			$filter_data['filters2'][0]	=	'this_year';  
-			$filter_data['filters3'][0]	=	'01-01-'.date('Y');  
-			$filter_data['filters4'][0]	=	'31-12-'.date('Y');  
+			if (in_array('project_start_date', $need_fields)){
+				$filter_data['filters'][0]	=	'project_start_date';  
+				$filter_data['filters1'][0]	=	'is';  
+				$filter_data['filters2'][0]	=	'this_year';  
+				$filter_data['filters3'][0]	=	'01-01-'.date('Y');  
+				$filter_data['filters4'][0]	=	'31-12-'.date('Y'); 
+			}
 		}
 		else if($report_12_id == 'activity_performance'){
 			$filter_data['activity_filters'][0]		=	'dateadded';  
