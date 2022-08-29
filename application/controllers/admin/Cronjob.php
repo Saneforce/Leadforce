@@ -1657,12 +1657,18 @@ exit;
 	public function webhook_knowlarity_history()
 	{
 		$post = json_decode(file_get_contents("php://input"), true);
+		if(isset($_GET['printdata'])){
+			$myfile = fopen("knowlarity_callback_log.txt", "r") or die("Unable to open file!");
+			echo fread($myfile,filesize("knowlarity_callback_log.txt"));
+			fclose($myfile);
+		}else{
+			$myfile = fopen("knowlarity_callback_log.txt", "a") or die("Unable to open file!");
+			$txt = json_encode($post)."\n";
+			fwrite($myfile, $txt);
+			fclose($myfile);
+			echo 'callback loged successfully';
+		}
 		
-		$myfile = fopen("knowlarity_callback_log.txt", "a") or die("Unable to open file!");
-		$txt = json_encode($post)."\n";
-		fwrite($myfile, $txt);
-		fclose($myfile);
-		echo 'callback loged successfully';
 		return ;
 		$this->knowlarity_model->webhookHandler($post);
 	}
