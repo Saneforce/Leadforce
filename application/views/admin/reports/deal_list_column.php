@@ -28,13 +28,13 @@ foreach($custom_fields as $cfkey=>$cfval){
     $cus_1[$cfval['slug']] = $colarr[$cfval['slug']] = array("ins"=>$cfval['name'],"ll"=>$cfval['name']);
 }
 ?>  
-  <ul id="sortable">
+  <ul id="sortable" class="ui-sortable">
   <?php $projects_list_column_order = (array)json_decode(get_option('report_deal_list_column_order')); 
   ?>
   <?php foreach($projects_list_column_order as $ckey=>$cval){
 	  if((!empty($need_fields) && in_array($ckey, $need_fields)) || !empty($cus_1[$ckey])){
 	  ?>
-	  <li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
+	  <li class="ui-state-default ui-sortable-handle"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
 	  <input type="checkbox" name="settings[report_deal_list_column][<?php echo $ckey; ?>]" value="1" checked="checked" /> <?php echo _l($colarr[$ckey]['ll']); ?>
 	  </li>
 	  <?php }

@@ -34,7 +34,6 @@ $aColumns_temp = [
     'currency'=>'(SELECT name FROM ' . db_prefix() . 'currencies WHERE '.db_prefix() .'currencies.name=p.project_currency) as currency',
     'created_by'=>'(SELECT GROUP_CONCAT(CONCAT(firstname, \' \', lastname) SEPARATOR ",") FROM ' . db_prefix() . 'staff WHERE '.db_prefix() .'staff.staffid=p.created_by) as created_by',
     ];
-    //pre($aColumns_temp);
 
 $sIndexColumn = 'id';
 $sTable       = db_prefix() . 'projects as p ';
@@ -43,7 +42,6 @@ $sTable       = db_prefix() . 'projects as p ';
 $join = [
     'LEFT JOIN  ' . db_prefix() . 'projects_status ON ' . db_prefix() . 'projects_status.id = p.status',
     'LEFT JOIN  ' . db_prefix() . 'clients ON ' . db_prefix() . 'clients.userid = p.clientid',
-   // 'LEFT JOIN  ' . db_prefix() . 'project_products ON ' . db_prefix() . 'project_products.projectid = ' . db_prefix() . 'projects.id',
 ];
 
 $where  = [];
@@ -83,7 +81,6 @@ if(isset($_REQUEST['last_order_identifier']) && strpos($_REQUEST['last_order_ide
     }
 } elseif(isset($_REQUEST['last_order_identifier']) && strpos($_REQUEST['last_order_identifier'], 'products_projects') !== false) {
     $exp = explode('products_projects_',$_REQUEST['last_order_identifier']);
-    //pre($exp);
     foreach ($this->ci->projects_model->get_project_statuses() as $status) {
         array_push($statusIds1, $status['id']);
     }
@@ -92,16 +89,7 @@ if(isset($_REQUEST['last_order_identifier']) && strpos($_REQUEST['last_order_ide
         array_push($filter, 'OR p.status IN (' . implode(', ', $statusIds1) . ')');
         array_push($where, 'AND (' . prepare_dt_filter($filter) . ')');
     }
-} else {
-    if ($clientid != '') {
-       // array_push($where, ' AND clientid=' . $clientid);
-    }
-    // $my_staffids = $this->ci->staff_model->get_my_staffids();
-    // if($my_staffids){
-    //     array_push($where, ' AND (' . db_prefix() . 'projects.id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')) OR  ' . db_prefix() . 'projects.teamleader in (' . implode(',',$my_staffids) . ') )');
-    // }
-}
-
+} 
 foreach ($this->ci->projects_model->get_project_statuses() as $status) {
     if ($this->ci->input->post('project_status_' . $status['id'])) {
         array_push($statusIds, $status['id']);
@@ -119,7 +107,6 @@ if (count($filter) > 0) {
 $custom_fields = get_table_custom_fields('projects');
 $req_fields = array_column($custom_fields, 'slug'); 
 $req_cnt = count($req_fields);
-//$req_fields[$req_cnt + 1] = 'id';
 $req_fields[$req_cnt + 1] = 'name';
 $req_fields[$req_cnt + 2] = 'teamleader_name';
 $req_fields[$req_cnt + 3] ='contact_name';
@@ -133,10 +120,8 @@ $req_fields[$req_cnt + 10]= 'deadline';
 $req_fields[$req_cnt + 11]= 'contact_email1';
 $req_fields[$req_cnt + 12]= 'contact_phone1';
 $report_deal_list_column = (array)json_decode(get_option('report_deal_list_column_order')); 
-//pre($report_deal_list_column);
 $custom_fields = array_merge($custom_fields,get_table_custom_fields('customers'));
 $customFieldsColumns = $cus = [];
-//pre($custom_fields);
 foreach ($custom_fields as $key => $field) {
     $fieldtois= db_prefix().'clients.userid';
     if($field['fieldto'] =='projects'){
@@ -153,9 +138,6 @@ foreach ($custom_fields as $key => $field) {
 }
 $aColumns = array();
 $aColumns_temp = array_merge($aColumns_temp,$cus);
-// $aColumns[] = db_prefix().'clients.userid as userid';
- //echo '<pre>';print_r($aColumns_temp);
-
 
 $idkey = 0;
 foreach($report_deal_list_column as $ckey=>$cval){
@@ -192,8 +174,6 @@ $my_staffids = $this->ci->staff_model->get_my_staffids();
 if ($_SESSION['member']) {
     $memb = $_SESSION['member'];
     array_push($where, ' AND (p.id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . $memb . ')) OR  p.teamleader in (' . $memb . ') )');
-    //array_push($where, ' AND ' . db_prefix() . 'projects.id IN (SELECT project_id FROM ' . db_prefix() . 'project_members WHERE staff_id=' . $memb . ')');
-    //array_push($where, ' AND ' . db_prefix() . 'projects.teamleader = ' . $memb);
 } else {
     if($my_staffids){
         array_push($where, ' AND (p.id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')) OR  p.teamleader in (' . implode(',',$my_staffids) . ') )');
@@ -225,7 +205,6 @@ $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
 ],$s_group_by);
 $output  = $result['output'];
 $rResult = $result['rResult'];
-//echo $this->ci->db->last_query();exit;
 foreach ($rResult as $aRow) {
     
     $row = [];
@@ -241,12 +220,10 @@ foreach ($rResult as $aRow) {
 		if($aRow['project_status'] == 0){
 			$stage_of = 'OPEN';
 		}
-        //$stage_of = (($aRow['project_status'] == 1)?'WON':'LOSS');
     }
     $row_temp['project_status'] = $stage_of;
 
     $name = $aRow['name'];
-    // $row[] = $name;
     $row_temp['name'] = $name;
    $row_temp['project_cost'] = $aRow['project_cost'];
     $row_temp['product_qty'] = $aRow['product_qty'];
@@ -257,7 +234,6 @@ foreach ($rResult as $aRow) {
         $row_temp['product_amt'] = '0.00';
     $row_temp['company']  = $aRow['company'];
 
-    //$row_temp['tags']  = render_tags($aRow['tags']);
     $row_temp['tags']  = $aRow['tags'];
 
     $row_temp['start_date']   = _d($aRow['start_date']);
@@ -287,11 +263,9 @@ foreach ($rResult as $aRow) {
         $lable = '';
         $contact = '';
         if(isset($aRow['contact_email']) && !empty($aRow['contact_email'])) {
-           // $lable .= 'Email - '.$aRow['contact_email'].' </br> ';
 			$lable .= "Email - ".$aRow['contact_email'].'<br>';
         }
         if(isset($aRow['contact_phone']) && !empty($aRow['contact_phone'])) {
-            //$lable .= 'Phone - '.$aRow['contact_phone'];
 			 $lable .= "Phone - ".$aRow['contact_phone'];
         }
         if($lable == '') {
@@ -309,13 +283,7 @@ foreach ($rResult as $aRow) {
         if ($member != '') {
             $members_ids = explode(',', $aRow['members_ids']);
             $member_id   = $members_ids[$key];
-          /*  $membersOutput .= '<a href="' . admin_url('profile/' . $member_id) . '">' .
-            staff_profile_image($member_id, [
-                'staff-profile-image-small mright5',
-                ], 'small', [
-                'data-toggle' => 'tooltip',
-                'data-title'  => $member,
-                ]) . '</a>';*/
+         
             // For exporting
             $exportMembers .= $member . ', ';
         }
@@ -337,7 +305,6 @@ foreach ($rResult as $aRow) {
 			}
 			$i2++;
 		}
-        //if(isset($row_temp[$ckey])){
 			if((!empty($need_fields) && in_array($ckey, $need_fields)) || !empty($cus[$ckey])){
 				if($ckey == 'project_start_date'){
 					$ckey = 'start_date';
@@ -347,7 +314,6 @@ foreach ($rResult as $aRow) {
 				}
 				$row[] =$row_temp[$ckey];
 			}
-        //}
     }
 
     $row['DT_RowClass'] = 'has-row-options';

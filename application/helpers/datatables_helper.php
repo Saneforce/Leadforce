@@ -339,6 +339,8 @@ function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = [], $where 
     SELECT FOUND_ROWS()
     ';
     $_query         = $CI->db->query($sQuery)->result_array();
+	//echo $CI->db->last_query();
+	//pre($_query);
     $iFilteredTotal = $_query[0]['FOUND_ROWS()'];
     if (startsWith($where, 'AND')) {
         $where = 'WHERE ' . substr($where, 3);
@@ -369,17 +371,21 @@ function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = [], $where 
 		}
     }
     $_query = $CI->db->query($sQuery)->result_array();
-    $iTotal = $_query[0]['COUNT(' . $sTable . '.' . $sIndexColumn . ')'];
-    //pre($taskpage);
+	
+	if (str_contains($sTable, 'as')) {
+		$ch_column = explode('as',$sTable);
+		$cur_clmns =  'COUNT('.trim($ch_column[1],' ') . ' .' . $sIndexColumn . ')';
+		$iTotal = $_query[0][$cur_clmns];
+	}else{
+		$iTotal = $_query[0]['COUNT(' . $sTable . '.' . $sIndexColumn . ')'];
+	}
     $exp_page = explode('_',$taskpage);
-    //pre($exp_page);
     if($exp_page[0] == 'taskrelation') {
         $taskpage = 'taskrelation';
     }
     if($taskpage == 'taskpage') {
        $statusCounts = datatable_tasks_summary_data($taskQry);
 
-       //pre($statusCounts);
        $output = [
         'draw'                 => $__post['draw'] ? intval($__post['draw']) : 0,
         'iTotalRecords'        => $iTotal,
@@ -414,7 +420,6 @@ function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = [], $where 
             $sGroupBy
             ";
         $statusCounts = datatable_tasks_summary_data($taskQry);
-        //pre($statusCounts);
         $output = [
             'draw'                 => $__post['draw'] ? intval($__post['draw']) : 0,
             'iTotalRecords'        => $iTotal,
