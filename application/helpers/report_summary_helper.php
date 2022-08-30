@@ -155,7 +155,6 @@ function summary_val($tables,$fields,$qry_cond,$measure,$view_by,$cur_rows,$filt
 	return $data;
 }
 function filter_cond($filter){
-	
 	if($filter!=''  &&  ( $filter != 'this_year' && $filter != 'last_year' && $filter != 'next_year' && $filter != 'this_month' && $filter != 'next_month' && $filter != 'last_month' && $filter != 'this_week' && $filter != 'last_week' && $filter != 'next_week' && $filter != 'today' && $filter != 'yesterday' && $filter != 'tomorrow' && $filter != 'custom_period' )){
 		return true;
 	}
@@ -182,12 +181,13 @@ function get_flters($req_filters){
 		$table = db_prefix().'filter';
 		foreach($filters as $filter12){
 			if (!empty($needed['need_fields']) && in_array($filter12, $needed['need_fields'])){
+				$check_cond = filter_cond($filters2[$i1]);
 				$deal_vals 	= $CI->db->query("SELECT filter_name,filter_cond,filter_type,date_field,filter FROM ".$table." where filter_name = '".$filter12."' and filter_type= '".$filters1[$i1]."' and filter = 'deal' ")->result_array();
 				if(!empty($deal_vals)){
 					$cur_cond = $deal_vals[0]['filter_cond'];
 					
 					$cur_cond = str_replace('db_prefix()', db_prefix(), $cur_cond);
-					$check_cond = filter_cond($filters2[$i1]);
+					
 					if(($filters1[$i1]=='is' || $filters1[$i1]=='is_more_than' || $filters1[$i1]=='is_less_than') && $deal_vals[0]['date_field'] ==0){
 						if($check_cond){
 							$cur_cond = str_replace('$$cond1', $filters2[$i1], $cur_cond);
@@ -260,7 +260,7 @@ function get_flters($req_filters){
 					}
 				}
 				else if($filter12 == 'project_status' ){
-					if($filters1[$i1]=='is'  ){
+					if($filters1[$i1]=='is' && $check_cond ){
 						if($filters2[$i1] == 'WON'){
 							$cur_cond = " AND ( p.stage_of = '1' )";
 							$req_cond .= $cur_cond;
