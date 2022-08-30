@@ -48,7 +48,7 @@ function get_relation_data($type, $rel_id = '')
             if ($CI->input->post('contact_userid')) {
                 $where_contacts .= ' AND '.db_prefix().'contacts.userid=' . $CI->input->post('contact_userid');
             }
-			//$where_contacts .= ' AND '.db_prefix().'contacts.deleted_status=0' ;
+			$where_contacts .= ' AND '.db_prefix().'contacts.deleted_status=0' ;
             $search = $CI->misc_model->_search_contacts($q, 0, $where_contacts);
             $data   = $search['result'];
         }
