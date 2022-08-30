@@ -240,6 +240,10 @@ class Reports extends AdminController
 			$filter_data['date_range1']	=	$_POST['date_range1'];
 			$filter_data['sel_measure']	=	$_POST['sel_measure'];
 			$this->session->set_userdata($filter_data);
+			if(!empty($_POST['summary_edit'])){
+				redirect(admin_url('reports/edit/'.$_POST['summary_edit']));
+				exit;
+			}
 		}
 		redirect(admin_url('reports/add'));
 	}
@@ -2037,7 +2041,7 @@ class Reports extends AdminController
 					$req_out = $this->get_req_val($req_val,'number','','','','');
 					break;
 				default:
-					$fields =  $this->db->query("SELECT type FROM " . db_prefix() . "customfields where slug = '".$cur_val."' ")->row();
+					$fields =  $this->db->query("SELECT type,options FROM " . db_prefix() . "customfields where slug = '".$cur_val."' ")->row();
 					if($fields->type == 'date_picker'){
 						$req_out = $this->get_req_val($req_val,'date','','','','');
 					}
