@@ -77,7 +77,6 @@ class Settings extends AdminController
 						$post_data['settings']['smtp_password'] = $mail_setting12[0]['smtp_password'];
 					}
 				}
-				//$post_data['settings']['company_mail_server'] = $_REQUEST['mail_server'];
                 $post_data['settings']['company_smtp_server'] = $_REQUEST['company_smtpserver'];
                
                 $post_data['settings']['company_smtp_host'] = $_REQUEST['smtp_host'];
@@ -87,46 +86,12 @@ class Settings extends AdminController
                 $post_data['settings']['company_smtp_password'] = $_REQUEST['smtp_password'];
 				$post_data['settings']['company_smtp_email'] = $_REQUEST['smtp_email'];
 				
-				/*$post_data['settings']['company_imap_encryption'] = $_REQUEST['imap_encryption'];
-                $post_data['settings']['company_imap_host'] = $_REQUEST['imap_host'];
-                $post_data['settings']['company_imap_port'] = $_REQUEST['imap_port'];
-                $post_data['settings']['company_smtp_email'] = $_REQUEST['smtp_email'];*/
+			
 			}
 			if($_REQUEST['group'] == 'company_settings') {
 				$post_data['settings']['connect_mail'] = $_REQUEST['connect_mail'];
 				 $post_data['settings']['company_imap_server'] = $_REQUEST['company_imap_server'];
-				/*if($_REQUEST['mail_server'] == 'yes'){
-					$post_data['settings']['smtp_encryption'] = $_REQUEST['smtp_encryption'];
-					$post_data['settings']['smtp_host'] = $_REQUEST['smtp_host'];
-					$post_data['settings']['smtp_port'] = $_REQUEST['smtp_port'];
-					$post_data['settings']['smtp_email'] = $_REQUEST['smtp_email'];
-					$post_data['settings']['smtp_username'] = $_REQUEST['smtp_username'];
-					$post_data['settings']['smtp_password'] = $_REQUEST['smtp_password'];
-				}
-				else{
-					$ch1_staffid = get_staff_user_id();
-					$ch_admin = is_admin($ch1_staffid);
-					$cond = array('user_id'=>$ch1_staffid);
-					$table = db_prefix() . 'personal_mail_setting';
-					$mail_setting12 = $this->db->where($cond)->get($table)->result_array();
-					if(!empty($mail_setting12)){
-						$post_data['settings']['smtp_encryption'] = $mail_setting12[0]['smtp_encryption'];
-						$post_data['settings']['smtp_host'] = $mail_setting12[0]['smtp_host'];
-						$post_data['settings']['smtp_port'] = $mail_setting12[0]['smtp_port'];
-						$post_data['settings']['smtp_email'] = $mail_setting12[0]['smtp_email'];
-						$post_data['settings']['smtp_username'] = $mail_setting12[0]['smtp_username'];
-						$post_data['settings']['smtp_password'] = $mail_setting12[0]['smtp_password'];
-					}
-				}*/
 				
-                /*$post_data['settings']['company_mail_server'] = $_REQUEST['mail_server'];
-                $post_data['settings']['company_smtp_server'] = $_REQUEST['company_smtpserver'];
-                $post_data['settings']['company_imap_server'] = $_REQUEST['company_imap_server'];
-                $post_data['settings']['company_smtp_host'] = $_REQUEST['smtp_host'];
-                $post_data['settings']['company_smtp_encryption'] = $_REQUEST['smtp_encryption'];
-                $post_data['settings']['company_smtp_port'] = $_REQUEST['smtp_port'];
-				$post_data['settings']['company_smtp_username'] = $_REQUEST['smtp_username'];
-                $post_data['settings']['company_smtp_password'] = $_REQUEST['smtp_password'];*/
 				
 				$post_data['settings']['company_mail_server'] = $_REQUEST['mail_server'];
 				
@@ -162,9 +127,7 @@ class Settings extends AdminController
 			if($_REQUEST['group'] == 'email_local') {
                 $post_data['settings']['email_local'] = $_REQUEST['email_local'];
 			}
-            //echo "<pre>"; print_r($post_data); exit;
             $success = $this->settings_model->update($post_data);
-//echo $this->db->last_query();exit;
             if ($success > 0) {
                 set_alert('success', _l('settings_updated'));
             }
@@ -208,15 +171,6 @@ class Settings extends AdminController
         $data['tabs'] = $this->app_tabs->get_settings_tabs();
         $emailtab = array();
 
-       /* $emailtab['slug'] ='email';
-        $emailtab['name'] = 'Email Settings';
-        $emailtab['view'] = 'admin/settings/includes/' . $tab;
-        $emailtab['position'] = 70;
-        $emailtab['icon'] = '';
-        $emailtab['href'] = '#';
-        $emailtab['children'] = array();
-        $data['tabs']['email'] = $emailtab; */
-        //echo "<pre>"; print_r($data['tabs']); exit;
 		if($tab != 'company_settings' && $tab != 'deal' && $tab != 'email_local' && $tab != 'enable_call' && $tab != 'agent'){
 			if(!empty($data['tabs'])){
 				foreach($data['tabs'] as $tab_1 => $val12){
@@ -240,24 +194,12 @@ class Settings extends AdminController
 		}
         if (!in_array($tab, $data['admin_tabs'])) {
 			
-			//echo '<pre>';print_r($data['tabs']);exit;
             $data['tab'] = $this->app_tabs->filter_tab($data['tabs'], $tab);
         } else {
             // Core tabs are not registered
             $data['tab']['slug'] = $tab;
             $data['tab']['view'] = 'admin/settings/includes/' . $tab;
         }
-/*
-        if (!$data['tab'] && $tab == 'email') {
-            $data['tab']['slug'] = $tab;
-            $data['tab']['name'] = 'Email Settings';
-            $data['tab']['view'] = 'admin/settings/includes/' . $tab;
-            $data['tab']['position'] = 70;
-            $data['tab']['icon'] = '';
-            $data['tab']['href'] = '#';
-            $data['tab']['children'] = array();
-        }
-        */
         if (!$data['tab']) {
             show_404();
         }
@@ -291,7 +233,6 @@ class Settings extends AdminController
  
         $data['contacts_permissions'] = get_contact_permissions();
         $data['payment_gateways']     = $this->payment_modes_model->get_payment_gateways(true);
-//echo "<pre>"; print_r($data); exit;
         $this->load->view('admin/settings/all', $data);
     }
 
@@ -315,7 +256,6 @@ class Settings extends AdminController
 
     public function tasks_list_column()
     {
-		 //pre($_SERVER);
 		if (!has_permission('settings', '', 'view')) {
             access_denied('settings');
         }
@@ -324,8 +264,6 @@ class Settings extends AdminController
             if (!has_permission('settings', '', 'edit')) {
                 access_denied('settings');
             }
-           
-
             $post_data = $this->input->post();
             $rel_type_is = $this->input->post('rel_type_is');
 			if (isset($post_data['settings']['tasks_list_column_order'])) {
@@ -341,7 +279,6 @@ class Settings extends AdminController
 
     public function projects_list_column()
     {
-		 //pre($_SERVER);
 		if (!has_permission('settings', '', 'view')) {
             access_denied('settings');
         }
@@ -350,8 +287,6 @@ class Settings extends AdminController
             if (!has_permission('settings', '', 'edit')) {
                 access_denied('settings');
             }
-           
-
             $post_data = $this->input->post();
 			if (isset($post_data['settings']['projects_list_column'])) {
                 $post_data['settings']['projects_list_column_order'] = json_encode($post_data['settings']['projects_list_column']);
@@ -364,7 +299,6 @@ class Settings extends AdminController
     }
 	public function report_deal_list_column()
     {
-		 //pre($_SERVER);
 		if (!has_permission('settings', '', 'view')) {
             access_denied('settings');
         }
@@ -373,20 +307,23 @@ class Settings extends AdminController
             if (!has_permission('settings', '', 'edit')) {
                 access_denied('settings');
             }
-           
-
             $post_data = $this->input->post();
 			if (isset($post_data['settings']['report_deal_list_column'])) {
                 $post_data['settings']['report_deal_list_column_order'] = json_encode($post_data['settings']['report_deal_list_column']);
             }
 			$success = $this->settings_model->update($post_data);
 		}
+		if(str_contains($this->agent->referrer(), 'filter_tab')){
+			$cond = '';
+		}
+		else{
+			$cond = '?filter_tab=2';
+		}
 		$this->load->library('user_agent');
-		redirect($this->agent->referrer());
+		redirect($this->agent->referrer().$cond);
     }
 	public function target_list_column()
     {
-		 //pre($_SERVER);
 		if (!has_permission('settings', '', 'view')) {
             access_denied('settings');
         }
@@ -395,8 +332,6 @@ class Settings extends AdminController
             if (!has_permission('settings', '', 'edit')) {
                 access_denied('settings');
             }
-           
-
             $post_data = $this->input->post();
 			if (isset($post_data['settings']['target_list_column'])) {
                 $post_data['settings']['target_list_column_order'] = json_encode($post_data['settings']['target_list_column']);
@@ -409,7 +344,6 @@ class Settings extends AdminController
     }
 	public function target_activity_list_column()
     {
-		 //pre($_SERVER);
 		if (!has_permission('settings', '', 'view')) {
             access_denied('settings');
         }
@@ -434,7 +368,6 @@ class Settings extends AdminController
 
     public function leads_list_column()
     {
-		 //pre($_SERVER);
 		if (!has_permission('settings', '', 'view')) {
             access_denied('settings');
         }
@@ -443,8 +376,6 @@ class Settings extends AdminController
             if (!has_permission('settings', '', 'edit')) {
                 access_denied('settings');
             }
-           
-
             $post_data = $this->input->post();
 			if (isset($post_data['settings']['leads_list_column'])) {
                 $post_data['settings']['leads_list_column'] = json_encode($post_data['settings']['leads_list_column']);
@@ -457,7 +388,6 @@ class Settings extends AdminController
     }
     public function client_list_column()
     {
-		 //pre($_SERVER);
 		if (!has_permission('settings', '', 'view')) {
             access_denied('settings');
         }
@@ -481,7 +411,6 @@ class Settings extends AdminController
 
     public function contacts_list_column()
     {
-		 //pre($_SERVER);
 		if (!has_permission('settings', '', 'view')) {
             access_denied('settings');
         }

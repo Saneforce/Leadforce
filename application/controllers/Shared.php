@@ -15,11 +15,10 @@ class Shared extends App_Controller
 
     public function index($shared)
     {
-        $links = $this->db->query("SELECT id,report_id,link_name,share_link FROM " . db_prefix() . "report_public WHERE share_link = '".$shared."' ")->result_array();
-		if(empty($links) || empty($shared)){
-			 access_denied('reports');
-		}
 		$data = array();
+        $links = $this->db->query("SELECT id,report_id,link_name,share_link FROM " . db_prefix() . "report_public WHERE share_link = '".$shared."' ")->result_array();
+		
+		
 		$data['id'] = $links[0]['report_id'];
 		$fields = deal_needed_fields();
 		$needed = json_decode($fields,true);

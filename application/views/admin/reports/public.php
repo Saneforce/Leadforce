@@ -40,6 +40,7 @@ $table_data = hooks()->apply_filters('projects_table_columns', $table_data);
 		 <title><?php echo isset($title) ? $title : get_option('companyname'); ?></title>
 		<!-- Datatable CSS -->
 		<link href='https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 		<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/tabletools/2.2.4/css/dataTables.tableTools.css">
 		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css">
 		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.4.0/css/select.dataTables.min.css">
@@ -61,29 +62,44 @@ $table_data = hooks()->apply_filters('projects_table_columns', $table_data);
  <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.4.1/js/buttons.print.min.js"></script>
 	</head>
 	<body>
-		<div class="container">
+		<div class="container" <?php if(empty($id)){?>style="overflow-x:hidden" <?php }?>>
 			<div class="row">
-				<div class="col-md-12">
-					<div class="col-md-6"></div>
-						<div class="col-md-6">
-							<h2>Report</h2>
-							<div class="info" id="buttons"></div>
-							<table id='empTable' class='display dataTable' >
-							  <thead>
-								<tr>
-								 <?php if(!empty($table_data)){
-									foreach($table_data as $table1){
-								?>
-								  <th><?php echo $table1;?></th>
-									<?php }
-								 }
-								?>
-								</tr>
-							  </thead>
+				<?php if(!empty($id)){?>
+					<div class="col-md-12">
+						<div class="col-md-6"></div>
+							<div class="col-md-6">
+								<h2>Report</h2>
+								<div class="info" id="buttons"></div>
+								<table id='empTable' class='display dataTable' >
+								  <thead>
+									<tr>
+									 <?php if(!empty($table_data)){
+										foreach($table_data as $table1){
+									?>
+									  <th><?php echo $table1;?></th>
+										<?php }
+									 }
+									?>
+									</tr>
+								  </thead>
 
-							</table>
-						</div>
-				</div>
+								</table>
+							</div>
+					</div>
+				<?php }else{?>
+					<div class="col-md-6 mx-auto mt-5">
+						 <div class="payment">
+							<div class="payment_header">
+							   <div class="check"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></div>
+							</div>
+							<div class="content">
+							   <h1>Opps ! </h1>
+							   <p>The Report link has been deleted. </p>
+							</div>
+							
+						 </div>
+					  </div>
+				<?php }?>
 			</div>
 		</div>
 	</body>
@@ -135,14 +151,6 @@ $table_data = hooks()->apply_filters('projects_table_columns', $table_data);
 		  ]
 	   });
 	   
-	
-	   /* var tableTools = new $.fn.dataTable.TableTools(table, {
-               "buttons": ["copy",
-                                  "csv",
-                                  "xls",
-                                  "pdf",{ "type": "print", "buttonText": "Print me!" } ],
-                                  "sSwfPath": "//cdn.datatables.net/tabletools/2.2.2/swf/copy_csv_xls_pdf.swf" });
-           $(tableTools.fnContainer()).prependTo('#mytable_wrapper');*/
 	});
 	</script>
 	<style>
@@ -157,5 +165,67 @@ $table_data = hooks()->apply_filters('projects_table_columns', $table_data);
 	th,td {
 		white-space: nowrap;
 	}
-	</style>
+	
+
+    .payment
+	{
+		border:1px solid #f01b1b;
+		height:280px;
+        border-radius:20px;
+        background:#fff;
+	}
+   .payment_header
+   {
+	   background:#f01b1b;
+	   padding:20px;
+       border-radius:20px 20px 0px 0px;
+	   
+   }
+   
+   .check
+   {
+	   margin:0px auto;
+	   width:50px;
+	   height:50px;
+	   border-radius:100%;
+	   background:#fff;
+	   text-align:center;
+   }
+   
+   .check i
+   {
+	   vertical-align:middle;
+	   line-height:50px;
+	   font-size:30px;
+   }
+
+    .content 
+    {
+        text-align:center;
+    }
+
+    .content  h1
+    {
+        font-size:25px;
+        padding-top:25px;
+    }
+
+    .content a
+    {
+        width:200px;
+        height:35px;
+        color:#fff;
+        border-radius:30px;
+        padding:5px 10px;
+        background:#f01b1b;
+        transition:all ease-in-out 0.3s;
+    }
+
+    .content a:hover
+    {
+        text-decoration:none;
+        background:#000;
+    }
+   
+</style>
 </html>
