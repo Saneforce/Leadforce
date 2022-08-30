@@ -338,10 +338,12 @@ class Reports extends AdminController
 		$data['filters2']	=	$this->session->userdata('filters2');
 		$data['filters3']	=	$this->session->userdata('filters3');
 		$data['filters4']	=	$this->session->userdata('filters4');
+		$custom_fields = get_table_custom_fields('projects');
+		$customs = array_column($custom_fields, 'slug');
 		if(!empty($filters)){
 			$i = 0;
 			foreach($filters as $filter1){
-				if (!empty($needed['need_fields']) && !in_array($filter1, $needed['need_fields'])){
+				if ((!empty($needed['need_fields']) && !in_array($filter1, $needed['need_fields'])) && (!in_array($filter1, $customs)) ){
 					unset($data['filters'][$i]);
 					unset($data['filters1'][$i]);
 					unset($data['filters2'][$i]);
