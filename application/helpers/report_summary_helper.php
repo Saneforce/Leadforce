@@ -155,7 +155,8 @@ function summary_val($tables,$fields,$qry_cond,$measure,$view_by,$cur_rows,$filt
 	return $data;
 }
 function filter_cond($filter){
-	if($filter!='' && !str_contains($filter, ',') &&  ( $filter != 'this_year' && $filter != 'last_year' && $filter != 'next_year' && $filter != 'this_month' && $filter != 'next_month' && $filter != 'last_month' && $filter != 'this_week' && $filter != 'last_week' && $filter != 'next_week' && $filter != 'today' && $filter != 'yesterday' && $filter != 'tomorrow' && $filter != 'custom_period' )){
+	
+	if($filter!=''  &&  ( $filter != 'this_year' && $filter != 'last_year' && $filter != 'next_year' && $filter != 'this_month' && $filter != 'next_month' && $filter != 'last_month' && $filter != 'this_week' && $filter != 'last_week' && $filter != 'next_week' && $filter != 'today' && $filter != 'yesterday' && $filter != 'tomorrow' && $filter != 'custom_period' )){
 		return true;
 	}
 	return false;
