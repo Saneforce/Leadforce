@@ -26,7 +26,7 @@ $aColumns_temp = [
    'contact_phone1'=>'(SELECT ' . db_prefix() . 'contacts.phonenumber FROM ' . db_prefix() . 'project_contacts JOIN ' . db_prefix() . 'contacts on ' . db_prefix() . 'contacts.id = ' . db_prefix() . 'project_contacts.contacts_id WHERE ' . db_prefix() . 'project_contacts.project_id=p.id AND ' . db_prefix() . 'project_contacts.is_primary = 1) as contact_phone1',
     'won_date'=>'stage_on as won_date',
     'lost_date'=>'stage_on as lost_date',
-    'loss_reason_name'=>db_prefix() . 'deallossreasons.name as loss_reason_name',
+    'loss_reason_name'=>'(SELECT ' . db_prefix() . 'deallossreasons.name FROM ' . db_prefix() . 'deallossreasons  WHERE ' . db_prefix() . 'deallossreasons.id=p.loss_reason) as loss_reason_name',
     'project_currency'=>'project_currency',
     'project_created'=>'project_created',
     'project_modified'=>'project_modified',
@@ -224,6 +224,7 @@ foreach ($rResult as $aRow) {
 		}
     }
     $row_temp['project_status'] = $stage_of;
+    $row_temp['loss_reason_name'] = $aRow['loss_reason_name'];
 	
 
     $name = $aRow['name'];
