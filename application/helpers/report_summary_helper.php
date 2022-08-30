@@ -259,7 +259,7 @@ function get_flters($req_filters){
 					}
 				}
 				else if($filter12 == 'project_status' ){
-					if($filters1[$i1]=='is'  && $check_cond){
+					if($filters1[$i1]=='is'  ){
 						if($filters2[$i1] == 'WON'){
 							$cur_cond = " AND ( p.stage_of = '1' )";
 							$req_cond .= $cur_cond;
