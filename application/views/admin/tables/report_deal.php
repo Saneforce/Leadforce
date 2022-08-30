@@ -62,9 +62,6 @@ if(!empty($req_filters)){
 	array_push($where, $req_filters);
 }
 
-if (!has_permission('projects', '', 'view') || $this->ci->input->post('my_projects')) {
-    array_push($where, ' AND p.id IN (SELECT project_id FROM ' . db_prefix() . 'project_members WHERE staff_id=' . get_staff_user_id() . ')');
-}
 
 $statusIds = $statusIds1 = [];
 
@@ -170,15 +167,7 @@ $gsearch = $_SESSION['gsearch'];
 if(!empty($gsearch)){
     array_push($where, ' AND p.id IN (SELECT id FROM ' . db_prefix() . 'projects WHERE name like "%' . $gsearch . '%")');
 }
-$my_staffids = $this->ci->staff_model->get_my_staffids();
-if ($_SESSION['member']) {
-    $memb = $_SESSION['member'];
-    array_push($where, ' AND (p.id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . $memb . ')) OR  p.teamleader in (' . $memb . ') )');
-} else {
-    if($my_staffids){
-        array_push($where, ' AND (p.id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')) OR  p.teamleader in (' . implode(',',$my_staffids) . ') )');
-    }
-}
+
 array_push($where, ' AND p.deleted_status = 0');
 
 $aColumns = hooks()->apply_filters('projects_table_sql_columns', $aColumns);

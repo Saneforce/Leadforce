@@ -46,9 +46,27 @@ class Shared extends App_Controller
 				$i++;
 			}
 		}
-		$data['id'] = $id;
 		$fields = deal_needed_fields();
-		$needed = json_decode($fields,true);
+		$needed = array();
+		if(!empty($fields) && $fields != 'null'){
+			$needed = json_decode($fields,true);
+		}
+		$custom_fields = get_table_custom_fields('projects');
+		$customs = array_column($custom_fields, 'slug');
+		if(!empty($filters)){
+			$i = 0;
+			foreach($filters as $filter1){
+				if ((!empty($needed['need_fields']) && !in_array($filter1, $needed['need_fields'])) && (!in_array($filter1, $customs)) ){
+					unset($data['filters'][$i]);
+					unset($data['filters1'][$i]);
+					unset($data['filters2'][$i]);
+					unset($data['filters3'][$i]);
+					unset($data['filters4'][$i]);
+				}
+				$i++;
+			}
+		}
+		$data['id'] = $id;
 		if (($key = array_search('id', $needed['need_fields'])) !== false) {
 			unset($needed['need_fields'][$key]);
 		}
