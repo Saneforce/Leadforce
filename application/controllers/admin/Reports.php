@@ -1489,6 +1489,7 @@ class Reports extends AdminController
 			case 'created_by':
 			case 'modified_by':
 				$filter_data['filters1'.$cur_id12][$cur_num1]	=	'is'; 
+				$filter_data['filters2'.$cur_id12][$cur_num1] = '';
 				break;
 			case 'loss_reason':
 				$filter_data['filters1'.$cur_id12][$cur_num1]	=	'is'; 
