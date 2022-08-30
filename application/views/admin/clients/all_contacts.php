@@ -211,8 +211,7 @@
 
                         $where_summary_activeperson_qry = 'SELECT  COUNT(*) AS `numrows`
                         FROM tblcontacts
-                        LEFT JOIN tblclients ON tblclients.userid=tblcontacts.userid 
-                        where tblcontacts.active=1  AND tblcontacts.deleted_status=0 AND tblclients.deleted_status=0 '.$likeqry;
+                        where tblcontacts.active=1  AND tblcontacts.deleted_status=0  '.$likeqry;
 
                         $CI          = & get_instance();
                         $where_summary_activeperson     = $CI->db->query($where_summary_activeperson_qry)->result_array();
@@ -223,8 +222,7 @@
 
                         $where_summary_inactiveperson_qry = 'SELECT  COUNT(*) AS `numrows`
                         FROM tblcontacts
-                        LEFT JOIN tblclients ON tblclients.userid=tblcontacts.userid 
-                        where tblcontacts.active=0  AND tblcontacts.deleted_status=0  AND tblclients.deleted_status=0 '.$likeqry;
+                        where tblcontacts.active=0  AND tblcontacts.deleted_status=0 '.$likeqry;
 
                         $CI          = & get_instance();
                         $where_summary_inactiveperson     = $CI->db->query($where_summary_inactiveperson_qry)->result_array();

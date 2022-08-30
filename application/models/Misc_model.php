@@ -1092,8 +1092,9 @@ class Misc_model extends App_Model
 
         $have_assigned_customers        = have_assigned_customers();
         $have_permission_customers_view = has_permission('customers', '', 'view');
+        $have_permission_contacts_view = has_permission('contacts', '', 'view');
 
-        if ($have_assigned_customers || $have_permission_customers_view) {
+        if ($have_assigned_customers || $have_permission_customers_view || $have_permission_contacts_view) {
             // Contacts
             $this->db->select(implode(',', prefixed_table_fields_array(db_prefix() . 'contacts')) . ',company');
             $this->db->from(db_prefix() . 'contacts');

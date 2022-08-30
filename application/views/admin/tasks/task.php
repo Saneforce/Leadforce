@@ -337,8 +337,9 @@ p#rel_id-error {
                         <label for="rel_type" class="control-label"><?php echo _l('task_related_to'); ?></label>
                         <select name="rel_type" class="selectpicker" id="rel_type" data-width="100%" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
                           <option value=""></option>
-                        <?php if(!$rel_type){$rel_type ='project';} ?>
+                        
                         <?php foreach(task_relatedto_list() as $relatedto_id => $relatedto_name){ ?>
+                           <?php if(!$rel_type){$rel_type =$relatedto_id;} ?>
                            <option value="<?php echo $relatedto_id ?>"<?php if(isset($task) || $rel_type){if($rel_type == $relatedto_id){echo 'selected="true"';}} ?>><?php echo $relatedto_name; ?></option>
                         <?php } ?>
                         </select>
