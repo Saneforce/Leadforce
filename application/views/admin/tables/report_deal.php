@@ -208,20 +208,23 @@ $rResult = $result['rResult'];
 foreach ($rResult as $aRow) {
     
     $row = [];
-
+	$row_temp['won_date']   = $row_temp['lost_date'] = '';
     $stage_of = '';
     if($aRow['project_status']) {
 		if($aRow['project_status'] == 1){
 			$stage_of = 'WON';
+			$row_temp['won_date']   = _d($aRow['won_date']);
 		}
 		if($aRow['project_status'] == 2){
 			$stage_of = 'LOST';
+			$row_temp['lost_date']   = _d($aRow['lost_date']);
 		}
 		if($aRow['project_status'] == 0){
 			$stage_of = 'OPEN';
 		}
     }
     $row_temp['project_status'] = $stage_of;
+	
 
     $name = $aRow['name'];
     $row_temp['name'] = $name;
@@ -237,13 +240,7 @@ foreach ($rResult as $aRow) {
     $row_temp['tags']  = $aRow['tags'];
 
     $row_temp['start_date']   = _d($aRow['start_date']);
-	if($aRow['project_status']==1){
-		$row_temp['won_date']   = _d($aRow['won_date']);
-		
-	}
-	if($aRow['project_status']==2){
-		$row_temp['lost_date']   = _d($aRow['lost_date']);
-	}
+	
     $row_temp['project_created']  = _d($aRow['project_created']);
     $row_temp['project_modified']  = _d($aRow['project_modified']);
     $row_temp['deadline']  = _d($aRow['deadline']);
