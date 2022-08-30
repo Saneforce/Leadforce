@@ -1946,8 +1946,7 @@ class Reports extends AdminController
 					break;
 				case 'tags':
 					$selected = '';
-					$rel_data = get_relation_data('manager',$selected);
-					$rel_val = get_relation_values($rel_data,'staff');
+					$rel_val = get_relation_values($rel_data,'tags');
 					$rel_data = get_relation_data('tags',$selected);
 					
 					if(empty($filters2[$req_val-1])){

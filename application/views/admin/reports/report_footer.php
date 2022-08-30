@@ -698,6 +698,9 @@ function change_filter1(a,b){
 			if(cur_val=='name'){
 				init_ajax_search('project', '#year_'+req_val+'.ajax-search');
 			}
+			if(cur_val=='tags'){
+				init_ajax_search('tags', '#year_'+req_val+'.ajax-search');
+			}
 			if(cur_val=='company'){
 				init_ajax_search('customer', '#year_'+req_val+'.ajax-search');
 			}
