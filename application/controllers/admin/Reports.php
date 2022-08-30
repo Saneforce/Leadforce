@@ -2225,8 +2225,8 @@ class Reports extends AdminController
 		redirect(admin_url('reports/view_deal_report/'.$folder));
 	}
 	public function view_deal_folder(){
-		if (!has_permission('report', '', 'view')) {
-            access_denied('report');
+		if (!has_permission('reports', '', 'view')) {
+            access_denied('reports');
         }
 		$data = array();
 		$data['title']    =  _l('view_report');
@@ -2312,8 +2312,8 @@ class Reports extends AdminController
 		}
 	}
 	public function view_deal_report($id=''){
-		if (!has_permission('report', '', 'view')) {
-            access_denied('report');
+		if (!has_permission('reports', '', 'view')) {
+            access_denied('reports');
         }
 		$data = array();
 		$data['id']		  =	 $id;
