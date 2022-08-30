@@ -372,8 +372,8 @@ function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = [], $where 
     }
     $_query = $CI->db->query($sQuery)->result_array();
 	
-	if (str_contains($sTable, 'as')) {
-		$ch_column = explode('as',$sTable);
+	if (str_contains($sTable, ' as ')) {
+		$ch_column = explode(' as ',$sTable);
 		$cur_clmns =  'COUNT('.trim($ch_column[1],' ') . ' .' . $sIndexColumn . ')';
 		$iTotal = $_query[0][$cur_clmns];
 	}else{

@@ -44,6 +44,19 @@ function get_relation_data($type, $rel_id = '')
                 if (!has_permission('customers', '', 'view') && get_option('staff_members_open_tickets_to_all_contacts') == 0) {
                     $where_contacts .= ' AND '.db_prefix().'contacts.userid IN (SELECT customer_id FROM '.db_prefix().'customer_admins WHERE staff_id=' . get_staff_user_id() . ')';
                 }
+            }else{
+                $my_staffids = $CI->staff_model->get_my_staffids();
+                $view_ids = $CI->staff_model->getFollowersViewList();
+                if (!is_admin()) {
+                    if($_GET['contacts'] && $_GET['contacts'] != 'all') {
+                        $where_contacts .='  AND tblcontacts.id = "'.$_GET['contacts'].'" ';
+                    } else {
+                        if($my_staffids){
+                            $where_contacts .=' AND ('.db_prefix().'contacts.addedfrom IN (' . implode(',',$my_staffids) . ') OR (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')  AND tblprojects.clientid != "")) OR  (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects where ' . db_prefix() . 'projects.teamleader in (' . implode(',',$my_staffids) . ') AND tblprojects.clientid != "" )))';
+                        }
+                    }
+                    
+                }
             }
             if ($CI->input->post('contact_userid')) {
                 $where_contacts .= ' AND '.db_prefix().'contacts.userid=' . $CI->input->post('contact_userid');
