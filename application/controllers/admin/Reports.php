@@ -332,7 +332,6 @@ class Reports extends AdminController
 		if(!empty($fields) && $fields != 'null'){
 			$needed = json_decode($fields,true);
 		}
-		
 		$data['filters']	=	$filters = $this->session->userdata('filters');
 		$data['filters1']	=	$this->session->userdata('filters1');
 		$data['filters2']	=	$this->session->userdata('filters2');
@@ -1951,8 +1950,8 @@ class Reports extends AdminController
 					$selected = '';
 					$rel_val = get_relation_values($rel_data,'tags');
 					$rel_data = get_relation_data('tags',$selected);
-					
 					if(empty($filters2[$req_val-1])){
+						$rel_data = array();
 						$req_out = $this->get_req_val($req_val,'select','id','name','',$rel_data);
 					}else{
 						if (str_contains($filters2[$req_val-1], ',')) {

@@ -193,7 +193,7 @@ function get_flters($req_filters){
 					
 					if(($filters1[$i1]=='is' || $filters1[$i1]=='is_more_than' || $filters1[$i1]=='is_less_than') && $deal_vals[0]['date_field'] ==0){
 						if($check_cond){
-							$cur_cond = str_replace('$$cond1', $filters2[$i1], $cur_cond);
+							$cur_cond = str_replace('$$cond1', "'".$filters2[$i1]."'", $cur_cond);
 						}
 						else{
 							$cur_cond = '';
