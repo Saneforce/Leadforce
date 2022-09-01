@@ -155,7 +155,7 @@ function summary_val($tables,$fields,$qry_cond,$measure,$view_by,$cur_rows,$filt
 	return $data;
 }
 function filter_cond($filter){
-	if($filter!=''  &&  ( $filter != 'this_year' && $filter != 'last_year' && $filter != 'next_year' && $filter != 'this_month' && $filter != 'next_month' && $filter != 'last_month' && $filter != 'this_week' && $filter != 'last_week' && $filter != 'next_week' && $filter != 'today' && $filter != 'yesterday' && $filter != 'tomorrow' && $filter != 'custom_period' )){
+	if($filter!=''  &&  ( $filter != 'this_year' || $filter != 'last_year' || $filter != 'next_year' || $filter != 'this_month' || $filter != 'next_month' || $filter != 'last_month' || $filter != 'this_week' || $filter != 'last_week' || $filter != 'next_week' || $filter != 'today' || $filter != 'yesterday' || $filter != 'tomorrow' || $filter != 'custom_period' )){
 		return true;
 	}
 	return false;
@@ -179,8 +179,11 @@ function get_flters($req_filters){
 		$i1 = 0;
 		$s_group_by = '';
 		$table = db_prefix().'filter';
+		$custom_fields = get_table_custom_fields('projects');
+		$customs = array_column($custom_fields, 'slug');
 		foreach($filters as $filter12){
-			if (!empty($needed['need_fields']) && in_array($filter12, $needed['need_fields'])){
+			if ((!empty($needed['need_fields']) && in_array($filter12, $needed['need_fields'])) || in_array($filter12, $customs)){
+				
 				$check_cond = filter_cond($filters2[$i1]);
 				$deal_vals 	= $CI->db->query("SELECT filter_name,filter_cond,filter_type,date_field,filter FROM ".$table." where filter_name = '".$filter12."' and filter_type= '".$filters1[$i1]."' and filter = 'deal' ")->result_array();
 				if(!empty($deal_vals)){
@@ -304,10 +307,10 @@ function get_flters($req_filters){
 						array_push($where, $cur_cond);
 					}
 				}
-				else{
+				else if(in_array($filter12, $customs)){
 					if($filters1[$i1]=='is'){
-						if(empty($filters3[$i1])){
-							$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  > '".$filters2[$i1]."') )";
+						if($check_cond ){
+							$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  = '".$filters2[$i1]."') )";
 							$req_cond .= $cur_cond;
 							array_push($where, $cur_cond);
 						}else{
