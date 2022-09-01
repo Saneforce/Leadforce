@@ -293,7 +293,6 @@ class Reports extends AdminController
 		$data['mandatory_fields1']	=	$needed['mandatory_fields1'];
 		$data['clientid'] = $clientid;
         $this->app->get_table_data('report_deal', $data);
-        
     }
 	public function check_view_by(){
 		if ($this->input->is_ajax_request()) {
@@ -322,6 +321,9 @@ class Reports extends AdminController
 		}
 	}
 	public function add(){
+		if (!has_permission('reports', '', 'create')) {
+            access_denied('reports');
+        }
 		$this->load->model('pipeline_model');
 		$data = array();
 		$data['title'] = _l('add_report');
@@ -338,7 +340,7 @@ class Reports extends AdminController
 		$data['filters3']	=	$this->session->userdata('filters3');
 		$data['filters4']	=	$this->session->userdata('filters4');
 		$custom_fields = get_table_custom_fields('projects');
-		$customs = array_column($custom_fields, 'slug');
+		$customs = array_column($custom_fields, 'slug'); 
 		if(!empty($filters)){
 			$i = 0;
 			foreach($filters as $filter1){
@@ -352,7 +354,6 @@ class Reports extends AdminController
 				$i++;
 			}
 		}
-		
 		$data['folders']	=	$this->db->query('SELECT id,folder from '.db_prefix().'folder order by folder asc')->result_array();
 		$data['id'] = $data['links'] = '';
 		
@@ -385,7 +386,6 @@ class Reports extends AdminController
 			$deals['filters2']	=	$this->session->userdata('filters2');
 			$deals['filters3']	=	$this->session->userdata('filters3');
 			$deals['filters4']	=	$this->session->userdata('filters4');
-			
 			$this->load->helper('report_summary');
 			$data = $_REQUEST;
 			$fields = deal_needed_fields();
@@ -445,7 +445,6 @@ class Reports extends AdminController
 		else if($view_by == 'won_date' || $view_by == 'lost_date'){
 			$view_by = 'stage_on';
 		}
-		
 		$data['columns']		=	array($view_by,'own','lost','open','avg_deal','total_val_deal','total_cnt_deal');
 		if($data['sel_measure'] == 'Deal Value'){
 			$data['columns']	=	array($view_by,'avg_deal','total_val_deal','total_cnt_deal');
@@ -522,7 +521,7 @@ class Reports extends AdminController
 					$sum_data[$i] = deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$tot_avg);
 				}
 			}
-			if($data['view_type'] == 'date' && ($data['date_range1'] == 'Weekly')){			
+			if($data['view_type'] == 'date' && ($data['date_range1'] == 'Weekly')){
 				$cur_month = date('M');
 				$cur_date  = date('d');
 				$num_dates = $m = $tot_avg = 0;
@@ -647,17 +646,13 @@ class Reports extends AdminController
 									$tot_cnt=	$tot_cnt + $sum_data[$m-1]['total_cnt_deal'];
 									$tot_val=	$tot_val + $sum_data[$m-1]['total_val_deal'];
 									$tot_avg = $tot_avg + $sum_data[$m-1]['avg_deal'];
-									
 									$w_start_date	= $w_end_date +1;
 									$w_end_date		= $w_end_date +7;
-									
 									break;
 								}
 							}
 							$k++;
-							
 						}
-
 					}
 					$sum_data[$m] = deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$m,$tot_avg);
 					$m++;
@@ -740,6 +735,9 @@ class Reports extends AdminController
 		return $data;
 	}
 	public function edit($id){
+		if (!has_permission('reports', '', 'create')) {
+            access_denied('reports');
+        }
 		$this->load->model('pipeline_model');
 		$data = array();
 		$data['title'] = _l('add_report');
@@ -772,9 +770,7 @@ class Reports extends AdminController
 		$data['folders']	=	$this->db->query('SELECT id,folder FROM ' . db_prefix() . 'folder order by folder asc')->result_array();
 		$data['teamleaders'] = $this->staff_model->get('', [ 'active' => 1]);
 		$data['links'] = $this->db->query("SELECT report_id,link_name,link_name FROM " . db_prefix() . "report_public WHERE report_id = '".$id."' ")->result_array();
-		
 		$reports1 = $this->db->query("SELECT report_name,folder_id FROM " . db_prefix() . "report WHERE id = '".$id."' ")->row();
-		
 		if (($key = array_search('id', $needed['need_fields'])) !== false) {
 			unset($needed['need_fields'][$key]);
 		}
@@ -821,7 +817,6 @@ class Reports extends AdminController
 			$data = array();
 			$shares = $this->db->query("SELECT id,share_type,report_id FROM " . db_prefix() ."shared where  report_id = '".$report_id."'")->result_array();
 			$all_staffs = $this->db->query("SELECT staffid,firstname,lastname FROM " . db_prefix() ."staff where active = '1'")->result_array();
-			
 			if(!empty($shares)){
 				$staffs = $this->db->query("SELECT id,share_id,staff_id FROM " . db_prefix() ."shared_staff where  share_id = '".$shares[0]['id']."'")->result_array();				
 				$source_from = array_column($staffs, 'staff_id'); 
@@ -889,7 +884,41 @@ class Reports extends AdminController
 			]);
 		}
 	}
+	public function save_2_filter(){
+		$cur_id =  '';
+		if(!empty($_REQUEST['cur_id12'])){
+			$cur_id = '_edit_'.$_REQUEST['cur_id12'];
+		}
+		$filters	=	$this->session->userdata('filters2'.$cur_id);
+		$filters1	=	$this->session->userdata('filters1'.$cur_id);
+		$filter_data = array();
+		if(!empty($filters)){
+			$i = 0;
+			foreach($filters as $filter_val){
+				$filter_data['filters2'.$cur_id][$i]  =	$filter_val;
+				$i++;
+			}
+		}
+		if(!empty($filters1)){
+			$i = 0;
+			foreach($filters1 as $filter_val1){
+				$filter_data['filters1'.$cur_id][$i]  =	$filter_val1;
+				$i++;
+			}
+		}
+		if(!empty($_REQUEST['req_val'])){
+			if(is_array($_REQUEST['req_val'])){
+				$req_val = implode(",",$_REQUEST['req_val']);
+			}
+			else{
+				$req_val = $_REQUEST['req_val'];
+			}
+			$filter_data['filters2'.$cur_id][$_REQUEST['num_val']]	=	$req_val;
+		}
+		$this->session->set_userdata($filter_data);
+	}
 	public function save_filter_report(){
+		$this->load->helper('report_summary');
 		$cur_id =  '';
 		if(!empty($_REQUEST['cur_id121'])){
 			$cur_id = '_edit_'.$_REQUEST['cur_id121'];
@@ -902,7 +931,8 @@ class Reports extends AdminController
 				if(!empty($_REQUEST['filter_'.$filter12])){
 					$req_val = implode(",",$_REQUEST['filter_'.$filter12]);
 					$filter_data['filters2'.$cur_id][$i]	=	$req_val;
-					if($req_val == 'this_year' || $req_val == 'last_year' || $req_val == 'next_year' || $req_val == 'this_month' || $req_val == 'next_month' || $req_val == 'last_month' || $req_val == 'this_week' || $req_val == 'last_week' || $req_val == 'next_week' || $req_val == 'today' || $req_val == 'yesterday' || $req_val == 'tomorrow' || $req_val == 'custom_period' ){
+					$check_cond = filter_cond($req_val);
+					if(!$check_cond ){
 						$filter_data['filters3'.$cur_id][$i]	=	$_REQUEST['filter_4'][$j];  
 						$filter_data['filters4'.$cur_id][$i]	=	$_REQUEST['filter_5'][$j]; 
 						$j++;
@@ -968,7 +998,6 @@ class Reports extends AdminController
 			$req_out .= '</select></div>';
 			$req_out .= '<div class="col-md-6" id="2_'.$req_val.'_filter" '.$req_disp.'><div class="col-md-12"><select data-live-search="true" data-width="100%" class="ajax-search selectpicker" data-none-selected-text="Nothing selected" tabindex="-98" data-action-box="true" id="year_'.$req_val.'" '.$req_mul.'  name="filter_'.$filters[$req_val-1].'[]" >';
 			if (str_contains($d_val, ',')) {
-				
 				$d_all_vals = explode(',',$d_val);
 				if(!empty($all_val)){
 					foreach($all_val as $val1){
@@ -985,7 +1014,6 @@ class Reports extends AdminController
 						$req_out .= '<option value="'.$val1[$s_val].'" '.$ch_sel.'>'.$display_val.'</option>';
 					}
 				}
-				
 			}else{
 				if(!empty($all_val) && is_array($all_val) ){
 					foreach($all_val as $val1){
@@ -995,10 +1023,8 @@ class Reports extends AdminController
 								$ch_filters = explode(',',$filters2[$req_val-1]);
 								$ch_sel = '';
 							}
-							
 							$req_out .= '<option value="'.$val1[$s_val].'" '.$ch_sel.'>'.$val1[$d_val].'</option>';
 						}
-						
 					}
 				}
 			}
@@ -1165,7 +1191,6 @@ class Reports extends AdminController
 				foreach($filters3 as $key12 => $filter3){
 					$filter_data['filters3'.$cur_id12][$key12]	=	$filter3;  
 				}
-				
 				echo $filter_data['filters3'.$cur_id12][$cur_num]	=	'01-01-'.$last_year;  
 			}
 			$filters4	=	$this->session->userdata('filters4'.$cur_id12);
@@ -1182,7 +1207,6 @@ class Reports extends AdminController
 				foreach($filters3 as $key12 => $filter3){
 					$filter_data['filters3'.$cur_id12][$key12]	=	$filter3;  
 				}
-				
 				echo $filter_data['filters3'.$cur_id12][$cur_num]	=	'01-01-'.$next_year;  
 			}
 			$filters4	=	$this->session->userdata('filters4'.$cur_id12);
@@ -1389,7 +1413,6 @@ class Reports extends AdminController
 			}
 			$filter_data['filters3'.$cur_id12][$cur_num]	=	$cur_val;  
 		}
-		
 		$this->session->set_userdata($filter_data);
 		return true;
 	}
@@ -1423,11 +1446,11 @@ class Reports extends AdminController
 			}
 			$filter_data['filters4'.$cur_id12][$cur_num]	=	$cur_val;  
 		}
-		
 		$this->session->set_userdata($filter_data);
 		return true;
 	}
 	public function set_filters($cur_val='',$cur_num1=''){
+		$this->load->helper('report_summary');
 		$cur_id12 = '';
 		if(!empty($_REQUEST['cur_id12'])){
 			$cur_id12 = '_edit_'.$_REQUEST['cur_id12'];
@@ -1446,10 +1469,16 @@ class Reports extends AdminController
 			$cur_num1 = $_REQUEST['req_val']-1;
 			$filter_data['filters'.$cur_id12][$cur_num1]	=	$cur_val;
 		}
-		$filters1	=	$this->session->userdata('filters1');
+		$filters1	=	$this->session->userdata('filters1'.$cur_id12);
+		$filters2	=	$this->session->userdata('filters2'.$cur_id12);
 		if(!empty($filters1)){
 			foreach($filters1 as $key12 => $filter1){
 				$filter_data['filters1'.$cur_id12][$key12]	=	$filter1;  
+			}
+		}
+		if(!empty($filters2)){
+			foreach($filters2 as $key12 => $filter1){
+				$filter_data['filters2'.$cur_id12][$key12]	=	$filter1;  
 			}
 		}
 		switch($cur_val){
@@ -1459,22 +1488,16 @@ class Reports extends AdminController
 			case 'lost_date':
 			case 'project_created':
 			case 'project_modified':
-				$filters2	=	$this->session->userdata('filters2'.$cur_id12);
 				$filters3	=	$this->session->userdata('filters3'.$cur_id12);
 				$filters4	=	$this->session->userdata('filters4'.$cur_id12);
-				if(!empty($filters2)){
-					foreach($filters2 as $key12 => $filter1){
-						$filter_data['filters2'.$cur_id12][$key12]	=	$filter1;  
-					}
-				}
 				if(!empty($filters3)){
 					foreach($filters3 as $key12 => $filter1){
-						$filter_data['filters3'.$cur_id12][$key12]	=	$filter1;  
+						$filter_data['filters3'.$cur_id12][$key12]	=	$filter1;
 					}
 				}
 				if(!empty($filters4)){
 					foreach($filters4 as $key12 => $filter1){
-						$filter_data['filters4'.$cur_id12][$key12]	=	$filter1;  
+						$filter_data['filters4'.$cur_id12][$key12]	=	$filter1;
 					}
 				}
 				$filter_data['filters1'.$cur_id12][$cur_num1]	=	'is';  
@@ -1505,7 +1528,7 @@ class Reports extends AdminController
 				$filter_data['filters2'.$cur_id12][$cur_num1]	=	$currencies[0]['name'];
 				break;
 			case 'status':
-				$all_status = $this->projects_model->get_project_statuses();
+				$all_status = get_stage_report();
 				$filter_data['filters1'.$cur_id12][$cur_num1]	=	'is'; 
 				$filter_data['filters2'.$cur_id12][$cur_num1]	=	$all_status[0]['id']; 
 				break;
@@ -1514,8 +1537,7 @@ class Reports extends AdminController
 				$filter_data['filters2'.$cur_id12][$cur_num1]	=	'WON';  
 				break;
 			case 'pipeline_id':
-				$filter_data['filters1'.$cur_id12][$cur_num1]	=	'is'; 
-				$pipelines = $this->pipeline_model->getPipeline();
+				$pipelines = get_pipeline_report();
 				$filter_data['filters2'.$cur_id12][$cur_num1]	=	$pipelines[0]['id'];  
 				break;
 			case 'tags':
@@ -1531,14 +1553,8 @@ class Reports extends AdminController
 			default:
 				$fields =  $this->db->query("SELECT type FROM " . db_prefix() . "customfields where slug = '".$cur_val."' ")->row();
 				if($fields->type == 'date_picker'){
-					$filters2	=	$this->session->userdata('filters2'.$cur_id12);
 					$filters3	=	$this->session->userdata('filters3'.$cur_id12);
 					$filters4	=	$this->session->userdata('filters4'.$cur_id12);
-					if(!empty($filters2)){
-						foreach($filters2 as $key12 => $filter1){
-							$filter_data['filters2'.$cur_id12][$key12]	=	$filter1;  
-						}
-					}
 					if(!empty($filters3)){
 						foreach($filters3 as $key12 => $filter1){
 							$filter_data['filters3'.$cur_id12][$key12]	=	$filter1;  
@@ -1641,7 +1657,6 @@ class Reports extends AdminController
 		$this->session->set_userdata($filter_data);
 		return true;
 	}
-	
 	public function add_filter(){
 		$cur_id12 = '';
 		if(!empty($_REQUEST['cur_id12'])){
@@ -1739,10 +1754,12 @@ class Reports extends AdminController
 		echo json_encode($req_val);
 	}
 	public function get_filters($cur_val='',$req_val=''){
+		$this->load->helper('report_summary');
 		$cur_id12 = '';
 		if(!empty($_REQUEST['cur_id12'])){
 			$cur_id12 = '_edit_'.$_REQUEST['cur_id12'];
 		}
+		$filters	=	$this->session->userdata('filters'.$cur_id12);
 		$filters2	=	$this->session->userdata('filters2'.$cur_id12);
 		$check_val1 = $cur_val;
 		$check_val2 = $req_val;
@@ -1779,7 +1796,6 @@ class Reports extends AdminController
 								$req_data[0] = $rel_li1;
 								break;
 							}
-
 						}
 					}
 					$req_out = $this->get_req_val($req_val,'select','staffid','firstname,lastname','',$req_data);
@@ -1810,7 +1826,6 @@ class Reports extends AdminController
 								$req_data[0] = $rel_li1;
 								break;
 							}
-
 						}
 					}
 					$req_out = $this->get_req_val($req_val,'select','id','firstname,lastname','',$req_data);
@@ -1884,14 +1899,13 @@ class Reports extends AdminController
 									$req_data[0] = $rel_li1;
 									break;
 								}
-
 							}
 						}
 						$req_out = $this->get_req_val($req_val,'select','staffid','firstname,lastname','',$req_data);
 					}
 					break;
 				case 'status':
-					$all_status = $this->projects_model->get_project_statuses();
+					$all_status = get_stage_report();
 					
 					$req_out = $this->get_req_val($req_val,'select','id','name','',$all_status);
 					
@@ -1902,7 +1916,7 @@ class Reports extends AdminController
 					
 					break;
 				case 'pipeline_id':
-					$pipelines = $this->pipeline_model->getPipeline();
+					$pipelines = get_pipeline_report();
 					$req_out = $this->get_req_val($req_val,'select','id','name','',$pipelines);
 					break;
 				case 'loss_reason_name':
@@ -1918,6 +1932,7 @@ class Reports extends AdminController
 					break;
 				case 'name':
 					$selected = '';
+					$cond = array();
 					$rel_data = get_relation_data('project',$selected);
 					$req_data = array();
 					$rel_val = get_relation_values($rel_data,'project');
@@ -1970,7 +1985,6 @@ class Reports extends AdminController
 									$req_data[0] = $rel_li1;
 									break;
 								}
-
 							}
 						}
 						$req_out = $this->get_req_val($req_val,'select','id','name','',$req_data);
@@ -2030,7 +2044,6 @@ class Reports extends AdminController
 									$req_data[0] = $rel_li1;
 									break;
 								}
-
 							}
 						}
 						$req_out = $this->get_req_val($req_val,'select','phonenumber','phonenumber','',$req_data);
@@ -2057,7 +2070,6 @@ class Reports extends AdminController
 						else{
 							$req_array[$fields->options] = $fields->options;
 						}
-						
 						$req_out = $this->get_req_val($req_val,'select','','','key',$req_array);
 					}
 					else if($fields->type == 'number'){
@@ -2169,7 +2181,6 @@ class Reports extends AdminController
 		$req_out = '';
 		$links = $this->db->query("SELECT link_name FROM " . db_prefix() . "report_public WHERE id = '".$report_id."' ")->row();
 		echo $req_out = $links->link_name;
-		
 	}
 	public function update_public_name(){
 		extract($_REQUEST);

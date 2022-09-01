@@ -223,7 +223,60 @@ function app_admin_ajax_search_function()
 {
     ?>
 <script>
+function project_ajax_search(type, selector, server_data, url){
+
+    var ajaxSelector = $('body').find(selector);
+    if(ajaxSelector.length){
+      var options = {
+        ajax: {
+          url: (typeof(url) == 'undefined' ? admin_url + 'misc/get_project_data' : url),
+          data: function () {
+            var data = {};
+            data.type = type;
+            data.rel_id = '';
+            data.q = '{{{q}}}';
+            if(typeof(server_data) != 'undefined'){
+              jQuery.extend(data, server_data);
+            }
+            return data;
+          }
+        },
+        locale: {
+          emptyTitle: "<?php echo _l('search_ajax_empty'); ?>",
+          statusInitialized: "<?php echo _l('search_ajax_initialized'); ?>",
+          statusSearching:"<?php echo _l('search_ajax_searching'); ?>",
+          statusNoResults:"<?php echo _l('not_results_found'); ?>",
+          searchPlaceholder:"<?php echo _l('search_ajax_placeholder'); ?>",
+          currentlySelected:"<?php echo _l('currently_selected'); ?>",
+        },
+        requestDelay:500,
+        cache:false,
+        preprocessData: function(processData){
+          var bs_data = [];
+          var len = processData.length;
+          for(var i = 0; i < len; i++){
+            var tmp_data =  {
+              'value': processData[i].id,
+              'text': processData[i].name,
+            };
+            if(processData[i].subtext){
+              tmp_data.data = {subtext:processData[i].subtext}
+            }
+            bs_data.push(tmp_data);
+          }
+          return bs_data;
+        },
+        preserveSelectedPosition:'after',
+        preserveSelected:true
+      }
+      if(ajaxSelector.data('empty-title')){
+        options.locale.emptyTitle = ajaxSelector.data('empty-title');
+      }
+      ajaxSelector.selectpicker().ajaxSelectPicker(options);
+    }
+  }
   function init_ajax_search(type, selector, server_data, url){
+
     var ajaxSelector = $('body').find(selector);
     if(ajaxSelector.length){
       var options = {

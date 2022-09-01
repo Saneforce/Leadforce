@@ -8,6 +8,80 @@ defined('BASEPATH') or exit('No direct script access allowed');
  * @param  string $rel_id
  * @return mixed
  */
+function get_project_data($type, $rel_id = '')
+{
+	$CI = & get_instance();
+    $q  = '';
+    if ($CI->input->post('q')) {
+        $q = $CI->input->post('q');
+        $q = trim($q);
+    }
+    $data = [];
+	$fields = get_option('deal_fields');
+	$fields1 = get_option('deal_mandatory');
+	$need_fields = $mandatory_fields = array("name");
+	if(!empty($fields) && $fields != 'null'){
+		$need_fields = json_decode($fields);
+	}
+	if(!empty($fields1) && $fields1 != 'null'){
+		$mandatory_fields = json_decode($fields1);
+	}
+	if ($rel_id != '') {
+		$CI->load->model('projects_model');
+		$data = $CI->projects_model->get($rel_id);
+	} else {
+		$where_projects = ' '.db_prefix().'projects.deleted_status = 0 ';
+		$cur_id12 = '';
+		if(!empty($_REQUEST['cur_id12'])){
+			$cur_id12 = '_edit_'.$_REQUEST['cur_id12'];
+		}
+		$cond = array();
+		$filters	=	$CI->session->userdata('filters'.$cur_id12);
+		$filters2	=	$CI->session->userdata('filters2'.$cur_id12);
+		if(!empty($filters) && in_array('pipeline_id',$filters)){
+			$key = array_search ('pipeline_id', $filters);
+			if(!empty($filters2[$key])){
+				$cond['pipeline_id'] = $filters2[$key];
+			}
+		}
+		if(!empty($filters) && in_array('status',$filters)){
+			$key1 = array_search ('status', $filters);
+			if(!empty($filters2[$key1])){
+				$cond['status'] = $filters2[$key1];
+			}
+		}
+		if(!empty($cond)){
+			$keys = array_keys($cond);
+			if(!empty($keys)){
+				foreach($keys as $key1){
+					if (str_contains($cond[$key1], ',')) {
+						$conds = explode(',',$cond[$key1]);
+						if(!empty($conds)){
+							foreach($conds as $cond1){
+								$where_projects .= ' and '.db_prefix().'projects.'.$key1. "= '".$cond1."'";
+							}
+						}
+					}else{
+						$where_projects .= ' and '.db_prefix().'projects.'.$key1. "= '".$cond[$key1]."'";
+					}
+				}
+			}
+		}
+		if(in_array('clientid',$need_fields) && in_array('clientid',$mandatory_fields)){
+			if ($CI->input->post('customer_id')) {
+				$where_projects .= 'AND clientid=' . $CI->input->post('customer_id');
+			}
+		}
+		else if(in_array('clientid',$need_fields)){
+			if ($CI->input->post('customer_id')) {
+				$where_projects .= 'AND clientid=' . $CI->input->post('customer_id')." or (  clientid  = '')";
+			}
+		}
+		$search = $CI->misc_model->_search_projects($q, 0, $where_projects);
+		$data   = $search['result'];
+	}
+	return $data;
+}
 function get_relation_data($type, $rel_id = '')
 {
     $CI = & get_instance();
@@ -460,6 +534,7 @@ function get_relation_values($relation, $type)
  * @param  string $rel_id rel_id
  * @return string
  */
+ 
 function init_relation_options($data, $type, $rel_id = '')
 {
     $_data = [];

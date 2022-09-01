@@ -181,11 +181,15 @@ function get_flters($req_filters){
 		$table = db_prefix().'filter';
 		$custom_fields = get_table_custom_fields('projects');
 		$customs = array_column($custom_fields, 'slug');
+		//echo '<pre>';print_r($filters);
+		//echo '<pre>';print_r($filters2);
+		//echo '<pre>';print_r($filters1);
 		foreach($filters as $filter12){
 			if ((!empty($needed['need_fields']) && in_array($filter12, $needed['need_fields'])) || in_array($filter12, $customs)){
 				
 				$check_cond = filter_cond($filters2[$i1]);
 				$deal_vals 	= $CI->db->query("SELECT filter_name,filter_cond,filter_type,date_field,filter FROM ".$table." where filter_name = '".$filter12."' and filter_type= '".$filters1[$i1]."' and filter = 'deal' ")->result_array();
+				//echo '<pre>';print_r($deal_vals);
 				if(!empty($deal_vals)){
 					$cur_cond = $deal_vals[0]['filter_cond'];
 					
@@ -362,6 +366,7 @@ function get_flters($req_filters){
 			}
 		}
 	}
+	//echo $req_cond;exit;
 	return $req_cond;
 }
 function get_product_vals($deal_vals,$view_by,$cur_rows){
@@ -1092,4 +1097,74 @@ function deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$tot_avg)
 	}
 	$data[$view_by]	= 	$data['rows']	=	'Total';
 	return $data;
+}
+function get_pipeline_report(){
+	$CI		= & get_instance();
+	$filter_data['filters1'.$cur_id12][$cur_num1]	=	'is'; 
+	$cond = $ids = array();
+	$filters	=	$CI->session->userdata('filters'.$cur_id12);
+	$filters2	=	$CI->session->userdata('filters2'.$cur_id12);
+	if(!empty($filters) && in_array('name',$filters)){
+		$key = array_search ('name', $filters);
+		if(isset($filters2[$key]) && $filters2[$key]!=''){
+			if (str_contains($filters2[$key], ',')) {
+				$conds = explode(',',$filters2[$key]);
+				if(!empty($conds)){
+					foreach($conds as $cond1){
+						$CI->db->where('id', $cond1);
+						$project = $CI->db->get(db_prefix() . 'projects')->row();
+						$ids[] = $project->pipeline_id;
+					}
+					$pipelines = $CI->pipeline_model->getpipelinebyIdInarray($ids);
+				}
+			}else{
+				$CI->db->where('id', $filters2[$key]);
+				$project = $CI->db->get(db_prefix() . 'projects')->row();
+				$id = $project->pipeline_id;
+				$pipelines = $CI->pipeline_model->getpipelinebyIdarray($id);
+			}
+		}
+		else{
+			$pipelines = $CI->pipeline_model->getPipeline();
+		}
+	}
+	else{
+		$pipelines = $CI->pipeline_model->getPipeline();
+	}
+	return $pipelines;
+}
+function get_stage_report(){
+	$CI		= & get_instance();
+	$filter_data['filters1'.$cur_id12][$cur_num1]	=	'is'; 
+	$cond = $ids = array();
+	$filters	=	$CI->session->userdata('filters'.$cur_id12);
+	$filters2	=	$CI->session->userdata('filters2'.$cur_id12);
+	if(!empty($filters) && in_array('name',$filters)){
+		$key = array_search ('name', $filters);
+		if(isset($filters2[$key]) && $filters2[$key]!=''){
+			if (str_contains($filters2[$key], ',')) {
+				$conds = explode(',',$filters2[$key]);
+				if(!empty($conds)){
+					foreach($conds as $cond1){
+						$CI->db->where('id', $cond1);
+						$project = $CI->db->get(db_prefix() . 'projects')->row();
+						$ids[] = $project->status;
+					}
+					$all_status = $CI->projects_model->get_status_in_array($ids);
+				}
+			}else{
+				$CI->db->where('id', $filters2[$key]);
+				$project = $CI->db->get(db_prefix() . 'projects')->row();
+				$id = $project->status;
+				$all_status = $CI->projects_model->get_status_array($id);
+			}
+		}
+		else{
+			$all_status = $CI->projects_model->get_project_statuses();
+		}
+	}
+	else{
+		$all_status = $CI->projects_model->get_project_statuses();
+	}
+	return $all_status;
 }
