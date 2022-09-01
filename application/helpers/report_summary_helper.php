@@ -29,7 +29,7 @@ function get_counts($own,$open,$lost,$tot_val,$view_by,$cur_rows,$deal_vals,$prd
 	$data['own']				=	(!empty($own) && $own!=0)?get_decimal($own):0;
 	$data['open']				=	(!empty($open) && $open!=0)?get_decimal($open):0;
 	
-	$data['losts']				=	(!empty($lost) && $lost!=0)?get_decimal($lost):0;
+	$data['lost']				=	(!empty($lost) && $lost!=0)?get_decimal($lost):0;
 	$data['tot_cnt'] 			= 	$tot_cnt = $deal_vals['own_count'] + $deal_vals['open_count'];
 	if(!empty($deal_vals['req_id'])){
 		$data['req_id']			=	$deal_vals['req_id'];
@@ -493,7 +493,7 @@ function get_qry_fields(){
    'contact_phone1'=>'(SELECT ' . db_prefix() . 'contacts.phonenumber FROM ' . db_prefix() . 'project_contacts JOIN ' . db_prefix() . 'contacts on ' . db_prefix() . 'contacts.id = ' . db_prefix() . 'project_contacts.contacts_id WHERE ' . db_prefix() . 'project_contacts.project_id=' . db_prefix() . 'projects.id AND ' . db_prefix() . 'project_contacts.is_primary = 1) as contact_phone1',
     'won_date'=>'stage_on as won_date',
     'lost_date'=>'stage_on as lost_date',
-    'loss_reason_name'=>db_prefix() . 'deallossreasons.name as loss_reason_name',
+    'loss_reason_name'=>'(SELECT ' . db_prefix() . 'deallossreasons.name FROM ' . db_prefix() . 'deallossreasons  WHERE ' . db_prefix() . 'deallossreasons.id='.db_prefix().'projects.loss_reason) as loss_reason_name',
     'project_currency'=>'project_currency',
     'project_created'=>'project_created',
     'project_modified'=>'project_modified',
