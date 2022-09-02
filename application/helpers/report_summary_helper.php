@@ -164,7 +164,7 @@ function filter_cond1($filter){
 	}
 	return false;
 }
-function get_flters($req_filters){
+function get_flters($req_filters,$check_data=''){
 	$CI			= 	& get_instance();
 	$fields = deal_needed_fields();
 	$needed = array();
@@ -276,7 +276,6 @@ function get_flters($req_filters){
 							array_push($where, $cur_cond);
 						}
 					}
-					
 					else if($filters1[$i1]=='is_not'){
 						if($filters2[$i1] == 'WON'){
 							$cur_cond = " AND ( p.stage_of != '1' )";
@@ -362,6 +361,9 @@ function get_flters($req_filters){
 				$i1++;
 			}
 		}
+	}
+	if(!empty($check_data)){
+		$req_cond = str_replace('p.', db_prefix().'projects.', $req_cond);
 	}
 	return $req_cond;
 }
