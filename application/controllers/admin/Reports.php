@@ -941,18 +941,36 @@ class Reports extends AdminController
 		}
 		$filter_data = array();
 		$filters	=	$this->session->userdata('filters'.$cur_id);
+		$filters1	=	$this->session->userdata('filters1'.$cur_id);
+		if(!empty($filters1)){
+			$i = 0;
+			foreach($filters1 as $filter_val1){
+				$filter_data['filters1'.$cur_id][$i]  =	$filter_val1;
+				$i++;
+			}
+		}
 		if(!empty($filters)){
 			$i = $j = 0;
 			foreach($filters as $filter12){
 				if(!empty($_REQUEST['filter_'.$filter12])){
 					$req_val = implode(",",$_REQUEST['filter_'.$filter12]);
 					$filter_data['filters2'.$cur_id][$i]	=	$req_val;
-					$check_cond = filter_cond($req_val);
+					if(empty($filter_data['filters1'.$cur_id][$i])){
+						if($filter12!='product_qty' && $filter12!='product_amt' && $filter12!='project_cost'){
+							$filter_data['filters1'.$cur_id][$i]	=	'is';
+						}
+						else{
+							$filter_data['filters1'.$cur_id][$i]	=	'is_more_than';
+						}
+					}
+					
+					$check_cond = filter_cond1($req_val);
 					if(!$check_cond ){
 						$filter_data['filters3'.$cur_id][$i]	=	$_REQUEST['filter_4'][$j];  
 						$filter_data['filters4'.$cur_id][$i]	=	$_REQUEST['filter_5'][$j]; 
 						$j++;
 					}
+					
 					$i++;
 				}
 			}
@@ -1554,6 +1572,7 @@ class Reports extends AdminController
 				break;
 			case 'pipeline_id':
 				$pipelines = get_pipeline_report();
+				$filter_data['filters1'.$cur_id12][$cur_num1]	=	'is'; 
 				$filter_data['filters2'.$cur_id12][$cur_num1]	=	$pipelines[0]['id'];  
 				break;
 			case 'tags':
@@ -2075,7 +2094,7 @@ class Reports extends AdminController
 					if($fields->type == 'date_picker'){
 						$req_out = $this->get_req_val($req_val,'date','','','','');
 					}
-					else if($fields->type == 'select'){
+					else if($fields->type == 'select' || $fields->type='multiselect'){
 						$req_array = array();
 						if (str_contains($fields->options, ',')) { 
 							$options = explode(',',$fields->options);
