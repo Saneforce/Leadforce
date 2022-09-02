@@ -64,7 +64,6 @@ function get_counts($own,$open,$lost,$tot_val,$view_by,$cur_rows,$deal_vals,$prd
 			$data[$view_by]	= 	$data['rows']	=	$cur_rows;
 		}
 	}
-	
 	return $data;
 }
 function get_decimal($val)
@@ -151,11 +150,16 @@ function summary_val($tables,$fields,$qry_cond,$measure,$view_by,$cur_rows,$filt
 		$deal_vals = get_deal_vals('*,sum(p.project_cost) as tot_val',$fields,$tables,$qry_cond,$filters);
 		$data = get_data($view_by,$cur_rows,$deal_vals);
 	}
-	
 	return $data;
 }
 function filter_cond($filter){
 	if($filter!=''  &&  ( $filter != 'this_year' || $filter != 'last_year' || $filter != 'next_year' || $filter != 'this_month' || $filter != 'next_month' || $filter != 'last_month' || $filter != 'this_week' || $filter != 'last_week' || $filter != 'next_week' || $filter != 'today' || $filter != 'yesterday' || $filter != 'tomorrow' || $filter != 'custom_period' )){
+		return true;
+	}
+	return false;
+}
+function filter_cond1($filter){
+	if($filter!=''  &&  ( $filter != 'this_year' && $filter != 'last_year' && $filter != 'next_year' && $filter != 'this_month' && $filter != 'next_month' && $filter != 'last_month' && $filter != 'this_week' && $filter != 'last_week' && $filter != 'next_week' && $filter != 'today' && $filter != 'yesterday' && $filter != 'tomorrow' && $filter != 'custom_period' )){
 		return true;
 	}
 	return false;
@@ -181,20 +185,13 @@ function get_flters($req_filters){
 		$table = db_prefix().'filter';
 		$custom_fields = get_table_custom_fields('projects');
 		$customs = array_column($custom_fields, 'slug');
-		//echo '<pre>';print_r($filters);
-		//echo '<pre>';print_r($filters2);
-		//echo '<pre>';print_r($filters1);
 		foreach($filters as $filter12){
 			if ((!empty($needed['need_fields']) && in_array($filter12, $needed['need_fields'])) || in_array($filter12, $customs)){
-				
 				$check_cond = filter_cond($filters2[$i1]);
 				$deal_vals 	= $CI->db->query("SELECT filter_name,filter_cond,filter_type,date_field,filter FROM ".$table." where filter_name = '".$filter12."' and filter_type= '".$filters1[$i1]."' and filter = 'deal' ")->result_array();
-				//echo '<pre>';print_r($deal_vals);
 				if(!empty($deal_vals)){
 					$cur_cond = $deal_vals[0]['filter_cond'];
-					
 					$cur_cond = str_replace('db_prefix()', db_prefix(), $cur_cond);
-					
 					if(($filters1[$i1]=='is' || $filters1[$i1]=='is_more_than' || $filters1[$i1]=='is_less_than') && $deal_vals[0]['date_field'] ==0){
 						if($check_cond){
 							$cur_cond = str_replace('$$cond1', "'".$filters2[$i1]."'", $cur_cond);
@@ -352,12 +349,12 @@ function get_flters($req_filters){
 						array_push($where, $cur_cond);
 					}
 					else if($filters1[$i1]=='is_more_than' && $filters2[$i1]!=''){
-						$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  > '".$filters2[$i1]."') )";
+						$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  > ".$filters2[$i1].") )";
 						$req_cond .= $cur_cond;
 						array_push($where, $cur_cond);
 					}
 					else if($filters1[$i1]=='is_less_than'  && $filters2[$i1]!=''){
-						$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  < '".$filters2[$i1]."') )";
+						$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  < ".$filters2[$i1].") )";
 						$req_cond .= $cur_cond;
 						array_push($where, $cur_cond);
 					}
@@ -366,14 +363,12 @@ function get_flters($req_filters){
 			}
 		}
 	}
-	//echo $req_cond;exit;
 	return $req_cond;
 }
 function get_product_vals($deal_vals,$view_by,$cur_rows){
 	$CI			= & get_instance();
 	if(!empty($deal_vals)){	 
 		foreach($deal_vals as $deal_val1){
-			
 			$tot_val =  $deal_val1['own_price'] + $deal_val1['open_price'];
 			$tot_cnt=	$tot_cnt + $deal_val1['own_count'] + $deal_val1['open_count'];
 			$data = get_counts($deal_val1['own_price'],$deal_val1['open_price'],0,$tot_val,$view_by,$cur_rows,$deal_val1,1);
@@ -385,7 +380,6 @@ function get_weight_vals($deal_vals,$view_by,$cur_rows){
 	$CI			= & get_instance();
 	if(!empty($deal_vals)){	 
 		foreach($deal_vals as $deal_val1){
-			
 			$tot_val =  $deal_val1['own_price'] + $deal_val1['open_price'] + $deal_val1['lost_price'];
 			$tot_cnt=	$tot_cnt + $deal_val1['own_count'] + $deal_val1['open_count'] + $deal_val1['lost_count'];
 			$data = get_counts($deal_val1['own_price'],$deal_val1['open_price'],$deal_val1['lost_price'],$tot_val,$view_by,$cur_rows,$deal_val1);
@@ -430,7 +424,6 @@ function get_sumary_weight_vals($deal_vals,$view_by,$cur_rows){
 			$own 	 =  $own + $deal_val1['own_price'];
 			$open 	 =  $open + $deal_val1['open_price'];
 			$lost 	 =  $open + $deal_val1['lost_price'];
-			
 			$tot_val =  $deal_val1['own_price'] + $deal_val1['open_price']  + $deal_val1['lost_price'];
 			$all_tot =  $all_tot + $tot_val;
 			$tot_cnt =	$tot_cnt + $deal_val1['own_count'] + $deal_val1['open_count'] + $deal_val1['lost_count'];
@@ -622,7 +615,6 @@ function check_year_week($view_by){
 							$m++;
 							$w_start_date	= $w_end_date +1;
 							$w_end_date		= $w_end_date +7;
-							
 							break;
 						}
 					}
@@ -748,7 +740,6 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 	$join_cond	= $req_tables['join_cond'];
 	$where  = array( db_prefix().'projects.deleted_status' =>0);
 	$req_view_by = $view_by;
-	
 	switch($view_by){
 		case 'start_date':
 			$req_view_by = 'start_date';
@@ -875,8 +866,6 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 			}
 			break;
 	}
-	
-	
 	if($view_type == 'date' && ($view_by == 'start_date' || $view_by == 'project_deadline' || $view_by == 'won_date' || $view_by == 'lost_date' || $view_by == 'project_created' || $view_by == 'project_modified')){
 		if($date_range == 'Monthly'){
 			$where['month('.db_prefix().'projects.'.$req_view_by.')']  =  $crow;
@@ -940,7 +929,6 @@ function select_join_query($fields,$table,$join_table=null,$join_condition=null,
 		 $CI->db->limit($offset,$limit);
 	}
 	$query = $CI->db->get();
-	
 	$res = $query->result_array();
 	if(!empty($res))
 		return $res;
@@ -1063,7 +1051,6 @@ function get_table_fields($view_by){
 			$data['qry_cond']   = " and cf.slug ='".$view_by."' and cv.fieldid = cf.id and cv.relid = p.id group by cv.relid order by cv.value asc";
 			$data['cur_rows']	= "value";
 			break;
-		
 	}
 	return $data;
 }
@@ -1074,7 +1061,6 @@ function deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$num,$tot_avg)
 		$data['own']	= 	get_decimal($own/$num);
 		$data['lost']	= 	get_decimal($lost/$num);
 		$data['open']	= 	get_decimal($open/$num);
-		
 		$data['total_cnt_deal']	= 	$data['total_num_prdts'] =  get_decimal($tot_cnt/$num);
 		$data['total_val_deal']	= 	$data['total_val_prdt'] =  get_decimal($tot_val/$num);
 		$data['avg_deal']	=	$data['avg_prdt_val'] = get_decimal($tot_avg/$num);
@@ -1088,7 +1074,6 @@ function deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$tot_avg)
 	$data['own']	= 	get_decimal($own);
 	$data['lost']	= 	get_decimal($lost);
 	$data['open']	= 	get_decimal($open);
-	
 	$data['total_cnt_deal']	= 	$data['total_num_prdts'] =  $tot_cnt;
 	$data['total_val_deal']	= 	$data['total_val_prdt'] =  get_decimal($tot_val);
 	$data['avg_deal']		= 	$data['avg_prdt_val'] =  0;

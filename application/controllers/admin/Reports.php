@@ -2094,7 +2094,7 @@ class Reports extends AdminController
 					if($fields->type == 'date_picker'){
 						$req_out = $this->get_req_val($req_val,'date','','','','');
 					}
-					else if($fields->type == 'select' || $fields->type='multiselect'){
+					else if($fields->type == 'select' || $fields->type=='multiselect'){
 						$req_array = array();
 						if (str_contains($fields->options, ',')) { 
 							$options = explode(',',$fields->options);
