@@ -51,8 +51,6 @@ if(!empty($req_filters)){
 	array_push($where, $req_filters);
 }
 
-
-
 $statusIds = $statusIds1 = [];
 
 // ROle based records
@@ -99,7 +97,6 @@ if (count($filter) > 0) {
 $custom_fields = get_table_custom_fields('projects');
 $req_fields = array_column($custom_fields, 'slug'); 
 $req_cnt = count($req_fields);
-//$req_fields[$req_cnt + 1] = 'id';
 $req_fields[$req_cnt + 1] = 'name';
 $req_fields[$req_cnt + 2] = 'teamleader_name';
 $req_fields[$req_cnt + 3] ='contact_name';
@@ -186,9 +183,21 @@ foreach ($rResult as $aRow) {
     $row = [];
 
     $stage_of = '';
+    $row_temp['won_date']   = $row_temp['lost_date'] = '';
     if($aRow['project_status']) {
-        $stage_of = (($aRow['project_status'] == 1)?'WON':'LOSS');
+		if($aRow['project_status'] == 1){
+			$stage_of = 'WON';
+			$row_temp['won_date']   = _d($aRow['won_date']);
+		}
+		if($aRow['project_status'] == 2){
+			$stage_of = 'LOST';
+			$row_temp['lost_date']   = _d($aRow['lost_date']);
+		}
+		if($aRow['project_status'] == 0){
+			$stage_of = 'OPEN';
+		}
     }
+    $row_temp['loss_reason_name'] = $aRow['loss_reason_name'];
     $row_temp['project_status'] = $stage_of;
     $name =  $aRow['name'] ;
     $row_temp['name'] = $name;
