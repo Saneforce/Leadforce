@@ -86,17 +86,43 @@ ob_end_clean();
 				if($submenu['name'] !='Shared Report List' || !empty($ch_shared)){
                ?>
             <li class="sub-menu-item-<?php echo $submenu['slug']; ?>">
-				<?php if($submenu['name']=='Add Report'){?>
-					<a href="javascript:void(0)" data-toggle="modal" data-target="#add_report_popup" >
-				<?php }else{?>
+				<?php if($submenu['name']=='Add Report'){
+					if (has_permission('reports', '', 'create')) {
+					?>
+						<a href="javascript:void(0)" data-toggle="modal" data-target="#add_report_popup" >
+							<?php if(!empty($submenu['icon'])){ ?>
+								<i class="<?php echo $submenu['icon']; ?> menu-icon"></i>
+						   <?php } ?>
+						   <span class="sub-menu-text">
+							  <?php echo _l($submenu['name'],'',false); ?>
+						   </span>
+					   </a>
+				<?php 
+					}
+				}
+				else if($submenu['name']=='View Report'){
+					if (has_permission('reports', '', 'view')) {
+					?>
+						<a href="<?php echo $submenu['href']; ?>"  >
+							<?php if(!empty($submenu['icon'])){ ?>
+								<i class="<?php echo $submenu['icon']; ?> menu-icon"></i>
+						   <?php } ?>
+						   <span class="sub-menu-text">
+							  <?php echo _l($submenu['name'],'',false); ?>
+						   </span>
+					   </a>
+				<?php 
+					}
+				}else{?>
 					<a href="<?php echo $submenu['href']; ?>">
-				<?php }if(!empty($submenu['icon'])){ ?>
-               <i class="<?php echo $submenu['icon']; ?> menu-icon"></i>
-               <?php } ?>
-               <span class="sub-menu-text">
-                  <?php echo _l($submenu['name'],'',false); ?>
-               </span>
-               </a>
+					<?php if(!empty($submenu['icon'])){ ?>
+				   <i class="<?php echo $submenu['icon']; ?> menu-icon"></i>
+				   <?php } ?>
+				   <span class="sub-menu-text">
+					  <?php echo _l($submenu['name'],'',false); ?>
+				   </span>
+				   </a>
+			<?php }?>
             </li>
             <?php }
 			}

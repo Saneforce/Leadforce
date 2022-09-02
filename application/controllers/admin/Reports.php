@@ -14,9 +14,7 @@ class Reports extends AdminController
     public function __construct()
     {
         parent::__construct();
-        if (!has_permission('reports', '', 'view')) {
-            access_denied('reports');
-        }
+        
         $this->ci = &get_instance();
         $this->load->model('reports_model');
 		$this->load->model('projects_model');
@@ -34,6 +32,9 @@ class Reports extends AdminController
     /* See knowledge base article reports*/
     public function knowledge_base_articles()
     {
+		if (!has_permission('reports', '', 'view')) {
+            access_denied('reports');
+        }
         $this->load->model('knowledge_base_model');
         $data['groups'] = $this->knowledge_base_model->get_kbg();
         $data['title']  = _l('kb_reports');
@@ -51,6 +52,9 @@ class Reports extends AdminController
     /* Repoert leads conversions */
     public function leads()
     {
+		if (!has_permission('reports', '', 'view')) {
+            access_denied('reports');
+        }
         $type = 'leads';
         if ($this->input->get('type')) {
             $type                       = $type . '_' . $this->input->get('type');
@@ -66,6 +70,9 @@ class Reports extends AdminController
     /* sales reportts */
     public function sales()
     {
+		if (!has_permission('reports', '', 'view')) {
+            access_denied('reports');
+        }
         $data['mysqlVersion'] = $this->db->query('SELECT VERSION() as version')->row();
         $data['sqlMode']      = $this->db->query('SELECT @@sql_mode as mode')->row();
 
@@ -101,6 +108,9 @@ class Reports extends AdminController
     /* deals reportts */
     public function deals()
     {
+		if (!has_permission('reports', '', 'view')) {
+            access_denied('reports');
+        }
         $data['mysqlVersion'] = $this->db->query('SELECT VERSION() as version')->row();
         $data['sqlMode']      = $this->db->query('SELECT @@sql_mode as mode')->row();
 
@@ -132,6 +142,9 @@ class Reports extends AdminController
         $this->load->view('admin/reports/deals', $data);
     }
 	public function add_report(){
+		if (!has_permission('reports', '', 'create')) {
+            access_denied('reports');
+        }
 		extract($_REQUEST);
 		$fields = deal_needed_fields();
 		$needed = array();
@@ -736,6 +749,9 @@ class Reports extends AdminController
 	}
 	public function edit($id){
 		if (!has_permission('reports', '', 'create')) {
+            access_denied('reports');
+        }
+		if (!has_permission('reports', '', 'view')) {
             access_denied('reports');
         }
 		$this->load->model('pipeline_model');
@@ -2243,7 +2259,9 @@ class Reports extends AdminController
 		$this->load->view('admin/reports/folder_deal', $data);
 	}
 	public function all_share(){
-		
+		if (!has_permission('reports', '', 'view')) {
+            access_denied('reports');
+        }
 		$data = array();
 		$data['title']    =  _l('shared_list');
 		$this->load->view('admin/reports/shared_list', $data);

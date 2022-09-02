@@ -362,7 +362,7 @@ function app_init_admin_sidebar_menu_items() {
             ]);
         }
     }
-    if (has_permission('reports', '', 'view')) {
+    if (has_permission('reports', '', 'view') || has_permission('reports', '', 'create')) {
        
         $CI->app_menu->add_sidebar_menu_item('reports', [
             'collapse' => true,
