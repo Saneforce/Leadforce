@@ -311,27 +311,27 @@ function get_flters($req_filters){
 				else if(in_array($filter12, $customs)){
 					if($filters1[$i1]=='is'){
 						if($check_cond ){
-							$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  = '".$filters2[$i1]."') )";
+							$cur_cond = " AND ( p.id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where cv.value  = '".$filters2[$i1]."' and c.slug = '".$filter12."' and cv.fieldid = c.id) )";
 							$req_cond .= $cur_cond;
 							array_push($where, $cur_cond);
 						}else{
-							$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  > '".date('Y-m-d',strtotime($filters3[$i1]))."' AND value < '".date('Y-m-d',strtotime($filters4[$i1]))."') )";
+							$cur_cond = " AND ( p.id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where value  > '".date('Y-m-d',strtotime($filters3[$i1]))."' AND value < '".date('Y-m-d',strtotime($filters4[$i1]))."' and c.slug = '".$filter12."' and cv.fieldid = c.id ) )";
 							$req_cond .= $cur_cond;
 							array_push($where, $cur_cond);
 						}
 					}
 					else if($filters1[$i1]=='is_empty'){
-						$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  = '' or value = '0' or value = '0000-00-00') )";
+						$cur_cond = " AND ( p.id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where (cv.value  = '' or cv.value = '0' or cv.value = '0000-00-00') and c.slug = '".$filter12."' and cv.fieldid = c.id) )";
 						$req_cond .= $cur_cond;
 						array_push($where, $cur_cond);
 					}
 					else if($filters1[$i1]=='is_not_empty'){
-						$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  != '' AND value != '0' AND value != '0000-00-00') )";
+						$cur_cond = " AND ( p.id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where cv.value  != '' AND cv.value != '0' AND cv.value != '0000-00-00' AND cv.fieldto = 'projects' and c.slug = '".$filter12."' and cv.fieldid = c.id) )";
 						$req_cond .= $cur_cond;
 						array_push($where, $cur_cond);
 					}
 					else if($filters1[$i1]=='is_not'){
-						$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  != '".$filters2[$i1]."') )";
+						$cur_cond = " AND ( p.id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c  where cv.value  != '".$filters2[$i1]."' and c.slug = '".$filter12."' and cv.fieldid = c.id) )";
 						$req_cond .= $cur_cond;
 						array_push($where, $cur_cond);
 					}
@@ -344,17 +344,17 @@ function get_flters($req_filters){
 							}
 						}
 						$req_arr = rtrim($req_arr,",");
-						$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  in(".$req_arr.")) )";
+						$cur_cond = " AND ( p.id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where cv.value  in(".$req_arr.") and c.slug = '".$filter12."' and cv.fieldid = c.id ) )";
 						$req_cond .= $cur_cond;
 						array_push($where, $cur_cond);
 					}
 					else if($filters1[$i1]=='is_more_than' && $filters2[$i1]!=''){
-						$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  > ".$filters2[$i1].") )";
+						$cur_cond = " AND ( p.id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where value  > ".$filters2[$i1]." and c.slug = '".$filter12."' and cv.fieldid = c.id) )";
 						$req_cond .= $cur_cond;
 						array_push($where, $cur_cond);
 					}
 					else if($filters1[$i1]=='is_less_than'  && $filters2[$i1]!=''){
-						$cur_cond = " AND ( p.id in(SELECT relid FROM ".db_prefix() ."customfieldsvalues where value  < ".$filters2[$i1].") )";
+						$cur_cond = " AND ( p.id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where cv.value  < ".$filters2[$i1]." and c.slug = '".$filter12."' and cv.fieldid = c.id) )";
 						$req_cond .= $cur_cond;
 						array_push($where, $cur_cond);
 					}
