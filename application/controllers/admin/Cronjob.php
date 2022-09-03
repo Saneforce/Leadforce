@@ -895,9 +895,10 @@ exit;
 						$result = $query->row();
 						$taskupdate = array();
 						$taskupdate['status'] = 5;
+						$taskupdate['datefinished'] = date ('Y-m-d H:i:s');
 						//pre($totData);
 						$this->db2->where('id',$result->task_id);
-						$this->db2->update('tbltasks', $taskupdate);
+						$this->db2->update(db_prefix().'tasks', $taskupdate);
 					}
 					echo "Done"; exit;
 				}
