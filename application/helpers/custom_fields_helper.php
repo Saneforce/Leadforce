@@ -1512,6 +1512,26 @@ function tataupdate_access_token_call(to_no,phone,contact_id,deal,agent_id,ftype
 		}
 	});
 }
+
+function telecmi_get_agent_token(agent_id,password){
+    var token ='';
+    $.ajax({
+        type: "POST",
+        url: 'https://rest.telecmi.com/v2/user/login',
+        data: {
+            id: agent_id,
+            password: password
+        },
+        dataType: 'json',
+        async:false,
+        success: function(res){
+            if(res.token){
+                token =res.token;
+            }
+        }
+    });
+    return token;
+}
 function callfromperson(contact, phone) {
     var url =  admin_url+'call_settings/getPersonDeals';
     $.ajax({
@@ -1548,52 +1568,94 @@ function callfromperson(contact, phone) {
                             success: function(msg){
 								<?php if(CALL_SOURCE_FROM =='telecmi'){?>
                                 if(msg.status == 'success') {
-                                    var to1 = msg.contact_no;
-                                    var agent1 = msg.agent_id;
-                                    var url1 = 'https://piopiy.telecmi.com/v1/adminConnect';
-                                    //$('.followers-div').show();
-                                    $.ajax({
-                                        type: "POST",
-                                        url: url1,
-                                        contentType: "application/json",
-                                        data: JSON.stringify({
-                                            agent_id:msg.agent_id,
-                                            token:msg.app_secret,
-                                            to:msg.contact_no,
-                                            custom:''
-                                        }),
-                                        dataType: 'json',
-                                        async: false,
-                                        success: function(res){
-                                            console.log(res);
-                                            if(res.code == '200') {
-                                                var request = res.request_id;
-                                                var msg = res.msg;
-                                                var code = res.code;
-                                                var url2 =  admin_url+'call_settings/createActivity';
-                                                $.ajax({
-                                                    type: "POST",
-                                                    url: url2,
-                                                    data: {req:request,msg:msg,code:code,deal_id:deal,contact_id:contact,type:ftype,agent:agent1,to:to1},
-                                                    dataType: 'json',
-                                                    success: function(result){
-                                                        console.log(result);
-                                                        if(result.status == 'success') {
-                                                            alert_float('success', 'Call Connecting...');
-                                                            setTimeout(function(){
-                                                                window.location.reload();
-                                                            },1000);
-                                                        } else {
-                                                            alert_float('warning', result.message);
-                                                            setTimeout(function(){
-                                                                window.location.reload();
-                                                            },1000);
+                                    if(msg.channel =='international_softphone'){
+                                        var to1 = msg.contact_no;
+                                        var agent1 = msg.agent_id;
+                                        $.ajax({
+                                            type: "POST",
+                                            url: 'https://rest.telecmi.com/v2/click2call',
+                                            contentType: "application/json",
+                                            data: JSON.stringify({
+                                                token: telecmi_get_agent_token(msg.agent_id,msg.password),
+                                                to: parseInt(msg.contact_no),
+                                            }),
+                                            dataType: 'json',
+                                            async: false,
+                                            success: function(res){
+                                                if(res.code == '200') {
+                                                    var request = res.request_id;
+                                                    var msg = res.msg;
+                                                    var code = res.code;
+                                                    var url2 =  admin_url+'call_settings/createActivity';
+                                                    $.ajax({
+                                                        type: "POST",
+                                                        url: url2,
+                                                        data: {req:request,msg:msg,code:code,deal_id:0,contact_id:contact,type:ftype,agent:agent1,to:to1},
+                                                        dataType: 'json',
+                                                        success: function(result){
+                                                            if(result.status == 'success') {
+                                                                alert_float('success', 'Call Connecting...');
+                                                                setTimeout(function(){
+                                                                    window.location.reload();
+                                                                },1000);
+                                                            } else {
+                                                                alert_float('warning', result.message);
+                                                                setTimeout(function(){
+                                                                    window.location.reload();
+                                                                },1000);
+                                                            }
                                                         }
-                                                    }
-                                                });
+                                                    });
+                                                }
                                             }
-                                        }
-                                    });
+                                        });
+                                    }else{
+                                        var to1 = msg.contact_no;
+                                        var agent1 = msg.agent_id;
+                                        var url1 = 'https://piopiy.telecmi.com/v1/adminConnect';
+                                        //$('.followers-div').show();
+                                        $.ajax({
+                                            type: "POST",
+                                            url: url1,
+                                            contentType: "application/json",
+                                            data: JSON.stringify({
+                                                agent_id:msg.agent_id,
+                                                token:msg.app_secret,
+                                                to:msg.contact_no,
+                                                custom:''
+                                            }),
+                                            dataType: 'json',
+                                            async: false,
+                                            success: function(res){
+                                                if(res.code == '200') {
+                                                    var request = res.request_id;
+                                                    var msg = res.msg;
+                                                    var code = res.code;
+                                                    var url2 =  admin_url+'call_settings/createActivity';
+                                                    $.ajax({
+                                                        type: "POST",
+                                                        url: url2,
+                                                        data: {req:request,msg:msg,code:code,deal_id:0,contact_id:contact,type:ftype,agent:agent1,to:to1},
+                                                        dataType: 'json',
+                                                        success: function(result){
+                                                            if(result.status == 'success') {
+                                                                alert_float('success', 'Call Connecting...');
+                                                                setTimeout(function(){
+                                                                    window.location.reload();
+                                                                },1000);
+                                                            } else {
+                                                                alert_float('warning', result.message);
+                                                                setTimeout(function(){
+                                                                    window.location.reload();
+                                                                },1000);
+                                                            }
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        });
+                                    }
+                                    
                                 }
 							<?php }
 							else  if(CALL_SOURCE_FROM =='daffytel'){ ?>
@@ -1710,50 +1772,95 @@ function callfromdeal(contact, deal, contact_no, ftype) {
                 if(msg.status == 'success') {
                     var to1 = msg.contact_no;
                     var agent1 = msg.agent_id;
-                    var url1 = 'https://piopiy.telecmi.com/v1/adminConnect';
-                    //$('.followers-div').show();
-                    $.ajax({
-                        type: "POST",
-                        url: url1,
-                        contentType: "application/json",
-                        data: JSON.stringify({
-                            agent_id:msg.agent_id,
-                            token:msg.app_secret,
-                            to:msg.contact_no,
-                            custom:''
-                        }),
-                        dataType: 'json',
-                        async: false,
-                        success: function(res){
-                            console.log(res);
-                            if(res.code == '200') {
-                                var request = res.request_id;
-                                var msg = res.msg;
-                                var code = res.code;
-                                var url2 =  admin_url+'call_settings/createActivity';
-                                $.ajax({
-                                    type: "POST",
-                                    url: url2,
-                                    data: {req:request,msg:msg,code:code,deal_id:deal,contact_id:contact,type:ftype,agent:agent1,to:to1},
-                                    dataType: 'json',
-                                    success: function(result){
-                                        console.log(result);
-                                        if(result.status == 'success') {
-                                            alert_float('success', 'Call Connecting...');
-                                            setTimeout(function(){
-                                                window.location.reload();
-                                            },1000);
-                                        } else {
-                                            alert_float('warning', result.message);
-                                            setTimeout(function(){
-                                                window.location.reload();
-                                            },1000);
+                    if(msg.channel =='international_softphone'){
+                        var url1 = 'https://rest.telecmi.com/v2/click2call';
+                        //$('.followers-div').show();
+                        $.ajax({
+                            type: "POST",
+                            url: url1,
+                            contentType: "application/json",
+                            data: JSON.stringify({
+                                token: telecmi_get_agent_token(msg.agent_id,msg.password),
+                                to: parseInt(msg.contact_no),
+                            }),
+                            dataType: 'json',
+                            async: false,
+                            success: function(res){
+                                console.log(res);
+                                if(res.code == '200') {
+                                    var request = res.request_id;
+                                    var msg = res.msg;
+                                    var code = res.code;
+                                    var url2 =  admin_url+'call_settings/createActivity';
+                                    $.ajax({
+                                        type: "POST",
+                                        url: url2,
+                                        data: {req:request,msg:msg,code:code,deal_id:deal,contact_id:contact,type:ftype,agent:agent1,to:to1},
+                                        dataType: 'json',
+                                        success: function(result){
+                                            console.log(result);
+                                            if(result.status == 'success') {
+                                                alert_float('success', 'Call Connecting...');
+                                                setTimeout(function(){
+                                                    window.location.reload();
+                                                },1000);
+                                            } else {
+                                                alert_float('warning', result.message);
+                                                setTimeout(function(){
+                                                    window.location.reload();
+                                                },1000);
+                                            }
                                         }
-                                    }
-                                });
+                                    });
+                                }
                             }
-                        }
-                    });
+                        });
+                    }else{
+                        var url1 = 'https://piopiy.telecmi.com/v1/adminConnect';
+                        //$('.followers-div').show();
+                        $.ajax({
+                            type: "POST",
+                            url: url1,
+                            contentType: "application/json",
+                            data: JSON.stringify({
+                                agent_id:msg.agent_id,
+                                token:msg.app_secret,
+                                to:msg.contact_no,
+                                custom:''
+                            }),
+                            dataType: 'json',
+                            async: false,
+                            success: function(res){
+                                console.log(res);
+                                if(res.code == '200') {
+                                    var request = res.request_id;
+                                    var msg = res.msg;
+                                    var code = res.code;
+                                    var url2 =  admin_url+'call_settings/createActivity';
+                                    $.ajax({
+                                        type: "POST",
+                                        url: url2,
+                                        data: {req:request,msg:msg,code:code,deal_id:deal,contact_id:contact,type:ftype,agent:agent1,to:to1},
+                                        dataType: 'json',
+                                        success: function(result){
+                                            console.log(result);
+                                            if(result.status == 'success') {
+                                                alert_float('success', 'Call Connecting...');
+                                                setTimeout(function(){
+                                                    window.location.reload();
+                                                },1000);
+                                            } else {
+                                                alert_float('warning', result.message);
+                                                setTimeout(function(){
+                                                    window.location.reload();
+                                                },1000);
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    }
                 }
 			<?php }else  if(CALL_SOURCE_FROM =='daffytel'){ ?>
 				calldaffy(contact_no,msg.agent_no,contact,deal,msg.agent_id,ftype,msg);
@@ -1765,7 +1872,8 @@ function callfromdeal(contact, deal, contact_no, ftype) {
         });
     }
 }
-function tele_delete_agent_db(id) {
+
+function tele_delete_agent_db(id,channel) {
 	var appid = $('#appid').val();
 	var secret = $('#secret').val();
 	var url =  admin_url+'call_settings/getAgentDetails';
@@ -1779,7 +1887,11 @@ function tele_delete_agent_db(id) {
 			//console.log(msg);
 			//alert(msg.status);
 			if(msg.status) {
-				var url2 = 'https://piopiy.telecmi.com/v1/agent/remove';
+                if(channel =='international_softphone'){
+                    var url2 ='https://rest.telecmi.com/v2/user/remove';
+                }else{
+				    var url2 = 'https://piopiy.telecmi.com/v1/agent/remove';
+                }
 				//$('.followers-div').show();
 				$.ajax({
 					type: "POST",
@@ -1793,8 +1905,7 @@ function tele_delete_agent_db(id) {
 					dataType: 'json',
 					async: false,
 					success: function(res){
-						console.log(res);
-						if(res.code == 'cmi-2000') {
+						if(res.code == 'cmi-2000' || res.status =="success") {
 							var url3 =  admin_url+'call_settings/delete_agent';
 							//$('.followers-div').show();
 							$.ajax({
@@ -1805,8 +1916,6 @@ function tele_delete_agent_db(id) {
 								},
 								dataType: 'json',
 								success: function(result){
-									console.log(result);
-									
 								}
 							});
 							//alert(res.msg);
@@ -2022,9 +2131,10 @@ function tatadeletAgent_db(id,cur_val) {
 function deletAgent_db(id,req_id1){
 	 if (confirm('Do you want to Delete this Agent?')) {
 			var source_from = $('#req_source_from').val();
+			var channel = $('#channel').val();
 			if(req_id1 == 1){
 				if(source_from == 'telecmi'){
-					tele_delete_agent_db(id);
+                    tele_delete_agent_db(id,channel);
 				}
 				else if(source_from == 'tata'){
 					tatadeletAgent_1_db(id,'');
@@ -3151,7 +3261,7 @@ $(document).ready(function(){
         var appid = $('#appid').val();
         var secret = $('#secret').val();
         var sms_alert = $('#addAgentModal #sms_alert').val();
-
+        var channel = $('#channel').val();
         // Validations
         var validate = 0;
         if(!extid) {
@@ -3214,93 +3324,156 @@ $(document).ready(function(){
         }
 
         if(appid) {
-            $('#addAgent').attr('disabled','disabled');
-            var url = 'https://piopiy.telecmi.com/v1/agent/add';
-            //$('.followers-div').show();
-            $.ajax({
-                type: "POST",
-                url: url,
-                contentType: "application/json",
-                data: JSON.stringify({
-                    name:name,
-                    phone_number:parseInt(phone_number),
-                    start_time:parseInt(start_time),
-                    end_time:parseInt(end_time),
-                    password:password,
-                    extension:parseInt(extension),
-                    appid:parseInt(appid),
-                    secret:secret,
-                    sms_alert: (sms_alert == 'true' ? true : false)
-                }),
-                dataType: 'json',
-                async: false,
-                success: function(msg){
-                  if(msg.status == 'success') {
-                    var url2 = 'https://piopiy.telecmi.com/v1/agent/status';
-                    //$('.followers-div').show();
-                    $.ajax({
-                        type: "POST",
-                        url: url2,
-                        contentType: "application/json",
-                        data: JSON.stringify({
-                            id:msg.agent.agent_id,
-                            appid:parseInt(appid),
-                            secret:secret,
-                            status:status
-                        }),
-                        dataType: 'json',
-                        async: false,
-                        success: function(res){
-                            if(res.code == 'cmi-200') {
-                                var url3 =  admin_url+'call_settings/saveAgent';
-                                //$('.followers-div').show();
-                                $.ajax({
-                                    type: "POST",
-                                    url: url3,
-                                    data: {
-                                        extid:extid,
-                                        phone_number:phone_number,
-                                        start_time:start_time,
-                                        end_time:end_time,
-                                        password:password,
-                                        agentid:msg.agent.agent_id,
-                                        secret:secret,
-                                        sms_alert:sms_alert,
-                                        status:res.status
-                                    },
-                                    dataType: 'json',
-                                    success: function(result){
-                                        console.log(result);
-                                        if(result.status == 'success') {
-                                            alert_float('success', result.msg);
-                                            setTimeout(function(){
-                                                window.location.reload();
-                                            },1000);
-                                        } else {
-                                            alert_float('warning', result.msg);
-                                            setTimeout(function(){
-                                                window.location.reload();
-                                            },1000);
-                                        }
+
+            if(channel =='international_softphone'){
+                $.ajax({
+                    type: "POST",
+                    url: 'https://rest.telecmi.com/v2/user/add',
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        name:name,
+                        phone_number:phone_number,
+                        start_time:parseInt(start_time),
+                        end_time:parseInt(end_time),
+                        password:password,
+                        extension:extension,
+                        appid:parseInt(appid),
+                        secret:secret,
+                        sms_alert: (sms_alert == 'true' ? true : false)
+                    }),
+                    dataType: 'json',
+                    async: false,
+                    success: function(msg){
+                        if(msg.status == 'success') {
+                            //$('.followers-div').show();
+                            $.ajax({
+                                type: "POST",
+                                url: admin_url+'call_settings/saveAgent',
+                                data: {
+                                    extid:extid,
+                                    phone_number:phone_number,
+                                    start_time:start_time,
+                                    end_time:end_time,
+                                    password:password,
+                                    agentid:msg.agent.agent_id,
+                                    secret:secret,
+                                    sms_alert:sms_alert,
+                                    status:msg.status
+                                },
+                                dataType: 'json',
+                                success: function(result){
+                                    console.log(result);
+                                    if(result.status == 'success') {
+                                        alert_float('success', result.msg);
+                                        setTimeout(function(){
+                                            window.location.reload();
+                                        },1000);
+                                    } else {
+                                        alert_float('warning', result.msg);
+                                        setTimeout(function(){
+                                            window.location.reload();
+                                        },1000);
                                     }
-                                });
-                                //alert(res.msg);
-                            } else {
-                                alert_float('warning', res.msg);
-                                setTimeout(function(){
-                                    window.location.reload();
-                                },1000);
-                            }
+                                }
+                            });
+                        } else {
+                            alert_float('warning', msg.msg);
+                            setTimeout(function(){
+                                window.location.reload();
+                            },1000);
                         }
-                    });
-                  } else {
-                    alert_float('warning', msg.msg);
-                    setTimeout(function(){
-                        window.location.reload();
-                    },1000);
-                  }
-                }
-            });
+                    }
+                });
+            }else{
+                $('#addAgent').attr('disabled','disabled');
+                var url = 'https://piopiy.telecmi.com/v1/agent/add';
+                //$('.followers-div').show();
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        name:name,
+                        phone_number:parseInt(phone_number),
+                        start_time:parseInt(start_time),
+                        end_time:parseInt(end_time),
+                        password:password,
+                        extension:parseInt(extension),
+                        appid:parseInt(appid),
+                        secret:secret,
+                        sms_alert: (sms_alert == 'true' ? true : false)
+                    }),
+                    dataType: 'json',
+                    async: false,
+                    success: function(msg){
+                    if(msg.status == 'success') {
+                        var url2 = 'https://piopiy.telecmi.com/v1/agent/status';
+                        //$('.followers-div').show();
+                        $.ajax({
+                            type: "POST",
+                            url: url2,
+                            contentType: "application/json",
+                            data: JSON.stringify({
+                                id:msg.agent.agent_id,
+                                appid:parseInt(appid),
+                                secret:secret,
+                                status:status
+                            }),
+                            dataType: 'json',
+                            async: false,
+                            success: function(res){
+                                if(res.code == 'cmi-200') {
+                                    var url3 =  admin_url+'call_settings/saveAgent';
+                                    //$('.followers-div').show();
+                                    $.ajax({
+                                        type: "POST",
+                                        url: url3,
+                                        data: {
+                                            extid:extid,
+                                            phone_number:phone_number,
+                                            start_time:start_time,
+                                            end_time:end_time,
+                                            password:password,
+                                            agentid:msg.agent.agent_id,
+                                            secret:secret,
+                                            sms_alert:sms_alert,
+                                            status:res.status
+                                        },
+                                        dataType: 'json',
+                                        success: function(result){
+                                            console.log(result);
+                                            if(result.status == 'success') {
+                                                alert_float('success', result.msg);
+                                                setTimeout(function(){
+                                                    window.location.reload();
+                                                },1000);
+                                            } else {
+                                                alert_float('warning', result.msg);
+                                                setTimeout(function(){
+                                                    window.location.reload();
+                                                },1000);
+                                            }
+                                        }
+                                    });
+                                    //alert(res.msg);
+                                } else {
+                                    alert_float('warning', res.msg);
+                                    setTimeout(function(){
+                                        window.location.reload();
+                                    },1000);
+                                }
+                            }
+                        });
+                    } else {
+                        alert_float('warning', msg.msg);
+                        setTimeout(function(){
+                            window.location.reload();
+                        },1000);
+                    }
+                    }
+                });
+            }
+            
         } else {
             alert_float('warning', 'Please enable call settings.');
             setTimeout(function(){
@@ -3345,6 +3518,7 @@ $(document).ready(function(){
         var password = $('#editAgentModal #password').val();
         var appid = $('#appid').val();
         var secret = $('#secret').val();
+        var channel = $('#channel').val();
         var sms_alert = $('#editAgentModal #sms_alert').val();
         var extid = $('#editAgentModal #id').val();
         var staff_id = $('#editAgentModal #staff_id').val();
@@ -3411,95 +3585,159 @@ var validate = 0;
         if(validate == 1) {
             return false;
         }
-
         if(appid) {
-            $('#editAgent').attr('disabled','disabled');
-            var url = 'https://piopiy.telecmi.com/v1/agent/update';
-            //$('.followers-div').show();
-            $.ajax({
-                type: "POST",
-                url: url,
-                contentType: "application/json",
-                data: JSON.stringify({
-                    name:name,
-                    phone_number:parseInt(phone_number),
-                    start_time:parseInt(start_time),
-                    end_time:parseInt(end_time),
-                    password:password,
-                    id:extension,
-                    appid:parseInt(appid),
-                    secret:secret,
-                    sms_alert: (sms_alert == 'true' ? true : false)
-                }),
-                dataType: 'json',
-                async: false,
-                success: function(msg){
-                  if(msg.status == 'success') {
-                    var url2 = 'https://piopiy.telecmi.com/v1/agent/status';
-                    //$('.followers-div').show();
-                    $.ajax({
-                        type: "POST",
-                        url: url2,
-                        contentType: "application/json",
-                        data: JSON.stringify({
-                            id:extension,
-                            appid:parseInt(appid),
-                            secret:secret,
-                            status:status
-                        }),
-                        dataType: 'json',
-                        async: false,
-                        success: function(res){
-                            if(res.code == 'cmi-200') {
-                                var url3 =  admin_url+'call_settings/updateAgent';
-                                //$('.followers-div').show();
-                                $.ajax({
-                                    type: "POST",
-                                    url: url3,
-                                    data: {
-                                        id:extid,
-                                        phone_number:phone_number,
-                                        start_time:start_time,
-                                        end_time:end_time,
-                                        password:password,
-                                        agentid:extension,
-                                        sms_alert:sms_alert,
-                                        status:res.status,
-                                        staff_id:staff_id
-                                    },
-                                    dataType: 'json',
-                                    success: function(result){
-                                        console.log(result);
-                                        if(result.status == 'success') {
-                                            alert_float('success', result.msg);
-                                            setTimeout(function(){
-                                                window.location.reload();
-                                            },1000);
-                                        } else {
-                                            alert_float('warning', result.msg);
-                                            setTimeout(function(){
-                                                window.location.reload();
-                                            },1000);
-                                        }
-                                    }
-                                });
-                                //alert(res.msg);
-                            } else {
-                                alert_float('warning', res.msg);
-                                setTimeout(function(){
-                                    window.location.reload();
-                                },1000);
+            if(channel =='international_softphone'){
+                $('#editAgent').attr('disabled','disabled');
+                var url = 'https://rest.telecmi.com/v2/user/update';
+                //$('.followers-div').show();
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        name:name,
+                        phone_number:phone_number,
+                        start_time:parseInt(start_time),
+                        end_time:parseInt(end_time),
+                        password:password,
+                        id:extension,
+                        appid:parseInt(appid),
+                        secret:secret,
+                        sms_alert: (sms_alert == 'true' ? true : false)
+                    }),
+                    dataType: 'json',
+                    async: false,
+                    success: function(msg){
+                    if(msg.status == 'success') {
+                        var url3 =  admin_url+'call_settings/updateAgent';
+                        //$('.followers-div').show();
+                        $.ajax({
+                            type: "POST",
+                            url: url3,
+                            data: {
+                                id:extid,
+                                phone_number:phone_number,
+                                start_time:start_time,
+                                end_time:end_time,
+                                password:password,
+                                agentid:extension,
+                                sms_alert:sms_alert,
+                                staff_id:staff_id
+                            },
+                            dataType: 'json',
+                            success: function(result){
+                                console.log(result);
+                                if(result.status == 'success') {
+                                    alert_float('success', result.msg);
+                                    setTimeout(function(){
+                                        window.location.reload();
+                                    },1000);
+                                } else {
+                                    alert_float('warning', result.msg);
+                                    setTimeout(function(){
+                                        window.location.reload();
+                                    },1000);
+                                }
                             }
-                        }
-                    });
-                  } else {
-                    alert_float('warning', msg.msg);
-                    setTimeout(function(){
-                        window.location.reload();
-                    },1000);
-                  }
-                }
-            });
+                        });
+                    } else {
+                        alert_float('warning', msg.msg);
+                        setTimeout(function(){
+                            window.location.reload();
+                        },1000);
+                    }
+                    }
+                });
+            }else{
+                $('#editAgent').attr('disabled','disabled');
+                var url = 'https://piopiy.telecmi.com/v1/agent/update';
+                //$('.followers-div').show();
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        name:name,
+                        phone_number:parseInt(phone_number),
+                        start_time:parseInt(start_time),
+                        end_time:parseInt(end_time),
+                        password:password,
+                        id:extension,
+                        appid:parseInt(appid),
+                        secret:secret,
+                        sms_alert: (sms_alert == 'true' ? true : false)
+                    }),
+                    dataType: 'json',
+                    async: false,
+                    success: function(msg){
+                    if(msg.status == 'success') {
+                        var url2 = 'https://piopiy.telecmi.com/v1/agent/status';
+                        //$('.followers-div').show();
+                        $.ajax({
+                            type: "POST",
+                            url: url2,
+                            contentType: "application/json",
+                            data: JSON.stringify({
+                                id:extension,
+                                appid:parseInt(appid),
+                                secret:secret,
+                                status:status
+                            }),
+                            dataType: 'json',
+                            async: false,
+                            success: function(res){
+                                if(res.code == 'cmi-200') {
+                                    var url3 =  admin_url+'call_settings/updateAgent';
+                                    //$('.followers-div').show();
+                                    $.ajax({
+                                        type: "POST",
+                                        url: url3,
+                                        data: {
+                                            id:extid,
+                                            phone_number:phone_number,
+                                            start_time:start_time,
+                                            end_time:end_time,
+                                            password:password,
+                                            agentid:extension,
+                                            sms_alert:sms_alert,
+                                            status:res.status,
+                                            staff_id:staff_id
+                                        },
+                                        dataType: 'json',
+                                        success: function(result){
+                                            console.log(result);
+                                            if(result.status == 'success') {
+                                                alert_float('success', result.msg);
+                                                setTimeout(function(){
+                                                    window.location.reload();
+                                                },1000);
+                                            } else {
+                                                alert_float('warning', result.msg);
+                                                setTimeout(function(){
+                                                    window.location.reload();
+                                                },1000);
+                                            }
+                                        }
+                                    });
+                                    //alert(res.msg);
+                                } else {
+                                    alert_float('warning', res.msg);
+                                    setTimeout(function(){
+                                        window.location.reload();
+                                    },1000);
+                                }
+                            }
+                        });
+                    } else {
+                        alert_float('warning', msg.msg);
+                        setTimeout(function(){
+                            window.location.reload();
+                        },1000);
+                    }
+                    }
+                });
+            }
+
         } else {
             alert_float('warning', 'Please enable call settings.');
             setTimeout(function(){

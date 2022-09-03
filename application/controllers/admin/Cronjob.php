@@ -860,7 +860,11 @@ exit;
 				$query = $this->db2->get();
 				if ( $query->num_rows() > 0 ) {
 					if($row['recorder'] == 1) {
-						$mp3 = 'https://piopiy.telecmi.com/v1/play?appid='.$appid.'&token='.$row['app_secret'].'&file='.$filename;
+						if($row['channel'] =='international_softphone'){
+							$mp3 = 'https://rest.telecmi.com/v2/play?appid='.$appid.'&secret='.$row['app_secret'].'&file='.$filename;
+						}else{
+							$mp3 = 'https://piopiy.telecmi.com/v1/play?appid='.$appid.'&token='.$row['app_secret'].'&file='.$filename;
+						}
 						//file_put_contents($_SERVER['DOCUMENT_ROOT']."/perfex_crm/uploads/recordings/".$filename, fopen($mp3, 'r'));
 						//if(file_exists($mp3)){
 							file_put_contents($_SERVER['DOCUMENT_ROOT']."/uploads/recordings/".$filename, fopen($mp3, 'r'));
