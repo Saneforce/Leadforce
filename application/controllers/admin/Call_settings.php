@@ -382,7 +382,7 @@ class Call_settings extends AdminController
         $result['webhook'] = $appDetails->webhook;
         $result['agent_no'] = $staff->phone;
         $result['status'] = 'success';
-        if($appDetails->channel =='international_softphone'){
+        if($appDetails->channel =='international_softphone' || $appDetails->channel =='national_softphone'){
             $result['password'] =$staff->password;
         }
         

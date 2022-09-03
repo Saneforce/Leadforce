@@ -1568,12 +1568,19 @@ function callfromperson(contact, phone) {
                             success: function(msg){
 								<?php if(CALL_SOURCE_FROM =='telecmi'){?>
                                 if(msg.status == 'success') {
-                                    if(msg.channel =='international_softphone'){
+                                    if(msg.channel =='international_softphone' || msg.channel =='national_softphone'){
                                         var to1 = msg.contact_no;
                                         var agent1 = msg.agent_id;
+
+                                        if(msg.channel =='national_softphone'){
+                                            var url1 = 'https://rest.telecmi.com/v2/ind/click2call';
+                                        }else{
+                                            var url1 = 'https://rest.telecmi.com/v2/click2call';
+                                        }
+
                                         $.ajax({
                                             type: "POST",
-                                            url: 'https://rest.telecmi.com/v2/click2call',
+                                            url: url1,
                                             contentType: "application/json",
                                             data: JSON.stringify({
                                                 token: telecmi_get_agent_token(msg.agent_id,msg.password),
@@ -1606,6 +1613,11 @@ function callfromperson(contact, phone) {
                                                             }
                                                         }
                                                     });
+                                                }else{
+                                                    alert_float('warning', res.message);
+                                                    setTimeout(function(){
+                                                        window.location.reload();
+                                                    },1000);
                                                 }
                                             }
                                         });
@@ -1772,8 +1784,13 @@ function callfromdeal(contact, deal, contact_no, ftype) {
                 if(msg.status == 'success') {
                     var to1 = msg.contact_no;
                     var agent1 = msg.agent_id;
-                    if(msg.channel =='international_softphone'){
-                        var url1 = 'https://rest.telecmi.com/v2/click2call';
+                    if(msg.channel =='international_softphone' || msg.channel =='national_softphone'){
+                        if(msg.channel =='national_softphone'){
+                            var url1 = 'https://rest.telecmi.com/v2/ind/click2call';
+                        }else{
+                            var url1 = 'https://rest.telecmi.com/v2/click2call';
+                        }
+                        
                         //$('.followers-div').show();
                         $.ajax({
                             type: "POST",
@@ -1887,7 +1904,7 @@ function tele_delete_agent_db(id,channel) {
 			//console.log(msg);
 			//alert(msg.status);
 			if(msg.status) {
-                if(channel =='international_softphone'){
+                if(channel =='international_softphone' || msg.channel =='national_softphone'){
                     var url2 ='https://rest.telecmi.com/v2/user/remove';
                 }else{
 				    var url2 = 'https://piopiy.telecmi.com/v1/agent/remove';
@@ -3325,7 +3342,7 @@ $(document).ready(function(){
 
         if(appid) {
 
-            if(channel =='international_softphone'){
+            if(channel =='international_softphone' || channel =='national_softphone'){
                 $.ajax({
                     type: "POST",
                     url: 'https://rest.telecmi.com/v2/user/add',
@@ -3586,7 +3603,7 @@ var validate = 0;
             return false;
         }
         if(appid) {
-            if(channel =='international_softphone'){
+            if(channel =='international_softphone' || channel =='national_softphone'){
                 $('#editAgent').attr('disabled','disabled');
                 var url = 'https://rest.telecmi.com/v2/user/update';
                 //$('.followers-div').show();

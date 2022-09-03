@@ -827,7 +827,9 @@ exit;
 		file_put_contents("test1.txt",'fsd');
 		$this->db2 = $this->load->database($this->dynamicDB, TRUE); 
 		if($post) {
-			
+			if($post['direction'] =='inbound' && $post['status'] !='answered'){
+				return;
+			}
 			//APP Credentials
 			$this->db2->select('*');
 			$this->db2->from('tblcall_settings');
@@ -860,7 +862,7 @@ exit;
 				$query = $this->db2->get();
 				if ( $query->num_rows() > 0 ) {
 					if($row['recorder'] == 1) {
-						if($row['channel'] =='international_softphone'){
+						if($row['channel'] =='international_softphone' || $row['channel'] =='national_softphone'){
 							$mp3 = 'https://rest.telecmi.com/v2/play?appid='.$appid.'&secret='.$row['app_secret'].'&file='.$filename;
 						}else{
 							$mp3 = 'https://piopiy.telecmi.com/v1/play?appid='.$appid.'&token='.$row['app_secret'].'&file='.$filename;

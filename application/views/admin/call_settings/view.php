@@ -42,8 +42,8 @@ if(empty($callsettings) || $callsettings->enable_call == '0') {
 			<label for="telecmi_channel" class="control-label">Channel</label>
 			<select name="telecmi_channel" id="telecmi_channel" class="form-control selectpicker">
 				<option value="" >Select Channel</option>
-				<option value="national" <?php if($callsettings->source_from =="telecmi" && $callsettings->channel=="national"){ echo 'selected';}?>>National</option>
-				<option value="national_softphone" <?php if($callsettings->source_from =="telecmi" && $callsettings->channel=="national_softphone"){ echo 'selected';}?>>National (Virtual Business Phone System)</option>
+				<option value="national" <?php if($callsettings->source_from =="telecmi" && $callsettings->channel=="national"){ echo 'selected';}?>>Indian</option>
+				<option value="national_softphone" <?php if($callsettings->source_from =="telecmi" && $callsettings->channel=="national_softphone"){ echo 'selected';}?>>Indian (Virtual Business Phone System)</option>
 				<option value="international_softphone" <?php if($callsettings->source_from =="telecmi" && $callsettings->channel=="international_softphone"){ echo 'selected';}?>>International (Virtual Business Phone System)</option>
 			</select>
 		</div>
