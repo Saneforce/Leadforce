@@ -101,6 +101,22 @@ class Misc extends AdminController
             die;
         }
     }
+	public function get_project_data()
+    {
+        if ($this->input->post()) {
+            $type = $this->input->post('type');
+            $data = get_project_data($type);
+            if ($this->input->post('rel_id')) {
+                $rel_id = $this->input->post('rel_id');
+            } else {
+                $rel_id = '';
+            }
+            
+            $relOptions = init_relation_options($data, $type, $rel_id);
+            echo json_encode($relOptions);
+            die;
+        }
+    }
 
     public function delete_sale_activity($id)
     {

@@ -259,7 +259,6 @@ function change_3_filter(a){
 	var cur_val = $('#start_date_edit_'+req_val).val();
 	var check_search = $('#check_search_id').val();
 	var cur_id12 = $('#cur_id12').val();
-		//$('.dropdown-menu open').hide();
 		var data = {cur_val:cur_val,req_val:req_val,cur_id12:cur_id12};
 		var ajaxRequest = $.ajax({
 			type: 'POST',
@@ -281,7 +280,6 @@ function change_4_filter(a){
 	var cur_val = $('#start_date_edit_'+req_val).val();
 	var check_search = $('#check_search_id').val();
 	var cur_id12 = $('#cur_id12').val();
-		//$('.dropdown-menu open').hide();
 		var data = {cur_val:cur_val,req_val:req_val,cur_id12:cur_id12};
 		var ajaxRequest = $.ajax({
 			type: 'POST',
@@ -503,7 +501,24 @@ function check_name(a){
 function add_filter(){
 	document.getElementById('overlay_deal').style.display = '';
 	var cur_num = $('#cur_num').val();
+	var j = 0;
+	var c1 = '';
 	var cur_id12 = $('#cur_id12').val();
+	for(var i=1; i<=cur_num;i++){
+		c1 = $('#year_'+i).val();
+		var data = {num_val:j,cur_id12:cur_id12,req_val:c1};
+		var ajaxRequest = $.ajax({
+			type: 'POST',
+			url: admin_url + 'reports/save_2_filter',
+			data: data,
+			dataType: '',
+			success: function(msg) {
+				
+			},
+		});
+		j++;
+	}
+	
 	var c_filter_val1 = parseInt($('#c_filter_val1').val())+1;
 	$('#c_filter_val1').val(c_filter_val1);
 	$('#ch_1_filter1').html(c_filter_val1);
@@ -521,9 +536,7 @@ function add_filter(){
 			 for(var i=1; i<=cur_num;i++){
 				  $('#year_'+i+' option').attr('selected', false);
 				 $('#year_'+i).selectpicker('refresh');
-				 //$('#filter_option_'+i+' option').attr('selected', false);
 				 $('#filter_option_'+i).selectpicker('refresh');
-				 //$('#filter_'+i+' option').attr('selected', false);
 				 $('#filter_'+i).selectpicker('refresh');
 				 $('#end_date_edit_'+i).datepicker({
 					 dateFormat:'dd-mm-yy',
@@ -553,12 +566,15 @@ function add_filter(){
 				appDatepicker();
 				var a1 = 'filter_'+i;
 				var b1 = $('#filter_'+i).val();
+				
 				change_filter1(a1,b1);
+				
 				document.getElementById('overlay_deal').style.display = 'none';
 			 }
-		}
+			 
+					 
+		},
 	});
-	
 }
 function del_filter(a){
 	document.getElementById('overlay_deal').style.display = '';
@@ -580,18 +596,7 @@ function check_filter(a){
 	var cur_id = a.id;
 	var req_val = cur_id.split("filter_option_");
 	req_val = req_val[1];
-	/*$('#2_'+req_val+"_filter").show();
-	$('#3_'+req_val+"_filter").show();
-	$('#4_'+req_val+"_filter").show();
-	$("#start_date_edit_"+req_val).show();
-	$("#end_date_edit_"+req_val).show();
-	if(a.value=='is_empty' || a.value=='is_not_empty'){
-		$('#2_'+req_val+"_filter").hide();
-		$('#3_'+req_val+"_filter").hide();
-		$('#4_'+req_val+"_filter").hide();
-		$("#start_date_edit_"+req_val).hide();
-		$("#end_date_edit_"+req_val).hide();
-	}*/
+	
 	var cur_id12 = $('#cur_id12').val();
 	var data = {cur_val:a.value,req_val:req_val,cur_id12:cur_id12};
 	var ajaxRequest = $.ajax({
@@ -696,7 +701,10 @@ function change_filter1(a,b){
 			 });
 			$('#filter_option_'+req_val).selectpicker('refresh');
 			if(cur_val=='name'){
-				init_ajax_search('project', '#year_'+req_val+'.ajax-search');
+				project_ajax_search('project', '#year_'+req_val+'.ajax-search');
+			}
+			if(cur_val=='tags'){
+				init_ajax_search('tags', '#year_'+req_val+'.ajax-search');
 			}
 			if(cur_val=='company'){
 				init_ajax_search('customer', '#year_'+req_val+'.ajax-search');

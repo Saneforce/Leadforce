@@ -14,11 +14,6 @@ class Pipeline_model extends App_Model
 **/
 	public function getPipeline()
     {
-        // if (!is_admin()) {
-        //     $get_staff_user_id = get_staff_user_id();
-        //     $this->db->where('( find_in_set("'.$get_staff_user_id.'", teammembers) OR find_in_set("'.$get_staff_user_id.'", teamleader) )');
-        //     // $this->db->where(' <> 0');
-        // }
 		$fields = get_option('deal_fields');
 		$need_fields = array();
 		if(!empty($fields) && $fields != 'null'){
@@ -47,8 +42,11 @@ class Pipeline_model extends App_Model
 		$this->db->where('id', $id);
         return $this->db->get(db_prefix() . 'pipeline')->result_array();
     }
-	
-	
+	public function getpipelinebyIdInarray($ids)
+    {
+		$this->db->where_in('id', $ids);
+        return $this->db->get(db_prefix() . 'pipeline')->result_array();
+    }
 /**
  * Check pipeline details exist by name
 **/
@@ -57,7 +55,6 @@ class Pipeline_model extends App_Model
 		$this->db->where('LOWER(name)', strtolower($name));
         return $this->db->get(db_prefix() . 'pipeline')->row();
     }
-	
 /**
  * View existing pipeline details
 **/
@@ -66,7 +63,6 @@ class Pipeline_model extends App_Model
 		$this->db->where('id', $id);
         return $this->db->get(db_prefix() . 'pipeline')->row();
     }
-	
 /** 
  * Add new pipeline details
 **/
@@ -81,7 +77,6 @@ class Pipeline_model extends App_Model
         }
         return $insert_id;
     }
-
 /**
  * Update existing pipeline details
 **/
@@ -97,7 +92,6 @@ class Pipeline_model extends App_Model
         }
         return false;
     }
-	
 /**
  * Get lead status name
 **/
@@ -108,7 +102,6 @@ class Pipeline_model extends App_Model
         $this->db->order_by("statusorder", "asc");
         return $this->db->get(db_prefix() . 'projects_status')->row();
     }
-	
 /**
  * Get Pipeline Client Details
 **/
@@ -165,7 +158,6 @@ class Pipeline_model extends App_Model
             }
         }
     }
-	
 /**
  * Get leads
 **/
@@ -185,12 +177,8 @@ class Pipeline_model extends App_Model
         $this->db->where_in('id', explode(',',$pipelindetails->status));
         $this->db->order_by("statusorder", "asc");
 		$statuses = $this->db->get(db_prefix() . 'projects_status')->result_array();
-		
-
         return $statuses;
-    }
-	
-	
+    }	
 /**
  * Get Pipeline lead status
 **/
@@ -207,7 +195,6 @@ class Pipeline_model extends App_Model
 
         return $statuses;
     }
-	
 /**
  * Team leaders
 **/
@@ -219,7 +206,6 @@ class Pipeline_model extends App_Model
 		$this->db->select('staffid as id,CONCAT(firstname," ",lastname) as name');
         return $this->db->get(db_prefix() . 'staff')->result_array();
     }
-	
 /**
  * Specific Team leaders Details
 **/
@@ -232,7 +218,6 @@ class Pipeline_model extends App_Model
 		$this->db->select('staffid as id,CONCAT(firstname," ",lastname) as name');
         return $this->db->get(db_prefix() . 'staff')->row_array();
     }
-	
 /**
  * Team Members
 **/
@@ -244,7 +229,6 @@ class Pipeline_model extends App_Model
 		$this->db->select('staffid as id,CONCAT(firstname," ",lastname) as name');
 		return $this->db->get(db_prefix() . 'staff')->result_array();
     }
-	
 /**
  * Specific Team Members Details
 **/
@@ -256,41 +240,23 @@ class Pipeline_model extends App_Model
 		$this->db->select('staffid as id,CONCAT(firstname," ",lastname) as name');
 		return $this->db->get(db_prefix() . 'staff')->row_array();
     }
-	
 /**
  * Get Pipeline Team Members
 **/
 	public function getPipelineTeammembers($pipeline)
     {
-		//$this->db->where('id', $pipeline);
-        //$pipelindetails = $this->db->get(db_prefix() . 'pipeline')->row();
-		//$staffids = array('1');
-        //$staffids = array_merge($staffids,explode(',',$pipelindetails->teammembers));
-        //$staffids = array_merge($staffids,explode(',',$pipelindetails->teamleader));
         $this->db->where('active', '1');
         $this->db->where('action_for', 'Active');
-        //$this->db->where_in('staffid', $staffids);
-		//$this->db->where_in('role', array('2','3'));
 		$this->db->select('*,staffid as id,CONCAT(firstname," ",lastname) as name');
 		return $this->db->get(db_prefix() . 'staff')->result_array();
     }
-
     public function getPipelineFilterTeammembers($pipeline)
     {
-		// $this->db->where('id', $pipeline);
-        // $pipelindetails = $this->db->get(db_prefix() . 'pipeline')->row();
-		// $staffids = array('1');
-        // $staffids = array_merge($staffids,explode(',',$pipelindetails->teammembers));
-        // $staffids = array_merge($staffids,explode(',',$pipelindetails->teamleader));
         $this->db->where('active', '1');
         $this->db->where('action_for', 'Active');
-        // $this->db->where_in('staffid', $staffids);
-		// $this->db->where_in('role', array('2','3'));
 		$this->db->select('*,staffid as staff_id,CONCAT(firstname," ",lastname) as name');
 		return $this->db->get(db_prefix() . 'staff')->result_array();
     }
-	
-	
 /**
  * Get Pipeline Team Members
 **/
@@ -299,30 +265,20 @@ class Pipeline_model extends App_Model
 		
         $this->db->where('active', '1');
         $this->db->where('action_for', 'Active');
-        //$this->db->where_in('reporting_to', $teammembers);
-		//$this->db->where_in('role', array('3'));
 		$this->db->select('*,staffid as id,CONCAT(firstname," ",lastname) as name');
 		return $this->db->get(db_prefix() . 'staff')->result_array();
     }
-	
 /**
  * Get Pipeline Team Leaders
 **/
 	public function getPipelineTeamleaders($pipeline)
     {
-		// $this->db->where('id', $pipeline);
-        // $pipelindetails = $this->db->get(db_prefix() . 'pipeline')->row();
-        // $staffids = array('1');
-        // $staffids = array_merge($staffids,explode(',',$pipelindetails->teammembers));
-        // $staffids = array_merge($staffids,explode(',',$pipelindetails->teamleader));
+		
         $this->db->where('active', '1');
         $this->db->where('action_for', 'Active');
-		// $this->db->where_in('staffid', $staffids);
-		// $this->db->where_in('role', array('2','1','3'));
 		$this->db->select('*,staffid as id,CONCAT(firstname," ",lastname) as name');
 		return $this->db->get(db_prefix() . 'staff')->result_array();
     }
-	
 /**
  * Get Logged User Details
 **/
@@ -332,7 +288,6 @@ class Pipeline_model extends App_Model
 		$this->db->where('staffid', $staffid);
         return $this->db->get(db_prefix() . 'staff')->row();
     }
-	
 /**
  * Get Specific Team Leader Pipelines
 **/
@@ -343,7 +298,6 @@ class Pipeline_model extends App_Model
 		
         return $this->db->get(db_prefix() . 'pipeline')->result_array();
     }
-	
 /**
  * Get Team Member Pipelines
 **/
@@ -354,7 +308,6 @@ class Pipeline_model extends App_Model
 		$this->db->where('publishstatus', '1');
         return $this->db->get(db_prefix() . 'pipeline')->result_array();
     }
-
     /**
  * Get Pipeline Team Members
 **/
@@ -362,67 +315,49 @@ class Pipeline_model extends App_Model
     {
         return $this->db->query('SELECT *, staff_id as id, CONCAT(firstname," ",lastname) as name, firstname, lastname FROM ' . db_prefix() . 'project_members JOIN ' . db_prefix() . 'staff ON ' . db_prefix() . 'staff.staffid=' . db_prefix() . 'project_members.staff_id GROUP by staff_id order by firstname ASC')->result_array();
     }
-
 /**
  * Get Team Members Except Owner
 **/
     public function getTeammembersexceptowner($teammember,$pipeline)
     {
-       
-        // $this->db->where('id', $pipeline);
-        // $pipelindetails = $this->db->get(db_prefix() . 'pipeline')->row();
-        // if($teammember != 1) {
-        //     $staffids = array('1');
-        // } else {
-        //     $staffids = array();
-        // }
-		
-        // $staffids = array_merge($staffids,explode(',',$pipelindetails->teammembers));
-        // $staffids = array_merge($staffids,explode(',',$pipelindetails->teamleader));
-        // if (($key = array_search($teammember, $staffids)) !== FALSE) {
-        //     unset($staffids[$key]);
-        // }
         $this->db->where('active', '1');
         $this->db->where('action_for', 'Active');
         $this->db->where('staffid !=', $teammember);
-        // $this->db->where_in('staffid', $staffids);
-		// $this->db->where_in('role', array('2','1','3'));
 		$this->db->select('*,staffid as id,CONCAT(firstname," ",lastname) as name');
         return $this->db->get(db_prefix() . 'staff')->result_array();
         
     }
+	public function getpipelinedealstatus($id)
+	{
+		$this->db->where('pipeline_id', $id);
+		$deals = $this->db->get(db_prefix() . 'projects')->result_array();
+		$data = array();
+		$cnt = count($deals);
+		$this->db->where('id', $id);
+		$pipeline_name = $this->db->get(db_prefix() . 'pipeline')->row();
+		$data['name'] = $pipeline_name->name;
+		if($cnt > 0) {
+			$data['count'] = $cnt;
+			$this->db->where('id !=', $id);
+			$html = '';
+			$pipelines = $this->db->get(db_prefix() . 'pipeline')->result_array();
+			foreach($pipelines as $val) {
+				$html .= '<option value="'.$val['id'].'">'.$val['name'].'</option>';
+			}
+			$data['pipelines'] = $html;
 
-public function getpipelinedealstatus($id)
-{
-    $this->db->where('pipeline_id', $id);
-    $deals = $this->db->get(db_prefix() . 'projects')->result_array();
-    $data = array();
-    $cnt = count($deals);
-    $this->db->where('id', $id);
-    $pipeline_name = $this->db->get(db_prefix() . 'pipeline')->row();
-    $data['name'] = $pipeline_name->name;
-    if($cnt > 0) {
-        $data['count'] = $cnt;
-        $this->db->where('id !=', $id);
-        $html = '';
-        $pipelines = $this->db->get(db_prefix() . 'pipeline')->result_array();
-        foreach($pipelines as $val) {
-            $html .= '<option value="'.$val['id'].'">'.$val['name'].'</option>';
-        }
-        $data['pipelines'] = $html;
-
-        $this->db->where('id !=', $pipelines[0]['id']);
-        $projects_status = $this->db->get(db_prefix() . 'projects_status')->result_array();
-        $html1 = '';
-        foreach($projects_status as $val) {
-            $html1 .= '<option value="'.$val['id'].'">'.$val['name'].'</option>';
-        }
-        $data['projects_status'] = $html1;
-    } else {
-        $data['count'] = 0;
-    }
-    return $data;
-}
+			$this->db->where('id !=', $pipelines[0]['id']);
+			$projects_status = $this->db->get(db_prefix() . 'projects_status')->result_array();
+			$html1 = '';
+			foreach($projects_status as $val) {
+				$html1 .= '<option value="'.$val['id'].'">'.$val['name'].'</option>';
+			}
+			$data['projects_status'] = $html1;
+		} else {
+			$data['count'] = 0;
+		}
+		return $data;
+	}
 	public function get_pipeline_stage($stage)
     {
         $this->db->where_in('id', $stage);
@@ -435,4 +370,3 @@ public function getpipelinedealstatus($id)
         return $this->db->get(db_prefix() . 'pipeline')->result_array();
     }
 }
-

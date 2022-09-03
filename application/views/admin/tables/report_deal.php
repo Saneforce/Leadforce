@@ -26,7 +26,7 @@ $aColumns_temp = [
    'contact_phone1'=>'(SELECT ' . db_prefix() . 'contacts.phonenumber FROM ' . db_prefix() . 'project_contacts JOIN ' . db_prefix() . 'contacts on ' . db_prefix() . 'contacts.id = ' . db_prefix() . 'project_contacts.contacts_id WHERE ' . db_prefix() . 'project_contacts.project_id=p.id AND ' . db_prefix() . 'project_contacts.is_primary = 1) as contact_phone1',
     'won_date'=>'stage_on as won_date',
     'lost_date'=>'stage_on as lost_date',
-    'loss_reason_name'=>db_prefix() . 'deallossreasons.name as loss_reason_name',
+    'loss_reason_name'=>'(SELECT ' . db_prefix() . 'deallossreasons.name FROM ' . db_prefix() . 'deallossreasons  WHERE ' . db_prefix() . 'deallossreasons.id=p.loss_reason) as loss_reason_name',
     'project_currency'=>'project_currency',
     'project_created'=>'project_created',
     'project_modified'=>'project_modified',
@@ -62,9 +62,6 @@ if(!empty($req_filters)){
 	array_push($where, $req_filters);
 }
 
-if (!has_permission('projects', '', 'view') || $this->ci->input->post('my_projects')) {
-    array_push($where, ' AND p.id IN (SELECT project_id FROM ' . db_prefix() . 'project_members WHERE staff_id=' . get_staff_user_id() . ')');
-}
 
 $statusIds = $statusIds1 = [];
 
@@ -170,15 +167,7 @@ $gsearch = $_SESSION['gsearch'];
 if(!empty($gsearch)){
     array_push($where, ' AND p.id IN (SELECT id FROM ' . db_prefix() . 'projects WHERE name like "%' . $gsearch . '%")');
 }
-$my_staffids = $this->ci->staff_model->get_my_staffids();
-if ($_SESSION['member']) {
-    $memb = $_SESSION['member'];
-    array_push($where, ' AND (p.id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . $memb . ')) OR  p.teamleader in (' . $memb . ') )');
-} else {
-    if($my_staffids){
-        array_push($where, ' AND (p.id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')) OR  p.teamleader in (' . implode(',',$my_staffids) . ') )');
-    }
-}
+
 array_push($where, ' AND p.deleted_status = 0');
 
 $aColumns = hooks()->apply_filters('projects_table_sql_columns', $aColumns);
@@ -224,6 +213,7 @@ foreach ($rResult as $aRow) {
 		}
     }
     $row_temp['project_status'] = $stage_of;
+    $row_temp['loss_reason_name'] = $aRow['loss_reason_name'];
 	
 
     $name = $aRow['name'];

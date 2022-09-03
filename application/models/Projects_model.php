@@ -39,6 +39,18 @@ class Projects_model extends App_Model
     {
         return $this->get_project_statuses();
     }
+	public function get_status_array($id)
+    {
+		$this->db->where('id', $id);
+		$this->db->order_by("statusorder", "asc");
+        return $this->db->get(db_prefix() . 'projects_status')->result_array();
+    }
+	public function get_status_in_array($ids)
+    {
+		$this->db->where_in('id', $ids);
+		$this->db->order_by("statusorder", "asc");
+        return $this->db->get(db_prefix() . 'projects_status')->result_array();
+    }
     public function get_project_statuses($pipelines = 0)
     {
         $npstatus = array();

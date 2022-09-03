@@ -21,7 +21,7 @@ $aColumns_temp = [
    'contact_phone1'=>'(SELECT ' . db_prefix() . 'contacts.phonenumber FROM ' . db_prefix() . 'project_contacts JOIN ' . db_prefix() . 'contacts on ' . db_prefix() . 'contacts.id = ' . db_prefix() . 'project_contacts.contacts_id WHERE tblproject_contacts.project_id=' . db_prefix() . 'projects.id AND tblproject_contacts.is_primary = 1) as contact_phone1',
     'won_date'=>'stage_on as won_date',
     'lost_date'=>'stage_on as lost_date',
-    'loss_reason_name'=>db_prefix() . 'deallossreasons.name as loss_reason_name',
+    'loss_reason_name'=>'(SELECT ' . db_prefix() . 'deallossreasons.name FROM ' . db_prefix() . 'deallossreasons  WHERE ' . db_prefix() . 'deallossreasons.id=' . db_prefix() . 'projects.loss_reason) as loss_reason_name',
     'project_currency'=>'project_currency',
     'project_created'=>'project_created',
     'project_modified'=>'project_modified',
@@ -42,369 +42,14 @@ $join = [
 $where  = [];
 $filter = [];
 $w_have = '';
-if(!empty($filters))
-{
-	$i1 = 0;
-	$s_group_by = '';
-	foreach($filters as $filter12){
-		if($filter12 == 'project_start_date' ){
-			if($filters1[$i1]=='is'){
-				array_push($where, " AND " . db_prefix() . "projects.start_date >='".date('Y-m-d',strtotime($filters3[$i1]))."' AND " . db_prefix() . "projects.start_date <='".date('Y-m-d',strtotime($filters4[$i1]))."'");
-			}
-			else if($filters1[$i1]=='is_empty'){
-				array_push($where, " AND (" . db_prefix() . "projects.start_date ='' or " . db_prefix() . "projects.start_date='0000-00-00')");
-			}
-			else if($filters1[$i1]=='is_not_empty'){
-				array_push($where, " AND (" . db_prefix() . "projects.start_date !='' or " . db_prefix() . "projects.start_date !='0000-00-00') ");
-			}
-		}
-		if($filter12 == 'project_deadline' && $filters2[$i1]=='is'){
-			if($filters1[$i1]=='is'){
-				array_push($where, " AND " . db_prefix() . "projects.project_deadline >='".date('Y-m-d',strtotime($filters3[$i1]))."' AND " . db_prefix() . "projects.project_deadline <='".date('Y-m-d',strtotime($filters4[$i1]))."'");
-			}
-			else if($filters1[$i1]=='is_empty'){
-				array_push($where, " AND (" . db_prefix() . "projects.project_deadline ='' or " . db_prefix() . "projects.project_deadline='0000-00-00')");
-			}
-			else if($filters21[$i1]=='is_not_empty'){
-				array_push($where, " AND (" . db_prefix() . "projects.project_deadline !='' or " . db_prefix() . "projects.project_deadline !='0000-00-00') ");
-			}
-			
-		}
-		if($filter12 == 'name' ){
-			if($filters1[$i1]=='is'  && $filters2[$i1]!=''){
-				array_push($where, " AND " . db_prefix() . "projects.id like '".$filters2[$i1]."' ");
-			}
-			else if($filters1[$i1]=='is_empty'){
-				array_push($where, " AND " . db_prefix() . "projects.name ='' ");
-			}
-			else if($filters1[$i1]=='is_not_empty'){
-				array_push($where, " AND " . db_prefix() . "projects.name !=''  ");
-			}
-			else if($filters1[$i1]=='is_not'){
-				array_push($where, " AND " . db_prefix() . "projects.id !='".$filters2[$i1]."'  ");
-			}
-			else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!=''){
-				$req_arrs = explode(',',$filters2[$i1]);
-				$req_arr = '';
-				if(!empty($req_arrs)){
-					foreach($req_arrs as $req_arr1){
-						$req_arr .= "'".$req_arr1."',";
-					}
-				}
-				$req_arr = rtrim($req_arr,",");
-				array_push($where, " AND " . db_prefix() . "projects.id in(".$req_arr.")  ");
-			}
-		}
-		if($filter12 == 'project_cost' ){
-			if($filters1[$i1]=='is_more_than' && $filters2[$i1]!=''){
-				array_push($where, " AND " . db_prefix() . "projects.project_cost > '".$filters2[$i1]."' ");
-			}
-			else if($filters1[$i1]=='is_empty'){
-				array_push($where, " AND " . db_prefix() . "projects.project_cost ='' ");
-			}
-			else if($filters1[$i1]=='is_not_empty'){
-				array_push($where, " AND " . db_prefix() . "projects.project_cost !=''  ");
-			}
-			else if($filters1[$i1]=='is_less_than'  && $filters2[$i1]!=''){
-				array_push($where, " AND " . db_prefix() . "projects.project_cost < '".$filters2[$i1]."'  ");
-			}
-			
-		}
-		if($filter12 == 'teamleader_name' ){
-			if($filters1[$i1]=='is'  && $filters2[$i1]!=''){
-				array_push($where, " AND " . db_prefix() . "projects.teamleader like '".$filters2[$i1]."' ");
-			}
-			else if($filters1[$i1]=='is_empty'){
-				array_push($where, " AND " . db_prefix() . "projects.teamleader ='' ");
-			}
-			else if($filters1[$i1]=='is_not_empty'){
-				array_push($where, " AND " . db_prefix() . "projects.teamleader !=''  ");
-			}
-			else if($filters1[$i1]=='is_not'){
-				array_push($where, " AND " . db_prefix() . "projects.teamleader !='".$filters2[$i1]."'  ");
-			}
-			else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!=''){
-				$req_arrs = explode(',',$filters2[$i1]);
-				$req_arr = '';
-				if(!empty($req_arrs)){
-					foreach($req_arrs as $req_arr1){
-						$req_arr .= "'".$req_arr1."',";
-					}
-				}
-				$req_arr = rtrim($req_arr,",");
-				array_push($where, " AND " . db_prefix() . "projects.teamleader in(".$req_arr.")  ");
-			}
-		}
-		if($filter12 == 'product_qty' ){
-			if($filters1[$i1]=='is_more_than' && $filters2[$i1]!=''){
-				array_push($where, " AND " . db_prefix() . "projects.id in(SELECT projectid FROM ".db_prefix() ."project_products where quantity > '".$filters2[$i1]."') ");
-			}
-			else if($filters1[$i1]=='is_empty'){
-				array_push($where, " AND (" . db_prefix() . "projects.id in(SELECT projectid FROM ".db_prefix() ."project_products where quantity = '0' or quantity = '') or  " . db_prefix() . "projects.id not in(SELECT projectid FROM ".db_prefix() ."project_products where quantity > '0' ) )  ");
-			}
-			else if($filters1[$i1]=='is_not_empty'){
-				array_push($where, " AND " . db_prefix() . "projects.id in(SELECT projectid FROM ".db_prefix() ."project_products where  quantity !='0' and quantity != '') ");
-			}
-			else if($filters1[$i1]=='is_less_than'  && $filters2[$i1]!=''){
-				array_push($where, " AND " . db_prefix() . "projects.id in(SELECT projectid FROM ".db_prefix() ."project_products where  quantity < '".$filters2[$i1]."') ");
-			}
-		}
-		if($filter12 == 'product_amt' ){
-			if($filters1[$i1]=='is_more_than' && $filters2[$i1]!=''){
-				array_push($where, " AND " . db_prefix() . "projects.id in(SELECT projectid FROM ".db_prefix() ."project_products where sum(price) > '".$filters2[$i1]."' group by projectid) ");
-			}
-			else if($filters1[$i1]=='is_empty'){
-				array_push($where, " AND (" . db_prefix() . "projects.id in(SELECT projectid FROM ".db_prefix() ."project_products where sum(price) = '0' or sum(price) = '' group by projectid) or  " . db_prefix() . "projects.id not in(SELECT projectid FROM ".db_prefix() ."project_products where sum(price) > '0' ) )  ");
-				array_push($where, " AND (SELECT projectid FROM tblproject_products WHERE projectid = ' . db_prefix() . 'projects.id) ='0' group by projectid");
-			}
-			else if($filters1[$i1]=='is_not_empty'){
-				array_push($where, " AND " . db_prefix() . "projects.id in(SELECT projectid FROM ".db_prefix() ."project_products where sum(price) > '0' group by projectid) ");
-			}
-			else if($filters1[$i1]=='is_less_than'  && $filters2[$i1]!=''){
-				array_push($where, " AND " . db_prefix() . "projects.id in(SELECT projectid FROM ".db_prefix() ."project_products where sum(price) < '".$filters2[$i1]."' group by projectid) ");
-			}
-		}
-		if($filter12 == 'company' ){
-			if($filters1[$i1]=='is'  && $filters2[$i1]!=''){
-				array_push($where, " AND " . db_prefix() . "projects.clientid in(SELECT userid FROM ".db_prefix() ."clients where userid = '".$filters2[$i1]."' ) ");
-			}
-			else if($filters1[$i1]=='is_empty'){
-				array_push($where, " AND (" . db_prefix() . "projects.clientid ='0' or " . db_prefix() . "projects.clientid ='' ) ");
-			}
-			else if($filters1[$i1]=='is_not_empty'){
-				array_push($where, " AND (" . db_prefix() . "projects.clientid !='0' AND " . db_prefix() . "projects.clientid != '' ) ");
-			}
-			else if($filters1[$i1]=='is_not'){
-				array_push($where, " AND " . db_prefix() . "projects.clientid in(SELECT userid FROM ".db_prefix() ."clients where userid != '".$filters2[$i1]."' ) ");
-			}
-			else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!=''){
-				$req_arrs = explode(',',$filters2[$i1]);
-				$req_arr = '';
-				if(!empty($req_arrs)){
-					foreach($req_arrs as $req_arr1){
-						$req_arr .= "'".$req_arr1."',";
-					}
-				}
-				$req_arr = rtrim($req_arr,",");
-				array_push($where, " AND " . db_prefix() . "projects.clientid in(SELECT userid FROM ".db_prefix() ."clients where userid in(".$req_arr.") ) ");
-			}
-		}
-		if($filter12 == 'tags' ){
-			if($filters1[$i1]=='is'  && $filters2[$i1]!=''){
-				array_push($where, " AND " . db_prefix() . "projects.id in(SELECT rel_id FROM ".db_prefix() ."taggables where tag_id = '".$filters2[$i1]."' and rel_type = 'project' ) ");
-			}
-			else if($filters1[$i1]=='is_empty'){
-				array_push($where, " AND " . db_prefix() . "projects.id not in(SELECT rel_id FROM ".db_prefix() ."taggables where rel_type = 'project' ) ");
-			}
-			else if($filters1[$i1]=='is_not_empty'){
-				array_push($where, " AND " . db_prefix() . "projects.id in(SELECT rel_id FROM ".db_prefix() ."taggables where  rel_type = 'project' ) ");
-			}
-			else if($filters1[$i1]=='is_not'){
-				array_push($where, " AND " . db_prefix() . "projects.id in(SELECT rel_id FROM ".db_prefix() ."taggables where tag_id != '".$filters2[$i1]."' and rel_type = 'project' ) ");
-			}
-			else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!=''){
-				$req_arrs = explode(',',$filters2[$i1]);
-				$req_arr = '';
-				if(!empty($req_arrs)){
-					foreach($req_arrs as $req_arr1){
-						$req_arr .= "'".$req_arr1."',";
-					}
-				}
-				$req_arr = rtrim($req_arr,",");
-				array_push($where, " AND " . db_prefix() . "projects.id in(SELECT rel_id FROM ".db_prefix() ."taggables where tag_id in(".$req_arr.") and rel_type = 'project' ) ");
-			}
-		}
-		if($filter12 == 'members' ){
-			if($filters1[$i1]=='is'  && $filters2[$i1]!=''){
-				array_push($where, " AND " . db_prefix() . "projects.id in(SELECT project_id FROM ".db_prefix() ."project_members where staff_id = '".$filters2[$i1]."' ) ");
-			}
-			else if($filters1[$i1]=='is_empty'){
-				array_push($where, " AND " . db_prefix() . "projects.id not in(SELECT project_id FROM ".db_prefix() ."project_members  ) ");
-			}
-			else if($filters1[$i1]=='is_not_empty'){
-				array_push($where, " AND " . db_prefix() . "projects.id in(SELECT project_id FROM ".db_prefix() ."project_members  ) ");
-			}
-			else if($filters1[$i1]=='is_not'){
-				array_push($where, " AND " . db_prefix() . "projects.id in(SELECT project_id FROM ".db_prefix() ."project_members where staff_id != '".$filters2[$i1]."' ) ");
-			}
-			else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!=''){
-				$req_arrs = explode(',',$filters2[$i1]);
-				$req_arr = '';
-				if(!empty($req_arrs)){
-					foreach($req_arrs as $req_arr1){
-						$req_arr .= "'".$req_arr1."',";
-					}
-				}
-				$req_arr = rtrim($req_arr,",");
-				array_push($where, " AND " . db_prefix() . "projects.id in(SELECT project_id FROM ".db_prefix() ."project_members where staff_id in(".$req_arr.") ) ");
-			}
-		}
-		if($filter12 == 'status' ){
-			if($filters1[$i1]=='is'  && $filters2[$i1]!=''){
-				array_push($where, " AND " . db_prefix() . "projects.status in(SELECT id FROM ".db_prefix() ."projects_status where id = '".$filters2[$i1]."' ) ");
-			}
-			else if($filters1[$i1]=='is_empty'){
-				array_push($where, " AND " . db_prefix() . "projects.status not in(SELECT id FROM ".db_prefix() ."projects_status  ) ");
-			}
-			else if($filters1[$i1]=='is_not_empty'){
-				array_push($where, " AND " . db_prefix() . "projects.status in(SELECT id FROM ".db_prefix() ."projects_status  ) ");
-			}
-			else if($filters1[$i1]=='is_not'){
-				array_push($where, " AND " . db_prefix() . "projects.status in(SELECT id FROM ".db_prefix() ."projects_status where id != '".$filters2[$i1]."' ) ");
-			}
-			else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!=''){
-				$req_arrs = explode(',',$filters2[$i1]);
-				$req_arr = '';
-				if(!empty($req_arrs)){
-					foreach($req_arrs as $req_arr1){
-						$req_arr .= "'".$req_arr1."',";
-					}
-				}
-				$req_arr = rtrim($req_arr,",");
-				array_push($where, " AND " . db_prefix() . "projects.status in(SELECT id FROM ".db_prefix() ."projects_status where id in(".$req_arr.") ) ");
-			}
-		}
-		if($filter12 == 'pipeline_id' ){
-			if($filters1[$i1]=='is'  && $filters2[$i1]!=''){
-				array_push($where, " AND " . db_prefix() . "projects.pipeline_id = '".$filters2[$i1]."'");
-			}
-			else if($filters1[$i1]=='is_empty'){
-				array_push($where, " AND " . db_prefix() . "projects.pipeline_id ='' ");
-			}
-			else if($filters1[$i1]=='is_not_empty'){
-				array_push($where, " AND " . db_prefix() . "projects.pipeline_id !=''  ");
-			}
-			else if($filters1[$i1]=='is_not'){
-				array_push($where, " AND " . db_prefix() . "projects.pipeline_id !='".$filters2[$i1]."'  ");
-			}
-			else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!=''){
-				$req_arrs = explode(',',$filters2[$i1]);
-				$req_arr = '';
-				if(!empty($req_arrs)){
-					foreach($req_arrs as $req_arr1){
-						$req_arr .= "'".$req_arr1."',";
-					}
-				}
-				$req_arr = rtrim($req_arr,",");
-				array_push($where, " AND " . db_prefix() . "projects.pipeline_id in(".$req_arr.")  ");
-			}
-		}
-		if($filter12 == 'contact_email1' ){
-			if($filters1[$i1]=='is'  && $filters2[$i1]!=''){
-				array_push($where, " AND " . db_prefix() . "projects.id in(SELECT project_id FROM ".db_prefix() ."project_contacts where contacts_id = '".$filters2[$i1]."' and is_primary=1) ");
-			}
-			else if($filters1[$i1]=='is_empty'){
-				array_push($where, " AND " . db_prefix() . "projects.id not in(SELECT project_id FROM ".db_prefix() ."project_contacts  ) ");
-			}
-			else if($filters1[$i1]=='is_not_empty'){
-				array_push($where, " AND " . db_prefix() . "projects.id  in(SELECT project_id FROM ".db_prefix() ."project_contacts  and is_primary=1) ");
-			}
-			else if($filters1[$i1]=='is_not'){
-				array_push($where, " AND " . db_prefix() . "projects.id in(SELECT project_id FROM ".db_prefix() ."project_contacts where contacts_id != '".$filters2[$i1]."' and is_primary=1) ");
-			}
-			else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!=''){
-				$req_arrs = explode(',',$filters2[$i1]);
-				$req_arr = '';
-				if(!empty($req_arrs)){
-					foreach($req_arrs as $req_arr1){
-						$req_arr .= "'".$req_arr1."',";
-					}
-				}
-				$req_arr = rtrim($req_arr,",");
-				array_push($where, " AND " . db_prefix() . "projects.id in(SELECT project_id FROM ".db_prefix() ."project_contacts where contacts_id in(".$req_arr.") and is_primary=1) ");
-			}
-		}
-		if($filter12 == 'contact_name' ){
-			if($filters1[$i1]=='is'  && $filters2[$i1]!=''){
-				array_push($where, " AND " . db_prefix() . "projects.id in(SELECT project_id FROM ".db_prefix() ."project_contacts where contacts_id = '".$filters2[$i1]."' and is_primary =1 ) ");
-			}
-			else if($filters1[$i1]=='is_empty'){
-				array_push($where, " AND " . db_prefix() . "projects.id not in(SELECT project_id FROM ".db_prefix() ."project_contacts  ) ");
-			}
-			else if($filters1[$i1]=='is_not_empty'){
-				array_push($where, " AND " . db_prefix() . "projects.id  in(SELECT project_id FROM ".db_prefix() ."project_contacts  and is_primary = 1) ");
-			}
-			else if($filters1[$i1]=='is_not'){
-				array_push($where, " AND " . db_prefix() . "projects.id in(SELECT project_id FROM ".db_prefix() ."project_contacts where contacts_id != '".$filters2[$i1]."' and is_primary=1) ");
-			}
-			else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!=''){
-				$req_arrs = explode(',',$filters2[$i1]);
-				$req_arr = '';
-				if(!empty($req_arrs)){
-					foreach($req_arrs as $req_arr1){
-						$req_arr .= "'".$req_arr1."',";
-					}
-				}
-				$req_arr = rtrim($req_arr,",");
-				array_push($where, " AND " . db_prefix() . "projects.id in(SELECT project_id FROM ".db_prefix() ."project_contacts where contacts_id in(".$req_arr.") and is_primary=1) ");
-			}
-		}
-		if($filter12 == 'project_status' ){
-			if($filters1[$i1]=='is'  && $filters2[$i1]!=''){
-				if($filters2[$i1] == 'WON'){
-					array_push($where, " AND " . db_prefix() . "projects.stage_of = '1'");
-				}
-				if($filters2[$i1] == 'LOSS'){
-					array_push($where, " AND " . db_prefix() . "projects.stage_of != '1'");
-				}
-			}
-			
-			else if($filters1[$i1]=='is_not'){
-				if($filters2[$i1] == 'WON'){
-					array_push($where, " AND " . db_prefix() . "projects.stage_of != '1'");
-				}
-				if($filters2[$i1] == 'LOSS'){
-					array_push($where, " AND " . db_prefix() . "projects.stage_of = '1'");
-				}
-			}
-			else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!=''){
-				$req_arrs = explode(',',$filters2[$i1]);
-				$req_arr = '';
-				if(!empty($req_arrs)){
-					foreach($req_arrs as $req_arr1){
-						if($filters2[$i1] == 'WON'){
-							$req_arr .= "'1',";
-						}
-						if($filters2[$i1] == 'Loss'){
-							$req_arr .= "'2',";
-							$req_arr .= "'0',";
-						}
-					}
-				}
-				$req_arr = rtrim($req_arr,",");
-				array_push($where, " AND " . db_prefix() . "projects.stage_of in(".$req_arr.")  ");
-			}
-		}
-		if($filter12 == 'contact_phone1' ){
-			if($filters1[$i1]=='is'  && $filters2[$i1]!=''){
-				array_push($where, " AND " . db_prefix() . "projects.id in(SELECT project_id FROM ".db_prefix() ."project_contacts where contacts_id = '".$filters2[$i1]."' and is_primary=1) ");
-			}
-			else if($filters1[$i1]=='is_empty'){
-				array_push($where, " AND " . db_prefix() . "projects.id not in(SELECT project_id FROM ".db_prefix() ."project_contacts  ) ");
-			}
-			else if($filters1[$i1]=='is_not_empty'){
-				array_push($where, " AND " . db_prefix() . "projects.id  in(SELECT project_id FROM ".db_prefix() ."project_contacts  and is_primary=1) ");
-			}
-			else if($filters1[$i1]=='is_not'){
-				array_push($where, " AND " . db_prefix() . "projects.id in(SELECT project_id FROM ".db_prefix() ."project_contacts where contacts_id != '".$filters2[$i1]."' and is_primary=1) ");
-			}
-			else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!=''){
-				$req_arrs = explode(',',$filters2[$i1]);
-				$req_arr = '';
-				if(!empty($req_arrs)){
-					foreach($req_arrs as $req_arr1){
-						$req_arr .= "'".$req_arr1."',";
-					}
-				}
-				$req_arr = rtrim($req_arr,",");
-				array_push($where, " AND " . db_prefix() . "projects.id in(SELECT project_id FROM ".db_prefix() ."project_contacts where contacts_id in(".$req_arr.") and is_primary=1) ");
-			}
-		}
-		$i1++;
-		
-	}
-}
+$where  = [];
+$filter = [];
+$w_have = '';
 
+$req_filters = get_flters($req_deals,'deal');
+if(!empty($req_filters)){
+	array_push($where, $req_filters);
+}
 
 $statusIds = $statusIds1 = [];
 
@@ -452,7 +97,6 @@ if (count($filter) > 0) {
 $custom_fields = get_table_custom_fields('projects');
 $req_fields = array_column($custom_fields, 'slug'); 
 $req_cnt = count($req_fields);
-//$req_fields[$req_cnt + 1] = 'id';
 $req_fields[$req_cnt + 1] = 'name';
 $req_fields[$req_cnt + 2] = 'teamleader_name';
 $req_fields[$req_cnt + 3] ='contact_name';
@@ -539,9 +183,21 @@ foreach ($rResult as $aRow) {
     $row = [];
 
     $stage_of = '';
+    $row_temp['won_date']   = $row_temp['lost_date'] = '';
     if($aRow['project_status']) {
-        $stage_of = (($aRow['project_status'] == 1)?'WON':'LOSS');
+		if($aRow['project_status'] == 1){
+			$stage_of = 'WON';
+			$row_temp['won_date']   = _d($aRow['won_date']);
+		}
+		if($aRow['project_status'] == 2){
+			$stage_of = 'LOST';
+			$row_temp['lost_date']   = _d($aRow['lost_date']);
+		}
+		if($aRow['project_status'] == 0){
+			$stage_of = 'OPEN';
+		}
     }
+    $row_temp['loss_reason_name'] = $aRow['loss_reason_name'];
     $row_temp['project_status'] = $stage_of;
     $name =  $aRow['name'] ;
     $row_temp['name'] = $name;

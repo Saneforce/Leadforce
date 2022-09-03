@@ -129,6 +129,7 @@ function get_available_staff_permissions($data = [])
             'name'         => _l('reports'),
             'capabilities' => [
                 'view' => $viewGlobalName,
+                'create' => _l('permission_create'),
             ],
         ],
         'roles' => [

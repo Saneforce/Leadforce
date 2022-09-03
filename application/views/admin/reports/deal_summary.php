@@ -25,6 +25,7 @@ foreach($custom_fields as $cfkey=>$cfval){
 <div class="row">
 	<div class="col-md-12 m-bt-10">
 		<?php echo form_open(admin_url('reports/summary'),array('id'=>'deal_summary','method'=>'post')); ?>
+			<input type="hidden" value="<?php echo $id;?>" name="summary_edit">
 			<div class="col-md-1 mar-11">
 					<label><?php echo _l('view_by');?></label>
 					<input type="hidden" name="view_type" id="view_type12" value="<?php echo $summary['view_type'];?>">

@@ -34,21 +34,40 @@ class Shared extends App_Controller
     }
 	public function deal_edit_table($id = '')
     {
+		$this->load->helper('report_summary');
 		$filters = $this->db->query("SELECT filter_1,filter_2,filter_3,filter_4,filter_5 FROM " . db_prefix() . "report_filter where report_id = '".$id."'")->result_array();
 		if(!empty($filters)){
 			$i = 0;
 			foreach($filters as $filter12){
-				$data['filters'][$i]	=	$filter12['filter_1'];
-				$data['filters1'][$i]	=	$filter12['filter_2'];
-				$data['filters2'][$i]	=	$filter12['filter_3'];
-				$data['filters3'][$i]	=	$filter12['filter_4'];
-				$data['filters4'][$i]	=	$filter12['filter_5'];
+				$data['req_deals']['filters'][$i]	=	$filter12['filter_1'];
+				$data['req_deals']['filters1'][$i]	=	$filter12['filter_2'];
+				$data['req_deals']['filters2'][$i]	=	$filter12['filter_3'];
+				$data['req_deals']['filters3'][$i]	=	$filter12['filter_4'];
+				$data['req_deals']['filters4'][$i]	=	$filter12['filter_5'];
+				$i++;
+			}
+		}
+		$fields = deal_needed_fields();
+		$needed = array();
+		if(!empty($fields) && $fields != 'null'){
+			$needed = json_decode($fields,true);
+		}
+		$custom_fields = get_table_custom_fields('projects');
+		$customs = array_column($custom_fields, 'slug');
+		if(!empty($filters)){
+			$i = 0;
+			foreach($filters as $filter1){
+				if ((!empty($needed['need_fields']) && !in_array($filter1, $needed['need_fields'])) && (!in_array($filter1, $customs)) ){
+					unset($data['filters'][$i]);
+					unset($data['filters1'][$i]);
+					unset($data['filters2'][$i]);
+					unset($data['filters3'][$i]);
+					unset($data['filters4'][$i]);
+				}
 				$i++;
 			}
 		}
 		$data['id'] = $id;
-		$fields = deal_needed_fields();
-		$needed = json_decode($fields,true);
 		if (($key = array_search('id', $needed['need_fields'])) !== false) {
 			unset($needed['need_fields'][$key]);
 		}
