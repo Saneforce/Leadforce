@@ -842,6 +842,12 @@ exit;
 					return ;
 				}
 				// create activity for incoming call
+				$this->db2->where('agent_id',$post['user']);
+				$addedfrom =0;
+				$agent =$this->db2->get(db_prefix().'agents')->row();
+				if($agent){
+					$addedfrom =$agent->staff_id;
+				}
 				$task_details =array(
 					'req' => $post['cmiuuid'],
 					'code' => '200',
@@ -851,6 +857,7 @@ exit;
 					'contact_id' => $contact->id,
 					'to' => $post['from'],
 					'agent' => $post['user'],
+					'addedfrom' => $addedfrom
 				);
 				$result = $this->callsettings_model->addtask($task_details);
 			}

@@ -166,7 +166,12 @@ class Callsettings_model extends App_Model {
         $data['startdate']             = $startdate;
         $data['dateadded']             = $startdate;
         //$data['datefinished']             = $startdate;
-        $data['addedfrom']             = get_staff_user_id();
+        if(isset($post['addedfrom'])){
+            $data['addedfrom']             = $post['addedfrom'];
+        }else{
+            $data['addedfrom']             = get_staff_user_id();
+        }
+        
         $data['is_added_from_contact'] = 0;
         
 		$data['status'] = 3;
