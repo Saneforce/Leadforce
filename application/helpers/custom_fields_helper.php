@@ -1708,52 +1708,107 @@ function clicktocall_create() {
             success: function(msg){
 				<?php if(CALL_SOURCE_FROM =='telecmi'){?>
                 if(msg.status == 'success') {
-                    var to = msg.contact_no;
-                    var agent = msg.agent_id;
-                    var url1 = 'https://piopiy.telecmi.com/v1/adminConnect';
-                    //$('.followers-div').show();
-                    $.ajax({
-                        type: "POST",
-                        url: url1,
-                        contentType: "application/json",
-                        data: JSON.stringify({
-                            agent_id:msg.agent_id,
-                            token:msg.app_secret,
-                            to:msg.contact_no,
-                            custom:''
-                        }),
-                        dataType: 'json',
-                        async: false,
-                        success: function(res){
-                            console.log(res);
-                            if(res.code == '200') {
-                                var request = res.request_id;
-                                var msg = res.msg;
-                                var code = res.code;
-                                var url2 =  admin_url+'call_settings/createActivity';
-                                $.ajax({
-                                    type: "POST",
-                                    url: url2,
-                                    data: {req:request,msg:msg,code:code,deal_id:deal,contact_id:contact,type:ftype,agent:agent,to:to},
-                                    dataType: 'json',
-                                    success: function(result){
-                                        console.log(result);
-                                        if(result.status == 'success') {
-                                            alert_float('success', 'Call Connecting...');
-                                            setTimeout(function(){
-                                                window.location.reload();
-                                            },1000);
-                                        } else {
-                                            alert_float('warning', result.message);
-                                            setTimeout(function(){
-                                                window.location.reload();
-                                            },1000);
-                                        }
-                                    }
-                                });
-                            }
+                    if(msg.channel =='international_softphone' || msg.channel =='national_softphone'){
+                        var to1 = msg.contact_no;
+                        var agent1 = msg.agent_id;
+
+                        if(msg.channel =='national_softphone'){
+                            var url1 = 'https://rest.telecmi.com/v2/ind/click2call';
+                        }else{
+                            var url1 = 'https://rest.telecmi.com/v2/click2call';
                         }
-                    });
+
+                        $.ajax({
+                            type: "POST",
+                            url: url1,
+                            contentType: "application/json",
+                            data: JSON.stringify({
+                                token: telecmi_get_agent_token(msg.agent_id,msg.password),
+                                to: parseInt(msg.contact_no),
+                            }),
+                            dataType: 'json',
+                            async: false,
+                            success: function(res){
+                                if(res.code == '200') {
+                                    var request = res.request_id;
+                                    var msg = res.msg;
+                                    var code = res.code;
+                                    var url2 =  admin_url+'call_settings/createActivity';
+                                    $.ajax({
+                                        type: "POST",
+                                        url: url2,
+                                        data: {req:request,msg:msg,code:code,deal_id:deal,contact_id:contact,type:ftype,agent:agent1,to:to1},
+                                        dataType: 'json',
+                                        success: function(result){
+                                            if(result.status == 'success') {
+                                                alert_float('success', 'Call Connecting...');
+                                                setTimeout(function(){
+                                                    window.location.reload();
+                                                },1000);
+                                            } else {
+                                                alert_float('warning', result.message);
+                                                setTimeout(function(){
+                                                    window.location.reload();
+                                                },1000);
+                                            }
+                                        }
+                                    });
+                                }else{
+                                    alert_float('warning', res.message);
+                                    setTimeout(function(){
+                                        window.location.reload();
+                                    },1000);
+                                }
+                            }
+                        });
+                    }else{
+                        var to = msg.contact_no;
+                        var agent = msg.agent_id;
+                        var url1 = 'https://piopiy.telecmi.com/v1/adminConnect';
+                        //$('.followers-div').show();
+                        $.ajax({
+                            type: "POST",
+                            url: url1,
+                            contentType: "application/json",
+                            data: JSON.stringify({
+                                agent_id:msg.agent_id,
+                                token:msg.app_secret,
+                                to:msg.contact_no,
+                                custom:''
+                            }),
+                            dataType: 'json',
+                            async: false,
+                            success: function(res){
+                                console.log(res);
+                                if(res.code == '200') {
+                                    var request = res.request_id;
+                                    var msg = res.msg;
+                                    var code = res.code;
+                                    var url2 =  admin_url+'call_settings/createActivity';
+                                    $.ajax({
+                                        type: "POST",
+                                        url: url2,
+                                        data: {req:request,msg:msg,code:code,deal_id:deal,contact_id:contact,type:ftype,agent:agent,to:to},
+                                        dataType: 'json',
+                                        success: function(result){
+                                            console.log(result);
+                                            if(result.status == 'success') {
+                                                alert_float('success', 'Call Connecting...');
+                                                setTimeout(function(){
+                                                    window.location.reload();
+                                                },1000);
+                                            } else {
+                                                alert_float('warning', result.message);
+                                                setTimeout(function(){
+                                                    window.location.reload();
+                                                },1000);
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    }
                 }
 			<?php }
 				else  if(CALL_SOURCE_FROM =='daffytel'){ ?>
