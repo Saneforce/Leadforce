@@ -167,18 +167,18 @@
 
 
    <?php if(!is_admin(get_staff_user_id())) { ?>
-    <form class="pull-right" action="" method="GET" id="getcontact">
+    <!-- <form class="pull-right" action="" method="GET" id="getcontact">
         <select class="form-control" name="contacts" id="contacts">
-            <option value="all">All</option>
-            <?php foreach($list_person as $val) {
+            <option value="all">All</option> -->
+            <!-- <?php foreach($list_person as $val) {
                 $selected = '';
                 if($val['id'] == $_GET['contacts']) {
                     $selected = 'selected';
                 }
                 echo '<option value="'.$val['id'].'" '.$selected.'>'.$val['firstname'].' - '.$val['email'].'</option>';
-            } ?>
-        </select>
-    </form>
+            } ?> -->
+        <!-- </select>
+    </form> -->
     <?php } ?>
 </div>
 <div class="alpha-filter _filter_data">
@@ -253,47 +253,42 @@
                         if($_GET['contacts'] && $_GET['contacts'] != 'all') {
                             $where_summary_activeperson_qry = 'SELECT  COUNT(*) AS `numrows`
                             FROM tblcontacts
-                            LEFT JOIN tblclients ON tblclients.userid=tblcontacts.userid LEFT JOIN tblcustomfieldsvalues as ctable_0 ON tblcontacts.id = ctable_0.relid AND ctable_0.fieldto="contacts" AND ctable_0.fieldid=7
-                            
-                            WHERE ('.db_prefix().'contacts.addedfrom="'.get_staff_user_id().'" OR tblcontacts.id IN (select contacts_id from tblproject_contacts where project_id IN (select project_id from tblproject_contacts where project_id IN (select project_id from tblproject_members where staff_id = "'.get_staff_user_id().'") AND contacts_id = "'.$_GET['contacts'].'" ) ) OR tblcontacts.id IN (select contacts_id from tblproject_contacts where project_id IN (select tblprojects.id from tblprojects where tblprojects.teamleader = "'.get_staff_user_id().'") AND contacts_id = "'.$_GET['contacts'].'" ) )  AND tblcontacts.active=1  AND tblcontacts.deleted_status=0  AND tblclients.deleted_status=0 '.$likeqry;
+                            WHERE ('.db_prefix().'contacts.addedfrom="'.get_staff_user_id().'" OR tblcontacts.id IN (select contacts_id from tblproject_contacts where project_id IN (select project_id from tblproject_contacts where project_id IN (select project_id from tblproject_members where staff_id = "'.get_staff_user_id().'") AND contacts_id = "'.$_GET['contacts'].'" ) ) OR tblcontacts.id IN (select contacts_id from tblproject_contacts where project_id IN (select tblprojects.id from tblprojects where tblprojects.teamleader = "'.get_staff_user_id().'") AND contacts_id = "'.$_GET['contacts'].'" ) )  AND tblcontacts.active=1  AND tblcontacts.deleted_status=0 '.$likeqry;
                             
                             $where_summary_activeperson     = $CI->db->query($where_summary_activeperson_qry)->result_array();
 
                             $where_summary_inactiveperson_qry = 'SELECT  COUNT(*) AS `numrows`
                             FROM tblcontacts
-                            LEFT JOIN tblclients ON tblclients.userid=tblcontacts.userid LEFT JOIN tblcustomfieldsvalues as ctable_0 ON tblcontacts.id = ctable_0.relid AND ctable_0.fieldto="contacts" AND ctable_0.fieldid=7
                             
-                            WHERE  ('.db_prefix().'contacts.addedfrom="'.get_staff_user_id().'" OR tblcontacts.id IN (select contacts_id from tblproject_contacts where project_id IN (select project_id from tblproject_contacts where project_id IN (select project_id from tblproject_members where staff_id = "'.get_staff_user_id().'") AND contacts_id = "'.$_GET['contacts'].'" ) ) OR tblcontacts.id IN (select contacts_id from tblproject_contacts where project_id IN (select tblprojects.id from tblprojects where tblprojects.teamleader = "'.get_staff_user_id().'") AND contacts_id = "'.$_GET['contacts'].'" ) )  AND tblcontacts.active=0  AND tblcontacts.deleted_status=0  AND tblclients.deleted_status=0 '.$likeqry;
+                            WHERE  ('.db_prefix().'contacts.addedfrom="'.get_staff_user_id().'" OR tblcontacts.id IN (select contacts_id from tblproject_contacts where project_id IN (select project_id from tblproject_contacts where project_id IN (select project_id from tblproject_members where staff_id = "'.get_staff_user_id().'") AND contacts_id = "'.$_GET['contacts'].'" ) ) OR tblcontacts.id IN (select contacts_id from tblproject_contacts where project_id IN (select tblprojects.id from tblprojects where tblprojects.teamleader = "'.get_staff_user_id().'") AND contacts_id = "'.$_GET['contacts'].'" ) )  AND tblcontacts.active=0  AND tblcontacts.deleted_status=0 '.$likeqry;
                             
                             $where_summary_inactiveperson     = $CI->db->query($where_summary_inactiveperson_qry)->result_array();
                         } else {
                             $my_staffids = $CI->staff_model->get_my_staffids();
                             if($my_staffids){
-                                $where = ' WHERE ('.db_prefix().'contacts.addedfrom IN (' . implode(',',$my_staffids) . ') OR (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')  AND tblprojects.clientid != "")) OR  (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects where ' . db_prefix() . 'projects.teamleader in (' . implode(',',$my_staffids) . ') AND tblprojects.clientid != "" )))   AND tblcontacts.active=1  AND tblcontacts.deleted_status=0 AND tblclients.deleted_status=0 '.$likeqry;
+                                $where = ' WHERE ('.db_prefix().'contacts.addedfrom IN (' . implode(',',$my_staffids) . ') OR (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')  AND tblprojects.clientid != "")) OR  (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects where ' . db_prefix() . 'projects.teamleader in (' . implode(',',$my_staffids) . ') AND tblprojects.clientid != "" )))   AND tblcontacts.active=1  AND tblcontacts.deleted_status=0 '.$likeqry;
                                 $where_summary_activeperson_qry = 'SELECT  COUNT(*) AS `numrows`
                                 FROM tblcontacts
                                 LEFT JOIN tblclients ON tblclients.userid=tblcontacts.userid LEFT JOIN tblcustomfieldsvalues as ctable_0 ON tblcontacts.id = ctable_0.relid AND ctable_0.fieldto="contacts" AND ctable_0.fieldid=7'.$where;
                                 $where_summary_activeperson     = $CI->db->query($where_summary_activeperson_qry)->result_array();
 
-                                $where = ' WHERE ('.db_prefix().'contacts.addedfrom IN (' . implode(',',$my_staffids) . ') OR (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')  AND tblprojects.clientid != "")) OR  (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects where ' . db_prefix() . 'projects.teamleader in (' . implode(',',$my_staffids) . ') AND tblprojects.clientid != "" )))   AND tblcontacts.active=0  AND tblcontacts.deleted_status=0 AND tblclients.deleted_status=0 '.$likeqry;
+                                $where = ' WHERE ('.db_prefix().'contacts.addedfrom IN (' . implode(',',$my_staffids) . ') OR (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')  AND tblprojects.clientid != "")) OR  (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects where ' . db_prefix() . 'projects.teamleader in (' . implode(',',$my_staffids) . ') AND tblprojects.clientid != "" )))   AND tblcontacts.active=0  AND tblcontacts.deleted_status=0 '.$likeqry;
                                 $where_summary_inactiveperson_qry = 'SELECT  COUNT(*) AS `numrows`
                                 FROM tblcontacts
-                                LEFT JOIN tblclients ON tblclients.userid=tblcontacts.userid LEFT JOIN tblcustomfieldsvalues as ctable_0 ON tblcontacts.id = ctable_0.relid AND ctable_0.fieldto="contacts" AND ctable_0.fieldid=7'.$where;
+                                '.$where;
                                 $where_summary_inactiveperson     = $CI->db->query($where_summary_inactiveperson_qry)->result_array();
                             } else {
                                 $where_summary_activeperson_qry = 'SELECT  COUNT(*) AS `numrows`
-                                FROM tblcontacts
-                                LEFT JOIN tblclients ON tblclients.userid=tblcontacts.userid LEFT JOIN tblcustomfieldsvalues as ctable_0 ON tblcontacts.id = ctable_0.relid AND ctable_0.fieldto="contacts" AND ctable_0.fieldid=7
+                                FROM tblcontacts 
                                 
-                                WHERE  ('.db_prefix().'contacts.addedfrom="'.get_staff_user_id().'" OR (tblcontacts.userid IN (select userid from tblclients where '.db_prefix().'clients.addedfrom="'.get_staff_user_id().'")) OR tblcontacts.id IN (select contacts_id from tblproject_contacts where project_id IN (select project_id from tblproject_members where staff_id = "'.get_staff_user_id().'") ) OR tblcontacts.id IN (select contacts_id from tblproject_contacts where project_id IN (select tblprojects.id from tblprojects where tblprojects.teamleader = "'.get_staff_user_id().'") ) )  AND tblcontacts.active=1  AND tblcontacts.deleted_status=0 AND tblclients.deleted_status=0 '.$likeqry;
+                                WHERE  ('.db_prefix().'contacts.addedfrom="'.get_staff_user_id().'" OR (tblcontacts.userid IN (select userid from tblclients where '.db_prefix().'clients.addedfrom="'.get_staff_user_id().'")) OR tblcontacts.id IN (select contacts_id from tblproject_contacts where project_id IN (select project_id from tblproject_members where staff_id = "'.get_staff_user_id().'") ) OR tblcontacts.id IN (select contacts_id from tblproject_contacts where project_id IN (select tblprojects.id from tblprojects where tblprojects.teamleader = "'.get_staff_user_id().'") ) )  AND tblcontacts.active=1  AND tblcontacts.deleted_status=0 AND '.$likeqry;
                                 $CI          = & get_instance();
                                 $where_summary_activeperson     = $CI->db->query($where_summary_activeperson_qry)->result_array();
 
                                 $where_summary_inactiveperson_qry = 'SELECT  COUNT(*) AS `numrows`
-                                FROM tblcontacts
-                                LEFT JOIN tblclients ON tblclients.userid=tblcontacts.userid LEFT JOIN tblcustomfieldsvalues as ctable_0 ON tblcontacts.id = ctable_0.relid AND ctable_0.fieldto="contacts" AND ctable_0.fieldid=7
+                                FROM tblcontacts 
                                 
-                                WHERE  ('.db_prefix().'contacts.addedfrom="'.get_staff_user_id().'" OR (tblcontacts.userid IN (select userid from tblclients where '.db_prefix().'clients.addedfrom="'.get_staff_user_id().'")) OR tblcontacts.id IN (select contacts_id from tblproject_contacts where project_id IN (select project_id from tblproject_members where staff_id = "'.get_staff_user_id().'") ) OR tblcontacts.id IN (select contacts_id from tblproject_contacts where project_id IN (select tblprojects.id from tblprojects where tblprojects.teamleader = "'.get_staff_user_id().'") ) )  AND tblcontacts.active=0  AND tblcontacts.deleted_status=0 AND tblclients.deleted_status=0 '.$likeqry;
+                                WHERE  ('.db_prefix().'contacts.addedfrom="'.get_staff_user_id().'" OR (tblcontacts.userid IN (select userid from tblclients where '.db_prefix().'clients.addedfrom="'.get_staff_user_id().'")) OR tblcontacts.id IN (select contacts_id from tblproject_contacts where project_id IN (select project_id from tblproject_members where staff_id = "'.get_staff_user_id().'") ) OR tblcontacts.id IN (select contacts_id from tblproject_contacts where project_id IN (select tblprojects.id from tblprojects where tblprojects.teamleader = "'.get_staff_user_id().'") ) )  AND tblcontacts.active=0  AND tblcontacts.deleted_status=0 '.$likeqry;
                                 $CI          = & get_instance();
                                 $where_summary_inactiveperson     = $CI->db->query($where_summary_inactiveperson_qry)->result_array();
                             }
@@ -324,21 +319,6 @@
                      ?>
                   <hr class="hr-panel-heading" />
                   <div class="row mbot15">
-                     <!-- <div class="col-md-12">
-                        <h4 class="no-margin"><?php echo _l('customers_summary'); ?></h4>
-                     </div>
-                     <div class="col-md-2 col-xs-6 border-right">
-                        <h3 class="bold"><?php echo $totcnt = count($where_summary_active) + count($where_summary_inactive); ?></h3>
-                        <span class="text-dark"><?php echo _l('customers_summary_total'); ?></span>
-                     </div>
-                     <div class="col-md-2 col-xs-6 border-right">
-                        <h3 class="bold"><?php echo count($where_summary_active); ?></h3>
-                        <span class="text-success"><?php echo _l('active_customers'); ?></span>
-                     </div>
-                     <div class="col-md-2 col-xs-6 border-right">
-                        <h3 class="bold"><?php echo count($where_summary_inactive); ?></h3>
-                        <span class="text-danger"><?php echo _l('inactive_active_customers'); ?></span>
-                     </div> -->
                      <div class="col-md-2 col-xs-6 border-right">
                         <h3 class="bold"><?php echo $where_summary_activeperson[0]['numrows']; ?></h3>
                         <span class="text-info"><?php echo _l('customers_summary_active'); ?></span>
