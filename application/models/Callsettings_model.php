@@ -195,13 +195,13 @@ class Callsettings_model extends App_Model {
             if ($insert_id) {
                 $this->db->insert(db_prefix() . 'task_assigned', [
                     'taskid'        => $insert_id,
-                    'staffid'       => get_staff_user_id(),
-                    'assigned_from' => get_staff_user_id(),
+                    'staffid'       => $data['addedfrom'],
+                    'assigned_from' => $data['addedfrom'],
                 ]);
             
                 $this->db->insert(db_prefix() . 'task_followers', [
                     'taskid'  => $insert_id,
-                    'staffid' => get_staff_user_id(),
+                    'staffid' => $data['addedfrom'],
                 ]);
 
                 log_activity('New Task Added [ID:' . $insert_id . ', Name: ' . $data['name'] . ']');

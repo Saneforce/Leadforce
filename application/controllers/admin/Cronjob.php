@@ -829,7 +829,6 @@ exit;
 			
 			if($post['direction'] =='inbound'){
 				if($post['status'] !='answered'){
-					echo 'Contact not found1';
 					return ;
 				}
 				// validate person exists
@@ -838,10 +837,10 @@ exit;
 				$this->db2->where('active',1); 
 				$contact =$this->db2->get(db_prefix().'contacts')->row();
 				if(!$contact){
-					echo 'Contact not found';
 					return ;
 				}
 				// create activity for incoming call
+				
 				$this->db2->where('agent_id',$post['user']);
 				$addedfrom =0;
 				$agent =$this->db2->get(db_prefix().'agents')->row();
