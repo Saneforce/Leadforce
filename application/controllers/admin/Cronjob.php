@@ -12,7 +12,7 @@ class Cronjob extends CI_Controller
 		$this->load->model('base');
         $this->load->model('projects_model');
         $this->load->model('tasktype_model');
-        // $this->load->model('callsettings_model');
+        $this->load->model('callsettings_model');
 		// $this->load->model('knowlarity_model');
         
     }
@@ -789,13 +789,12 @@ exit;
 	}
 
 	public function webhook_call_history() {
-
+		
 		if($json = json_decode(file_get_contents("php://input"), true)) {
 			$post = $json;
 		} else {
 			$post = $_POST;
 		}
-		//	 pr($post);
 		$dbname = explode('.leadforce.mobi',$_SERVER['HTTP_HOST']);	
 			 
 		$this->dynamicDB = array(	
@@ -827,8 +826,31 @@ exit;
 		file_put_contents("test1.txt",'fsd');
 		$this->db2 = $this->load->database($this->dynamicDB, TRUE); 
 		if($post) {
-			if($post['direction'] =='inbound' && $post['status'] !='answered'){
-				return;
+			
+			if($post['direction'] =='inbound'){
+				if($post['status'] !='answered'){
+					echo 'Contact not found1';
+					return ;
+				}
+				// validate person exists
+				$this->db2->where('phonenumber',$post['from']); 
+				$contact =$this->db2->get(db_prefix().'contacts')->row();
+				if(!$contact){
+					echo 'Contact not found';
+					return ;
+				}
+				// create activity for incoming call
+				$task_details =array(
+					'req' => $post['cmiuuid'],
+					'code' => '200',
+					'msg' => $post['status'],
+					'rel_id' => $contact->id,
+					'rel_type' => 'contact',
+					'contact_id' => $contact->id,
+					'to' => $post['from'],
+					'agent' => $post['user'],
+				);
+				$result = $this->callsettings_model->addtask($task_details);
 			}
 			//APP Credentials
 			$this->db2->select('*');
@@ -838,7 +860,11 @@ exit;
 			
 			 file_put_contents("test1.txt",json_encode($post));
 			$appid = $post['appid'];
-			$to = $post['to'];
+			if($post['direction'] =='inbound'){
+				$to =$post['from'];
+			}else{
+				$to = $post['to'];
+			}
 			$cmiuid = $post['cmiuuid'];
 			$status = $post['status'];
 			$agent = $post['user'];

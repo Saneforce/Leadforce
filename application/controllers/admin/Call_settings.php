@@ -400,6 +400,8 @@ class Call_settings extends AdminController
 			$updateData = array();
 		}
         $resArray = array();
+        $data['to'] ==$_POST['to'];
+        $data['agent'] ==$_POST['agent'];
         if($_POST['type'] == 'task') {
             $task = $this->callsettings_model->getTaskDetails($_POST['deal_id']);
             $data['deal_id'] = $task->rel_id;
