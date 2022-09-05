@@ -1541,7 +1541,7 @@ function callfromperson(contact, phone) {
         dataType: 'json',
         success: function(msg){
             if(msg.status == 'success') {
-                if(msg.cnt > 1) {
+                if(msg.cnt > 0) {
                     $('#call_person_modal').modal('show');
                     var groupFilter = $('#deals_list');
                         groupFilter.selectpicker('val', '');

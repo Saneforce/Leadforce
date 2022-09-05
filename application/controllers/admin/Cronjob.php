@@ -834,6 +834,8 @@ exit;
 				}
 				// validate person exists
 				$this->db2->where('phonenumber',$post['from']); 
+				$this->db2->where('deleted_status',0); 
+				$this->db2->where('active',1); 
 				$contact =$this->db2->get(db_prefix().'contacts')->row();
 				if(!$contact){
 					echo 'Contact not found';
