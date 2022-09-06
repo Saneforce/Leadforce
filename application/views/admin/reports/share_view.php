@@ -51,3 +51,8 @@ $(function(){
      init_ajax_search('customer', '#clientid_copy_project.ajax-search');
 });
 </script>
+<style>
+th.sorting,td {
+    white-space: nowrap;
+}
+</style>

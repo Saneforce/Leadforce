@@ -20,6 +20,12 @@ class Shared extends App_Controller
 		
 		
 		$data['id'] = $links[0]['report_id'];
+		$reports1 = $this->db->query("SELECT report_name,report_type,folder_id FROM " . db_prefix() . "report WHERE id = '".$data['id']."' ")->row();
+		if(empty($reports1)){
+			redirect(admin_url('reports/view_deal_folder/'));
+			exit;
+		}
+		$data['report_name'] =	$reports1->report_name.' '.$reports1->report_type;
 		$fields = deal_needed_fields();
 		$needed = json_decode($fields,true);
 		if (($key = array_search('id', $needed['need_fields'])) !== false) {
