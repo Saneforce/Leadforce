@@ -47,7 +47,7 @@ $(function(){
      $.each($('._hidden_inputs._filters input'),function(){
          ProjectsServerParams[$(this).attr('name')] = '[name="'+$(this).attr('name')+'"]';
      });
-     initDataTable('.table-projects', admin_url+'reports/deal_table/<?php echo $id;?>', undefined, [0], ProjectsServerParams, <?php echo hooks()->apply_filters('projects_table_default_order', json_encode(array())); ?>);
+     initDataTable('.table-projects', admin_url+'reports/deal_table/<?php echo $id;?>?call=share', undefined, [0], ProjectsServerParams, <?php echo hooks()->apply_filters('projects_table_default_order', json_encode(array())); ?>);
      init_ajax_search('customer', '#clientid_copy_project.ajax-search');
 });
 </script>

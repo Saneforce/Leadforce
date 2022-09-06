@@ -7,6 +7,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
  * @return string
  */
  function get_deal_vals($fields,$fields1,$table,$qry_cond,$filters = array()){
+	 $CI	= & get_instance();
 	 $conds = get_flters($filters);
 	 if(!empty($qry_cond)){
 		 $qry_cond = " where p.deleted_status ='0' ".$conds." AND ".$qry_cond;
@@ -18,6 +19,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
 	 }
 	  if(!empty($fields1)){
 		 $fields1 = "".$fields1;
+	 }
+	 $my_staffids = $CI->staff_model->get_my_staffids();
+	 if(!is_admin(get_staff_user_id()) && $my_staffids){
+		 $qry_cond .= ' AND (p.id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')) OR  p.teamleader in (' . implode(',',$my_staffids) . ') )';
 	 }
 	 $CI			= & get_instance();
 	 $deal_vals 	= $CI->db->query("SELECT ".$fields."COUNT(DISTINCT IF(stage_of = '1',p.id,NULL)) AS own_count,COUNT(DISTINCT IF(stage_of = '2',p.id,NULL)) AS lost_count,COUNT(DISTINCT IF(stage_of = '0',p.id,NULL)) AS open_count ".$fields1." FROM ".$table.$qry_cond)->result_array();
@@ -691,8 +696,9 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 		if(!empty($qry_cond)){
 			$req_cond .= $qry_cond;
 		}
-		$ress = $CI->db->query("SELECT id FROM " . db_prefix() . "projects p where p.deleted_status = '0' ".$req_cond)->result_array();	
 		
+		$ress = $CI->db->query("SELECT id FROM " . db_prefix() . "projects p where p.deleted_status = '0' ".$req_cond)->result_array();	
+			
 		if(!empty($ress)){
 			foreach($ress as $res1){
 				$projects[$i] = $res1['id'];
@@ -741,6 +747,10 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 	$fields	.= ','.$req_tables['fields'];
 	$join_cond	= $req_tables['join_cond'];
 	$where  = array( db_prefix().'projects.deleted_status' =>0);
+	$my_staffids = $CI->staff_model->get_my_staffids();
+	if(!empty($my_staffids) && !is_admin(get_staff_user_id())){
+			$where_in[db_prefix().'projects.teamleader']  = $my_staffids;
+	}
 	$req_view_by = $view_by;
 	switch($view_by){
 		case 'start_date':
@@ -877,9 +887,7 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 			$where['year('.db_prefix().'projects.'.$req_view_by.')']   =  date('Y');
 		}
 	}
-	if($clmn == 'own'){
-		$where[db_prefix().'projects.stage_of']  =  '1';
-	}
+	
 	if($clmn == 'lost'){
 		$where[db_prefix().'projects.stage_of']  =  '2';
 	}
