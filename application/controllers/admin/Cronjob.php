@@ -12,7 +12,7 @@ class Cronjob extends CI_Controller
 		$this->load->model('base');
         $this->load->model('projects_model');
         $this->load->model('tasktype_model');
-        // $this->load->model('callsettings_model');
+        $this->load->model('callsettings_model');
 		// $this->load->model('knowlarity_model');
         
     }
@@ -789,13 +789,12 @@ exit;
 	}
 
 	public function webhook_call_history() {
-
+		
 		if($json = json_decode(file_get_contents("php://input"), true)) {
 			$post = $json;
 		} else {
 			$post = $_POST;
 		}
-		//	 pr($post);
 		$dbname = explode('.leadforce.mobi',$_SERVER['HTTP_HOST']);	
 			 
 		$this->dynamicDB = array(	
@@ -828,6 +827,39 @@ exit;
 		$this->db2 = $this->load->database($this->dynamicDB, TRUE); 
 		if($post) {
 			
+			if($post['direction'] =='inbound'){
+				if($post['status'] !='answered'){
+					return ;
+				}
+				// validate person exists
+				$this->db2->where('phonenumber',$post['from']); 
+				$this->db2->where('deleted_status',0); 
+				$this->db2->where('active',1); 
+				$contact =$this->db2->get(db_prefix().'contacts')->row();
+				if(!$contact){
+					return ;
+				}
+				// create activity for incoming call
+				
+				$this->db2->where('agent_id',$post['user']);
+				$addedfrom =0;
+				$agent =$this->db2->get(db_prefix().'agents')->row();
+				if($agent){
+					$addedfrom =$agent->staff_id;
+				}
+				$task_details =array(
+					'req' => $post['cmiuuid'],
+					'code' => '200',
+					'msg' => $post['status'],
+					'rel_id' => $contact->id,
+					'rel_type' => 'contact',
+					'contact_id' => $contact->id,
+					'to' => $post['from'],
+					'agent' => $post['user'],
+					'addedfrom' => $addedfrom
+				);
+				$result = $this->callsettings_model->addtask($task_details);
+			}
 			//APP Credentials
 			$this->db2->select('*');
 			$this->db2->from('tblcall_settings');
@@ -836,7 +868,11 @@ exit;
 			
 			 file_put_contents("test1.txt",json_encode($post));
 			$appid = $post['appid'];
-			$to = $post['to'];
+			if($post['direction'] =='inbound'){
+				$to =$post['from'];
+			}else{
+				$to = $post['to'];
+			}
 			$cmiuid = $post['cmiuuid'];
 			$status = $post['status'];
 			$agent = $post['user'];
@@ -860,7 +896,11 @@ exit;
 				$query = $this->db2->get();
 				if ( $query->num_rows() > 0 ) {
 					if($row['recorder'] == 1) {
-						$mp3 = 'https://piopiy.telecmi.com/v1/play?appid='.$appid.'&token='.$row['app_secret'].'&file='.$filename;
+						if($row['channel'] =='international_softphone' || $row['channel'] =='national_softphone'){
+							$mp3 = 'https://rest.telecmi.com/v2/play?appid='.$appid.'&secret='.$row['app_secret'].'&file='.$filename;
+						}else{
+							$mp3 = 'https://piopiy.telecmi.com/v1/play?appid='.$appid.'&token='.$row['app_secret'].'&file='.$filename;
+						}
 						//file_put_contents($_SERVER['DOCUMENT_ROOT']."/perfex_crm/uploads/recordings/".$filename, fopen($mp3, 'r'));
 						//if(file_exists($mp3)){
 							file_put_contents($_SERVER['DOCUMENT_ROOT']."/uploads/recordings/".$filename, fopen($mp3, 'r'));
@@ -889,9 +929,10 @@ exit;
 						$result = $query->row();
 						$taskupdate = array();
 						$taskupdate['status'] = 5;
+						$taskupdate['datefinished'] = date ('Y-m-d H:i:s');
 						//pre($totData);
 						$this->db2->where('id',$result->task_id);
-						$this->db2->update('tbltasks', $taskupdate);
+						$this->db2->update(db_prefix().'tasks', $taskupdate);
 					}
 					echo "Done"; exit;
 				}

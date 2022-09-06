@@ -166,7 +166,12 @@ class Callsettings_model extends App_Model {
         $data['startdate']             = $startdate;
         $data['dateadded']             = $startdate;
         //$data['datefinished']             = $startdate;
-        $data['addedfrom']             = get_staff_user_id();
+        if(isset($post['addedfrom'])){
+            $data['addedfrom']             = $post['addedfrom'];
+        }else{
+            $data['addedfrom']             = get_staff_user_id();
+        }
+        
         $data['is_added_from_contact'] = 0;
         
 		$data['status'] = 3;
@@ -182,7 +187,7 @@ class Callsettings_model extends App_Model {
         $data['milestone'] = 0;
         
         
-        if($_POST['type'] == 'task' && $post['status'] != 5) {
+        if(isset($_POST['type']) && $_POST['type'] == 'task' && $post['status'] != 5) {
             $insert_id = $_POST['deal_id'];
         } else {
             $this->db->insert(db_prefix() . 'tasks', $data);
@@ -190,13 +195,13 @@ class Callsettings_model extends App_Model {
             if ($insert_id) {
                 $this->db->insert(db_prefix() . 'task_assigned', [
                     'taskid'        => $insert_id,
-                    'staffid'       => get_staff_user_id(),
-                    'assigned_from' => get_staff_user_id(),
+                    'staffid'       => $data['addedfrom'],
+                    'assigned_from' => $data['addedfrom'],
                 ]);
             
                 $this->db->insert(db_prefix() . 'task_followers', [
                     'taskid'  => $insert_id,
-                    'staffid' => get_staff_user_id(),
+                    'staffid' => $data['addedfrom'],
                 ]);
 
                 log_activity('New Task Added [ID:' . $insert_id . ', Name: ' . $data['name'] . ']');
@@ -208,22 +213,22 @@ class Callsettings_model extends App_Model {
 
             $totData = array();
             $totData['task_id'] = $insert_id;
-            $totData['call_to'] = $_POST['to'];
-            $totData['agent'] = $_POST['agent'];
+            $totData['call_to'] = $post['to'];
+            $totData['agent'] = $post['agent'];
             $this->db->insert(db_prefix() . 'call_history', $totData);
             $history_id = $this->db->insert_id();
 
-            $this->db->where('agent',$_POST['agent']);
+            $this->db->where('agent',$post['agent']);
             $chistory = $this->db->get(db_prefix() . 'call_history_flag')->row();
             if($chistory) {
                 $updateHis['history_id'] = $history_id;
-                $updateHis['call_to'] = $_POST['to'];
-                $this->db->where('agent', $_POST['agent']);
+                $updateHis['call_to'] = $post['to'];
+                $this->db->where('agent', $post['agent']);
                 $this->db->update(db_prefix() . 'call_history_flag', $updateHis);
             } else {
                 $insertHis['history_id'] = $history_id;
-                $insertHis['call_to'] = $_POST['to'];
-                $insertHis['agent'] = $_POST['agent'];
+                $insertHis['call_to'] = $post['to'];
+                $insertHis['agent'] = $post['agent'];
                 $this->db->insert(db_prefix() . 'call_history_flag', $insertHis);
             }
             return $insert_id;

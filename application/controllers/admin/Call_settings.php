@@ -17,7 +17,7 @@ class Call_settings extends AdminController
         $this->enable_call();
     }
 
-    /* List all custom fields */
+     /* List all custom fields */
     public function enable_call()
     {
         if (!has_permission('settings', '', 'view')) {
@@ -30,33 +30,45 @@ class Call_settings extends AdminController
             if (!has_permission('settings', '', 'edit')) {
                 access_denied('settings');
             }
-			if(empty($_POST['source_from']) || $_POST['source_from'] != 'daffytel'){
-				unset($_POST['country_daffy']);
-			}
+            if(empty($_POST['source_from']) || $_POST['source_from'] != 'daffytel'){
+                unset($_POST['country_daffy']);
+            }
             if(!empty(trim($_POST['id']))) {
                 $updateData = array();
-				if($_POST['call_enable'] == 1){
-					$updateData['source_from'] = $_POST['source_from'];
-					$updateData['enable_call'] = $_POST['call_enable'];
-					if(!empty($_POST['source_from']) && $_POST['source_from'] == 'daffytel'){
-						 $updateData['country_code'] = $_POST['country_daffy'];
-						 $updateData['webhook']		 = $_POST['webhook'];
-					}
-					$updateData['app_id'] = $_POST['app_key'];
-					$updateData['app_secret'] = $_POST['app_secret'];
-					$updateData['recorder'] = $_POST['recorder'];
-				}
-				else{
-					$updateData['source_from'] = '';
-					$updateData['enable_call'] = '';
-					
-					$updateData['country_code'] = '';
-					$updateData['webhook']		 = '';
-					$updateData['app_id'] = '';
-					$updateData['app_secret'] = '';
-					$updateData['recorder'] = '';
-				}
+                if($_POST['call_enable'] == 1){
+                    $updateData['source_from'] = $_POST['source_from'];
+                    $updateData['enable_call'] = $_POST['call_enable'];
+                    $updateData['recorder'] = $_POST['recorder'];
+                    if($_POST['source_from'] =='telecmi'){
+                        $updateData['app_id'] = $_POST['telecmi_app_key'];
+                        $updateData['app_secret'] = $_POST['telecmi_app_secret'];
+                        $updateData ['channel'] =$_POST['telecmi_channel'];
+                    }elseif($_POST['source_from'] =='tata'){
+                        $updateData['app_id'] = $_POST['tata_app_key'];
+                        $updateData['app_secret'] = $_POST['tata_app_secret'];
+                    }elseif($_POST['source_from'] =='daffytel'){
+                        $updateData['app_id'] = $_POST['daffytel_app_key'];
+                        $updateData['app_secret'] = $_POST['daffytel_app_secret'];
+                        $updateData['country_code'] = $_POST['daffytel_country_daffy'];
+                        $updateData['webhook']		 = $_POST['daffytel_webhook'];
+                    }elseif($_POST['source_from'] =='knowlarity'){
+                        $updateData['app_id'] = $_POST['knowlarity_app_key'];
+                        $updateData['app_secret'] = $_POST['knowlarity_app_secret'];
+                        $updateData ['channel'] =$_POST['knowlarity_channel'];
+                    }
+                }
+                else{
+                    $updateData['source_from'] = '';
+                    $updateData['enable_call'] = '';
+                    
+                    $updateData['country_code'] = '';
+                    $updateData['webhook']		 = '';
+                    $updateData['app_id'] = '';
+                    $updateData['app_secret'] = '';
+                    $updateData['recorder'] = '';
+                }
                 $update = $this->callsettings_model->updateCallSettings($updateData, $_POST['id']);
+                // $this->callsettings_model->importAgentFromApi();
                 if($update) {
                     set_alert('success', _l('call_settings_updated'));
                 } else {
@@ -66,12 +78,12 @@ class Call_settings extends AdminController
                 $result = $this->callsettings_model->getcallSettings();
                 if(empty($result)) {
                     $updateData = array();
-					$updateData['source_from'] = $_POST['source_from'];
+                    $updateData['source_from'] = $_POST['source_from'];
                     $updateData['enable_call'] = $_POST['call_enable'];
-					if(!empty($_POST['source_from']) && $_POST['source_from'] == 'daffytel'){
-						 $updateData['country_code'] = $_POST['country_daffy'];
-						 $updateData['webhook']		 = $_POST['webhook'];
-					}
+                    if(!empty($_POST['source_from']) && $_POST['source_from'] == 'daffytel'){
+                        $updateData['country_code'] = $_POST['country_daffy'];
+                        $updateData['webhook']		 = $_POST['webhook'];
+                    }
                     $updateData['app_id'] = $_POST['app_key'];
                     $updateData['app_secret'] = $_POST['app_secret'];
                     $updateData['recorder'] = $_POST['recorder'];
@@ -106,29 +118,29 @@ class Call_settings extends AdminController
 
         
         if($tab != 'enable_call' && $tab != 'agent'){
-			if(!empty($data['tabs'])){
-				foreach($data['tabs'] as $tab_1 => $val12){
-					if($tab_1 == 'enable_call' || $tab_1 == 'agent'){
-						unset($data['tabs'][$tab_1]);
-					}
-					
-				}
-			}
-		}
-		else{
-			if(!empty($data['tabs'])){
-				foreach($data['tabs'] as $tab_1 => $val12){
-					
-					if($tab_1 != 'enable_call' && $tab_1 != 'agent'){
-						unset($data['tabs'][$tab_1]);
-					}
-					
-				}
-			}
+            if(!empty($data['tabs'])){
+                foreach($data['tabs'] as $tab_1 => $val12){
+                    if($tab_1 == 'enable_call' || $tab_1 == 'agent'){
+                        unset($data['tabs'][$tab_1]);
+                    }
+                    
+                }
+            }
+        }
+        else{
+            if(!empty($data['tabs'])){
+                foreach($data['tabs'] as $tab_1 => $val12){
+                    
+                    if($tab_1 != 'enable_call' && $tab_1 != 'agent'){
+                        unset($data['tabs'][$tab_1]);
+                    }
+                    
+                }
+            }
         }
         
         if (!in_array($tab, $data['admin_tabs'])) {
-			
+            
             $data['tab'] = $this->app_tabs->filter_tab($data['tabs'], $tab);
         } else {
             // Core tabs are not registered
@@ -365,10 +377,14 @@ class Call_settings extends AdminController
         $result['app_secret'] = $appDetails->app_secret;
         $result['code'] = $appDetails->country_code;
         $result['app_id'] = $appDetails->app_id;
+        $result['channel'] = $appDetails->channel;
         $result['contact_no'] = $_POST['contact_no'];
         $result['webhook'] = $appDetails->webhook;
         $result['agent_no'] = $staff->phone;
         $result['status'] = 'success';
+        if($appDetails->channel =='international_softphone' || $appDetails->channel =='national_softphone'){
+            $result['password'] =$staff->password;
+        }
         
         //pre($result);
         echo json_encode($result);
@@ -384,6 +400,8 @@ class Call_settings extends AdminController
 			$updateData = array();
 		}
         $resArray = array();
+        $data['to'] ==$_POST['to'];
+        $data['agent'] ==$_POST['agent'];
         if($_POST['type'] == 'task') {
             $task = $this->callsettings_model->getTaskDetails($_POST['deal_id']);
             $data['deal_id'] = $task->rel_id;

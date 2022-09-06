@@ -244,6 +244,7 @@
 	 <input type="hidden" name="appid" id="appid" value="<?php echo $callsettings->app_id; ?>">
 	 <input type="hidden" id="req_source_from" value="<?php echo $callsettings->source_from; ?>">
 	 <input type="hidden" name="secret" id="secret" value="<?php echo $callsettings->app_secret; ?>">
+	 <input type="hidden" name="channel" id="channel" value="<?php echo $callsettings->channel; ?>">
   
   <div class="modal" id="addAgentModal" style="display: none;">
     <div class="modal-dialog">
@@ -285,7 +286,7 @@
 			
 			<div class="form-group">
 				<label class="control-label"><small class="req text-danger">* </small><?php echo _l('phone'); ?></label>
-				<input type="number" id="phone" name="phone" maxlenght="10" class="form-control" value="" placeholder="Enter Phone Number" required>
+				<input type="phone" id="phone" name="phone" maxlenght="10" class="form-control" value="" placeholder="Enter Phone Number" required>
 				<span id="phone_val" class="errmsg"></span>
 			</div>
 			<?php if($callsettings->source_from=='telecmi'){?>
@@ -380,7 +381,7 @@
 			<span id="staff_val" class="errmsg"></span>
 			<div class="form-group">
 				<label class="control-label"><small class="req text-danger">* </small><?php echo _l('phone'); ?></label>
-				<input type="number" id="phone" name="phone" class="form-control" value="" placeholder="Enter Phone Number" required>
+				<input type="phone" id="phone" name="phone" class="form-control" value="" placeholder="Enter Phone Number" required>
 				<input type="hidden" id="edit_phone1" class="form-control" value="" placeholder="Enter Phone Number" required>
 				<span id="phone_val" class="errmsg"></span>
 			</div>
