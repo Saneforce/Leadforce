@@ -775,7 +775,7 @@ class Reports extends AdminController
 		$data['id'] = $id;
 		$check_report = $this->db->query("SELECT id FROM " . db_prefix() . "report WHERE id = '".$id."' ")->row();
 		if(empty($check_report)){
-			redirect(admin_url('reports/view_deal_folder/'));
+			redirect(admin_url('reports/view_deal_folder'));
 			exit;
 		}
 		$data['filters']	=	$filters = $this->session->userdata('filters_edit_'.$id);
@@ -797,7 +797,7 @@ class Reports extends AdminController
 			}
 		}
 		$data['folders']	=	$this->db->query('SELECT id,folder FROM ' . db_prefix() . 'folder order by folder asc')->result_array();
-		$data['teamleaders'] = $this->staff_model->get('', [ 'active' => 1]);
+		$data['teamleaders']= $this->staff_model->get('', [ 'active' => 1]);
 		$data['links'] = $this->db->query("SELECT report_id,link_name,link_name FROM " . db_prefix() . "report_public WHERE report_id = '".$id."' ")->result_array();
 		$reports1 = $this->db->query("SELECT report_name,report_type,folder_id FROM " . db_prefix() . "report WHERE id = '".$id."' ")->row();
 		if (($key = array_search('id', $needed['need_fields'])) !== false) {
@@ -809,7 +809,7 @@ class Reports extends AdminController
 		if (($key = array_search('product_count', $needed['need_fields'])) !== false ) {
 			unset($needed['need_fields'][$key]);
 		}
-		$data['report_name']		=	$reports1->report_name.' '.$reports1->report_type;
+		$data['report_name']		=	$reports1->report_name.'('.$reports1->report_type.')';
 		$data['folder_id']			=	$reports1->folder_id;
 		$data['need_fields']		=	$needed['need_fields'];
 		$data['need_fields_label']	=	$needed['need_fields_label'];
@@ -2131,9 +2131,9 @@ class Reports extends AdminController
 			exit;
 		}
 		$data['id'] = $id;
-		$reports1 = $this->db->query("SELECT report_name,folder_id FROM " . db_prefix() . "report WHERE id = '".$id."' ")->row();
+		$reports1 = $this->db->query("SELECT report_name,report_type,folder_id FROM " . db_prefix() . "report WHERE id = '".$id."' ")->row();
 		
-		$data['report_name']		=	$reports1->report_name;
+		$data['report_name']		=	$reports1->report_name.'('.$reports1->report_type.')';
 		$data['folder_id']			=	$reports1->folder_id;
 		$fields = deal_needed_fields();
 		$needed = json_decode($fields,true);

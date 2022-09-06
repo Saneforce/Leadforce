@@ -25,7 +25,7 @@ class Shared extends App_Controller
 			redirect(admin_url('reports/view_deal_folder/'));
 			exit;
 		}
-		$data['report_name'] =	$reports1->report_name.' '.$reports1->report_type;
+		$data['report_name'] =	$reports1->report_name.'('.$reports1->report_type.')';
 		$fields = deal_needed_fields();
 		$needed = json_decode($fields,true);
 		if (($key = array_search('id', $needed['need_fields'])) !== false) {
