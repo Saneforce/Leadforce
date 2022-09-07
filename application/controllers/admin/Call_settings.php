@@ -33,7 +33,7 @@ class Call_settings extends AdminController
             if(empty($_POST['source_from']) || $_POST['source_from'] != 'daffytel'){
                 unset($_POST['country_daffy']);
             }
-            if(isset($_POST['source_from']) && $_POST['source_from']) {
+            if(isset($_POST['call_enable'])){
                 $updateData = array();
                 if($_POST['call_enable'] == 1){
                     $updateData['source_from'] = $_POST['source_from'];
@@ -70,11 +70,8 @@ class Call_settings extends AdminController
                 }
                 if(isset($_POST['id']) && $_POST['id'] >0){
                     $update = $this->callsettings_model->updateCallSettings($updateData, $_POST['id']);
-                    if($update) {
-                        set_alert('success', _l('call_settings_updated'));
-                    } else {
-                        set_alert('warning', _l('call_settings_failed'));
-                    }
+                    set_alert('success', _l('call_settings_updated'));
+                    
                 }else{
                     $insert = $this->callsettings_model->insertCallSettings($updateData);
                     if($insert > 0) {
