@@ -33,7 +33,7 @@ class Call_settings extends AdminController
             if(empty($_POST['source_from']) || $_POST['source_from'] != 'daffytel'){
                 unset($_POST['country_daffy']);
             }
-            if(!empty(trim($_POST['id']))) {
+            if(isset($_POST['source_from']) && $_POST['source_from']) {
                 $updateData = array();
                 if($_POST['call_enable'] == 1){
                     $updateData['source_from'] = $_POST['source_from'];
@@ -66,27 +66,16 @@ class Call_settings extends AdminController
                     $updateData['app_id'] = '';
                     $updateData['app_secret'] = '';
                     $updateData['recorder'] = '';
+                    $updateData['channel'] = '';
                 }
-                $update = $this->callsettings_model->updateCallSettings($updateData, $_POST['id']);
-                // $this->callsettings_model->importAgentFromApi();
-                if($update) {
-                    set_alert('success', _l('call_settings_updated'));
-                } else {
-                    set_alert('warning', _l('call_settings_failed'));
-                }
-            } else {
-                $result = $this->callsettings_model->getcallSettings();
-                if(empty($result)) {
-                    $updateData = array();
-                    $updateData['source_from'] = $_POST['source_from'];
-                    $updateData['enable_call'] = $_POST['call_enable'];
-                    if(!empty($_POST['source_from']) && $_POST['source_from'] == 'daffytel'){
-                        $updateData['country_code'] = $_POST['country_daffy'];
-                        $updateData['webhook']		 = $_POST['webhook'];
+                if(isset($_POST['id']) && $_POST['id'] >0){
+                    $update = $this->callsettings_model->updateCallSettings($updateData, $_POST['id']);
+                    if($update) {
+                        set_alert('success', _l('call_settings_updated'));
+                    } else {
+                        set_alert('warning', _l('call_settings_failed'));
                     }
-                    $updateData['app_id'] = $_POST['app_key'];
-                    $updateData['app_secret'] = $_POST['app_secret'];
-                    $updateData['recorder'] = $_POST['recorder'];
+                }else{
                     $insert = $this->callsettings_model->insertCallSettings($updateData);
                     if($insert > 0) {
                         set_alert('success', _l('call_settings_updated'));
