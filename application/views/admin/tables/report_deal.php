@@ -167,6 +167,17 @@ $gsearch = $_SESSION['gsearch'];
 if(!empty($gsearch)){
     array_push($where, ' AND p.id IN (SELECT id FROM ' . db_prefix() . 'projects WHERE name like "%' . $gsearch . '%")');
 }
+if(empty($_REQUST['call']) || $_REQUEST['call']!='share'){
+	$my_staffids = $this->ci->staff_model->get_my_staffids();
+	if ($_SESSION['member']) {
+		$memb = $_SESSION['member'];
+		array_push($where, ' AND (p.id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . $memb . ')) OR  p.teamleader in (' . $memb . ') )');
+	} else {
+		if($my_staffids){
+			array_push($where, ' AND (p.id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')) OR  p.teamleader in (' . implode(',',$my_staffids) . ') )');
+		}
+	}
+}
 
 array_push($where, ' AND p.deleted_status = 0');
 

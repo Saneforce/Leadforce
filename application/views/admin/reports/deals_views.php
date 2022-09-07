@@ -91,7 +91,9 @@
 				<div class="horizontal-tabs">
 					<?php if(!empty($report_name)){?>
 						<h1>
-							<a href="<?php echo admin_url('reports/view_deal_report/'.$folder_id);?>" title="<?php echo _l('back');?>"><i class="fa fa-arrow-circle-left fa-6" style="font-size: 45px;padding-right: 10px;top: 4px;position: relative;"></i></a>
+							<?php if(!empty($folder_id)){?>
+								<a href="<?php echo admin_url('reports/view_deal_report/'.$folder_id);?>" title="<?php echo _l('back');?>"><i class="fa fa-arrow-circle-left fa-6" style="font-size: 45px;padding-right: 10px;top: 4px;position: relative;"></i></a>
+							<?php }?>
 							<?php echo $report_name;?>
 						</h1>
 					<?php }?>
@@ -257,7 +259,14 @@
 					<div id="overlay_deal" style="display: none;"><div class="spinner"></div></div>
 					 <div class="tab-content">
 						<div id="report_table" class="tab_summary tab-pane fade <?php if(!empty($_GET['filter_tab']) && $_GET['filter_tab'] == 2){ echo 'in active';}?>" >
-								<?php $this->load->view('admin/reports/deal_list_column'); ?>
+								<?php 
+								if($report_page == 'deal'){
+									$this->load->view('admin/reports/deal_list_column');
+								}
+								if($report_page == 'activity'){
+									$this->load->view('admin/reports/activity_list_column');
+								}
+								?>
 					
 								<?php $this->load->view('admin/reports/deal_table_html'); ?>
 						</div>

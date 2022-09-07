@@ -68,7 +68,7 @@ $table_data = hooks()->apply_filters('projects_table_columns', $table_data);
 					<div class="col-md-12">
 						<div class="col-md-6"></div>
 							<div class="col-md-6">
-								<h2>Report</h2>
+								<h2><?php echo $report_name;?></h2>
 								<div class="info" id="buttons"></div>
 								<table id='empTable' class='display dataTable' >
 								  <thead>

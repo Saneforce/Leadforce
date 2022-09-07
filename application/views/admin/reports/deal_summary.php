@@ -161,13 +161,13 @@ foreach($custom_fields as $cfkey=>$cfval){
 												
 											<?php }?>
 											<?php if(_l($clm1) == 'Stage' && $j ==0){
-												if($summary['summary_cls'][$i][$clm1] == 0){
+												if($summary['summary_cls'][$i][$clm1] == '0'){
 													echo _l('open');
 												}
-												else if($summary['summary_cls'][$i][$clm1] == 1){
+												else if($summary['summary_cls'][$i][$clm1] == '1'){
 													echo _l('own');
 												}
-												else if($summary['summary_cls'][$i][$clm1] == 2){
+												else if($summary['summary_cls'][$i][$clm1] == '2'){
 													echo _l('lost');
 												}
 												else{
