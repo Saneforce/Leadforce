@@ -281,7 +281,7 @@
                                 $where_summary_activeperson_qry = 'SELECT  COUNT(*) AS `numrows`
                                 FROM tblcontacts 
                                 
-                                WHERE  ('.db_prefix().'contacts.addedfrom="'.get_staff_user_id().'" OR (tblcontacts.userid IN (select userid from tblclients where '.db_prefix().'clients.addedfrom="'.get_staff_user_id().'")) OR tblcontacts.id IN (select contacts_id from tblproject_contacts where project_id IN (select project_id from tblproject_members where staff_id = "'.get_staff_user_id().'") ) OR tblcontacts.id IN (select contacts_id from tblproject_contacts where project_id IN (select tblprojects.id from tblprojects where tblprojects.teamleader = "'.get_staff_user_id().'") ) )  AND tblcontacts.active=1  AND tblcontacts.deleted_status=0 AND '.$likeqry;
+                                WHERE  ('.db_prefix().'contacts.addedfrom="'.get_staff_user_id().'" OR (tblcontacts.userid IN (select userid from tblclients where '.db_prefix().'clients.addedfrom="'.get_staff_user_id().'")) OR tblcontacts.id IN (select contacts_id from tblproject_contacts where project_id IN (select project_id from tblproject_members where staff_id = "'.get_staff_user_id().'") ) OR tblcontacts.id IN (select contacts_id from tblproject_contacts where project_id IN (select tblprojects.id from tblprojects where tblprojects.teamleader = "'.get_staff_user_id().'") ) )  AND tblcontacts.active=1  AND tblcontacts.deleted_status=0 '.$likeqry;
                                 $CI          = & get_instance();
                                 $where_summary_activeperson     = $CI->db->query($where_summary_activeperson_qry)->result_array();
 
