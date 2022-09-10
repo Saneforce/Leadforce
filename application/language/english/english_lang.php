@@ -4105,6 +4105,9 @@ $lang['user_access_token'] = 'User-Access-Token';
 $lang['cannot_update_settings'] = 'Cannot update settings';
 $lang['waba_id'] = 'WABA-ID';
 $lang['version'] = 'Version';
-
-
 $lang ['pdf_template'] ='PDF template';
+
+// for ivr
+$lang['vendor'] ='Vendor';
+$lang['ivr_name'] ='IVR Name';
+$lang['enable_call'] = 'Enable call';
