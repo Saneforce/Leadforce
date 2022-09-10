@@ -73,7 +73,8 @@ class Call_settings extends AdminController
                     $this->form_validation->set_rules('daffytel_ivr_name', 'IVR name', $ivr_name_rule);
                     $this->form_validation->set_rules('daffytel_app_key', 'Access Token', 'required');
                     $this->form_validation->set_rules('daffytel_app_secret', 'Bridge No.', 'required');
-                    $this->form_validation->set_rules('tata_recorder', 'Record calls', 'required');
+                    $this->form_validation->set_rules('daffytel_recorder', 'Record calls', 'required');
+                    $this->form_validation->set_rules('daffytel_webhook', 'Webhook', 'required');
                 }elseif($_POST['source_from'] =='knowlarity'){
                     if(isset($_POST['id']) && $_POST['id']>0 && $this->callsettings_model->check_ivr_name_same($_POST['id'],$_POST['knowlarity_ivr_name']) == false){
                         $ivr_name_rule .='|is_unique['.db_prefix().'call_settings.ivr_name]';
@@ -128,7 +129,7 @@ class Call_settings extends AdminController
                         ]);
                         die;
                     }else{
-                        $updateData['enable_call'] = 0;
+                        $updateData['enable_call'] = 1;
                         $insert = $this->callsettings_model->insertCallSettings($updateData);
                         if($insert > 0) {
                             echo json_encode([
@@ -625,5 +626,12 @@ class Call_settings extends AdminController
                 'msg'=>'Something went wrong'
             ]);
         }
+    }
+
+    public function syncagents()
+    {
+        $this->callsettings_model->syncAgents();
+        set_alert('success',_l('updated_successfully',_l('agents')));
+        redirect(admin_url('call_settings/agent'));
     }
 }

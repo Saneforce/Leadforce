@@ -1750,6 +1750,9 @@ function tele_delete_agent_db(id,dbdel) {
                             //alert(res.msg);
                         }
                         else{
+                            if(dbdel==true){
+                                deleteagentfromdb(id);
+                            }
                             alert_float('warning', res.msg+' <br> Please Delete Manually on Telecmi Portal');
                             setTimeout(function(){
                                 window.location.reload();
@@ -2007,7 +2010,7 @@ function deletAgent_db(id,req_id1,source_from){
 function deletAgent(id) {
     if (confirm('Do you want to Deactivate this Agent?')) {
         tele_delete_agent_db(id,false);
-        alert_float('success', res.msg+' Agent deactivated successfully');
+        alert_float('success','Agent deactivated successfully');
         setTimeout(function(){
             window.location.reload();
         },1000);
@@ -2230,11 +2233,13 @@ function edit_agent(id) {
             $('#editAgentModal #password').val(msg.password);
             $('#editAgentModal #name').val(msg.staff_name);
             
-
-            $('#editAgentModal select#staff_id').selectpicker('val',msg.staff_id);
-            $('#editAgentModal select#staff_id').attr('disabled',true);
-            $('#editAgentModal select#staff_id option[value='+msg.staff_id+']').attr('selected','selected');
-            $('#editAgentModal select#staff_id').selectpicker('refresh');
+            if(msg.staff_id >0){
+                $('#editAgentModal select#staff_id').selectpicker('val',msg.staff_id);
+                $('#editAgentModal select#staff_id').attr('disabled',true);
+                $('#editAgentModal select#staff_id option[value='+msg.staff_id+']').attr('selected','selected');
+                $('#editAgentModal select#staff_id').selectpicker('refresh');
+            }
+            
            
 
             $('#editAgentModal select#status').selectpicker('val',msg.status);
@@ -3441,7 +3446,7 @@ $(document).ready(function(){
                         dataType: 'json',
                         async: false,
                         success: function(res){
-                            if(res.code == 'cmi-200') {
+                            if(res.code == 'cmi-200' || res.code == '200') {
                                 var url3 =  admin_url+'call_settings/updateAgent';
                                 //$('.followers-div').show();
                                 $.ajax({
@@ -3460,7 +3465,6 @@ $(document).ready(function(){
                                     },
                                     dataType: 'json',
                                     success: function(result){
-                                        console.log(result);
                                         if(result.status == 'success') {
                                             alert_float('success', result.msg);
                                             setTimeout(function(){

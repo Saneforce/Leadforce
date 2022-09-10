@@ -159,7 +159,7 @@ if($vendors){ // full wrapper for agents page
 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addAgentModal" style="float:right; margin-bottom:15px;" data-backdrop="static" data-keyboard="false">
 + Add Agent
 </button>
-<a type="button" href="" class="btn btn-primary mr-2" style="float:right; margin-bottom:15px;margin-right:15px;">
+<a type="button" href="<?= admin_url('call_settings/syncagents') ?>" class="btn btn-primary mr-2" style="float:right; margin-bottom:15px;margin-right:15px;">
 Sync Agents
 </a>
 <div class="clearfix"></div> 
@@ -207,6 +207,8 @@ Sync Agents
 <table class="table dt-table scroll-responsive table-project-files" data-order-col="0" data-order-type="desc">
   	<thead>
     <tr>
+		<th><?php echo _l('vendor'); ?></th>
+		<th><?php echo _l('ivr_name'); ?></th>
 		<th><?php echo _l('staff_id'); ?></th>
 		<th><?php echo _l('phone'); ?></th>
 		<th><?php echo _l('agent_id'); ?></th>
@@ -218,6 +220,8 @@ Sync Agents
   	<tbody>
     <?php foreach($deactive_agent_result as $agent){?>
     <tr>
+		<td data-order="<?php echo $agent['source_from']; ?>"><?php echo $vendors[$agent['source_from']]; ?></td>
+        <td data-order="<?php echo $agent['ivr_name']; ?>"><?php echo $agent['ivr_name']; ?></td>
         <td data-order="<?php echo $agent['staff_name']; ?>"><?php echo $agent['staff_name']; ?></td>
         <td data-order="<?php echo $agent['phone']; ?>"><?php echo $agent['phone']; ?></td>
 
@@ -378,6 +382,7 @@ Sync Agents
 			<input type="hidden" name="name" id="name" value="">
 			<input type="hidden" name="id" id="id" value="">
 			<input type="hidden" name="agentid" id="agentid" value="">
+			
 			<?php 
 			echo render_select('staff_id', $editAgents, array('staffid', array('firstname', 'lastname')), 'staff_id', '', array());
 			?>

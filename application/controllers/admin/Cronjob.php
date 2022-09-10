@@ -863,7 +863,7 @@ exit;
 			//APP Credentials
 			$this->db->where('agent_id',$post['user']);
         	$staff = $this->db->get(db_prefix().'agents')->row();
-			if(!$staff){
+			if(!$staff || !$staff->staff_id){
 				return;
 			}
 			$this->db->where('id',$staff->ivr_id);

@@ -99,7 +99,7 @@
 								<label for="telecmi_recorderes">Yes</label>
 							</div>
 							<div class="radio radio-primary radio-inline">
-								<input type="radio" id="telecmi_recorderno" name="telecmi_recorder" value="0" >
+								<input type="radio" id="telecmi_recorderno" name="telecmi_recorder" value="0" checked>
 								<label for="telecmi_recorderno">No</label>
 							</div>
 						</div>
@@ -130,7 +130,7 @@
 								<label for="tata_recorderyes">Yes</label>
 							</div>
 							<div class="radio radio-primary radio-inline">
-								<input type="radio" id="tata_recorderno" name="tata_recorder" value="0" >
+								<input type="radio" id="tata_recorderno" name="tata_recorder" value="0" checked>
 								<label for="tata_recorderno">No</label>
 							</div>
 						</div>
@@ -161,7 +161,7 @@
 							</select>
 							<div style="margin-top:15px">
 								<label for="daffytel_appsecret" class="control-label app_secret" >Webhook Id</label>
-								<input type="text" id="webhook" name="webhook" class="form-control" required placeholder="WEBHOOK ID" >
+								<input type="text" id="daffytel_webhook" name="daffytel_webhook" class="form-control" required placeholder="WEBHOOK ID" >
 							</div>
 						</div>
 
@@ -177,7 +177,7 @@
 								<label for="daffytel_recorderyes">Yes</label>
 							</div>
 							<div class="radio radio-primary radio-inline">
-								<input type="radio" id="daffytel_recorderno" name="daffytel_recorder" value="0" >
+								<input type="radio" id="daffytel_recorderno" name="daffytel_recorder" value="0" checked>
 								<label for="daffytel_recorderno">No</label>
 							</div>
 						</div>`
@@ -215,11 +215,11 @@
 						<div class="form-group" style="display:inline-flex;">
 							<label for="rtl_support_admin" class="control-label clearfix" style="margin-right:10px;">Record Calls: </label>
 							<div class="radio radio-primary radio-inline">
-								<input type="radio" id="knowlarity_recorderyes" name="knowlarity_recorder" value="1" >
+								<input type="radio" id="knowlarity_recorderyes" name="knowlarity_recorder" value="1">
 								<label for="knowlarity_recorderyes">Yes</label>
 							</div>
 							<div class="radio radio-primary radio-inline">
-								<input type="radio" id="knowlarity_recorderno" name="knowlarity_recorder" value="0" >
+								<input type="radio" id="knowlarity_recorderno" name="knowlarity_recorder" value="0" checked>
 								<label for="knowlarity_recorderno">No</label>
 							</div>
 						</div>

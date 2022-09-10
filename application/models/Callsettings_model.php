@@ -51,8 +51,8 @@ class Callsettings_model extends App_Model {
     public function getDeactiveAgents() {
 
         $this->db->where('deleted', 1);
-        $this->db->join(db_prefix() . 'staff', db_prefix() . 'staff.staffid = ' . db_prefix() . 'agents.staff_id');
-        $this->db->join(db_prefix() . 'call_settings', db_prefix() . 'call_settings.id = ' . db_prefix() . 'agents.ivr_id');
+        $this->db->join(db_prefix() . 'staff', db_prefix() . 'staff.staffid = ' . db_prefix() . 'agents.staff_id','left');
+        $this->db->join(db_prefix() . 'call_settings', db_prefix() . 'call_settings.id = ' . db_prefix() . 'agents.ivr_id','left');
         $this->db->select(db_prefix().'agents.*,'.db_prefix() . 'call_settings.ivr_name ,'.db_prefix().'staff.firstname as staff_name');
         $agents = $this->db->get(db_prefix() . 'agents')->result_array();
         return $agents;
@@ -60,8 +60,8 @@ class Callsettings_model extends App_Model {
 
     public function getAgentDetail($id) {
         $this->db->where(db_prefix().'agents.id', $id);
-        $this->db->join(db_prefix() . 'staff', db_prefix() . 'staff.staffid = ' . db_prefix() . 'agents.staff_id');
-        $this->db->join(db_prefix() . 'call_settings', db_prefix() . 'call_settings.id = ' . db_prefix() . 'agents.ivr_id');
+        $this->db->join(db_prefix() . 'staff', db_prefix() . 'staff.staffid = ' . db_prefix() . 'agents.staff_id','left');
+        $this->db->join(db_prefix() . 'call_settings', db_prefix() . 'call_settings.id = ' . db_prefix() . 'agents.ivr_id','left');
         $this->db->select(db_prefix().'agents.*,'.db_prefix() . 'call_settings.ivr_name ,'.db_prefix() . 'call_settings.app_id ,'.db_prefix() . 'call_settings.app_secret ,'.db_prefix() . 'call_settings.channel ,'.db_prefix().'staff.firstname as staff_name');
         $agents = $this->db->get(db_prefix() . 'agents')->row();
         return $agents;
@@ -332,4 +332,91 @@ class Callsettings_model extends App_Model {
         return $this->db->get(db_prefix().'call_settings')->result_object();
     }
     
+    public function syncTelecmiAgents($ivr)
+    {
+        if($ivr->channel =='international_softphone' || $ivr->channel =='national_softphone' || $ivr->channel =='national'){
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+              CURLOPT_URL => 'https://rest.telecmi.com/v2/user/all',
+              CURLOPT_RETURNTRANSFER => true,
+              CURLOPT_ENCODING => '',
+              CURLOPT_MAXREDIRS => 10,
+              CURLOPT_TIMEOUT => 0,
+              CURLOPT_FOLLOWLOCATION => true,
+              CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+              CURLOPT_CUSTOMREQUEST => 'POST',
+              CURLOPT_POSTFIELDS =>'{
+                "appid":'.$ivr->app_id.',
+                "secret":"'.$ivr->app_secret.'"
+            }',
+              CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json'
+              ),
+            ));
+            $response = curl_exec($curl);
+            
+            curl_close($curl);
+            $response = json_decode($response); 
+        }
+
+        if(isset($response->agents) && count($response->agents)>0){
+            $agent_ids =array();
+            foreach($response->agents as $key => $agent){
+                $agent_ids []=$agent->agent_id;
+                $this->db->where(['source_from'=>'telecmi','agent_id'=>$agent->agent_id,'ivr_id'=>$ivr->id]);
+                $exist =$this->db->get(db_prefix().'agents')->row();
+                $data =array(
+                    'source_from'=>'telecmi',
+                    'phone'=>$agent->phone,
+                    'agent_id'=>$agent->agent_id,
+                    'password'=>$agent->password,
+                    'sms_alert'=>'',
+                    'start_time'=>$agent->start_time,
+                    'end_time'=>$agent->end_time,
+                    'deleted'=>0,
+                    'ivr_id'=>$ivr->id,
+                );
+                if(!$exist){
+                    $data['staff_id'] =0;
+                    $data['status'] ='online';
+                    $this->db->insert(db_prefix().'agents',$data);
+                }else{
+                    $this->db->where(['source_from'=>'telecmi','agent_id'=>$agent->agent_id,'ivr_id'=>$ivr->id]);
+                    $this->db->update(db_prefix().'agents',$data);
+                }
+                
+            }
+
+            $this->db->where(['source_from'=>'telecmi','ivr_id'=>$ivr->id]);
+            $agents =$this->db->get(db_prefix().'agents')->result();
+            if($agents){
+                foreach($agents as $agent){
+                    if(!in_array($agent->agent_id,$agent_ids)){
+                        $this->db->where('id',$agent->id);
+                        $this->db->update(db_prefix().'agents',['deleted'=>1]);
+                    }
+                }
+            }
+        }
+    }
+    public function syncAgents()
+    {
+        
+        $this->db->where('enable_call',1);
+        $ivrs =$this->db->get(db_prefix().'call_settings')->result_object();
+        
+        if($ivrs){
+            foreach($ivrs as $ivr){
+                switch ($ivr->source_from) {
+                    case 'telecmi':
+                        $this->syncTelecmiAgents($ivr);
+                        break;
+                    
+                    default:
+                        # code...
+                        break;
+                }
+            }
+        }    
+    }
 }

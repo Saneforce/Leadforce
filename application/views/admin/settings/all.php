@@ -58,7 +58,7 @@
         <?php } $i++;
       } } ?>
       </ul>
-      
+      <?php if($this->uri->segment(2) !='call_settings'): ?> 
       <div class="panel_s">
        <div class="panel-body">
        <?php /*  
@@ -78,16 +78,16 @@
         <?php
       } ?>
 */ ?>
-      <?php if($this->uri->segment(2).'/'.$this->uri->segment(3) !='call_settings/enable_call'): ?>
+       
         <div class="btn-bottom-toolbar text-right">
           <button type="submit" class="btn btn-info">
             <?php echo _l('settings_save'); ?>
           </button>
         </div>
-      <?php endif; ?>
+      
       </div>
     </div>
-       
+    <?php endif; ?>
   </div>
   <div class="col-md-9">
     <div class="panel_s">
