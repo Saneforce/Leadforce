@@ -1,7 +1,8 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
 <div id="wrapper">
- <div class="content"> 
+ <div class="content">
+ <?php if($this->uri->segment(2).'/'.$this->uri->segment(3) !='call_settings/enable_call'): ?> 
   <?php echo form_open_multipart(
     (!isset($tab['update_url'])
     ? $this->uri->uri_string() . '?group=' . $tab['slug'] . ($this->input->get('tab') ? '&active_tab=' . $this->input->get('tab') : '')
@@ -9,6 +10,7 @@
     ['id' => 'settings-form','autocomplete'=>'off', 'class' => isset($tab['update_url']) ? 'custom-update-url' : '']
 );
     ?>
+    <?php endif; ?>
     <div class="row">
      <?php if ($this->session->flashdata('debug')) {
         ?>
@@ -76,11 +78,13 @@
         <?php
       } ?>
 */ ?>
+      <?php if($this->uri->segment(2).'/'.$this->uri->segment(3) !='call_settings/enable_call'): ?>
         <div class="btn-bottom-toolbar text-right">
           <button type="submit" class="btn btn-info">
             <?php echo _l('settings_save'); ?>
           </button>
         </div>
+      <?php endif; ?>
       </div>
     </div>
        
@@ -96,7 +100,9 @@
 </div>
 <div class="clearfix"></div>
 </div>
+<?php if($this->uri->segment(2).'/'.$this->uri->segment(3) !='call_settings/enable_call'): ?>
 <?php echo form_close(); ?>
+<?php endif; ?>
 <div class="btn-bottom-pusher"></div>
 </div>
 </div>

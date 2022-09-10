@@ -861,10 +861,13 @@ exit;
 				$result = $this->callsettings_model->addtask($task_details);
 			}
 			//APP Credentials
-			$this->db2->select('*');
-			$this->db2->from('tblcall_settings');
-			$query = $this->db2->get();
-			$row = $query->row_array();
+			$this->db->where('id',$post['user']);
+        	$staff = $this->db->get(db_prefix().'agents')->row();
+			if(!$staff){
+				return;
+			}
+			$this->db->where('id',$staff->ivr_id);
+        	$row = $this->db->get(db_prefix().'call_settings')->row_array();
 			
 			 file_put_contents("test1.txt",json_encode($post));
 			$appid = $post['appid'];

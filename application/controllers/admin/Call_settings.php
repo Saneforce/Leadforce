@@ -30,56 +30,122 @@ class Call_settings extends AdminController
             if (!has_permission('settings', '', 'edit')) {
                 access_denied('settings');
             }
+
+            if(isset($_POST['id']) && $_POST['id']>0){
+                $this->db->where('id',$_POST['id']);
+                $current_row = $this->db->get(db_prefix().'call_settings')->row();
+                if($current_row){
+                    $_POST['source_from'] =$current_row->source_from;
+                }
+            }
             if(empty($_POST['source_from']) || $_POST['source_from'] != 'daffytel'){
                 unset($_POST['country_daffy']);
             }
-            if(isset($_POST['call_enable'])){
+            if(isset($_POST['source_from'])){
+                $this->load->library('form_validation');
                 $updateData = array();
-                if($_POST['call_enable'] == 1){
+                $this->form_validation->set_rules('source_from', 'Source From', 'required');
+                $ivr_name_rule ='required';
+                if(!isset($_POST['id']) || $_POST['id']==0){
+                    $ivr_name_rule .='|is_unique['.db_prefix().'call_settings.ivr_name]';
+                }
+                if($_POST['source_from'] =='telecmi'){
+                    if(isset($_POST['id']) && $_POST['id']>0 && $this->callsettings_model->check_ivr_name_same($_POST['id'],$_POST['telecmi_ivr_name']) == false){
+                        $ivr_name_rule .='|is_unique['.db_prefix().'call_settings.ivr_name]';
+                    }
+                    $this->form_validation->set_rules('telecmi_ivr_name', 'IVR name', $ivr_name_rule);
+                    $this->form_validation->set_rules('telecmi_app_key', 'App Id', 'required');
+                    $this->form_validation->set_rules('telecmi_app_secret', 'App Secret', 'required');
+                    $this->form_validation->set_rules('telecmi_recorder', 'Record calls', 'required');
+                    $this->form_validation->set_rules('telecmi_channel', 'Channel', 'required');
+                }elseif($_POST['source_from'] =='tata'){
+                    if(isset($_POST['id']) && $_POST['id']>0 && $this->callsettings_model->check_ivr_name_same($_POST['id'],$_POST['tata_ivr_name']) == false){
+                        $ivr_name_rule .='|is_unique['.db_prefix().'call_settings.ivr_name]';
+                    }
+                    $this->form_validation->set_rules('tata_ivr_name', 'IVR name', $ivr_name_rule);
+                    $this->form_validation->set_rules('tata_app_key', 'Login Id', 'required');
+                    $this->form_validation->set_rules('tata_app_secret', 'Password', 'required');
+                    $this->form_validation->set_rules('tata_recorder', 'Record calls', 'required');
+                }elseif($_POST['source_from'] =='daffytel'){
+                    if(isset($_POST['id']) && $_POST['id']>0 && $this->callsettings_model->check_ivr_name_same($_POST['id'],$_POST['daffytel_ivr_name']) == false){
+                        $ivr_name_rule .='|is_unique['.db_prefix().'call_settings.ivr_name]';
+                    }
+                    $this->form_validation->set_rules('daffytel_ivr_name', 'IVR name', $ivr_name_rule);
+                    $this->form_validation->set_rules('daffytel_app_key', 'Access Token', 'required');
+                    $this->form_validation->set_rules('daffytel_app_secret', 'Bridge No.', 'required');
+                    $this->form_validation->set_rules('tata_recorder', 'Record calls', 'required');
+                }elseif($_POST['source_from'] =='knowlarity'){
+                    if(isset($_POST['id']) && $_POST['id']>0 && $this->callsettings_model->check_ivr_name_same($_POST['id'],$_POST['knowlarity_ivr_name']) == false){
+                        $ivr_name_rule .='|is_unique['.db_prefix().'call_settings.ivr_name]';
+                    }
+                    $this->form_validation->set_rules('knowlarity_ivr_name', 'IVR name', $ivr_name_rule);
+                    $this->form_validation->set_rules('knowlarity_app_key', 'App Id', 'required');
+                    $this->form_validation->set_rules('knowlarity_app_secret', 'App Secret', 'required');
+                    $this->form_validation->set_rules('knowlarity_recorder', 'Record calls', 'required');
+                    $this->form_validation->set_rules('knowlarity_channel', 'Channel', 'required');
+                }
+
+                if ($this->form_validation->run() == FALSE)
+                {
+                    echo json_encode([
+                        'success'=> false,
+                        'errors' => $this->form_validation->error_array(),
+                        'msg' => _l('call_settings_failed')
+                    ]);
+                    die;
+                }else{
                     $updateData['source_from'] = $_POST['source_from'];
-                    $updateData['enable_call'] = $_POST['call_enable'];
-                    $updateData['recorder'] = $_POST['recorder'];
                     if($_POST['source_from'] =='telecmi'){
+                        $updateData['ivr_name'] = $_POST['telecmi_ivr_name'];
                         $updateData['app_id'] = $_POST['telecmi_app_key'];
                         $updateData['app_secret'] = $_POST['telecmi_app_secret'];
                         $updateData ['channel'] =$_POST['telecmi_channel'];
+                        $updateData ['recorder'] =$_POST['telecmi_recorder'];
                     }elseif($_POST['source_from'] =='tata'){
+                        $updateData['ivr_name'] = $_POST['tata_ivr_name'];
                         $updateData['app_id'] = $_POST['tata_app_key'];
                         $updateData['app_secret'] = $_POST['tata_app_secret'];
+                        $updateData ['recorder'] =$_POST['tata_recorder'];
                     }elseif($_POST['source_from'] =='daffytel'){
+                        $updateData['ivr_name'] = $_POST['daffytel_ivr_name'];
                         $updateData['app_id'] = $_POST['daffytel_app_key'];
                         $updateData['app_secret'] = $_POST['daffytel_app_secret'];
                         $updateData['country_code'] = $_POST['daffytel_country_daffy'];
                         $updateData['webhook']		 = $_POST['daffytel_webhook'];
+                        $updateData ['recorder'] =$_POST['daffytel_recorder'];
                     }elseif($_POST['source_from'] =='knowlarity'){
+                        $updateData['ivr_name'] = $_POST['knowlarity_ivr_name'];
                         $updateData['app_id'] = $_POST['knowlarity_app_key'];
                         $updateData['app_secret'] = $_POST['knowlarity_app_secret'];
                         $updateData ['channel'] =$_POST['knowlarity_channel'];
+                        $updateData ['recorder'] =$_POST['knowlarity_recorder'];
+                    }
+                    if(isset($_POST['id']) && $_POST['id'] >0){
+                        $update = $this->callsettings_model->updateCallSettings($updateData, $_POST['id']);
+                        echo json_encode([
+                            'success'=> true,
+                            'msg' => _l('call_settings_updated')
+                        ]);
+                        die;
+                    }else{
+                        $updateData['enable_call'] = 0;
+                        $insert = $this->callsettings_model->insertCallSettings($updateData);
+                        if($insert > 0) {
+                            echo json_encode([
+                                'success'=> true,
+                                'msg' => _l('call_settings_updated')
+                            ]);
+                            die;
+                        } else {
+                            echo json_encode([
+                                'success'=> false,
+                                'msg' => _l('call_settings_failed')
+                            ]);
+                            die;
+                        }
                     }
                 }
-                else{
-                    $updateData['source_from'] = '';
-                    $updateData['enable_call'] = '';
-                    
-                    $updateData['country_code'] = '';
-                    $updateData['webhook']		 = '';
-                    $updateData['app_id'] = '';
-                    $updateData['app_secret'] = '';
-                    $updateData['recorder'] = '';
-                    $updateData['channel'] = '';
-                }
-                if(isset($_POST['id']) && $_POST['id'] >0){
-                    $update = $this->callsettings_model->updateCallSettings($updateData, $_POST['id']);
-                    set_alert('success', _l('call_settings_updated'));
-                    
-                }else{
-                    $insert = $this->callsettings_model->insertCallSettings($updateData);
-                    if($insert > 0) {
-                        set_alert('success', _l('call_settings_updated'));
-                    } else {
-                        set_alert('warning', _l('call_settings_failed'));
-                    }
-                }
+                
             }
         }
         $this->load->model('taxes_model');
@@ -135,6 +201,7 @@ class Call_settings extends AdminController
         }
         $data['callsettings'] = $this->callsettings_model->getcallSettings();
         $data['countries']    = $this->callsettings_model->getCountries();
+        $data['vendors']    = $this->callsettings_model->list_vendors();
         //echo '<pre>';print_r($data['callsettings']);exit;
         $this->load->view('admin/settings/all', $data);
     }
@@ -201,13 +268,14 @@ class Call_settings extends AdminController
             $data['tab']['slug'] = $tab;
             $data['tab']['view'] = 'admin/' . $tab . '/list';
         }
-        
+        $data ['vendors'] = $this->callsettings_model->get_active_ivr_vendors();
         $data['agents']    = $this->callsettings_model->getAllAgents();
         $data['editAgents']    = $this->pipeline_model->getPipelineTeamleaders(0);
         //pre($data['agents']);
         $data['agent_result'] = $this->callsettings_model->getAgents();
         $data['deactive_agent_result'] = $this->callsettings_model->getDeactiveAgents();
         $data['callsettings'] = $this->callsettings_model->getcallSettings();
+        $data['active_ivrs'] = $this->callsettings_model->get_active_ivrs();
         //$data['agent_result'] = $this->callsettings_model->getAllAgent();
         $this->load->view('admin/settings/all', $data);
     }
@@ -221,12 +289,14 @@ class Call_settings extends AdminController
 			unset($_POST['token']);
 		}
         $data = $res = array();
-		$callsettings = $this->callsettings_model->getcallSettings();
+        $this->db->where('id',$_POST['ivr_id']);
+        $callsettings =$this->db->get(db_prefix().'call_settings')->row();
         $data['staff_id'] = $_POST['extid'];
         $data['source_from'] = $callsettings->source_from;
         $data['phone'] = $_POST['phone_number'];
         $data['agent_id'] = $_POST['agentid'];
         $data['status'] = $_POST['status'];
+        $data['ivr_id'] = $_POST['ivr_id'];
 		if($callsettings->source_from=='telecmi'){
 			$data['start_time'] = $_POST['start_time'];
 			$data['end_time'] = $_POST['end_time'];
@@ -355,9 +425,11 @@ class Call_settings extends AdminController
 
     public function getAppAgentDetails() {
         $staffid = get_staff_user_id();
-        $appDetails = $this->callsettings_model->getcallSettings();
+        
         //pre($appDetails);
         $staff = $this->callsettings_model->getAgentDetailbyStaffId($staffid);
+        $this->db->where('id',$staff->ivr_id);
+        $appDetails = $this->db->get(db_prefix().'call_settings')->row();
         $result = array();
         $result['agent_id'] = $staff->agent_id;
         $result['app_secret'] = $appDetails->app_secret;
@@ -505,5 +577,53 @@ class Call_settings extends AdminController
         $result['result'] = $html;
         echo json_encode($result);
         //pre($callhis);
+    }
+
+    public function change_status($id, $status)
+    {
+        if (!has_permission('settings', '', 'edit')) {
+            access_denied('settings');
+        }
+        $this->db->where('id',$id);
+        $this->db->update(db_prefix().'call_settings',['enable_call'=>$status]);
+    }
+
+    public function delete_ivr($id)
+    {
+        if (!has_permission('settings', '', 'delete')) {
+            access_denied('settings');
+        }
+        $this->db->where('ivr_id',$id);
+        $has_record = $this->db->get(db_prefix().'agents')->row();
+        if($has_record){
+            set_alert('danger','Could not delete this IVR. It has some agents');
+        }else{
+            $this->db->where('id',$id);
+            $this->db->delete(db_prefix().'call_settings');
+            set_alert('success',_l('deleted_successfully'));
+        }
+        
+        redirect(admin_url('call_settings/enable_call'));
+    }
+
+    public function getIvr($id)
+    {
+        if (!has_permission('settings', '', 'view')) {
+            access_denied('settings');
+        }
+
+        $this->db->where('id',$id);
+        $data =$this->db->get(db_prefix().'call_settings')->row();
+        if($data){
+            echo json_encode([
+                'success'=>true,
+                'data'=>$data
+            ]);
+        }else{
+            echo json_encode([
+                'success'=>false,
+                'msg'=>'Something went wrong'
+            ]);
+        }
     }
 }

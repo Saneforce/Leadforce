@@ -1,5 +1,11 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-
+<?php 
+if($vendors){ // full wrapper for agents page
+	foreach($vendors as $vendor => $vendorname){
+		$default_vendor = $vendor;
+		continue;
+	}
+?>
 <style>
 .followers-div, .addfollower_btn, #rollback {
   display:none;
@@ -150,102 +156,90 @@
 
 </style>
 <div id="overlay" style="display:none; z-index: 1050;"><div class="spinner"></div></div>
-<?php if($callsettings->enable_call == 0) { ?>
-    <div style="margin-bottom:10px;color:red;text-align:right;"><b>Note: Please enable Call Settings</b></div>
-   <?php } ?>
-<?php if($callsettings->enable_call == 1) { ?>
 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addAgentModal" style="float:right; margin-bottom:15px;" data-backdrop="static" data-keyboard="false">
 + Add Agent
 </button>
-<?php } ?>
+<a type="button" href="" class="btn btn-primary mr-2" style="float:right; margin-bottom:15px;margin-right:15px;">
+Sync Agents
+</a>
 <div class="clearfix"></div> 
 <table class="table dt-table scroll-responsive table-project-files" data-order-col="0" data-order-type="desc">
-  <thead>
-    <tr>
-      <th><?php echo _l('staff_id'); ?></th>
-      <th><?php echo _l('phone'); ?></th>
-	   <?php if($callsettings->source_from != 'daffytel'){?>
+  	<thead>
+		<tr>
+			<th><?php echo _l('vendor'); ?></th>
+			<th><?php echo _l('ivr_name'); ?></th>
+			<th><?php echo _l('staff_id'); ?></th>
+			<th><?php echo _l('phone'); ?></th>
 			<th><?php echo _l('agent_id'); ?></th>
-	   <?php }?>
-	  <th><?php echo _l('status'); ?></th>
-	  <th><?php echo _l('created_date'); ?></th>
-<?php if($callsettings->enable_call == 1) { ?> <th><?php echo _l('options'); ?></th> <?php } ?>
-    </tr>
-  </thead>
-  <tbody>
-    <?php foreach($agent_result as $agent){
-      ?>
-      <tr>
-        <td data-order="<?php echo $agent['staff_name']; ?>"><?php echo $agent['staff_name']; ?></td>
-        <td data-order="<?php echo $agent['phone']; ?>"><?php echo $agent['phone']; ?></td>
-		 <?php if($callsettings->source_from != 'daffytel'){?>
-			<td data-order="<?php echo $agent['agent_id']; ?>"><?php echo $agent['agent_id']; ?></td>
-		 <?php }?>
-        <td data-order="<?php echo $agent['status']; ?>"><?php echo ucfirst($agent['status']); ?></td>
-		<td data-order="<?php echo $agent['created_date']; ?>"><?php echo ((isset($agent['created_date']))?date('M j, Y',strtotime($agent['created_date'])):''); ?></td>
-    <?php if($callsettings->enable_call == 1) { ?>	<td>
-			<a href="#" onclick="edit_agent(<?php echo $agent['id']; ?>); return false">Edit </a><span class="text-dark"> | </span>
-			 <?php if($callsettings->source_from=='telecmi'){?>
-			<a href="#" onclick="deletAgent(<?php echo $agent['id']; ?>); return false" class="text-danger">Deactivate </a>	
-			 <?php }else if($callsettings->source_from=='daffytel'){?>
-			<a href="#" onclick="daffydeletAgent(<?php echo $agent['id']; ?>); return false" class="text-danger">Deactivate </a>	
-			 <?php }else{?>
-			<a href="#" onclick="tatadeletAgent(<?php echo $agent['id']; ?>,''); return false" class="text-danger">Deactivate </a>	
-			 <?php }?>
-			 <span class="text-dark"> | </span><a href="#" onclick="deletAgent_db(<?php echo $agent['id']; ?>,1); return false" class="text-danger">Delete </a>	
-    </td> <?php } ?>
-	</tr>
-       <?php } ?>
-     </tbody>
-   </table>
-   
-   <hr>
-   <h3>Deactivated Agents:</h3><br>
-   <table class="table dt-table scroll-responsive table-project-files" data-order-col="0" data-order-type="desc">
-  <thead>
+			<th><?php echo _l('status'); ?></th>
+			<th><?php echo _l('created_date'); ?></th>
+			<th><?php echo _l('options'); ?></th>
+		</tr>
+  	</thead>
+  	<tbody>
+    <?php foreach($agent_result as $agent){?>
     <tr>
-      <th><?php echo _l('staff_id'); ?></th>
-      <th><?php echo _l('phone'); ?></th>
-	 <?php if($callsettings->source_from != 'daffytel'){?>
-		<th><?php echo _l('agent_id'); ?></th>
-	 <?php }?>
-	  <th><?php echo _l('status'); ?></th>
-	  <th><?php echo _l('created_date'); ?></th>
-<?php if($callsettings->enable_call == 1) { ?> <th><?php echo _l('options'); ?></th> <?php } ?>
-    </tr>
-  </thead>
-  <tbody>
-    <?php foreach($deactive_agent_result as $agent){
-      ?>
-      <tr>
+        <td data-order="<?php echo $agent['source_from']; ?>"><?php echo $vendors[$agent['source_from']]; ?></td>
+        <td data-order="<?php echo $agent['ivr_name']; ?>"><?php echo $agent['ivr_name']; ?></td>
         <td data-order="<?php echo $agent['staff_name']; ?>"><?php echo $agent['staff_name']; ?></td>
         <td data-order="<?php echo $agent['phone']; ?>"><?php echo $agent['phone']; ?></td>
-		 <?php if($callsettings->source_from != 'daffytel'){?>
-			<td data-order="<?php echo $agent['agent_id']; ?>"><?php echo $agent['agent_id']; ?></td>
-		 <?php }?>
+		<td data-order="<?php echo $agent['agent_id']; ?>"><?php echo $agent['agent_id']; ?></td>
         <td data-order="<?php echo $agent['status']; ?>"><?php echo ucfirst($agent['status']); ?></td>
 		<td data-order="<?php echo $agent['created_date']; ?>"><?php echo ((isset($agent['created_date']))?date('M j, Y',strtotime($agent['created_date'])):''); ?></td>
-    <?php if($callsettings->enable_call == 1) { ?>	<td>
+		<td>
+			<a href="#" onclick="edit_agent(<?php echo $agent['id']; ?>); return false">Edit </a><span class="text-dark"> | </span>
+			<?php if($agent['source_from']=='telecmi'){?>
+			<a href="#" onclick="deletAgent(<?php echo $agent['id']; ?>); return false" class="text-danger">Deactivate </a>	
+			<?php }else if($agent['source_from']=='daffytel'){?>
+			<a href="#" onclick="daffydeletAgent(<?php echo $agent['id']; ?>); return false" class="text-danger">Deactivate </a>	
+			<?php }else{?>
+			<a href="#" onclick="tatadeletAgent(<?php echo $agent['id']; ?>,''); return false" class="text-danger">Deactivate </a>	
+			<?php }?>
+			<span class="text-dark"> | </span><a href="#" onclick="deletAgent_db(<?php echo $agent['id']; ?>,1,'<?php echo $agent['source_from']; ?>'); return false" class="text-danger">Delete </a>	
+		</td> 
+	</tr>
+    <?php } ?>
+    </tbody>
+</table>
+   
+<hr>
+<h3>Deactivated Agents:</h3><br>
+<table class="table dt-table scroll-responsive table-project-files" data-order-col="0" data-order-type="desc">
+  	<thead>
+    <tr>
+		<th><?php echo _l('staff_id'); ?></th>
+		<th><?php echo _l('phone'); ?></th>
+		<th><?php echo _l('agent_id'); ?></th>
+		<th><?php echo _l('status'); ?></th>
+		<th><?php echo _l('created_date'); ?></th>
+		<th><?php echo _l('options'); ?></th>
+    </tr>
+  	</thead>
+  	<tbody>
+    <?php foreach($deactive_agent_result as $agent){?>
+    <tr>
+        <td data-order="<?php echo $agent['staff_name']; ?>"><?php echo $agent['staff_name']; ?></td>
+        <td data-order="<?php echo $agent['phone']; ?>"><?php echo $agent['phone']; ?></td>
+
+		<td data-order="<?php echo $agent['agent_id']; ?>"><?php echo $agent['agent_id']; ?></td>
+        <td data-order="<?php echo $agent['status']; ?>"><?php echo ucfirst($agent['status']); ?></td>
+		<td data-order="<?php echo $agent['created_date']; ?>"><?php echo ((isset($agent['created_date']))?date('M j, Y',strtotime($agent['created_date'])):''); ?></td>
+    	<td>
 			<!-- <a href="#" onclick="edit_agent(<?php echo $agent['id']; ?>); return false">Edit </a><span class="text-dark"> | </span> -->
-			 <?php if($callsettings->source_from=='telecmi'){?>
+			 <?php if($agent['source_from']=='telecmi'){?>
 			<a href="#" onclick="activateAgent(<?php echo $agent['id']; ?>); return false" class="text-info">Activate </a>	
-			 <?php }else if($callsettings->source_from=='daffytel'){?>
+			 <?php }else if($agent['source_from']=='daffytel'){?>
 			<a href="#" onclick="daffyactivateAgent(<?php echo $agent['id']; ?>); return false" class="text-info">Activate </a>	
 			 <?php }else{?>
 			<a href="#" onclick="tataactivateAgent(<?php echo $agent['id']; ?>,''); return false" class="text-info">Activate </a>	
 			 <?php }?>
 			 <span class="text-dark"> | </span><a href="#" onclick="deletAgent_db(<?php echo $agent['id']; ?>,0); return false" class="text-danger">Delete </a>
-    </td> <?php } ?>
+    	</td>
 	</tr>
-       <?php } ?>
-     </tbody>
-   </table>
+    <?php } ?>
+    </tbody>
+</table>
    
-	 <input type="hidden" name="appid" id="appid" value="<?php echo $callsettings->app_id; ?>">
-	 <input type="hidden" id="req_source_from" value="<?php echo $callsettings->source_from; ?>">
-	 <input type="hidden" name="secret" id="secret" value="<?php echo $callsettings->app_secret; ?>">
-	 <input type="hidden" name="channel" id="channel" value="<?php echo $callsettings->channel; ?>">
-  
   <div class="modal" id="addAgentModal" style="display: none;">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -253,20 +247,25 @@
         <button type="button" class="close" data-dismiss="modal">&times;</button>
         <h4>Add Agent</h4>
 	  </div>
-	  <?php if($callsettings->source_from == 'telecmi'){?>
-		<form id="add_agent">
-	  <?php }else if($callsettings->source_from == 'daffytel'){?>
-		<form id="daffyaddAgent">
-	  <?php  }else{?>
-		<form id="tata_add_agent">
-	  <?php  }?>
-	  
+		<form >
         <div class="modal-body" >
 			<input type="hidden" name="name" id="name" value="">
 			<input type="hidden" name="ext" id="ext" value="">
 			<?php 
 			//echo render_select('staff_id', $agents, array('staffid', array('firstname', 'lastname')), 'staff_id', '', array());
       ?>
+
+		<div class="form-group">
+			<label for="clients_default_theme" class="control-label">IVR</label>
+			<select name="ivr_id" id="ivr_id" class="form-control selectpicker">
+				<option value="" >Select IVR</option>
+				<?php foreach($active_ivrs as $ivr): ?>
+				<option id="ivr_source_from_<?= $ivr->id ?>" value="<?= $ivr->id ?>" data-source_from="<?= $ivr->source_from?>"><?= $ivr->ivr_name ?> - <?= $vendors[$ivr->source_from] ?></option>
+				<?php endforeach; ?>
+			</select>
+			<span id="ivr_id_val" class="errmsg"></span>
+		</div>
+
       <div class="form-group select-placeholder contactid input-group-select">
         <label class="control-label"><small class="req text-danger">* </small>Agent</label>
         <div class="dropdown bootstrap-select emp_id input-group-select show-tick bs3 bs3-has-addon" style="width: 100%;">
@@ -289,13 +288,18 @@
 				<input type="phone" id="phone" name="phone" maxlenght="10" class="form-control" value="" placeholder="Enter Phone Number" required>
 				<span id="phone_val" class="errmsg"></span>
 			</div>
-			<?php if($callsettings->source_from=='telecmi'){?>
+			<div class="telecmi_settings_wrapper settings_wrapper">
 				<div class="form-group">
 					<label class="control-label"><small class="req text-danger">* </small><?php echo _l('password'); ?></label>
 					<input type="password" id="password" name="password" minlenght="6" class="form-control" value="" placeholder="Enter Password" required>
 					<span id="pass_val" class="errmsg"></span>
 				</div>
-			<?php }?>
+				<div class="form-group">
+					<label class="control-label"><small class="req text-danger">* </small><?php echo "Three Digit's Extension"; ?></label>
+					<input type="number" id="extension_id" name="extension_id" maxlenght="3" class="form-control" value="" placeholder="Enter Password" required>
+					<span id="extension_id_val" class="errmsg"></span>
+				</div>
+			</div>
 			<div class="form-group mtop15">
 				<label for="status"><?php echo _l('status'); ?></label><br />
 				<select id="status" name="status" class="selectpicker" data-width="100%" >
@@ -306,7 +310,7 @@
 					<option value="dialer" >Dialer</option>
 				</select>
 			</div>
-			<?php if($callsettings->source_from=='telecmi'){?>
+			<div class="telecmi_settings_wrapper settings_wrapper">
 				<div class="form-group mtop15">
 					<label for="sms_alert"><?php echo _l('sms_alert'); ?></label><br />
 					<select id="sms_alert" name="sms_alert" class="selectpicker" data-width="100%" >
@@ -338,17 +342,12 @@
 					</select>
 					<span id="end_val" class="errmsg"></span>
 				</div>
-			<?php }?>
+			</div>
         </div>
         <div class="modal-footer">
-			 <?php if($callsettings->source_from == 'telecmi'){?>
-			<button type="button" class="btn btn-primary" id="addAgent">Save</button>
-			 <?php }else if($callsettings->source_from == 'daffytel'){?>
-				<button type="button" class="btn btn-primary" id="daffyaddAgent">Save</button>
-			 <?php 
-			 }else{?>
-				<button type="button" class="btn btn-primary" id="tataaddAgent">Save</button>
-			 <?php }?>
+			<button type="button" class="btn btn-primary telecmi_settings_wrapper settings_wrapper" id="addAgent">Save</button>
+			<button type="button" class="btn btn-primary daffytel_settings_wrapper settings_wrapper" id="daffyaddAgent">Save</button>
+			<button type="button" class="btn btn-primary tata_settings_wrapper settings_wrapper" id="tataaddAgent">Save</button>
 			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 		</div>
 	</form>
@@ -364,14 +363,18 @@
         <button type="button" class="close" data-dismiss="modal">&times;</button>
         <h4>Edit Agent</h4>
 	  </div>
-	   <?php if($callsettings->source_from == 'telecmi'){?>
-		<form id="add_agent">
-	  <?php }else if($callsettings->source_from == 'daffytel'){?>
-		<form id="daffyaddAgent">
-	  <?php }else{?>
-		<form id="tata_add_agent">
-	  <?php  }?>
+		<form>
         <div class="modal-body" >
+			<div class="form-group">
+				<label for="clients_default_theme" class="control-label">IVR</label>
+				<select name="ivr_id" id="ivr_id" class="form-control selectpicker">
+					<option value="" >Select IVR</option>
+					<?php foreach($active_ivrs as $ivr): ?>
+					<option id="ivr_source_from_<?= $ivr->id ?>" value="<?= $ivr->id ?>" data-source_from="<?= $ivr->source_from?>"><?= $ivr->ivr_name ?> - <?= $vendors[$ivr->source_from] ?></option>
+					<?php endforeach; ?>
+				</select>
+				<span id="ivr_id_val" class="errmsg"></span>
+			</div>
 			<input type="hidden" name="name" id="name" value="">
 			<input type="hidden" name="id" id="id" value="">
 			<input type="hidden" name="agentid" id="agentid" value="">
@@ -385,13 +388,13 @@
 				<input type="hidden" id="edit_phone1" class="form-control" value="" placeholder="Enter Phone Number" required>
 				<span id="phone_val" class="errmsg"></span>
 			</div>
-			<?php if($callsettings->source_from == 'telecmi'){?>
+			<div class="telecmi_settings_wrapper settings_wrapper">
 			<div class="form-group">
 				<label class="control-label"><small class="req text-danger">* </small><?php echo _l('password'); ?></label>
 				<input type="password" id="password" name="password" class="form-control" minlenght="6" value="" placeholder="Enter Password" required>
 				<span id="pass_val" class="errmsg"></span>
 			</div>
-			<?php }?>
+	  		</div>
 			<div class="form-group mtop15">
 				<label for="status"><?php echo _l('status'); ?></label><br />
 				<select id="status" name="status" class="selectpicker" data-width="100%" >
@@ -402,7 +405,7 @@
 					<option value="dialer" >Dialer</option>
 				</select>
 			</div>
-			<?php if($callsettings->source_from == 'telecmi'){?>
+			<div class="telecmi_settings_wrapper settings_wrapper">
 			<div class="form-group mtop15">
 				<label for="sms_alert"><?php echo _l('sms_alert'); ?></label><br />
 				<select id="sms_alert" name="sms_alert" class="selectpicker" data-width="100%" >
@@ -434,16 +437,12 @@
 				</select>
 				<span id="end_val" class="errmsg"></span>
 			</div>
-			<?php }?>
+			</div>
         </div>
         <div class="modal-footer">
-		<?php if($callsettings->source_from == 'telecmi'){?>
-			<button type="button" class="btn btn-primary" id="editAgent">Save</button>
-		<?php }else if($callsettings->source_from == 'daffytel'){?>
-			<button type="button" class="btn btn-primary" id="daffyeditAgent">Save</button>
-		<?php }else{?>
-			<button type="button" class="btn btn-primary" id="targeteditAgent">Save</button>
-		<?php }?>
+			<button type="button" class="btn btn-primary telecmi_settings_wrapper settings_wrapper" id="editAgent">Save</button>
+			<button type="button" class="btn btn-primary daffytel_settings_wrapper settings_wrapper" id="daffyeditAgent">Save</button>
+			<button type="button" class="btn btn-primary tata_settings_wrapper settings_wrapper" id="targeteditAgent">Save</button>
 			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 		</div>
 	</form>
@@ -455,3 +454,22 @@
 	top:80px !important;
 }
 </style>
+
+<script>
+	function show_wrapper(source_from){
+		$('.settings_wrapper').hide();
+		$('.'+source_from+'_settings_wrapper').show();
+	}
+	document.addEventListener("DOMContentLoaded", function(event) { 
+		show_wrapper('<?= $default_vendor ?>');
+		$('[name="ivr_id"]').change(function(){
+			var source_from =$('#ivr_source_from_'+$(this).val()).attr('data-source_from');
+			show_wrapper(source_from);
+		});
+	});
+</script>
+
+<?php
+}else{
+	echo 'Should have at least one active IVR';
+}

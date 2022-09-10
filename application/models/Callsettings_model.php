@@ -17,8 +17,8 @@ class Callsettings_model extends App_Model {
      * @return mixed
      */
     public function getcallSettings() {
-        $client = $this->db->get(db_prefix() . 'call_settings')->row();
-        return $client;
+        $settings = $this->db->get(db_prefix() . 'call_settings')->result_object();
+        return $settings;
     }
 
     public function insertCallSettings($data) {
@@ -39,25 +39,30 @@ class Callsettings_model extends App_Model {
     }
 
     public function getAgents() {
-		 $client = $this->db->get(db_prefix() . 'call_settings')->row();
-        $this->db->select('tblagents.*, (select firstname from tblstaff where staffid = tblagents.staff_id) as staff_name');
-		$this->db->where("( deleted IS NULL OR deleted = 0) and (source_from = '".$client->source_from."')");
+        $this->db->where("( deleted IS NULL OR deleted = 0)");
+        $this->db->where(db_prefix() . 'call_settings.id = ' . db_prefix() . 'agents.ivr_id');
+        $this->db->join(db_prefix() . 'staff', db_prefix() . 'staff.staffid = ' . db_prefix() . 'agents.staff_id','left');
+        $this->db->join(db_prefix() . 'call_settings', db_prefix() . 'call_settings.id = ' . db_prefix() . 'agents.ivr_id','left');
+        $this->db->select(db_prefix().'agents.*,'.db_prefix() . 'call_settings.ivr_name ,'.db_prefix().'staff.firstname as staff_name');
         $agents = $this->db->get(db_prefix() . 'agents')->result_array();
         return $agents;
     }
 
     public function getDeactiveAgents() {
-		$client = $this->db->get(db_prefix() . 'call_settings')->row();
-        $this->db->select('tblagents.*, (select firstname from tblstaff where staffid = tblagents.staff_id) as staff_name');
+
         $this->db->where('deleted', 1);
-        $this->db->where('source_from', $client->source_from);
+        $this->db->join(db_prefix() . 'staff', db_prefix() . 'staff.staffid = ' . db_prefix() . 'agents.staff_id');
+        $this->db->join(db_prefix() . 'call_settings', db_prefix() . 'call_settings.id = ' . db_prefix() . 'agents.ivr_id');
+        $this->db->select(db_prefix().'agents.*,'.db_prefix() . 'call_settings.ivr_name ,'.db_prefix().'staff.firstname as staff_name');
         $agents = $this->db->get(db_prefix() . 'agents')->result_array();
         return $agents;
     }
 
     public function getAgentDetail($id) {
-        $this->db->select('tblagents.*, (select firstname from tblstaff where staffid = tblagents.staff_id) as staff_name');
-        $this->db->where('id',$id);
+        $this->db->where(db_prefix().'agents.id', $id);
+        $this->db->join(db_prefix() . 'staff', db_prefix() . 'staff.staffid = ' . db_prefix() . 'agents.staff_id');
+        $this->db->join(db_prefix() . 'call_settings', db_prefix() . 'call_settings.id = ' . db_prefix() . 'agents.ivr_id');
+        $this->db->select(db_prefix().'agents.*,'.db_prefix() . 'call_settings.ivr_name ,'.db_prefix() . 'call_settings.app_id ,'.db_prefix() . 'call_settings.app_secret ,'.db_prefix() . 'call_settings.channel ,'.db_prefix().'staff.firstname as staff_name');
         $agents = $this->db->get(db_prefix() . 'agents')->row();
         return $agents;
     }
@@ -134,9 +139,11 @@ class Callsettings_model extends App_Model {
     }
 
     public function getAgentDetailbyStaffId($id) {
-        $this->db->select('tblagents.*, (select firstname from tblstaff where staffid = tblagents.staff_id) as staff_name');
+
+        $this->db->join(db_prefix() . 'staff', db_prefix() . 'staff.staffid = ' . db_prefix() . 'agents.staff_id');
+        $this->db->join(db_prefix() . 'call_settings', db_prefix() . 'call_settings.id = ' . db_prefix() . 'agents.ivr_id');
+        $this->db->select(db_prefix().'agents.*,'.db_prefix() . 'call_settings.ivr_name ,'.db_prefix() . 'call_settings.app_id ,'.db_prefix() . 'call_settings.app_secret ,'.db_prefix() . 'call_settings.channel ,'.db_prefix().'staff.firstname as staff_name');
         $this->db->where('staff_id',$id);
-        $this->db->where('source_from',CALL_SOURCE_FROM);
         $agents = $this->db->get(db_prefix() . 'agents')->row();
         return $agents;
     }
@@ -278,6 +285,51 @@ class Callsettings_model extends App_Model {
             return 0;
         }
 
+    }
+
+    public function list_vendors()
+    {
+        return array(
+            'telecmi' => 'Tele CMI',
+            'tata' => 'TATA Tele Services',
+            'daffytel' => 'Daffytel',
+        );
+    }
+
+    public function check_ivr_name_same($id,$ivr_name)
+    {
+        $this->db->where('id',$_POST['id']);
+        $current_row = $this->db->get(db_prefix().'call_settings')->row();
+        
+        if($current_row && $current_row->ivr_name == $ivr_name){
+            return true;
+        }
+        return false;
+    }
+
+    public function get_active_ivr_vendors()
+    {
+        $this->db->where('enable_call',1);
+        $this->db->group_by('source_from'); 
+        $vendors =$this->db->get(db_prefix().'call_settings')->result_object();
+        $vendors_list=$this->list_vendors();
+        $active_vendors=array();
+        if($vendors){
+            foreach($vendors as $vendor){
+                if(isset($vendors_list[$vendor->source_from])){
+                    $active_vendors[$vendor->source_from] =$vendors_list[$vendor->source_from];
+                }
+            }
+            
+           
+        }
+        return $active_vendors;
+    }
+
+    public function get_active_ivrs()
+    {
+        $this->db->where('enable_call',1);
+        return $this->db->get(db_prefix().'call_settings')->result_object();
     }
     
 }
