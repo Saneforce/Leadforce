@@ -861,7 +861,7 @@ exit;
 				$result = $this->callsettings_model->addtask($task_details);
 			}
 			//APP Credentials
-			$this->db->where('id',$post['user']);
+			$this->db->where('agent_id',$post['user']);
         	$staff = $this->db->get(db_prefix().'agents')->row();
 			if(!$staff){
 				return;
