@@ -4111,3 +4111,4 @@ $lang ['pdf_template'] ='PDF template';
 $lang['vendor'] ='Vendor';
 $lang['ivr_name'] ='IVR Name';
 $lang['enable_call'] = 'Enable call';
+$lang['agents'] ='Agents';

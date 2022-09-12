@@ -393,7 +393,7 @@ class Callsettings_model extends App_Model {
                 foreach($agents as $agent){
                     if(!in_array($agent->agent_id,$agent_ids)){
                         $this->db->where('id',$agent->id);
-                        $this->db->update(db_prefix().'agents',['deleted'=>1]);
+                        $this->db->delete(db_prefix().'agents');
                     }
                 }
             }
