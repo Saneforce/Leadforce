@@ -17,27 +17,23 @@
                   <?php echo _l('new_project'); ?>
                 </a>
               <?php }
-             // $list_url = admin_url('projects/index_list?pipelines='.$pipelines[0]['id'].'&member=&gsearch=');
               $list_url = admin_url('projects/index_list?pipelines=&member=&gsearch=');
               $kanban_onscroll_url = admin_url('projects/kanban_noscroll?pipelines='.$pipelines[0]['id'].'&member=&gsearch=');
               $kanban_url = admin_url('projects/kanbans?pipelines='.$pipelines[0]['id'].'&member=&gsearch=');
               $forecast_url = admin_url('projects/kanbans_forecast?pipelines='.$pipelines[0]['id'].'&member='.$mem.'&gsearch='.$gsearch);
               if(!is_admin(get_staff_user_id())) {
                   $list_url = admin_url('projects/index_list?pipelines='.$pipelines[0]['id'].'&member='.get_staff_user_id().'&gsearch=');
-                  //$list_url = admin_url('projects/index_list?pipelines=&member='.get_staff_user_id().'&gsearch=');
                   $kanban_onscroll_url = admin_url('projects/kanban_noscroll?pipelines='.$pipelines[0]['id'].'&member='.get_staff_user_id().'&gsearch=');
                   $kanban_url = admin_url('projects/kanbans?pipelines='.$pipelines[0]['id'].'&member='.get_staff_user_id().'&gsearch=');
                   $forecast_url = admin_url('projects/kanbans_forecast?pipelines='.$pipelines[0]['id'].'&member='.$mem.'&gsearch='.$gsearch);
               }
               ?>
               <a href="<?php echo $list_url; ?>" data-toggle="tooltip" title="<?php echo _l('projects'); ?>" class="btn btn-primary"><i class="fa fa-list" aria-hidden="true"></i></a>
-              <!-- <a href="<?php echo admin_url('projects/gantt?pipelines='.$pipelines[0]['id'].'&member=&gsearch='); ?>" data-toggle="tooltip" title="<?php echo _l('project_gant'); ?>" class="btn btn-default"><i class="fa fa-align-left" aria-hidden="true"></i></a> -->
               <a href="<?php echo $kanban_onscroll_url; ?>" data-toggle="tooltip" title="<?php echo _l('leads_switch_to_kanban_noscroll'); ?>" class="btn btn-default"><i class="fa fa-th" aria-hidden="true"></i></a>
               <a href="<?php echo $kanban_url; ?>" data-toggle="tooltip" title="<?php echo _l('leads_switch_to_kanban'); ?>" class="btn btn-default"><i class="fa fa-th-large" aria-hidden="true"></i></a>
               <a href="<?php echo $forecast_url; ?>" data-toggle="tooltip" title="<?php echo _l('leads_switch_to_forecast'); ?>" class="btn btn-default"><i class="fa fa-line-chart" aria-hidden="true"></i></a>
               
-              
-
+           
 <div class="btn-group pull-right mleft4 mbot25 btn-with-tooltip-group _filter_data" data-toggle="tooltip" data-title="<?php echo _l('projects_list_column'); ?>">
        <!-- Button trigger modal -->
 <button type="button" class="btn btn-default" data-toggle="modal" data-target="#projects_list_column_orderModal">
@@ -150,17 +146,6 @@ foreach($custom_fields as $cfkey=>$cfval){
 							<h4><?php echo _l('filter_by'); ?></h4>
 						</div>
 						<?php echo form_open(admin_url('projects/index_list'), array('method'=>'get','id'=>'ganttFiltersForm')); ?>
-						<!-- <div class="col-md-3 pipeselect">
-							<select class="selectpicker" data-none-selected-text="<?php echo _l('all'); ?>" name="pipelines" data-width="100%">
-              
-								<?php foreach($pipelines as $status){
-									?>
-									<option value="<?php echo $status['id']; ?>"<?php if($selected_statuses == $status['id']){echo ' selected';} ?>>
-										<?php //echo $status['name']; ?>
-									</option>
-								<?php } ?>
-							</select>
-						</div> -->
 						<?php
 			            /**
 			             * Only show this filter if user has permission for projects view otherwise
@@ -197,13 +182,8 @@ foreach($custom_fields as $cfkey=>$cfval){
 			        </div>
               <?php echo form_close(); ?>
               </div>
-			        <!-- <div class="clearfix"></div>
-                <hr class="hr-panel-heading" />
-              </div> -->
                <div class="row mbot15">
                 <div class="col-md-12">
-                  <!-- <h4 class="no-margin"><?php echo _l('projects_summary'); ?></h4>
-                  <br> -->
                   <?php
                   $_where = '';
                   if(!has_permission('projects','','view')){
@@ -228,7 +208,6 @@ foreach($custom_fields as $cfkey=>$cfval){
                      } else if($this->input->get('status')) {
                         $value = ($this->input->get('status') == $status['id'] ? $status['id'] : "");
                      }
-                     //echo form_hidden('project_status_'.$status['id'],$value);
                      echo form_hidden('project_status_'.$status['id'],'');
                     ?>
                    <!-- <div class="col-md-5ths total-column"> 
@@ -280,12 +259,7 @@ foreach($custom_fields as $cfkey=>$cfval){
 					<div class="col-md-2" style="width:auto">
 						<a href="javascript:void(0);" id="del_mail" data-toggle="modal" data-target="#edt_multiple"  data-backdrop="static" data-keyboard="false" title="Edit" onclick="edit_multiple()"><i class="fa fa-edit fa-2x"  style="color:red"></i></a>
 					</div>
-					<?php /*<div class="col-md-2" style="width:auto;padding-top:6px">
-						<a href="javascript:void(0);" style="color:#666" id="read_mail">Mark as Read </a>
-					</div>
-					<div class="col-md-2" style="width:auto;padding-top:6px">
-						<a href="javascript:void(0);" style="color:#666" id="unread_mail">Mark as Unread </a>
-					</div>*/?>
+					
 				</div>
 			</div>
 <?php if($this->session->flashdata('warning_msg_deal')){ ?>
@@ -316,7 +290,6 @@ foreach($custom_fields as $cfkey=>$cfval){
       <div class="modal-body">
 		<?php if(!empty($need_fields_edit)){
 			$i = 0;
-			//echo '<pre>';print_r($mandatory_fields1);exit;
 			foreach($need_fields_edit as $need_field12){
 				$req_field = $need_field12;
 				if($need_field12 == 'project_contacts[]'){
@@ -338,16 +311,11 @@ foreach($custom_fields as $cfkey=>$cfval){
 					<?php if($need_field12 == 'clientid'){?>
 						<div class="ch_field_div" id="div_<?php echo $need_fields_label[$i];?>" style="display:none;margin-top:15px;">
 							 <select id="clientid" name="sel_<?php echo $need_field12;?>" data-live-search="true" data-width="100%" class="ajax-search " style="display:block" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>" onchange="get_person(this.value)">
-								<?php //// $selected = (isset($project) ? $project->clientid : '');
-								// if($selected == ''){
-									//$selected = (isset($customer_id) ? $customer_id: '');
-								// }
-								// if($selected != ''){
+								<?php 
 									$selected = '';
 									$rel_data = get_relation_data('customer',$selected);
 									$rel_val = get_relation_values($rel_data,'customer');
 									echo '<option value="'.$rel_val['id'].'" >'.$rel_val['name'].'</option>';
-								//} 
 								?>
 
 							</select>
@@ -405,7 +373,7 @@ foreach($custom_fields as $cfkey=>$cfval){
 								<?php }?>
 							</select>
 						</div>
-					<?php }else if($need_field12 == 'teamleader'){?>
+					<?php }else if($need_field12 == 'teamleader' || $need_field12 == 'teamleader_name'){?>
 						<div id="div_<?php echo $need_fields_label[$i];?>" style="display:none;margin-top:15px;" class="ch_field_div">
 							 <select name="sel_<?php echo $need_field12;?>" id="<?php echo $need_fields_label[$i];?>" class="selectpicker " data-width="100%"
                                         data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
@@ -543,17 +511,11 @@ $(function(){
 		$('#div_'+a).hide();
 		$("#"+a).prop('required',false);
 		$("#clientid").prop('required',false);
-		if(!(isNaN(a))){
-			document.getElementById("custom_fields[projects]["+a+"]").required = false;
-		}
-
+		
 		if(b.value == 'Edit current value...'){
 			$("#"+a).prop('required',true);
 			if(a=='project_customer'){
 				$("#clientid").prop('required',true);
-			}
-			if(!(isNaN(a))){
-				document.getElementById("custom_fields[projects]["+a+"]").required = true;
 			}
 			$('#div_'+a).show();
 		}
