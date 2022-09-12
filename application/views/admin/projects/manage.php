@@ -511,17 +511,11 @@ $(function(){
 		$('#div_'+a).hide();
 		$("#"+a).prop('required',false);
 		$("#clientid").prop('required',false);
-		if(!(isNaN(a))){
-			document.getElementById("custom_fields[projects]["+a+"]").required = false;
-		}
-
+		
 		if(b.value == 'Edit current value...'){
 			$("#"+a).prop('required',true);
 			if(a=='project_customer'){
 				$("#clientid").prop('required',true);
-			}
-			if(!(isNaN(a))){
-				document.getElementById("custom_fields[projects]["+a+"]").required = true;
 			}
 			$('#div_'+a).show();
 		}
