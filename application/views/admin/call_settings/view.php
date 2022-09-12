@@ -305,6 +305,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 					$('[name="'+response.data.source_from+'_app_secret"]').val(response.data.app_secret);
 					$('[name="'+response.data.source_from+'_channel"]').val(response.data.channel);
 					$('[name="'+response.data.source_from+'_channel"]').selectpicker('refresh');
+					$('[name="'+response.data.source_from+'_webhook"]').val(response.data.webhook);
 					// $('[name="'+response.data.source_from+'_recorder"]').removeAttr('checked');
 					
 					if(response.data.recorder ==1){
