@@ -2221,6 +2221,7 @@ function edit_agent(id) {
         data: {id:id},
         dataType: 'json',
         success: function(msg){
+            $('.errmsg').html('');
             show_wrapper(msg.source_from);
             $('#editAgentModal select[name="ivr_id"]').attr('disabled',true);
             $('#editAgentModal select[name=ivr_id]').val(msg.ivr_id);
@@ -2237,6 +2238,10 @@ function edit_agent(id) {
                 $('#editAgentModal select#staff_id').selectpicker('val',msg.staff_id);
                 $('#editAgentModal select#staff_id').attr('disabled',true);
                 $('#editAgentModal select#staff_id option[value='+msg.staff_id+']').attr('selected','selected');
+                $('#editAgentModal select#staff_id').selectpicker('refresh');
+            }else{
+                $('#editAgentModal select#staff_id').removeAttr('disabled');
+                $('#editAgentModal select#staff_id').val('');
                 $('#editAgentModal select#staff_id').selectpicker('refresh');
             }
             
