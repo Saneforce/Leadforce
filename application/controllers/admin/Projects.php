@@ -113,6 +113,8 @@ class Projects extends AdminController
 		$data['need_fields_label'] = $needed_fields['need_fields_label'];
 		$data['need_fields_edit']	=	$needed_fields['need_fields_edit'];
 		$data['mandatory_fields1']	=	$needed_fields['mandatory_fields1'];
+		$mandatory_count			=	count($data['mandatory_fields1']);
+		$data['mandatory_fields1'][$mandatory_count]	=	'teamleader_name';
 		$data['client_contacts']     = $this->clients_model->getAllContacts_active();
 		$allcurrency = $this->projects_model->get_allcurrency();
         $data['allcurrency'] = $allcurrency;
@@ -3722,8 +3724,13 @@ class Projects extends AdminController
 			$upd_data	= array();
 			foreach($all_fields as $key=>$all_field1){
 				if($all_field1 == 'Edit current value...'){
-					
-					$upd_data[$key] = $_POST['sel_'.$key];
+					if($key == 'teamleader_name'){
+						$key = 'teamleader';
+						$upd_data[$key] = $_POST['sel_teamleader_name'];
+					}
+					else{
+						$upd_data[$key] = $_POST['sel_'.$key];
+					}
 					if($key == 'project_cost'){
 						$upd_data['project_currency'] = $_POST['project_currency'];
 					}
