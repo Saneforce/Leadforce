@@ -306,6 +306,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
 					$('[name="'+response.data.source_from+'_channel"]').val(response.data.channel);
 					$('[name="'+response.data.source_from+'_channel"]').selectpicker('refresh');
 					$('[name="'+response.data.source_from+'_webhook"]').val(response.data.webhook);
+					if(response.data.country_code){
+						$('select[name=daffytel_country_daffy]').val(response.data.country_code);
+						$('[name=daffytel_country_daffy]').selectpicker('refresh');
+					}
 					// $('[name="'+response.data.source_from+'_recorder"]').removeAttr('checked');
 					
 					if(response.data.recorder ==1){
