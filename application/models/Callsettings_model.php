@@ -271,17 +271,14 @@ class Callsettings_model extends App_Model {
     }
 
     public function accessToCall() {
-        $call = $this->db->get(db_prefix() . 'call_settings')->row();
-        if(isset($call->enable_call) && $call->enable_call == 1) {
-            $this->db->where('staff_id',get_staff_user_id());
-            $this->db->where("( deleted IS NULL OR deleted = 0) and (source_from = '".$call->source_from."')");
-            $agent = $this->db->get(db_prefix() . 'agents')->row();
-            if($agent) {
-                return 1;
-            } else {
-                return 0;
-            }
-        } else {
+        $this->db->where(db_prefix().'agents.staff_id', get_staff_user_id());
+        $this->db->join(db_prefix() . 'staff', db_prefix() . 'staff.staffid = ' . db_prefix() . 'agents.staff_id','left');
+        $this->db->join(db_prefix() . 'call_settings', db_prefix() . 'call_settings.id = ' . db_prefix() . 'agents.ivr_id','left');
+        $this->db->select(db_prefix().'agents.*,'.db_prefix() . 'call_settings.ivr_name ,'.db_prefix() . 'call_settings.app_id ,'.db_prefix() . 'call_settings.app_secret ,'.db_prefix() . 'call_settings.channel ,'.db_prefix().'staff.firstname as staff_name,'.db_prefix().'call_settings.enable_call');
+        $agent = $this->db->get(db_prefix() . 'agents')->row();
+        if($agent && $agent->enable_call ==1){
+            return 1;
+        }else{
             return 0;
         }
 
