@@ -187,7 +187,9 @@ Sync Agents
         <td data-order="<?php echo $agent['status']; ?>"><?php echo ucfirst($agent['status']); ?></td>
 		<td data-order="<?php echo $agent['created_date']; ?>"><?php echo ((isset($agent['created_date']))?date('M j, Y',strtotime($agent['created_date'])):''); ?></td>
 		<td>
-			<a href="#" onclick="edit_agent(<?php echo $agent['id']; ?>); return false">Edit </a><span class="text-dark"> | </span>
+			<a href="#" onclick="edit_agent(<?php echo $agent['id']; ?>); return false">Edit </a>
+			<?php if($agent['staff_id'] >0): ?>
+			<span class="text-dark"> | </span>
 			<?php if($agent['source_from']=='telecmi'){?>
 			<a href="#" onclick="deletAgent(<?php echo $agent['id']; ?>); return false" class="text-danger">Deactivate </a>	
 			<?php }else if($agent['source_from']=='daffytel'){?>
@@ -195,6 +197,7 @@ Sync Agents
 			<?php }else{?>
 			<a href="#" onclick="tatadeletAgent(<?php echo $agent['id']; ?>,''); return false" class="text-danger">Deactivate </a>	
 			<?php }?>
+			<?php endif; ?>
 			<span class="text-dark"> | </span><a href="#" onclick="deletAgent_db(<?php echo $agent['id']; ?>,1,'<?php echo $agent['source_from']; ?>'); return false" class="text-danger">Delete </a>	
 		</td> 
 	</tr>

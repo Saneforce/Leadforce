@@ -46,42 +46,72 @@ class Call_settings extends AdminController
                 $updateData = array();
                 $this->form_validation->set_rules('source_from', 'Source From', 'required');
                 $ivr_name_rule ='required';
+                $app_id_rule ='required';
+                $app_secret_rule ='required';
                 if(!isset($_POST['id']) || $_POST['id']==0){
                     $ivr_name_rule .='|is_unique['.db_prefix().'call_settings.ivr_name]';
+                    $app_id_rule .='|is_unique['.db_prefix().'call_settings.app_id]';
+                    $app_secret_rule .='|is_unique['.db_prefix().'call_settings.app_secret]';
                 }
                 if($_POST['source_from'] =='telecmi'){
                     if(isset($_POST['id']) && $_POST['id']>0 && $this->callsettings_model->check_ivr_name_same($_POST['id'],$_POST['telecmi_ivr_name']) == false){
                         $ivr_name_rule .='|is_unique['.db_prefix().'call_settings.ivr_name]';
                     }
+
+                    if(isset($_POST['id']) && $_POST['id']>0 && $this->callsettings_model->check_app_id_same($_POST['id'],$_POST['telecmi_app_key']) == false){
+                        $app_id_rule .='|is_unique['.db_prefix().'call_settings.app_id]';
+                    }
+                    if(isset($_POST['id']) && $_POST['id']>0 && $this->callsettings_model->check_app_id_secret($_POST['id'],$_POST['telecmi_app_secret']) == false){
+                        $app_secret_rule .='|is_unique['.db_prefix().'call_settings.app_secret]';
+                    }
+
                     $this->form_validation->set_rules('telecmi_ivr_name', 'IVR name', $ivr_name_rule);
-                    $this->form_validation->set_rules('telecmi_app_key', 'App Id', 'required');
-                    $this->form_validation->set_rules('telecmi_app_secret', 'App Secret', 'required');
+                    $this->form_validation->set_rules('telecmi_app_key', 'App Id', $app_id_rule);
+                    $this->form_validation->set_rules('telecmi_app_secret', 'App Secret', $app_secret_rule);
                     $this->form_validation->set_rules('telecmi_recorder', 'Record calls', 'required');
                     $this->form_validation->set_rules('telecmi_channel', 'Channel', 'required');
                 }elseif($_POST['source_from'] =='tata'){
                     if(isset($_POST['id']) && $_POST['id']>0 && $this->callsettings_model->check_ivr_name_same($_POST['id'],$_POST['tata_ivr_name']) == false){
                         $ivr_name_rule .='|is_unique['.db_prefix().'call_settings.ivr_name]';
                     }
+                    if(isset($_POST['id']) && $_POST['id']>0 && $this->callsettings_model->check_app_id_same($_POST['id'],$_POST['tata_app_key']) == false){
+                        $app_id_rule .='|is_unique['.db_prefix().'call_settings.app_id]';
+                    }
+                    if(isset($_POST['id']) && $_POST['id']>0 && $this->callsettings_model->check_app_id_secret($_POST['id'],$_POST['tata_app_secret']) == false){
+                        $app_secret_rule .='|is_unique['.db_prefix().'call_settings.app_secret]';
+                    }
                     $this->form_validation->set_rules('tata_ivr_name', 'IVR name', $ivr_name_rule);
-                    $this->form_validation->set_rules('tata_app_key', 'Login Id', 'required');
-                    $this->form_validation->set_rules('tata_app_secret', 'Password', 'required');
+                    $this->form_validation->set_rules('tata_app_key', 'Login Id', $app_id_rule);
+                    $this->form_validation->set_rules('tata_app_secret', 'Password', $app_secret_rule);
                     $this->form_validation->set_rules('tata_recorder', 'Record calls', 'required');
                 }elseif($_POST['source_from'] =='daffytel'){
                     if(isset($_POST['id']) && $_POST['id']>0 && $this->callsettings_model->check_ivr_name_same($_POST['id'],$_POST['daffytel_ivr_name']) == false){
                         $ivr_name_rule .='|is_unique['.db_prefix().'call_settings.ivr_name]';
                     }
+                    if(isset($_POST['id']) && $_POST['id']>0 && $this->callsettings_model->check_app_id_same($_POST['id'],$_POST['daffytel_app_key']) == false){
+                        $app_id_rule .='|is_unique['.db_prefix().'call_settings.app_id]';
+                    }
+                    if(isset($_POST['id']) && $_POST['id']>0 && $this->callsettings_model->check_app_id_secret($_POST['id'],$_POST['daffytel_app_secret']) == false){
+                        $app_secret_rule .='|is_unique['.db_prefix().'call_settings.app_secret]';
+                    }
                     $this->form_validation->set_rules('daffytel_ivr_name', 'IVR name', $ivr_name_rule);
-                    $this->form_validation->set_rules('daffytel_app_key', 'Access Token', 'required');
-                    $this->form_validation->set_rules('daffytel_app_secret', 'Bridge No.', 'required');
+                    $this->form_validation->set_rules('daffytel_app_key', 'Access Token', $app_id_rule);
+                    $this->form_validation->set_rules('daffytel_app_secret', 'Bridge No.', $app_secret_rule);
                     $this->form_validation->set_rules('daffytel_recorder', 'Record calls', 'required');
                     $this->form_validation->set_rules('daffytel_webhook', 'Webhook', 'required');
                 }elseif($_POST['source_from'] =='knowlarity'){
                     if(isset($_POST['id']) && $_POST['id']>0 && $this->callsettings_model->check_ivr_name_same($_POST['id'],$_POST['knowlarity_ivr_name']) == false){
                         $ivr_name_rule .='|is_unique['.db_prefix().'call_settings.ivr_name]';
                     }
+                    if(isset($_POST['id']) && $_POST['id']>0 && $this->callsettings_model->check_app_id_same($_POST['id'],$_POST['knowlarity_app_key']) == false){
+                        $app_id_rule .='|is_unique['.db_prefix().'call_settings.app_id]';
+                    }
+                    if(isset($_POST['id']) && $_POST['id']>0 && $this->callsettings_model->check_app_id_secret($_POST['id'],$_POST['knowlarity_app_secret']) == false){
+                        $app_secret_rule .='|is_unique['.db_prefix().'call_settings.app_secret]';
+                    }
                     $this->form_validation->set_rules('knowlarity_ivr_name', 'IVR name', $ivr_name_rule);
-                    $this->form_validation->set_rules('knowlarity_app_key', 'App Id', 'required');
-                    $this->form_validation->set_rules('knowlarity_app_secret', 'App Secret', 'required');
+                    $this->form_validation->set_rules('knowlarity_app_key', 'App Id', $app_id_rule);
+                    $this->form_validation->set_rules('knowlarity_app_secret', 'App Secret', $app_secret_rule);
                     $this->form_validation->set_rules('knowlarity_recorder', 'Record calls', 'required');
                     $this->form_validation->set_rules('knowlarity_channel', 'Channel', 'required');
                 }
@@ -633,5 +663,26 @@ class Call_settings extends AdminController
         $this->callsettings_model->syncAgents();
         set_alert('success',_l('updated_successfully',_l('agents')));
         redirect(admin_url('call_settings/agent'));
+    }
+
+    public function validate_agent_id($id)
+    {
+        $this->db->where('staff_id',$id);
+        $agent =$this->db->get(db_prefix().'agents')->row();
+        if($agent){
+            echo json_encode(
+                array(
+                    'success'=>false,
+                    'message'=>'Selected staff is already assigned'
+                )
+            );
+        }else{
+            echo json_encode(
+                array(
+                    'success'=>true,
+                    'message'=>''
+                )
+            );
+        }
     }
 }

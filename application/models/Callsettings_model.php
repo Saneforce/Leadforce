@@ -298,7 +298,7 @@ class Callsettings_model extends App_Model {
 
     public function check_ivr_name_same($id,$ivr_name)
     {
-        $this->db->where('id',$_POST['id']);
+        $this->db->where('id',$id);
         $current_row = $this->db->get(db_prefix().'call_settings')->row();
         
         if($current_row && $current_row->ivr_name == $ivr_name){
@@ -419,4 +419,28 @@ class Callsettings_model extends App_Model {
             }
         }    
     }
+
+    public function check_app_id_same($id,$app_id)
+    {
+        $this->db->where('id',$id);
+        $current_row = $this->db->get(db_prefix().'call_settings')->row();
+        
+        if($current_row && $current_row->app_id == $app_id){
+            return true;
+        }
+        return false;
+    }
+
+    public function check_app_id_secret($id,$app_secret)
+    {
+        $this->db->where('id',$id);
+        $current_row = $this->db->get(db_prefix().'call_settings')->row();
+        
+        if($current_row && $current_row->app_secret == $app_secret){
+            return true;
+        }
+        return false;
+    }
+
+    
 }

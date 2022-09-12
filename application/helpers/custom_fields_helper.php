@@ -3346,6 +3346,21 @@ $(document).ready(function(){
             $('#editAgentModal #staff_val').html('');
         }
 
+        $.ajax({
+            type: "POST",
+            url: admin_url+'call_settings/validate_agent_id/'+staff_id,
+            contentType: "application/json",
+            dataType: 'json',
+            async: false,
+            success: function(msg){
+                if(msg.success ==false){
+                    $('#editAgentModal #staff_val').html(msg.message);
+                    validate = 1;  
+                }
+            }
+        });
+
+
         if(!phone_number) {
             $('#editAgentModal #phone_val').html('Please enter Phone number, It should have minimum 7 digits to maximum 20 digits');
             validate = 1;

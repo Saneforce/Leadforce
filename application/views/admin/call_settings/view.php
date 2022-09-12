@@ -7,14 +7,13 @@
 
 <!-- call settings records -->
 <div>
-<table class="table dt-table scroll-responsive" data-order-col="0" data-order-type="desc">
+<table class="table dt-table scroll-responsive">
   	<thead>
     <tr>
 		<th><?php echo _l('vendor'); ?></th>
 		<th><?php echo _l('ivr_name'); ?></th>
 		<th><?php echo _l('enable_call'); ?></th>
-		<th></th>
-		<th></th>
+		<th><?php echo _l('options') ?></th>
     </tr>
   	</thead>
   	<tbody>
@@ -28,8 +27,8 @@
 					<label class="onoffswitch-label" for="<?= $settings->id ?>"></label>
 				</div>
 			</td>
-			<td ><a href="javascript:void(0)" class="text-primary editIvrModel" data-id="<?= $settings->id ?>"><?= _l("edit") ?></a></td>
-			<td ><a href="<?= admin_url('call_settings/delete_ivr/'.$settings->id) ?>" class="text-danger delete_ivr_link"><?= _l("delete") ?></a></td>
+			<td ><a href="javascript:void(0)" class="text-primary editIvrModel" data-id="<?= $settings->id ?>"><?= _l("edit") ?></a> | 
+			<a href="<?= admin_url('call_settings/delete_ivr/'.$settings->id) ?>" class="text-danger delete_ivr_link"><?= _l("delete") ?></a></td>
 		</tr>
 		<?php endforeach; ?>
     </tbody>
@@ -254,10 +253,10 @@ var callSettings =JSON.parse('<?php echo json_encode($callsettings); ?>');
 function show_settings(){
 	$('.settings_wrapper').hide();
 	var source_from =$('[name="source_from"]').val();
-	if(source_from ==''){
-		source_from ='telecmi';
+	if(source_from){
+		$('#'+source_from+'_settings_wrapper').show();
 	}
-	$('#'+source_from+'_settings_wrapper').show();
+	
 }
 </script>
 <?php //init_tail(); ?>
@@ -275,11 +274,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	});
 	$('#newIvrModel').click(function(){
 		$('.ivr_form_errors').remove();
+		$('select[name=source_from]').val('');
 		$('[name="source_from"]').removeAttr('disabled');
 		$('[name="source_from"]').selectpicker('refresh');
 		$('[name="id"]').val(0);
 		$('#ivrForm .modal-header .title').html('Add IVR');
 		$('#ivrForm').trigger('reset');
+		show_settings();
 		$('#ivrModal').modal('show');
 	});
 	$('.editIvrModel').click(function(){
