@@ -3345,20 +3345,22 @@ $(document).ready(function(){
         } else {
             $('#editAgentModal #staff_val').html('');
         }
-
-        $.ajax({
-            type: "POST",
-            url: admin_url+'call_settings/validate_agent_id/'+staff_id,
-            contentType: "application/json",
-            dataType: 'json',
-            async: false,
-            success: function(msg){
-                if(msg.success ==false){
-                    $('#editAgentModal #staff_val').html(msg.message);
-                    validate = 1;  
+        if($('#editAgentModal #staff_id').is(':disabled') == false){
+            $.ajax({
+                type: "POST",
+                url: admin_url+'call_settings/validate_agent_id/'+staff_id,
+                contentType: "application/json",
+                dataType: 'json',
+                async: false,
+                success: function(msg){
+                    if(msg.success ==false){
+                        $('#editAgentModal #staff_val').html(msg.message);
+                        validate = 1;  
+                    }
                 }
-            }
-        });
+            });
+        }
+        
 
 
         if(!phone_number) {
