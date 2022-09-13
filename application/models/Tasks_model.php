@@ -3161,6 +3161,7 @@ class Tasks_model extends App_Model
                 'tasktype as type_id',
                 'tblcontacts.email as contact_email',
                 'tblcontacts.phonenumber as contact_phone',
+                'tblcontacts.phone_country_code as contact_phone_country_code',
                 'recurring',
                 tasks_rel_name_select_query() . ' as rel_name',
                 'billed',

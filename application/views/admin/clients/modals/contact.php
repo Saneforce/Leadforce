@@ -90,15 +90,16 @@
                         </div>
                         
                         <?php $value=( isset($contact) ? $contact->phonenumber : ''); ?>
-                        <!-- <?php echo render_input( 'phonenumber', 'client_phonenumber',$value,'text',array('autocomplete'=>'off')); ?> -->
+                        <!-- <?php echo render_input( 'phonenumber', 'client_phonenumber',$value,'text',array('autocomplete'=>'off','style'=>'padding-left:90px !important')); ?> -->
 
-                        <div class="form-group" app-field-wrapper="phonenumber">
-                        <label for="phonenumber" class="control-label">Phone  </label>
-                        <div class="input-group">
-                        <input type="text" id="phonenumber" name="phonenumber" class="form-control" autocomplete="off" value="<?php echo $value; ?>">
-                        <div class="input-group-addon"><span class="add_field_button_ap pointer "><i class="fa fa fa-plus"></i></span></div>
+                        <div class="form-group" app-field-wrapper="phonenumber" id="phonenumber_iti_wrapper">
+                            <label for="phonenumber" class="control-label">Phone  </label>
+                            <div class="input-group">
+                            <input type="text" id="phonenumber" name="phonenumber" class="form-control" autocomplete="off" value="<?php echo $value; ?>">
+                            <div class="input-group-addon"><span class="add_field_button_ap pointer "><i class="fa fa fa-plus"></i></span></div>
+                            </div>
                         </div>
-                        </div>
+                        <input type="hidden" name="phone_country_code" id="phone_country_code" value="<?php echo ( isset($contact) ? $contact->phone_country_code : 'IN'); ?>">
                         <!-- <label class="control-label"><?php echo _l('alternative',_l('client_phonenumber')); ?>
                         
                         </label> -->
@@ -771,6 +772,23 @@ $('input.timepicker').timepicker({
     scrollbar: true
     });
     </script>
+
+<script>
+
+    // -----Country Code Selection
+    $("#phonenumber").intlTelInput({
+        initialCountry: "<?php echo ( isset($contact) ? $contact->phone_country_code : 'IN'); ?>",
+        separateDialCode: true,
+        // utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/11.0.4/js/utils.js"
+    });
+    $("#phonenumber_iti_wrapper .iti__flag-container ul li").click(function(){
+
+        var country_code =$(this).attr('data-country-code').toUpperCase();
+        $("#phone_country_code").val(country_code);
+    });
+
+</script>
+
 	<?php /*<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 */ ?>
 <!-- Latest compiled and minified JavaScript -->

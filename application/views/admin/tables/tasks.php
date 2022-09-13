@@ -121,7 +121,8 @@ foreach ($rResult as $aRow) {
         $contact .= '<a class="task-table-related" data-toggle="tooltip" data-html="true" title="' . $lable . '" href="' . admin_url("clients/view_contact/".$aRow['contacts_id']) . '">' .$aRow['project_contacts']. '</a><input type="hidden" id="input_phone_'.$aRow['id'].'" value="'.$aRow['contact_phone'].'">';
 		$contact .= '<div style="display:flex">';
         if(isset($aRow['contact_phone']) && !empty($aRow['contact_phone']) && $allow_to_call == 1 && $aRow['type_id'] == 1) {
-            $contact .= '<div><a href="#" onclick="callfromdeal('.$aRow['contacts_id'].','.$aRow['id'].','.$aRow['contact_phone'].',\'task\');" title="Call Now"><img src="'.APP_BASE_URL.'/assets/images/call.png" style="width:25px;"></a></div>';
+            $calling_code =$this->ci->callsettings_model->getCallingCode($aRow['contact_phone_country_code']);
+            $contact .= '<div><a href="#" onclick="callfromdeal('.$aRow['contacts_id'].','.$aRow['id'].','.$aRow['contact_phone'].',\'task\',\''.$calling_code.'\');" title="Call Now"><img src="'.APP_BASE_URL.'/assets/images/call.png" style="width:25px;"></a></div>';
         }
         if($aRow['call_id'] && !empty($aRow['recorded'])) {
             $contact .= '<div><a href="#" onclick="playrecord(\''.$aRow['recorded'].'\');" title="Play Now"><img src="'.APP_BASE_URL.'/assets/images/play.png" style="width:25px;"></a></div>';

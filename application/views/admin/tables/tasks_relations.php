@@ -377,6 +377,7 @@ else {
         db_prefix() .'tasks.tasktype as type_id',
         'tblcontacts.email as contact_email',
         'tblcontacts.phonenumber as contact_phone',
+        'tblcontacts.phone_country_code as contact_phone_country_code',
         'recurring',
         '(SELECT staffid FROM ' . db_prefix() . 'task_assigned WHERE taskid=' . db_prefix() . 'tasks.id AND staffid=' . get_staff_user_id() . ') as is_assigned',
         get_sql_select_task_assignees_ids() . ' as assignees_ids',
@@ -393,7 +394,6 @@ else {
 	//pre($rResult);
     $allow_to_call = $this->ci->callsettings_model->accessToCall();
     foreach ($rResult as $aRow) {
-        
         $row = [];
 
         $row[] = '<div class="checkbox"><input type="checkbox" value="' . $aRow['id'] . '"><label></label></div>';
@@ -455,7 +455,8 @@ else {
         }
         $contactss .= '<div style="display:flex">';
         if(isset($aRow['contact_phone']) && !empty($aRow['contact_phone']) && $allow_to_call == 1 && $aRow['type_id'] == 1) {
-            $contactss .= '<div><a href="#" onclick="callfromdeal('.$aRow['contactsid'].','.$aRow['id'].','.$aRow['contact_phone'].',\'task\');" title="Call Now"><img src="'.APP_BASE_URL.'/assets/images/call.png" style="width:25px;"></a></div>';
+            $calling_code =$this->ci->callsettings_model->getCallingCode($aRow['contact_phone_country_code']);
+            $contactss .= '<div><a href="#" onclick="callfromdeal('.$aRow['contactsid'].','.$aRow['id'].','.$aRow['contact_phone'].',\'task\',\''.$calling_code.'\');" title="Call Now"><img src="'.APP_BASE_URL.'/assets/images/call.png" style="width:25px;"></a></div>';
         }
         if($aRow['call_id'] && !empty($aRow['recorded'])) {
             $contactss .= '<div><a href="#" onclick="playrecord(\''.$aRow['recorded'].'\');" title="Play Now"><img src="'.APP_BASE_URL.'/assets/images/play.png" style="width:25px;"></a></div>';

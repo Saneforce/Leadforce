@@ -1,5 +1,19 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
+
+<style>
+.iti {
+    position: unset !important; 
+    display: block !important;
+    width : 100% !important;
+}
+.iti__flag-container {
+    z-index: 999 !important;
+}
+
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/css/intlTelInput.css">
+
 <style>
 .btn-disable {
   pointer-events: none;
@@ -263,6 +277,22 @@ function copyToClipboard(element) {
 }
   
   </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/intlTelInput-jquery.min.js"></script>
+  <script>
+
+    // -----Country Code Selection
+    $("#phonenumber").intlTelInput({
+        initialCountry: "<?php echo ( isset($client) ? $client->phone_country_code : 'IN'); ?>",
+        separateDialCode: true,
+        // utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/11.0.4/js/utils.js"
+    });
+    $("#phonenumber_iti_wrapper .iti__flag-container ul li").click(function(){
+
+        var country_code =$(this).attr('data-country-code').toUpperCase();
+        $("#phone_country_code").val(country_code);
+    });
+
+</script>
 <?php }?>
 </body>
 </html>

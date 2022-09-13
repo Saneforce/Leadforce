@@ -1,6 +1,20 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head();
 $roleselected = ''; ?>
+
+<style>
+.iti {
+    position: unset !important; 
+    display: block !important;
+    width : 100% !important;
+}
+.iti__flag-container {
+    z-index: 999 !important;
+}
+
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/css/intlTelInput.css">
+
 <div id="wrapper">
 	<div class="content">
 		<div class="row">
@@ -118,7 +132,14 @@ $roleselected = ''; ?>
 										</div>
 									</div>
 									<?php $value = (isset($member) ? $member->phonenumber : ''); ?>
-									<?php echo render_input('phonenumber','staff_add_edit_phonenumber',$value); ?>
+
+									<div class="form-group" app-field-wrapper="phonenumber" id="phonenumber_iti_wrapper">
+										<label for="phonenumber" class="control-label"><?php echo  _l('staff_add_edit_phonenumber') ?>  </label>
+										<div class="input-group" style="width:100%">
+											<input type="text" id="phonenumber" name="phonenumber" class="form-control" autocomplete="off" value="<?php echo $value; ?>">
+										</div>
+									</div>
+									<input type="hidden" name="phone_country_code" id="phone_country_code" value="<?php echo ( isset($member) ? $member->phone_country_code : 'IN'); ?>">
 									<?php
 									$designationselected = '';
 									foreach($designations as $designation)
@@ -735,5 +756,22 @@ $('#deavite_re_assign').change(function() {
 		}
 });
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/intlTelInput-jquery.min.js"></script>
+<script>
+
+    // -----Country Code Selection
+    $("#phonenumber").intlTelInput({
+        initialCountry: "<?php echo ( isset($member) ? $member->phone_country_code : 'IN'); ?>",
+        separateDialCode: true,
+        // utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/11.0.4/js/utils.js"
+    });
+    $("#phonenumber_iti_wrapper .iti__flag-container ul li").click(function(){
+
+        var country_code =$(this).attr('data-country-code').toUpperCase();
+        $("#phone_country_code").val(country_code);
+    });
+
+</script>
+
 </body>
 </html>

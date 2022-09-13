@@ -1,5 +1,19 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
+
+<style>
+.iti {
+    position: unset !important; 
+    display: block !important;
+    width : 100% !important;
+}
+.iti__flag-container {
+    z-index: 999 !important;
+}
+
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/css/intlTelInput.css">
+
 <div id="wrapper">
    <div class="content">
       <div class="row">
@@ -432,6 +446,6 @@
    
   }
 </script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/intlTelInput-jquery.min.js"></script>
 </body>
 </html>

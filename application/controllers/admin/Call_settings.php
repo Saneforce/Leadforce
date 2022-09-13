@@ -328,6 +328,7 @@ class Call_settings extends AdminController
         $data['agent_id'] = $_POST['agentid'];
         $data['status'] = $_POST['status'];
         $data['ivr_id'] = $_POST['ivr_id'];
+        $data['phone_country_code'] = $_POST['phone_country_code'];
 		if($callsettings->source_from=='telecmi'){
 			$data['start_time'] = $_POST['start_time'];
 			$data['end_time'] = $_POST['end_time'];
@@ -367,6 +368,7 @@ class Call_settings extends AdminController
         $data['phone'] = $_POST['phone_number'];
         
         $data['status'] = $_POST['status'];
+        $data['phone_country_code'] = $_POST['phone_country_code'];
 		if($callsettings->source_from=='telecmi'){
 			$data['agent_id'] = $_POST['agentid'];
 			$data['start_time'] = $_POST['start_time'];
@@ -397,6 +399,15 @@ class Call_settings extends AdminController
     public function getAgentDetails() {
         $id = $_POST['id'];
         $result = $this->callsettings_model->getAgentDetail($id);
+        $result->dial_code ='91';
+        if($result){
+            $this->db->where('iso2',$result->phone_country_code);
+            $country =$this->db->get(db_prefix().'countries')->row();
+            if($country){
+                $result->dial_code =$country->calling_code;
+            }
+
+        }
         echo json_encode($result);
     }
 

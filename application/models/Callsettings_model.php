@@ -439,5 +439,13 @@ class Callsettings_model extends App_Model {
         return false;
     }
 
-    
+    public function getCallingCode($country_iso2)
+    {
+        $this->db->where('iso2',$country_iso2);
+        $country =$this->db->get(db_prefix().'countries')->row();
+        if($country){
+            return $country->calling_code;
+        }
+        return '';
+    }
 }

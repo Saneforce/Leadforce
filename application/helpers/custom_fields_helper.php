@@ -1377,13 +1377,14 @@ function callTeleCmiSoftphone(data){
     }else{
         var url = 'https://rest.telecmi.com/v2/click2call';
     }
+    to =String(data.calling_code)+String(data.to);
     $.ajax({
         url: url,
         type: "POST",
         contentType: "application/json",
         data: JSON.stringify({
             token: telecmi_get_agent_token(data.agent_id,data.password),
-            to: parseInt(data.to),
+            to: parseInt(to),
         }),
         dataType: 'json',
         async: false,
@@ -1565,7 +1566,7 @@ function telecmi_get_agent_token(agent_id,password){
     });
     return token;
 }
-function callfromperson(contact, phone) {
+function callfromperson(contact, phone,calling_code) {
     var url =  admin_url+'call_settings/getPersonDeals';
     $.ajax({
         type: "POST",
@@ -1584,6 +1585,7 @@ function callfromperson(contact, phone) {
                     $('#deals_list').selectpicker('refresh');
                     $('#con_id').val(msg.contactId);
                     $('#contact_no').val(msg.contactNumber);
+                    $('#calling_code').val(calling_code);
                 } else {
                     var deal = msg.pid;
                     var contact = msg.contactId;
@@ -1602,7 +1604,7 @@ function callfromperson(contact, phone) {
 								<?php if(CALL_SOURCE_FROM =='telecmi'){?>
                                 if(msg.status == 'success') {
                                     if(msg.channel =='international_softphone' || msg.channel =='national_softphone'){
-                                        callTeleCmiSoftphone({channel:msg.channel,agent_id:msg.agent_id,password:msg.password,token:msg.app_secret,to:msg.contact_no,deal_id:0,contact_id:contact,type:ftype});
+                                        callTeleCmiSoftphone({channel:msg.channel,agent_id:msg.agent_id,password:msg.password,token:msg.app_secret,to:msg.contact_no,deal_id:0,contact_id:contact,type:ftype,calling_code:calling_code});
                                     }else{
                                         callTeleCmi({agent_id:msg.agent_id,token:msg.app_secret,to:msg.contact_no,deal_id:0,contact_id:contact,type:ftype});
                                     }
@@ -1633,6 +1635,7 @@ function clicktocall_create() {
     var contact = $('#con_id').val();
     var contact_no = $('#contact_no').val();
     var phone = $('#contact_no').val();
+    var calling_code = $('#calling_code').val();
     var ftype = '';
     if (confirm('Do you want to Make Call?')) {
         //alert(contact_no); alert(deal);
@@ -1647,7 +1650,7 @@ function clicktocall_create() {
 				<?php if(CALL_SOURCE_FROM =='telecmi'){?>
                 if(msg.status == 'success') {
                     if(msg.channel =='international_softphone' || msg.channel =='national_softphone'){
-                        callTeleCmiSoftphone({channel:msg.channel,agent_id:msg.agent_id,password:msg.password,token:msg.app_secret,to:msg.contact_no,deal_id:deal,contact_id:contact,type:ftype});
+                        callTeleCmiSoftphone({channel:msg.channel,agent_id:msg.agent_id,password:msg.password,token:msg.app_secret,to:msg.contact_no,deal_id:deal,contact_id:contact,type:ftype,calling_code:calling_code});
                     }else{
                         callTeleCmi({agent_id:msg.agent_id,token:msg.app_secret,to:msg.contact_no,deal_id:deal,contact_id:contact,type:ftype});
                     }
@@ -1665,7 +1668,7 @@ function clicktocall_create() {
     }
 
 }
-function callfromdeal(contact, deal, contact_no, ftype) {
+function callfromdeal(contact, deal, contact_no, ftype,calling_code) {
 
     if (confirm('Do you want to Make Call?')) {
         //alert(contact_no); alert(deal);
@@ -1682,7 +1685,7 @@ function callfromdeal(contact, deal, contact_no, ftype) {
                     var to1 = msg.contact_no;
                     var agent1 = msg.agent_id;
                     if(msg.channel =='international_softphone' || msg.channel =='national_softphone'){
-                        callTeleCmiSoftphone({channel:msg.channel,agent_id:msg.agent_id,password:msg.password,token:msg.app_secret,to:msg.contact_no,deal_id:deal,contact_id:contact,type:ftype});
+                        callTeleCmiSoftphone({channel:msg.channel,agent_id:msg.agent_id,password:msg.password,token:msg.app_secret,to:msg.contact_no,deal_id:deal,contact_id:contact,type:ftype,calling_code:calling_code});
                     }else{
                         callTeleCmi({agent_id:msg.agent_id,token:msg.app_secret,to:msg.contact_no,deal_id:deal,contact_id:contact,type:ftype});
                     }
@@ -2265,7 +2268,22 @@ function edit_agent(id) {
             $('#editAgentModal select#endtime option[value='+msg.end_time+']').attr('selected','selected');
             $('#editAgentModal select#endtime').selectpicker('refresh');
 
-            
+            // -----Country Code Selection
+            $("#editAgentModal #phone").intlTelInput({
+                initialCountry: msg.phone_country_code,
+                separateDialCode: true,
+                // utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/11.0.4/js/utils.js"
+            });
+            $("#editAgentModal  #phone_country_code").val(msg.phone_country_code);
+            $("#editAgentModal  #phone_code").val(msg.dial_code);
+            $("#editAgentModal #phone_iti_wrapper .iti__flag-container ul li").click(function(){
+
+                var dial_code =$(this).attr('data-dial-code');
+                var country_code =$(this).attr('data-country-code').toUpperCase();
+                $("#editAgentModal  #phone_country_code").val(country_code);
+                $("#editAgentModal  #phone_code").val(dial_code);
+            });
+
             // if(msg.phone) {
             // $('#addAgentModal #phone').val(msg.phone);
             // $('#addAgentModal #ext').val(emp_id);
@@ -2703,7 +2721,8 @@ function tataeditagent(cur_val){
 											phone_number:phone_number,
 											token:msg1.access_token,
 											 status:status,
-											staff_id:staff_id
+											staff_id:staff_id,
+                                            phone_country_code,phone_country_code
 											
 										},
 										dataType: 'json',
@@ -2773,6 +2792,7 @@ function tataaddagent(cur_val){
 	var phone_number = $('#addAgentModal #phone').val();
    
 	var status = $('#addAgentModal #status').val();
+	var phone_country_code = $('#addAgentModal #phone_country_code').val();
 	var extension = (100 + parseInt(extid));
     
     var ivr_id =$('#addAgentModal #ivr_id').val();
@@ -2855,7 +2875,8 @@ function tataaddagent(cur_val){
 								secret:secret,
 								token:msg1.access_token,
 								status:status,
-                                ivr_id:ivr_id
+                                ivr_id:ivr_id,
+                                phone_country_code:phone_country_code
 							},
 							dataType: 'json',
 							success: function(result){
@@ -2997,6 +3018,7 @@ $(document).ready(function(){
         var phone_number = $('#addAgentModal #phone').val();
        
         var status = $('#addAgentModal #status').val();
+        var phone_country_code = $('#addAgentModal #phone_country_code').val();
         var extension = (100 + parseInt(extid));
 
         // Validations
@@ -3048,7 +3070,8 @@ $(document).ready(function(){
 								secret:secret,
 								token:'',
 								status:status,
-                                ivr_id:ivr_id
+                                ivr_id:ivr_id,
+                                phone_country_code:phone_country_code
 							},
 							dataType: 'json',
 							success: function(result){
@@ -3105,6 +3128,7 @@ $(document).ready(function(){
         var ivr_id =$('#addAgentModal #ivr_id').val();
         var ivr_details =get_ivr_details(ivr_id);
         var sms_alert = $('#addAgentModal #sms_alert').val();
+        var phone_country_code = $('#addAgentModal #phone_country_code').val();
         
         $('#addAgentModal .errmsg').html ('');
         
@@ -3187,9 +3211,10 @@ $(document).ready(function(){
             $('#addAgent').attr('disabled','disabled');
             if(channel =='international_softphone' || channel =='national_softphone'){
                 var url = 'https://rest.telecmi.com/v2/user/add';
+                phone_number_new =$('#addAgentModal #phone_code').val()+phone_number;
             }else{
                 var url = 'https://piopiy.telecmi.com/v1/agent/add';
-                phone_number =parseInt(phone_number);
+                phone_number_new =parseInt(phone_number);
             }
             //$('.followers-div').show();
             $.ajax({
@@ -3198,7 +3223,7 @@ $(document).ready(function(){
                 contentType: "application/json",
                 data: JSON.stringify({
                     name:name,
-                    phone_number:phone_number,
+                    phone_number:phone_number_new,
                     start_time:parseInt(start_time),
                     end_time:parseInt(end_time),
                     password:password,
@@ -3247,6 +3272,7 @@ $(document).ready(function(){
                                         sms_alert:sms_alert,
                                         status:res.status,
                                         ivr_id:ivr_id,
+                                        phone_country_code:phone_country_code,
                                     },
                                     dataType: 'json',
                                     success: function(result){
@@ -3330,6 +3356,7 @@ $(document).ready(function(){
         var extid = $('#editAgentModal #id').val();
         var staff_id = $('#editAgentModal #staff_id').val();
         var ivr_id = $('#editAgentModal #ivr_id').val();
+        var phone_country_code = $('#editAgentModal #phone_country_code').val();
         //alert(staff_id);
 
 // Validations
@@ -3424,9 +3451,10 @@ $(document).ready(function(){
             $('#editAgent').attr('disabled','disabled');
             if(channel =='international_softphone' || channel =='national_softphone'){
                 var url = 'https://rest.telecmi.com/v2/user/update';
+                phone_number_new =$('#editAgentModal #phone_code').val()+phone_number
             }else{
                 var url = 'https://piopiy.telecmi.com/v1/agent/update';
-                phone_number =parseInt(phone_number);
+                phone_number_new =parseInt(phone_number);
             }
             //$('.followers-div').show();
             $.ajax({
@@ -3435,7 +3463,7 @@ $(document).ready(function(){
                 contentType: "application/json",
                 data: JSON.stringify({
                     name:name,
-                    phone_number:phone_number,
+                    phone_number:phone_number_new,
                     start_time:parseInt(start_time),
                     end_time:parseInt(end_time),
                     password:password,
@@ -3483,7 +3511,8 @@ $(document).ready(function(){
                                         agentid:extension,
                                         sms_alert:sms_alert,
                                         status:res.status,
-                                        staff_id:staff_id
+                                        staff_id:staff_id,
+                                        phone_country_code:phone_country_code,
                                     },
                                     dataType: 'json',
                                     success: function(result){
@@ -3539,6 +3568,7 @@ $(document).ready(function(){
 		var validate = 0;
 
         var ivr_id = $('#editAgentModal #ivr_id').val();
+        var phone_country_code = $('#editAgentModal #phone_country_code').val();
         var ivr_details =get_ivr_details(ivr_id);
         if (typeof ivr_details.app_id == 'undefined'){
             validate = 1;
@@ -3595,6 +3625,7 @@ $(document).ready(function(){
         var staff_id = $('#editAgentModal #staff_id').val();
 
         var ivr_id = $('#editAgentModal #ivr_id').val();
+        var phone_country_code = $('#editAgentModal #phone_country_code').val();
         var ivr_details =get_ivr_details(ivr_id);
         if (typeof ivr_details.app_id == 'undefined'){
             alert_float('warning', 'IVR should be selected');
@@ -3616,7 +3647,8 @@ $(document).ready(function(){
 				phone_number:phone_number,
 				token:'',
 				 status:status,
-				staff_id:staff_id
+				staff_id:staff_id,
+                phone_country_code:phone_country_code
 				
 			},
 			dataType: 'json',
@@ -3645,6 +3677,7 @@ $(document).ready(function(){
         var status = $('#editAgentModal #status').val();
         var extid = $('#editAgentModal #id').val();
         var staff_id = $('#editAgentModal #staff_id').val();
+        var phone_country_code = $('#editAgentModal #phone_country_code').val();
         //alert(staff_id);
 
 // Validations

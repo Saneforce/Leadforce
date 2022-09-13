@@ -1,5 +1,18 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
+
+<style>
+.iti {
+    position: unset !important; 
+    display: block !important;
+    width : 100% !important;
+}
+.iti__flag-container {
+    z-index: 999 !important;
+}
+
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/css/intlTelInput.css">
 <div id="wrapper">
  <div class="content">
  <?php if($this->uri->segment(2).'/'.$this->uri->segment(3) !='call_settings/enable_call'): ?> 
@@ -227,5 +240,6 @@ $("#settings-form").submit(function() {
 </script>
   <?php }?>
 <?php hooks()->do_action('settings_tab_footer', $tab); ?>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/intlTelInput-jquery.min.js"></script>
 </body>
 </html>

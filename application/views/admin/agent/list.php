@@ -6,6 +6,7 @@ if($vendors){ // full wrapper for agents page
 		continue;
 	}
 ?>
+
 <style>
 .followers-div, .addfollower_btn, #rollback {
   display:none;
@@ -290,11 +291,16 @@ Sync Agents
         <span id="staff_val" class="errmsg"></span>
       </div>
 			
-			<div class="form-group">
-				<label class="control-label"><small class="req text-danger">* </small><?php echo _l('phone'); ?></label>
-				<input type="phone" id="phone" name="phone" maxlenght="10" class="form-control" value="" placeholder="Enter Phone Number" required>
-				<span id="phone_val" class="errmsg"></span>
+	  		<div class="form-group" app-field-wrapper="phonenumber" id="phone_iti_wrapper">
+				<label for="phone" class="control-label"><?php echo  _l('phone') ?>  </label>
+				<div class="input-group" style="width:100%">
+					<input type="text" id="phone" name="phone" class="form-control" autocomplete="off" value="<?php echo $value; ?>">
+				</div>
 			</div>
+			<span id="phone_val" class="errmsg"></span>
+			<input type="hidden" name="phone_country_code" id="phone_country_code" value="IN">
+			<input type="hidden" name="phone_code" id="phone_code" value="91">
+
 			<div class="telecmi_settings_wrapper settings_wrapper">
 				<div class="form-group">
 					<label class="control-label"><small class="req text-danger">* </small><?php echo _l('password'); ?></label>
@@ -390,12 +396,16 @@ Sync Agents
 			echo render_select('staff_id', $editAgents, array('staffid', array('firstname', 'lastname')), 'staff_id', '', array());
 			?>
 			<span id="staff_val" class="errmsg"></span>
-			<div class="form-group">
-				<label class="control-label"><small class="req text-danger">* </small><?php echo _l('phone'); ?></label>
-				<input type="phone" id="phone" name="phone" class="form-control" value="" placeholder="Enter Phone Number" required>
-				<input type="hidden" id="edit_phone1" class="form-control" value="" placeholder="Enter Phone Number" required>
-				<span id="phone_val" class="errmsg"></span>
+			<div class="form-group" app-field-wrapper="phonenumber" id="phone_iti_wrapper">
+				<label for="phone" class="control-label"><small class="req text-danger">* </small><?php echo  _l('phone') ?>  </label>
+				<div class="input-group" style="width:100%">
+					<input type="text" id="phone" name="phone" class="form-control" autocomplete="off" value="<?php echo $value; ?>">
+				</div>
 			</div>
+			<span id="phone_val" class="errmsg"></span>
+			<input type="hidden" name="phone_country_code" id="phone_country_code" value="">
+			<input type="hidden" name="phone_code" id="phone_code" value="">
+
 			<div class="telecmi_settings_wrapper settings_wrapper">
 			<div class="form-group">
 				<label class="control-label"><small class="req text-danger">* </small><?php echo _l('password'); ?></label>
@@ -475,6 +485,23 @@ Sync Agents
 			show_wrapper(source_from);
 		});
 	});
+</script>
+<script>
+	document.addEventListener("DOMContentLoaded", function(event) { 
+		// -----Country Code Selection
+		$("#addAgentModal #phone").intlTelInput({
+			initialCountry: "<?php echo ( isset($member) ? $member->phone_country_code : 'IN'); ?>",
+			separateDialCode: true,
+			// utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/11.0.4/js/utils.js"
+		});
+		$("#addAgentModal #phone_iti_wrapper .iti__flag-container ul li").click(function(){
+			var dial_code =$(this).attr('data-dial-code');
+			var country_code =$(this).attr('data-country-code').toUpperCase();
+			$("#addAgentModal  #phone_country_code").val(country_code);
+			$("#addAgentModal  #phone_code").val(dial_code);
+		});
+	});
+
 </script>
 
 <?php

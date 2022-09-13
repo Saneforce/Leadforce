@@ -66,8 +66,6 @@
                         </div>
                         
                         <?php $value=( isset($contact) ? $contact->phonenumber : ''); ?>
-                        <!-- <?php echo render_input( 'phonenumber', 'client_phonenumber',$value,'text',array('autocomplete'=>'off')); ?> -->
-
                         <div class="form-group" app-field-wrapper="phonenumber">
                         <label for="phonenumber" class="control-label">Phone  </label>
                         <div class="input-group">

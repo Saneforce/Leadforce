@@ -25,6 +25,7 @@ $aColumns_temp = [
    'pipeline_id'=> 'pipeline_id',
    'contact_email1'=>'(SELECT ' . db_prefix() . 'contacts.email FROM ' . db_prefix() . 'project_contacts JOIN ' . db_prefix() . 'contacts on ' . db_prefix() . 'contacts.id = ' . db_prefix() . 'project_contacts.contacts_id WHERE tblproject_contacts.project_id=' . db_prefix() . 'projects.id AND tblproject_contacts.is_primary = 1) as contact_email1',
    'contact_phone1'=>'(SELECT ' . db_prefix() . 'contacts.phonenumber FROM ' . db_prefix() . 'project_contacts JOIN ' . db_prefix() . 'contacts on ' . db_prefix() . 'contacts.id = ' . db_prefix() . 'project_contacts.contacts_id WHERE tblproject_contacts.project_id=' . db_prefix() . 'projects.id AND tblproject_contacts.is_primary = 1) as contact_phone1',
+   'contact_phone_country_code'=>'(SELECT ' . db_prefix() . 'contacts.phone_country_code FROM ' . db_prefix() . 'project_contacts JOIN ' . db_prefix() . 'contacts on ' . db_prefix() . 'contacts.id = ' . db_prefix() . 'project_contacts.contacts_id WHERE tblproject_contacts.project_id=' . db_prefix() . 'projects.id AND tblproject_contacts.is_primary = 1) as contact_phone_country_code',
     'won_date'=>'stage_on as won_date',
     'lost_date'=>'stage_on as lost_date',
     'loss_reason_name'=>db_prefix() . 'deallossreasons.name as loss_reason_name',
@@ -172,6 +173,9 @@ foreach($projects_list_column_order as $ckey=>$cval){
 				 $ckey = 'deadline';
 			 }
 			 if(isset($aColumns_temp[$ckey])){
+                if($ckey =='contact_phone1'){
+                    $aColumns[] =$aColumns_temp['contact_phone_country_code'];
+                }
 				$aColumns[] =$aColumns_temp[$ckey];
 			 }
          }
@@ -340,7 +344,8 @@ foreach ($rResult as $aRow) {
         }
         $contact .= '<a class="task-table-related" data-toggle="tooltip" data-html="true" title="' . $lable . '" href="' . admin_url("clients/view_contact/".$aRow['primary_id']) . '">' .$aRow['contact_name']. '</a><input type="hidden" id="input_phone_'.$aRow['primary_id'].'" value="'.$aRow['contact_phone'].'">';
         if(isset($aRow['contact_phone']) && !empty($aRow['contact_phone']) && $allow_to_call == 1) {
-            $contact .= '<div><a href="#" onclick="callfromdeal('.$aRow['primary_id'].','.$aRow['id'].','.$aRow['contact_phone'].',\'deal\');" title="Call Now"><img src="'.APP_BASE_URL.'/assets/images/call.png" style="width:25px;"></a></div>';
+            $calling_code =$this->ci->callsettings_model->getCallingCode($aRow['contact_phone_country_code']);
+            $contact .= '<div><a href="#" onclick="callfromdeal('.$aRow['primary_id'].','.$aRow['id'].','.$aRow['contact_phone'].',\'deal\',\''.$calling_code.'\');" title="Call Now"><img src="'.APP_BASE_URL.'/assets/images/call.png" style="width:25px;"></a></div>';
         }
         $row_temp['contact_name']  = $contact;
 	}

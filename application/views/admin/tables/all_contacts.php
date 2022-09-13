@@ -66,6 +66,9 @@ foreach($contacts_list_column_order as $ckey=>$cval){
             $aColumns[] = '(SELECT tblclients.company FROM tblclients WHERE tblclients.userid = tblcontacts.userid) as company';
          } else {
 			if(in_array($ckey,$req_fields)){
+                if($ckey =='phonenumber'){
+                    $aColumns[] = db_prefix() . 'contacts.phone_country_code as phone_country_code';
+                }
 				$aColumns[] =$aColumns_temp[$ckey];
 			}
          }
@@ -191,9 +194,10 @@ foreach ($rResult as $aRow) {
 
     $contact = '';
     if(isset($aRow['phonenumber']) && !empty($aRow['phonenumber']) && $allow_to_call == 1) {
+        $calling_code =$this->ci->callsettings_model->getCallingCode($aRow['phone_country_code']);
         $exp_no = explode(',',$aRow['phonenumber']);
         $number = str_replace(' ', '', preg_replace('/[^A-Za-z0-9]/', '', $exp_no[0]));
-        $contact .= '<div>'.$number.'</div><a href="#" onclick="callfromperson('.$aRow['id'].','.$number.');" title="Call Now"><img src="'.APP_BASE_URL.'/assets/images/call.png" style="width:25px;"></a>';
+        $contact .= '<div>'.$number.'</div><a href="#" onclick="callfromperson('.$aRow['id'].','.$number.',\''.$calling_code.'\');" title="Call Now"><img src="'.APP_BASE_URL.'/assets/images/call.png" style="width:25px;"></a>';
     } else {
         $exp_no = explode(',',$aRow['phonenumber']);
         $number = str_replace(' ', '', preg_replace('/[^A-Za-z0-9]/', '', $exp_no[0]));

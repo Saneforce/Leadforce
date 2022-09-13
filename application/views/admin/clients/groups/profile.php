@@ -43,7 +43,16 @@
                      echo render_input( 'vat', 'client_vat_number',$value);
                      } ?>
                   <?php $value=( isset($client) ? $client->phonenumber : ''); ?>
-                  <?php echo render_input( 'phonenumber', 'client_phonenumber',$value); ?>
+                  
+
+                  <div class="form-group" app-field-wrapper="phonenumber" id="phonenumber_iti_wrapper">
+                        <label for="phonenumber" class="control-label"><?php echo _l('client_phonenumber') ?></label>
+                        <div class="input-group" style="width:100%">
+                           <input type="text" id="phonenumber" name="phonenumber" class="form-control" autocomplete="off" value="<?php echo $value; ?>">
+                        </div>
+                  </div>
+                  <input type="hidden" name="phone_country_code" id="phone_country_code" value="<?php echo ( isset($client) ? $client->phone_country_code : 'IN'); ?>">
+
                   <?php if((isset($client) && empty($client->website)) || !isset($client)){
                      $value=( isset($client) ? $client->website : '');
                      echo render_input( 'website', 'client_website',$value);
