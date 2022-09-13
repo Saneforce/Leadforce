@@ -1747,6 +1747,17 @@ function tele_delete_agent_db(id,dbdel) {
                                     },
                                     dataType: 'json',
                                     success: function(result){
+                                        if(result.status == 'success') {
+                                            alert_float('success', result.msg);
+                                            setTimeout(function(){
+                                                window.location.reload();
+                                            },1000);
+                                        } else {
+                                            alert_float('warning', result.msg);
+                                            setTimeout(function(){
+                                                window.location.reload();
+                                            },1000);
+                                        }
                                     }
                                 });
                             }
@@ -1756,7 +1767,7 @@ function tele_delete_agent_db(id,dbdel) {
                             if(dbdel==true){
                                 deleteagentfromdb(id);
                             }
-                            alert_float('warning', res.msg+' <br> Please Delete Manually on Telecmi Portal');
+                            alert_float('warning','Please Delete Manually on Telecmi Portal or sync agents');
                             setTimeout(function(){
                                 window.location.reload();
                             },1000);
@@ -2013,10 +2024,6 @@ function deletAgent_db(id,req_id1,source_from){
 function deletAgent(id) {
     if (confirm('Do you want to Deactivate this Agent?')) {
         tele_delete_agent_db(id,false);
-        alert_float('success','Agent deactivated successfully');
-        setTimeout(function(){
-            window.location.reload();
-        },1000);
     } else {
         return false;
     }
