@@ -29,29 +29,24 @@ ul.dropdown-menu li:first-child {
   left: 0;
   right: 0;
 }
-
 .autocomplete-items div {
   padding: 10px;
   cursor: pointer;
   background-color: #fff; 
   border-bottom: 1px solid #d4d4d4; 
 }
-
 /*when hovering an item:*/
 .autocomplete-items div:hover {
   background-color: #e9e9e9; 
 }
-
 /*when navigating through the items using the arrow keys:*/
 .autocomplete-active {
   background-color: DodgerBlue !important; 
   color: #ffffff; 
 }
-
 .cur_class {
     height: 21px;
 }
-
 /* Absolute Center Spinner */
 #overlay_deal,.overlay_new {
   position: fixed;
@@ -65,7 +60,6 @@ ul.dropdown-menu li:first-child {
   width: 50px;
   height: 50px;
 }
-
 /* Transparent Overlay */
 #overlay_deal:before,.overlay_new:before {
   content: '';
@@ -77,7 +71,6 @@ ul.dropdown-menu li:first-child {
   height: 100%;
   background-color: rgba(255,255,255,0.5);
 }
-
 /* :not(:required) hides these rules from IE9 and below */
 #overlay_deal:not(:required),.overlay_new:not(:required) {
   /* hide "loading..." text */
@@ -87,7 +80,6 @@ ul.dropdown-menu li:first-child {
   background-color: transparent;
   border: 0;
 }
-
 #overlay_deal:not(:required):after,.overlay_new:not(:required):after {
   content: '';
   display: block;
@@ -95,18 +87,13 @@ ul.dropdown-menu li:first-child {
   width: 50px;
   height: 50px;
   margin-top: -0.5em;
-
   border: 3px solid rgba(33, 150, 243, 1.0);
   border-radius: 100%;
   border-bottom-color: transparent;
   -webkit-animation: spinner 1s linear 0s infinite;
   animation: spinner 1s linear 0s infinite;
-
-
 }
-
 /* Animation */
-
 @-webkit-keyframes spinner {
   0% {
     -webkit-transform: rotate(0deg);
@@ -171,7 +158,6 @@ ul.dropdown-menu li:first-child {
     transform: rotate(360deg);
   }
 }
-
 @-webkit-keyframes rotation {
    from {-webkit-transform: rotate(0deg);}
    to {-webkit-transform: rotate(359deg);}
@@ -196,7 +182,8 @@ ul.dropdown-menu li:first-child {
 function get_deal(clmn,crow,view_by,measure,date_range,sum_id){
 	document.getElementById('overlay_deal1234').style.display = '';
 	var view_type = $('#view_type12').val();
-	var data = {clmn:clmn,crow:crow,view_by:view_by,measure:measure,date_range:date_range,view_type:view_type,sum_id:sum_id};
+	var cur_id12 = $('#cur_id12').val();
+	var data = {clmn:clmn,crow:crow,view_by:view_by,measure:measure,date_range:date_range,view_type:view_type,sum_id:sum_id,edit_id:cur_id12};
 	 var ajaxRequest = $.ajax({
 		type: 'POST',
 		url: admin_url + 'reports/get_deal_summary',
@@ -390,7 +377,6 @@ $(function(){
 		var shared = $('#shared').val();
 		var name_val = $('#name').val();
 		$('#name_id').hide();
-		
 		if((team!='' && shared =='Selected Person') || shared =='Everyone'){
 				var actionUrl = form.attr('action');
 				$.ajax({
@@ -409,8 +395,6 @@ $(function(){
 			document.getElementById('overlay_deal123').style.display = 'none';
 			$('#error_staff').html('This field is required');
 		}
-		
-		
 	});
 	$('#end_date_edit_1').datepicker({
 		 dateFormat:'dd-mm-yy',
@@ -471,11 +455,9 @@ function load_public(a){
 	  /* Select the text field */
 	  copyText.select();
 	  copyText.setSelectionRange(0, 99999); /* For mobile devices */
-
 	  /* Copy the text inside the text field */
 	  document.execCommand( 'copy' );
 	  alert_float('success', 'Link Copied Successfully');
-	  
 	  /* Alert the copied text */
  }
  function check_publick(a){
@@ -518,7 +500,6 @@ function add_filter(){
 		});
 		j++;
 	}
-	
 	var c_filter_val1 = parseInt($('#c_filter_val1').val())+1;
 	$('#c_filter_val1').val(c_filter_val1);
 	$('#ch_1_filter1').html(c_filter_val1);
@@ -571,8 +552,6 @@ function add_filter(){
 				
 				document.getElementById('overlay_deal').style.display = 'none';
 			 }
-			 
-					 
 		},
 	});
 }
@@ -596,7 +575,6 @@ function check_filter(a){
 	var cur_id = a.id;
 	var req_val = cur_id.split("filter_option_");
 	req_val = req_val[1];
-	
 	var cur_id12 = $('#cur_id12').val();
 	var data = {cur_val:a.value,req_val:req_val,cur_id12:cur_id12};
 	var ajaxRequest = $.ajax({
@@ -653,7 +631,6 @@ function change_filter1(a,b){
 		dataType: '',
 		success: function(msg) {
 			$('#ch_dr_'+req_val).html(msg);
-			//$('.table-projects').DataTable().ajax.reload();
 			if(cur_val=='project_start_date' || cur_val == 'project_deadline'){
 				$('#end_date_edit_'+req_val).datepicker({
 					 dateFormat:'dd-mm-yy',
@@ -665,7 +642,6 @@ function change_filter1(a,b){
 					onSelect: function(selectedDate) {
 						$('#year_'+req_val).val('custom_period');
 						$('#year_'+req_val).selectpicker('refresh');
-						//change_4_filter(req_val);
 					}
 				});
 				$('#start_date_edit_'+req_val).datepicker({
@@ -679,12 +655,10 @@ function change_filter1(a,b){
 						$('#end_date_edit_'+req_val).datepicker('option', 'minDate', selectedDate);
 						$('#year_'+req_val).val('custom_period');
 						$('#year_'+req_val).selectpicker('refresh');
-						//change_3_filter(req_val);
 					  }
 				});
 				appDatepicker();
 			}
-		
 			var year_val = $('#year_val_'+req_val).val(); 
 				if(year_val!='' && year_val.indexOf(',') != -1){
 					var myArray = year_val.split(",");
@@ -736,8 +710,6 @@ function change_filter1(a,b){
 	<?php $i1++;}
 }
 ?>
-
- 
 function change_2_filter(a){
 	var cur_id = a.id;
 	var req_val = cur_id.split("year_");
@@ -746,7 +718,6 @@ function change_2_filter(a){
 	var check_search = $('#check_search_id').val();
 	var cur_id12 = $('#cur_id12').val();
 	if(check_search==''){
-		//$('.dropdown-menu open').hide();
 		var data = {cur_val:cur_val,req_val:req_val,cur_id12:cur_id12};
 		var ajaxRequest = $.ajax({
 			type: 'POST',
