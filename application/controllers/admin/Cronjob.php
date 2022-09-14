@@ -827,12 +827,46 @@ exit;
 		$this->db2 = $this->load->database($this->dynamicDB, TRUE); 
 		if($post) {
 			
+			//APP Credentials
+			$this->db2->where('agent_id',$post['user']);
+        	$staff = $this->db2->get(db_prefix().'agents')->row();
+			if(!$staff || !$staff->staff_id){
+				return;
+			}
+			$this->db2->where('id',$staff->ivr_id);
+        	$row = $this->db2->get(db_prefix().'call_settings')->row_array();
+
 			if($post['direction'] =='inbound'){
 				if($post['status'] !='answered'){
 					return ;
 				}
 				// validate person exists
-				$this->db2->where('phonenumber',$post['from']); 
+				// validate person exists
+				$ccodes =array();
+				$countries =$this->db2->get(db_prefix().'countries')->result_object();
+				if($countries){
+					foreach($countries as $country){
+						$ccodes[$country->calling_code] =$country->iso2;
+					}
+				}
+				krsort( $ccodes );
+
+				$phone=$post['from'];
+				if($row->channel =='international_softphone' || $row->channel =='national_softphone'){
+					foreach( $ccodes as $key=>$value )
+					{
+						
+						if ( substr( $post['from'], 0, strlen( $key ) ) == $key )
+						{
+							$phone = substr($post['from'],strlen($key));
+							break;
+						}
+					}
+				}
+
+
+
+				$this->db2->where('phonenumber',$phone); 
 				$this->db2->where('deleted_status',0); 
 				$this->db2->where('active',1); 
 				$contact =$this->db2->get(db_prefix().'contacts')->row();
@@ -860,14 +894,6 @@ exit;
 				);
 				$result = $this->callsettings_model->addtask($task_details);
 			}
-			//APP Credentials
-			$this->db->where('agent_id',$post['user']);
-        	$staff = $this->db->get(db_prefix().'agents')->row();
-			if(!$staff || !$staff->staff_id){
-				return;
-			}
-			$this->db->where('id',$staff->ivr_id);
-        	$row = $this->db->get(db_prefix().'call_settings')->row_array();
 			
 			 file_put_contents("test1.txt",json_encode($post));
 			$appid = $post['appid'];
