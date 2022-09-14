@@ -852,7 +852,7 @@ exit;
 				krsort( $ccodes );
 
 				$phone=$post['from'];
-				if($row->channel =='international_softphone' || $row->channel =='national_softphone'){
+				if($row['channel'] =='international_softphone' || $row['channel'] =='national_softphone'){
 					foreach( $ccodes as $key=>$value )
 					{
 						
