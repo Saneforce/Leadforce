@@ -1393,7 +1393,7 @@ function callTeleCmiSoftphone(data){
                 var request = res.request_id;
                 var msg = res.msg;
                 var code = res.code;
-                createActivityForivr({req:request,msg:msg,code:code,deal_id:data.deal_id,contact_id:data.contact_id,type:data.type,agent:data.agent_id,to:data.to});
+                createActivityForivr({req:request,msg:msg,code:code,deal_id:data.deal_id,contact_id:data.contact_id,type:data.type,agent:data.agent_id,to:to});
             }else{
                 alert_float('warning', 'Call Not Connected');
                 setTimeout(function(){
