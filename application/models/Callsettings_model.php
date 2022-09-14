@@ -331,6 +331,15 @@ class Callsettings_model extends App_Model {
     
     public function syncTelecmiAgents($ivr)
     {
+        $ccodes =array();
+        $countries =$this->db->get(db_prefix().'countries')->result_object();
+        if($countries){
+            foreach($countries as $country){
+                $ccodes[$country->calling_code] =$country->iso2;
+            }
+        }
+        krsort( $ccodes );
+
         if($ivr->channel =='international_softphone' || $ivr->channel =='national_softphone' || $ivr->channel =='national'){
             $curl = curl_init();
             curl_setopt_array($curl, array(
@@ -359,12 +368,30 @@ class Callsettings_model extends App_Model {
         if(isset($response->agents) && count($response->agents)>0){
             $agent_ids =array();
             foreach($response->agents as $key => $agent){
+
+                $country_iso2 ='IN';
+                $phone=$agent->phone;
+                if($ivr->channel =='international_softphone' || $ivr->channel =='national_softphone'){
+                    foreach( $ccodes as $key=>$value )
+                    {
+                        
+                        if ( substr( $agent->phone, 0, strlen( $key ) ) == $key )
+                        {
+                            // match
+                            
+                            $country_iso2 =$value;
+                            $phone = substr($agent->phone,strlen($key));
+                            break;
+                        }
+                    }
+                }
+                
                 $agent_ids []=$agent->agent_id;
                 $this->db->where(['source_from'=>'telecmi','agent_id'=>$agent->agent_id,'ivr_id'=>$ivr->id]);
                 $exist =$this->db->get(db_prefix().'agents')->row();
                 $data =array(
                     'source_from'=>'telecmi',
-                    'phone'=>$agent->phone,
+                    'phone'=>$phone,
                     'agent_id'=>$agent->agent_id,
                     'password'=>$agent->password,
                     'sms_alert'=>'',
@@ -372,6 +399,7 @@ class Callsettings_model extends App_Model {
                     'end_time'=>$agent->end_time,
                     'deleted'=>0,
                     'ivr_id'=>$ivr->id,
+                    'phone_country_code'=>$country_iso2
                 );
                 if(!$exist){
                     $data['staff_id'] =0;
