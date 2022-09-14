@@ -9,10 +9,15 @@ defined('BASEPATH') or exit('No direct script access allowed');
  function get_deal_vals($fields,$fields1,$table,$qry_cond,$filters = array()){
 	 $CI	= & get_instance();
 	 $conds = get_flters($filters);
+	 $my_staffids = $CI->staff_model->get_my_staffids();
+	 $qry_cond1 = '';
+	 if(!is_admin(get_staff_user_id()) && $my_staffids){
+		 $qry_cond1 = ' AND (p.id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')) OR  p.teamleader in (' . implode(',',$my_staffids) . ') ) ';
+	 }
 	 if(!empty($qry_cond)){
-		 $qry_cond = " where p.deleted_status ='0' ".$conds." AND ".$qry_cond;
+		 $qry_cond = " where p.deleted_status ='0' ".$conds.$qry_cond1.' And '. $qry_cond;
 	 }else{
-		  $qry_cond = " where p.deleted_status ='0' ".$conds.$qry_cond;
+		  $qry_cond = " where p.deleted_status ='0' ".$conds.$qry_cond1.$qry_cond;
 	 }
 	 if(!empty($fields)){
 		 $fields = $fields.",";
@@ -20,11 +25,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 	  if(!empty($fields1)){
 		 $fields1 = "".$fields1;
 	 }
-	 $my_staffids = $CI->staff_model->get_my_staffids();
-	 if(!is_admin(get_staff_user_id()) && $my_staffids){
-		 $qry_cond .= ' AND (p.id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')) OR  p.teamleader in (' . implode(',',$my_staffids) . ') )';
-	 }
+	 
 	 $CI			= & get_instance();
+	 
 	 $deal_vals 	= $CI->db->query("SELECT ".$fields."COUNT(DISTINCT IF(stage_of = '1',p.id,NULL)) AS own_count,COUNT(DISTINCT IF(stage_of = '2',p.id,NULL)) AS lost_count,COUNT(DISTINCT IF(stage_of = '0',p.id,NULL)) AS open_count ".$fields1." FROM ".$table.$qry_cond)->result_array();
 	return $deal_vals;
  }
@@ -120,40 +123,48 @@ function date_summary($qry_cond,$week1,$measure,$view_by,$filters)
 	return $data;
 }
 
-function summary_val($tables,$fields,$qry_cond,$measure,$view_by,$cur_rows,$filters)
+function summary_val($tables,$fields,$qry_cond,$measure,$view_by,$cur_rows,$filters,$report_type)
 {
 	$cur_year	= date('Y');
 	$CI			= & get_instance();
-	if($measure == 'Number of Products'){
-		$qry_cond = "p.deleted_status = '0' ".$qry_cond;
-		$deal_vals = get_deal_vals('*,sum(p.project_cost) as tot_val',$fields,$tables,$qry_cond,$filters);
-		$data = get_data($view_by,$cur_rows,$deal_vals);
-	}
-	else if($measure == 'Product Value'){
-		$req_fields = "*,sum(p.project_cost) as tot_val,sum(IF(stage_of = '1',pp.total_price,NULL)) AS own_price,sum(IF(stage_of = '2',pp.total_price,NULL)) AS lost_price,sum(IF(stage_of = '0',pp.total_price,NULL)) AS open_price";
-		$qry_cond = " p.deleted_status = '0' and pp.projectid = p.id".$qry_cond;
-		$tables = $tables.','.db_prefix()."project_products pp ";
-		$deal_vals = get_deal_vals($req_fields,$fields,$tables,$qry_cond,$filters);
-		$data = get_sumary_product_vals($deal_vals,$view_by,$cur_rows);
-		
-	}
-	else if($measure == 'Deal Value'){
-		$req_fields = "*,sum(p.project_cost) as tot_val,sum(IF(p.stage_of = '1',p.project_cost,NULL)) AS own_price,sum(IF(p.stage_of = '0',p.project_cost,NULL)) AS open_price";
-		$qry_cond = " p.deleted_status = '0' ".$qry_cond;
-		$deal_vals = get_deal_vals($req_fields,$fields,$tables,$qry_cond,$filters);
-		$data = get_sumary_product_vals($deal_vals,$view_by,$cur_rows);
-		
-	}
-	else if($measure == 'Deal weighted value'){
-		$req_fields = "*,sum(p.project_cost) as tot_val,sum( IF(p.stage_of = '1',(p.project_cost*(p.progress/100)),NULL)) AS own_price,sum(IF(p.stage_of = '0',(p.project_cost*(p.progress/100)),NULL)) AS open_price,sum(IF(p.stage_of = '0',(p.project_cost*(p.progress/100)),NULL)) AS lost_price";
-		$qry_cond = " p.deleted_status = '0' ".$qry_cond;
-		$deal_vals = get_deal_vals($req_fields,$fields,$tables,$qry_cond,$filters);
-		$data = get_sumary_weight_vals($deal_vals,$view_by,$cur_rows);
+	if($report_type == 'deal'){
+		if($measure == 'Number of Products'){
+			$qry_cond = "p.deleted_status = '0' ".$qry_cond;
+			$deal_vals = get_deal_vals('*,sum(p.project_cost) as tot_val',$fields,$tables,$qry_cond,$filters);
+			$data = get_data($view_by,$cur_rows,$deal_vals);
+		}
+		else if($measure == 'Product Value'){
+			$req_fields = "*,sum(p.project_cost) as tot_val,sum(IF(stage_of = '1',pp.total_price,NULL)) AS own_price,sum(IF(stage_of = '2',pp.total_price,NULL)) AS lost_price,sum(IF(stage_of = '0',pp.total_price,NULL)) AS open_price";
+			$qry_cond = " p.deleted_status = '0' and pp.projectid = p.id".$qry_cond;
+			$tables = $tables.','.db_prefix()."project_products pp ";
+			$deal_vals = get_deal_vals($req_fields,$fields,$tables,$qry_cond,$filters);
+			$data = get_sumary_product_vals($deal_vals,$view_by,$cur_rows);
+			
+		}
+		else if($measure == 'Deal Value'){
+			$req_fields = "*,sum(p.project_cost) as tot_val,sum(IF(p.stage_of = '1',p.project_cost,NULL)) AS own_price,sum(IF(p.stage_of = '0',p.project_cost,NULL)) AS open_price";
+			$qry_cond = " p.deleted_status = '0' ".$qry_cond;
+			$deal_vals = get_deal_vals($req_fields,$fields,$tables,$qry_cond,$filters);
+			$data = get_sumary_product_vals($deal_vals,$view_by,$cur_rows);
+			
+		}
+		else if($measure == 'Deal weighted value'){
+			$req_fields = "*,sum(p.project_cost) as tot_val,sum( IF(p.stage_of = '1',(p.project_cost*(p.progress/100)),NULL)) AS own_price,sum(IF(p.stage_of = '0',(p.project_cost*(p.progress/100)),NULL)) AS open_price,sum(IF(p.stage_of = '0',(p.project_cost*(p.progress/100)),NULL)) AS lost_price";
+			$qry_cond = " p.deleted_status = '0' ".$qry_cond;
+			$deal_vals = get_deal_vals($req_fields,$fields,$tables,$qry_cond,$filters);
+			$data = get_sumary_weight_vals($deal_vals,$view_by,$cur_rows);
+		}
+		else{
+			$qry_cond  = "p.deleted_status = '0' ".$qry_cond;
+			$deal_vals = get_deal_vals('*,sum(p.project_cost) as tot_val',$fields,$tables,$qry_cond,$filters);
+			$data = get_data($view_by,$cur_rows,$deal_vals);
+		}
 	}
 	else{
-		$qry_cond  = "p.deleted_status = '0' ".$qry_cond;
-		$deal_vals = get_deal_vals('*,sum(p.project_cost) as tot_val',$fields,$tables,$qry_cond,$filters);
-		$data = get_data($view_by,$cur_rows,$deal_vals);
+		if($measure == 'Number'){
+			$task_vals = get_task_vals('',$fields,$tables,$qry_cond,$filters);
+			$data	   = get_task_data($view_by,$cur_rows,$task_vals);
+		}
 	}
 	return $data;
 }
@@ -893,6 +904,9 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 	}
 	if($clmn == 'open'){
 		$where[db_prefix().'projects.stage_of']  =  '0';
+	}
+	if($clmn == 'own'){
+		$where[db_prefix().'projects.stage_of']  =  '1';
 	}
 	if($req_projects == 1){
 		$result = select_join_query($fields,$sTable,$join,$join_cond,'left',$where,$where_in);

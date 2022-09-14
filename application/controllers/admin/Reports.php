@@ -221,23 +221,29 @@ class Reports extends AdminController
 		else if($report_12_id == 'activity_performance'){
 			$filter_data['activity_filters'][0]		=	'dateadded';  
 			$filter_data['activity_filters1'][0]	=	'is';  
-			$filter_data['activity_filters2'][0]	=	'this_year';  
+			$filter_data['activity_filters2'][0]	=	'this_month';  
 			$filter_data['activity_filters3'][0]	=	'01-'.date('m').'-'.date('Y');  
 			$filter_data['activity_filters4'][0]	=	date('t').'-'.date('m').'-'.date('Y');  
 		}
 		else if($report_12_id == 'email_performance'){
-			$filter_data['activity_filters'][0]	=	'project_start_date';  
+			$filter_data['activity_filters'][0]		=	'dateadded';  
 			$filter_data['activity_filters1'][0]	=	'is';  
-			$filter_data['activity_filters2'][0]	=	'this_year';  
-			$filter_data['activity_filters3'][0]	=	'01-01-'.date('Y');  
-			$filter_data['activity_filters4'][0]	=	'31-12-'.date('Y');  
+			$filter_data['activity_filters2'][0]	=	'this_month';  
+			$filter_data['activity_filters3'][0]	=	'01-'.date('m').'-'.date('Y');
+			$filter_data['activity_filters4'][0]	=	date('t').'-'.date('m').'-'.date('Y'); 
+			
+			$filter_data['activity_filters'][1]		=	'datefinished';  
+			$filter_data['activity_filters1'][1]	=	'is';  
+			$filter_data['activity_filters2'][1]	=	'this_month';  
+			$filter_data['activity_filters3'][1]	=	'01-'.date('m').'-'.date('Y');
+			$filter_data['activity_filters4'][1]	=	date('t').'-'.date('m').'-'.date('Y'); 
 		}
 		else if($report_12_id == 'call_performance'){
-			$filter_data['filters'][0]	=	'project_start_date';  
-			$filter_data['filters1'][0]	=	'is';  
-			$filter_data['filters2'][0]	=	'this_year';  
-			$filter_data['filters3'][0]	=	'01-01-'.date('Y');  
-			$filter_data['filters4'][0]	=	'31-12-'.date('Y');  
+			$filter_data['activity_filters'][0]		=	'dateadded';  
+			$filter_data['activity_filters1'][0]	=	'is';  
+			$filter_data['activity_filters2'][0]	=	'this_month';  
+			$filter_data['activity_filters3'][0]	=	'01-'.date('m').'-'.date('Y');
+			$filter_data['activity_filters4'][0]	=	date('t').'-'.date('m').'-'.date('Y');   
 		}
 		$filter_data['report_type'] = _l($report_12_id);
 		$this->session->set_userdata($filter_data);
@@ -402,11 +408,15 @@ class Reports extends AdminController
 		if ($this->input->is_ajax_request()) {			
 			$deal_val = deal_values();
 			$deals =  json_decode($deal_val, true);
-			$deals['filters']	=	$this->session->userdata('filters');
-			$deals['filters1']	=	$this->session->userdata('filters1');
-			$deals['filters2']	=	$this->session->userdata('filters2');
-			$deals['filters3']	=	$this->session->userdata('filters3');
-			$deals['filters4']	=	$this->session->userdata('filters4');
+			$cur_id =  '';
+			if(!empty($_REQUEST['edit_id'])){
+				$cur_id = '_edit_'.$_REQUEST['edit_id'];
+			}
+			$deals['filters']	=	$this->session->userdata('filters'.$cur_id);
+			$deals['filters1']	=	$this->session->userdata('filters1'.$cur_id);
+			$deals['filters2']	=	$this->session->userdata('filters2'.$cur_id);
+			$deals['filters3']	=	$this->session->userdata('filters3'.$cur_id);
+			$deals['filters4']	=	$this->session->userdata('filters4'.$cur_id);
 			$this->load->helper('report_summary');
 			$data = $_REQUEST;
 			$fields = deal_needed_fields();
@@ -488,7 +498,7 @@ class Reports extends AdminController
 		}
 		if($data['view_type'] != 'date'){
 			$fields = get_table_fields($view_by);
-			$sum_data = summary_val($fields['tables'],$fields['fields'],$fields['qry_cond'],$data['sel_measure'],$view_by,$fields['cur_rows'],$filters);
+			$sum_data = summary_val($fields['tables'],$fields['fields'],$fields['qry_cond'],$data['sel_measure'],$view_by,$fields['cur_rows'],$filters,'deal');
 		}
 		else{
 			$months = array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
@@ -1065,7 +1075,7 @@ class Reports extends AdminController
 				foreach($filters3 as $key12 => $filter3){
 					$filter_data['filters3'.$cur_id12][$key12]	=	$filter3;  
 				}
-				echo $filter_data['filters3'.$cur_id12][$cur_num]	=	'01-01-'.$next_year;  
+				$filter_data['filters3'.$cur_id12][$cur_num]	=	'01-01-'.$next_year;  
 			}
 			$filters4	=	$this->session->userdata('filters4'.$cur_id12);
 			if(!empty($filters4)){
@@ -1187,8 +1197,8 @@ class Reports extends AdminController
 			}
 		} 
 		elseif ($cur_val == 'this_month') {
-			$str_date = date('Y-m-01');
-			$end_date = date('Y-m-t');
+			$str_date = date('01-m-Y');
+			$end_date = date('t-m-Y');
 			if(!empty($filters3)){
 				foreach($filters3 as $key12 => $filter3){
 					$filter_data['filters3'.$cur_id12][$key12]	=	$filter3;  
@@ -1538,6 +1548,12 @@ class Reports extends AdminController
 					unset($all_clmns[$filter1]);
 				}if(!empty($cus_flds[$filter1])){
 					unset($cus_flds[$filter1]);
+				}
+				if($filter1 == 'project_start_date' || $filter1 == 'project_deadline' || $filter1 == 'won_date' || $filter1 == 'lost_date' || $filter1 == 'project_created' || $filter1 == 'project_modified'){
+					$filter_data['filters1'.$cur_id12][$key12]	=	'is';
+					$filter_data['filters2'.$cur_id12][$key12]	=	'this_year';
+					$filter_data['filters3'.$cur_id12][$key12]	=	'01-01-'.date('Y');
+					$filter_data['filters4'.$cur_id12][$key12]	=	'31-12-'.date('Y');
 				}
 				$filter_data['filters'.$cur_id12][$key12]	=	$filter1;
 			}
