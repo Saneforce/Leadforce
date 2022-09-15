@@ -723,6 +723,7 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 			$req_projects = 0;
 		}
 	}
+	
 	$aColumns_temp = get_qry_fields();
 	$sIndexColumn = 'id';
 	$sTable       = db_prefix() . 'projects ';
@@ -781,7 +782,12 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 			$where[db_prefix().'projects.teamleader']   =  $sum_id;
 			break;
 		case'tags':
-			$sql = " select rel_id from ".db_prefix()."tags t,".db_prefix()."taggables ta where t.name = '".$crow."' and ta.tag_id = t.id and ta.rel_type='project'";
+			$ids = implode(',',$where_in[db_prefix().'projects.id']);
+			$cond2 = '';
+			if(!empty($ids)){
+				$cond2 = " and ta.rel_id in($ids)";
+			}
+			$sql = " select rel_id from ".db_prefix()."tags t,".db_prefix()."taggables ta where t.name = '".$crow."' and ta.tag_id = t.id and ta.rel_type='project'".$cond2;
 			$query = $CI->db->query($sql);
 			$results = $query->result_array();
 			$tags_ids = array();
@@ -806,7 +812,12 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 			$where[db_prefix().'projects.stage_of']   =  $crow;
 			break;
 		case'contact_name':
-			$sql = " select project_id from ".db_prefix()."contacts c,".db_prefix()."project_contacts pc where c.id = '".$sum_id."' and pc.contacts_id = c.id";
+			$ids = implode(',',$where_in[db_prefix().'projects.id']);
+			$cond2 = '';
+			if(!empty($ids)){
+				$cond2 = " and pc.project_id in($ids)";
+			}
+			$sql = " select project_id from ".db_prefix()."contacts c,".db_prefix()."project_contacts pc where c.id = '".$sum_id."' and pc.contacts_id = c.id ".$cond2;
 			$query = $CI->db->query($sql);
 			$results = $query->result_array();
 			$projects = array();
@@ -820,7 +831,12 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 			}
 			break;
 		case'contact_email1':
-			$sql = " select project_id from ".db_prefix()."contacts c,".db_prefix()."project_contacts pc where c.email = '".$crow."' and pc.is_primary = '1' and pc.contacts_id = c.id";
+			$ids = implode(',',$where_in[db_prefix().'projects.id']);
+			$cond2 = '';
+			if(!empty($ids)){
+				$cond2 = " and pc.project_id in($ids)";
+			}
+			$sql = " select project_id from ".db_prefix()."contacts c,".db_prefix()."project_contacts pc where c.email = '".$crow."' and pc.is_primary = '1' and pc.contacts_id = c.id".$cond2;
 			$query = $CI->db->query($sql);
 			$results = $query->result_array();
 			$projects = array();
@@ -834,7 +850,12 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 			}
 			break;
 		case'contact_phone1':
-			$sql = " select project_id from ".db_prefix()."contacts c,".db_prefix()."project_contacts pc where c.phonenumber = '".$crow."' and pc.is_primary = '1' and pc.contacts_id = c.id";
+			$ids = implode(',',$where_in[db_prefix().'projects.id']);
+			$cond2 = '';
+			if(!empty($ids)){
+				$cond2 = " and pc.project_id in($ids)";
+			}
+			$sql = " select project_id from ".db_prefix()."contacts c,".db_prefix()."project_contacts pc where c.phonenumber = '".$crow."' and pc.is_primary = '1' and pc.contacts_id = c.id ".$cond2;
 			$query = $CI->db->query($sql);
 			$results = $query->result_array();
 			$projects = array();
@@ -857,9 +878,14 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 				$i = 0;
 				foreach($results as $res1){
 					$projects[$i] = $res1['project_id'];
+					if(!empty($where_in[db_prefix().'projects.id'])){
+						$where_in[db_prefix().'projects.id']   =  $res1['project_id'];
+					}
 					$i++;
 				}
-				$where_in[db_prefix().'projects.id']   =  $projects;
+				if(empty($where_in[db_prefix().'projects.id'])){
+					$where_in[db_prefix().'projects.id']   =  $projects;
+				}
 			}
 			break;
 		case'project_currency':
@@ -875,7 +901,12 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 			$where[db_prefix().'projects.modified_by']   =  $sum_id;
 			break;
 		default:
-			$sql = " select relid from ".db_prefix()."customfieldsvalues where fieldid = '".$sum_id."' ";
+			$ids = implode(',',$where_in[db_prefix().'projects.id']);
+			$cond2 = '';
+			if(!empty($ids)){
+				$cond2 = " and relid in($ids)";
+			}
+			$sql = " select relid from ".db_prefix()."customfieldsvalues where fieldid = '".$sum_id.$cond2."' ";
 			$query = $CI->db->query($sql);
 			$results = $query->result_array();
 			$projects = array();
@@ -888,6 +919,29 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 				$where_in[db_prefix().'projects.id']   =  $projects;
 			}
 			break;
+	}
+	if($measure == 'Product Value'){
+		$i = 0;
+		$projects = array();
+		$ids = implode(',',$where_in[db_prefix().'projects.id']);
+		$cond2 = '';
+		if(!empty($ids)){
+			$cond2 = " where projectid in($ids)";
+		}
+		$ress = $CI->db->query("SELECT projectid FROM " . db_prefix() . "project_products ".$cond2)->result_array();	
+		
+		if(!empty($ress)){
+			foreach($ress as $res1){
+				$projects[$i] = $res1['projectid'];
+				$i++;
+			}
+		}
+		if(!empty($projects)){
+			$where_in[db_prefix().'projects.id']   =  $projects;
+		}
+		else{
+			$where[db_prefix().'projects.id']   =  '0';
+		}
 	}
 	if($view_type == 'date' && ($view_by == 'start_date' || $view_by == 'project_deadline' || $view_by == 'won_date' || $view_by == 'lost_date' || $view_by == 'project_created' || $view_by == 'project_modified')){
 		if($date_range == 'Monthly'){
@@ -908,6 +962,7 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 	if($clmn == 'own'){
 		$where[db_prefix().'projects.stage_of']  =  '1';
 	}
+	
 	if($req_projects == 1){
 		$result = select_join_query($fields,$sTable,$join,$join_cond,'left',$where,$where_in);
 	}else{
