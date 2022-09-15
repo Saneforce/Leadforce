@@ -31,7 +31,6 @@ class Import_deals extends App_import
     {
 	
         //$this->initialize();
-		
         $databaseFields      = $this->getImportableDatabaseFields();
         $custFields = array();
         foreach ($this->getCustomFields() as $field) {
@@ -123,6 +122,10 @@ class Import_deals extends App_import
 								if($insert['person_phonenumber']) {
 									$person['phonenumber'] = $insert['person_phonenumber'];
 								}
+
+                                if($insert['person_phone_country_code']) {
+									$person['phone_country_code'] = strtoupper($insert['person_phone_country_code']);
+								}
 								if($insert['person_position']) {
 									$person['title'] = $insert['person_position'];
 								}
@@ -133,7 +136,7 @@ class Import_deals extends App_import
 								} else {
 									$personId = $this->insertPerson($person, $orgId);
 								}
-                               
+                                
 							}
 							//Deal
 							$deal = array();
@@ -208,6 +211,7 @@ class Import_deals extends App_import
 								$deal['deal_followers'] = $insert['deal_followers'];
 							}
 							$deal['imported_id'] = $this->uniqueId;
+                            
 							$dealId = $this->insertDeal($deal, $orgId, $personId);
                             if($personId >0 && $insert['activity_name'] || $insert['activity_tasktype'] || $insert['activity_priority'] || $insert['activity_startdate']){
                                 //Activity
@@ -296,6 +300,10 @@ class Import_deals extends App_import
 							if($insert['person_phonenumber']) {
 								$person['phonenumber'] = $insert['person_phonenumber'];
 							}
+                            if($insert['person_phone_country_code']) {
+                                $person['phone_country_code'] = strtoupper($insert['person_phone_country_code']);
+                            }
+                            
 							if($insert['person_position']) {
 								$person['title'] = $insert['person_position'];
 							}
@@ -379,6 +387,26 @@ class Import_deals extends App_import
 		array_unshift($mandatory_fields,"name");
         if(!$data['person_fullname'] && (in_array("project_contacts[]", $mandatory_fields) || in_array("primary_contact", $mandatory_fields) )) {
             $reason = 'Person Name is empty';
+        }
+        if($data['person_phonenumber']) {
+           
+            if(!$data['person_phone_country_code']){
+                if($reason){
+                    $reason .= ', ';
+                }
+                $reason .= 'Person phone country code cannot be empty';
+            }else{
+                $this->ci->db->where('iso2',strtoupper($data['person_phone_country_code']));
+                
+                $country =$this->ci->db->get(db_prefix().'countries')->row();
+                if(!$country){
+                    if($reason){
+                        $reason .= ', ';
+                    }
+                    $reason .='Incorrect person phone country code';
+                }
+            }
+            
         }
         if(!$data['organization_name'] && in_array("clientid", $mandatory_fields)) {
             if($reason)
@@ -652,6 +680,7 @@ class Import_deals extends App_import
         if($data['phonenumber']) {
             if($personData['phonenumber'] == $data['phonenumber']) {
                 $update['phonenumber']  = $data['phonenumber'];
+                $update['phone_country_code']  = $data['phone_country_code'];
             } else {
                 $emplodPhone = explode(',',$personData['alternative_phonenumber']);
                 
@@ -670,7 +699,9 @@ class Import_deals extends App_import
         $update['title']  = $data['title'];
         $update['userid'] = $update['userids'] = $orgId;
         $this->ci->db->where('id', $personData['id']);
+        
         $this->ci->db->update(db_prefix() . 'contacts', $update);
+        print_r($update);die;
         return $personData['id'];
     }
 
