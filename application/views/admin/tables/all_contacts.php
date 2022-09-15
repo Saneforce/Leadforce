@@ -215,7 +215,7 @@ foreach ($rResult as $aRow) {
         $diabled = "disabled";
     }
         $outputActive = '<div class="onoffswitch">
-                    <input type="checkbox"' . ($aRow['registration_confirmed'] == 0 ? ' disabled' : '') . ' data-switch-url="' . admin_url() . 'clients/change_contact_status" name="onoffswitch" class="onoffswitch-checkbox" id="c_' . $aRow['id'] . '" data-id="' . $aRow['id'] . '"' . ($aRow['active'] == 1 ? ' checked': '') . ' '.$diabled.'>
+                    <input type="checkbox" data-switch-url="' . admin_url() . 'clients/change_contact_status" name="onoffswitch" class="onoffswitch-checkbox" id="c_' . $aRow['id'] . '" data-id="' . $aRow['id'] . '"' . ($aRow['active'] == 1 ? ' checked': '') . ' '.$diabled.'>
                     <label class="onoffswitch-label" for="c_' . $aRow['id'] . '"></label>
                 </div>';
         // For exporting
