@@ -612,8 +612,13 @@ class Clients extends AdminController
                         die;
                     }
                 }
-                $data['userid'] = $data['userids'] = $data['clientid'];
-                unset($data['clientid']);
+                if(isset($data['clientid'])){
+                    $data['userid'] = $data['userids'] = $data['clientid'];
+                    unset($data['clientid']);
+                }else{
+                    $data['userid'] = $data['userids'] = $customer_id;
+                }
+                    
                
                 if (isset($data['deals'])) {
                     $deals = $data['deals'];

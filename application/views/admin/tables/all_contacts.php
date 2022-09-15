@@ -234,11 +234,11 @@ foreach ($rResult as $aRow) {
 
     $row['DT_RowClass'] = 'has-row-options';
 
-    if ($aRow['registration_confirmed'] == 0) {
-        $row['DT_RowClass'] .= ' alert-info requires-confirmation';
-        $row['Data_Title']  = _l('customer_requires_registration_confirmation');
-        $row['Data_Toggle'] = 'tooltip';
-    }
+    // if ($aRow['registration_confirmed'] == 0) {
+    //     $row['DT_RowClass'] .= ' alert-info requires-confirmation';
+    //     $row['Data_Title']  = _l('customer_requires_registration_confirmation');
+    //     $row['Data_Toggle'] = 'tooltip';
+    // }
     //pre($row);
     $output['aaData'][] = $row;
 }
