@@ -701,7 +701,6 @@ class Import_deals extends App_import
         $this->ci->db->where('id', $personData['id']);
         
         $this->ci->db->update(db_prefix() . 'contacts', $update);
-        print_r($update);die;
         return $personData['id'];
     }
 
