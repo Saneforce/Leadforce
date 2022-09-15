@@ -3131,7 +3131,7 @@ class Tasks_model extends App_Model
         }
         // Fix for big queries. Some hosting have max_join_limit
         if (count($custom_fields) > 4) {
-            @$this->ci->db->query('SET SQL_BIG_SELECTS=1');
+            @$this->db->query('SET SQL_BIG_SELECTS=1');
         }
         //pre($idkey);
         if($idkey == 0) {
