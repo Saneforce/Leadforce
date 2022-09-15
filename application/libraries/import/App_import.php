@@ -636,7 +636,7 @@ abstract class App_import
 
         $totalSampleRows = 1;
         if($_POST['download_contact_sample'] === 'true') {
-            $sample_CSV = array('123','Stojanovic Goran','client@gmail.com','9787654567','Manager','test','test','test');
+            $sample_CSV = array('123','Stojanovic Goran','client@gmail.com','9787654567','Manager','IN','test','test','test');
         } else {
             $sample_CSV =array();
             foreach ($this->getImportableDatabaseFields() as $field) {
@@ -649,6 +649,9 @@ abstract class App_import
                         break;
                     case 'person_phonenumber':
                         $sample_CSV []='9898989898';
+                        break;
+                    case 'person_phone_country_code':
+                        $sample_CSV []='IN';
                         break;
                     case 'person_position':
                         $sample_CSV []='Manager';
