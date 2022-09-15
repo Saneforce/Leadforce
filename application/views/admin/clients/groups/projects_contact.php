@@ -3,7 +3,8 @@
 <?php if(isset($client)){ ?>
 <?php if(has_permission('projects','','create')){ ?>
 <!-- <a href="<?php echo admin_url('projects/project?customer_id='.$client->userid); ?>" class="btn btn-info mbot25<?php if($client->active == 0){echo ' disabled';} ?>"><?php echo _l('new_project'); ?></a> -->
-<?php } ?>
+<?php } 
+}?>
 <div class="row">
    <?php
       $_where = '';
@@ -26,5 +27,4 @@
 </div>
 <?php
    $this->load->view('admin/projects/table_html', array('class'=>'projects-single-client'));
-}
 ?>
