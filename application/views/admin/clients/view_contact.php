@@ -91,6 +91,7 @@
 <script>
    $(function(){
     <?php if($_GET['group'] == 'tasks') { ?>
+      init_rel_tasks_table(<?php echo $contact->id; ?>,'contact');
    <?php } else { ?>
       init_rel_tasks_table(<?php echo $client->userid; ?>,'contact');
    <?php } ?>
