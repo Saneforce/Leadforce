@@ -14,6 +14,7 @@
 
 				$custom_fields = get_table_custom_fields('customers');
 				foreach($custom_fields as $cfkey=>$cfval){
+					
 					$cus_1[$cfval['slug']] = $colarr[$cfval['slug']] = array("ins"=>$cfval['name'],"ll"=>$cfval['name']);
 				}
 				$projects_lists = (array)json_decode(get_option('report_deal_list_column_order')); 
@@ -37,7 +38,7 @@
 				?>
 			</thead>
 			<tbody>
-				<?php
+				<?php 
 				if(!empty($results)){
 					$i = 0;
 					foreach($results as $rkey => $row_1){
@@ -61,7 +62,15 @@
 										<td class="sum_td">
 											<?php 
 											 if(_l($colarr[$ckey]['ll']) !='Status'){
-												echo (isset($row_1[$ckey]) || $row_1[$ckey]!='')?$row_1[$ckey]:'-'; 
+												 if(isset($row_1[$ckey]) || $row_1[$ckey]!=''){
+													 echo $row_1[$ckey];
+												 }
+												 else if(isset($row_1['cvalue_'.$ckey]) || $row_1['cvalue_'.$ckey]!=''){
+													 echo $row_1['cvalue_'.$ckey];
+												 }
+												 else{
+													 echo '-';
+												 }
 											 }
 											 else{
 												 if($row_1[$ckey] ==0){

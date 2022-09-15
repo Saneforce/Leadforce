@@ -69,7 +69,7 @@
 								<?php $attrs = array('autofocus'=>true, 'required'=>true,'onblur'=>"check_name(this)",'onkeyup'=>"check_validate(this)", 'maxlength'=>"150"); ?>
 								<?php echo render_input( 'name1', 'name','','',$attrs); ?>
 								<div id="contact_exists_info" class="hide"></div>
-								<div class="text-danger" id="name1_id" style="display:none">Please enter valid name</div>								
+								<div class="text-danger" id="name1_id" style="display:none"><?php echo _l('valid_name');?></div>								
 								<div class="input_fields_wrap_ae">
 								
 								</div>
@@ -99,12 +99,12 @@
 					<?php }?>
 					<div class="" style="float:left">
 					<?php $filters = (empty($filters)?array():$filters);?>
-						 <span id="ch_1_filter1"><?php echo count($filters);?></span> filters applied
+						 <span id="ch_1_filter1"><?php echo count($filters);?></span> <?php echo _l('filters_applied');?>
 						 <input type="hidden" id="c_filter_val1" value="<?php echo count($filters);?>"> 
 					</div>
 					<?php if(empty($id)){?>
 						<div class="float-right" style="float:right">
-							<button type="button" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" data-toggle="modal" data-target="#clientid_add_modal">Save</button>
+							<button type="button" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" data-toggle="modal" data-target="#clientid_add_modal"><?php echo _l('submit');?></button>
 						</div>
 					<?php }else{
 						$staffid = get_staff_user_id();
@@ -112,11 +112,12 @@
 					?>
 						<div class="float-right" style="float:right">
 							<?php if($ch_admin){?>
-								<button type="button" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" data-toggle="modal" data-target="#shared_add_modal" onclick="load_share('<?php echo $id;?>')">Shared</button>
+								<button type="button" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" data-toggle="modal" data-target="#shared_add_modal" onclick="load_share('<?php echo $id;?>')"><?php echo _l('shared');?></button>
+							
+								<button type="button" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" data-toggle="modal" data-target="#public_add_modal" onclick="load_public('<?php echo $id;?>')"><?php echo _l('public_link');?></button>
 							<?php }?>
-							<button type="button" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" data-toggle="modal" data-target="#public_add_modal" onclick="load_public('<?php echo $id;?>')">Public Link</button>
-							<a href="<?php echo admin_url('reports/update_report/'.$id);?>" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" >Save</a>
-							<button type="button" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" data-toggle="modal" data-target="#clientid_add_modal">Save New</button>
+							<a href="<?php echo admin_url('reports/update_report/'.$id);?>" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" ><?php echo _l('submit');?></a>
+							<button type="button" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" data-toggle="modal" data-target="#clientid_add_modal"><?php echo _l('save_new');?></button>
 						</div>
 					<?php }?>
 				</div>
@@ -143,13 +144,13 @@
 								<?php if(!empty($links)){
 									foreach($links as $link12){
 									?>
-										<div class="form-group" app-field-wrapper="name" ><label for="name" class="control-label"> Share Link</label><input type="text"  class="form-control" value="<?php echo base_url('shared/index/'.$link12['share_link']);?>"  readonly style="width:90%;float:left;"><a href="javascript:void(0);" " style="margin-left:10px;float:left" onclick="delete_link('<?php echo $link12['id'];?>')"><i class="fa fa-trash fa-2x" style="color:red"></i></a></div>
+										<div class="form-group" app-field-wrapper="name" ><label for="name" class="control-label"> <?php echo _l('share_link');?></label><input type="text"  class="form-control" value="<?php echo base_url('shared/index/'.$link12['share_link']);?>"  readonly style="width:90%;float:left;"><a href="javascript:void(0);" " style="margin-left:10px;float:left" onclick="delete_link('<?php echo $link12['id'];?>')"><i class="fa fa-trash fa-2x" style="color:red"></i></a></div>
 								<?php 
 									}
 								}?>
 							
 							</div>
-							<div class="row"> <div class="col-md-12"><a href="javascript:void(0)" onclick="add_public_link('<?php echo $id;?>')">Add Link</a></div></div>
+							<div class="row"> <div class="col-md-12"><a href="javascript:void(0)" onclick="add_public_link('<?php echo $id;?>')"><?php echo _l('add_link');?></a></div></div>
 						</div>
 						<div class="modal-footer">
 							<button group="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
@@ -173,7 +174,7 @@
 						<input type="hidden" id="link_id" name="link_id">
 							<?php $attrs = array('autofocus'=>true, 'required'=>true,'onblur'=>"check_name(this)",'onkeyup'=>"check_validate(this)", 'maxlength'=>"150"); ?>
 							<?php echo render_input( 'ch_name12', 'name','','text',$attrs); ?>
-							<div class="text-danger" id="ch_name12_id" style="display:none">Please enter valid name</div>
+							<div class="text-danger" id="ch_name12_id" style="display:none"><?php echo _l('valid_name');?></div>
 							<div id="companyname_exists_info" class="hide"></div>
 							
 					</div>
