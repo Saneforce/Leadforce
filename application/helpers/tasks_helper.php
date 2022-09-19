@@ -775,13 +775,19 @@ function tasks_summary_data($rel_id = null, $rel_type = null)
                 $tasks_my_where .= ' AND rel_id=' . $rel_id . ' AND rel_type="' . $rel_type . '"';
             }
         } else {
-            $sqlProjectTasksWhere = ' AND CASE
-            WHEN rel_type="project" AND rel_id IN (SELECT project_id FROM ' . db_prefix() . 'project_settings WHERE project_id=rel_id AND name="hide_tasks_on_main_tasks_table" AND value=1)
-            THEN rel_type != "project"
-            ELSE 1=1
-            END';
-            $tasks_where .= $sqlProjectTasksWhere;
-            $tasks_my_where .= $sqlProjectTasksWhere;
+			if($my_staffids){
+				$tasks_where .= ' AND (' . db_prefix() . 'tasks.id in (select taskid from tbltask_assigned where staffid in (' . implode(',',$my_staffids) . ')) OR ' . db_prefix() . 'tasks.rel_id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')) )';
+            	$tasks_my_where .= ' AND (' . db_prefix() . 'tasks.id in (select taskid from tbltask_assigned where staffid in (' . implode(',',$my_staffids) . ')) OR ' . db_prefix() . 'tasks.rel_id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')))';
+			}else{
+				$sqlProjectTasksWhere = ' AND CASE
+				WHEN rel_type="project" AND rel_id IN (SELECT project_id FROM ' . db_prefix() . 'project_settings WHERE project_id=rel_id AND name="hide_tasks_on_main_tasks_table" AND value=1)
+				THEN rel_type != "project"
+				ELSE 1=1
+				END';
+				$tasks_where .= $sqlProjectTasksWhere;
+				$tasks_my_where .= $sqlProjectTasksWhere;
+			}
+            
         }
         
         // ROle based records
@@ -791,7 +797,7 @@ function tasks_summary_data($rel_id = null, $rel_type = null)
         //     $tasks_my_where .=  ' AND rel_id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ') OR  ' . db_prefix() . 'projects.teamleader in (' . implode(',',$my_staffids) . ') )';
         // }
         
-//echo $tasks_where; exit;
+		
 		//$tasks_where = 'rel_type = "project" AND '.$tasks_where;
 		//$tasks_my_where = 'rel_type = "project" AND '.$tasks_my_where;
 		$tasks_where =$tasks_where;
