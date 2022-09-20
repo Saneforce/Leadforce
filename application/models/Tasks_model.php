@@ -3016,17 +3016,18 @@ class Tasks_model extends App_Model
     }
 
 
-    public function get_tasks_list($api =false)
+    public function get_tasks_list($api =false,$where_cond = '')
     {
 
         $aColumns_temp = get_tasks_all_fields();
-        
-        $tasks_list_column_order = (array)json_decode(get_option('tasks_list_column_order')); //pr($tasks_list_column_order);
+		if($this->uri->segment(2,0) == 'reports' || $this->uri->segment(2,0) == 'activity_reports' || $this->uri->segment(1,0) == 'shared'){
+			$tasks_list_column_order = (array)json_decode(get_option('report_task_list_column_order')); 
+		}else{
+			$tasks_list_column_order = (array)json_decode(get_option('tasks_list_column_order')); 
+		}
         $aColumns = array();
         $aColumns[] = db_prefix() . 'tasks.id as id';
-        
-        
-        // pre($aColumns);
+                
         $sIndexColumn = 'id';
         $sTable       = db_prefix() . 'tasks';
         
@@ -3039,13 +3040,7 @@ class Tasks_model extends App_Model
         array_push($join, 'LEFT JOIN '.db_prefix().'pipeline  as '.db_prefix().'pipeline ON '.db_prefix().'pipeline.id = ' .db_prefix() . 'projects.pipeline_id');
         array_push($join, 'LEFT JOIN '.db_prefix().'clients  as '.db_prefix().'clients ON '.db_prefix().'clients.userid = ' .db_prefix() . 'projects.clientid');
        array_push($join, 'LEFT JOIN '.db_prefix().'contacts  as '.db_prefix().'contacts ON ('.db_prefix().'contacts.id = ' .db_prefix() . 'tasks.contacts_id  OR (' .db_prefix() . 'tasks.rel_type ="contact" AND '.db_prefix().'contacts.id = ' .db_prefix() . 'tasks.rel_id) )');
-         //include_once(APPPATH . 'views/admin/tables/includes/tasks_filter.php');
-         //include_once(APPPATH . 'views/admin/tables/includes/tasks_wo_status_filter.php');
-       //  array_push($where, 'AND CASE WHEN rel_type="project" AND rel_id IN (SELECT project_id FROM ' . db_prefix() . 'project_settings WHERE project_id=rel_id AND name="hide_tasks_on_main_tasks_table" AND value=1) THEN rel_type != "project" ELSE 1=1 END');
-        // array_push($where, ' AND rel_type != "invoice" AND rel_type != "estimate" AND rel_type != "proposal"');
-        
-        
-        
+         
         // ROle based records
         $my_staffids = $this->staff_model->get_my_staffids();
         
@@ -3053,46 +3048,16 @@ class Tasks_model extends App_Model
             array_push($where, ' AND (' . db_prefix() . 'tasks.id in (select taskid from tbltask_assigned where staffid in (' . implode(',',$my_staffids) . ')) OR ' . db_prefix() . 'tasks.rel_id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')) OR  ' . db_prefix() . 'projects.teamleader in (' . implode(',',$my_staffids) . ') )');
             array_push($wherewo, ' AND (' . db_prefix() . 'tasks.id in (select taskid from tbltask_assigned where staffid in (' . implode(',',$my_staffids) . ')) OR ' . db_prefix() . 'tasks.rel_id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')) OR  ' . db_prefix() . 'projects.teamleader in (' . implode(',',$my_staffids) . ') )');
         }
-        
+        if(!empty($where_cond)){
+			array_push($where, $where_cond);
+		}
         if(isset($_POST['search']['value']) && ($_POST['search']['value'] == 'deal' || $_POST['search']['value'] == 'Deal')) {
             array_push($where, ' AND ' . db_prefix() . 'tasks.rel_type like "%project%"');
-            
         }
-        
-        // if(!empty($gsearch)){
-        //     array_push($where, ' AND ' . db_prefix() . 'projects.id IN (SELECT id FROM ' . db_prefix() . 'projects WHERE name like "%' . $gsearch . '%")');
-        // }
-        // $aColumns[] = db_prefix().'clients.userid as userid';
-        // $aColumns[] = db_prefix().'projects.id as projectid';
-        // $aColumns[] = db_prefix().'projects.teamleader as p_teamleader';
-        // $aColumns[] = db_prefix().'contacts.id as contactsid';
-        
         $idkey = 0;
-        
         $view_ids = $this->staff_model->getFollowersViewList();
-            
-        /*foreach($tasks_list_column_order as $ckey=>$cval){
-            if($ckey == 'id' ) {
-                $idkey = 1;
-                $aColumns[] = db_prefix() . 'tasks.id as id';
-            }
-            
-             if(isset($aColumns_temp[$ckey])){
-                 $aColumns[] =$aColumns_temp[$ckey];
-             }
-            //  pr($aColumns);
-        }*/
-        
-        
         $custom_fields = get_table_custom_fields('tasks');
-        
-        //$custom_fields = array_merge($custom_fields, get_table_custom_fields('projects'));
-        
-        //$custom_fields =array_merge($custom_fields, get_table_custom_fields('contacts'));
-        
-        //$custom_fields = array_merge($custom_fields,get_table_custom_fields('customers'));
         $customFieldsColumns= $locationCustomFields = $cus = [];
-        //pre($tasks_list_column_order);
         foreach ($custom_fields as $key => $field) {
             $fieldtois= 'clients.userid';
             if($field['fieldto'] =='projects'){
@@ -3108,11 +3073,8 @@ class Tasks_model extends App_Model
                     array_push($locationCustomFields, 'cvalue_' .$field['slug']);
                 }
                 $selectAs = 'cvalue_' .$field['slug'];
-                // array_push($customFieldsColumns, $selectAs);
-                // array_push($aColumns, '(SELECT value FROM ' . db_prefix() . 'customfieldsvalues WHERE ' . db_prefix() . 'customfieldsvalues.relid=' . db_prefix() . 'clients.userid AND ' . db_prefix() . 'customfieldsvalues.fieldid=' . $field['id'] . ' AND ' . db_prefix() . 'customfieldsvalues.fieldto="' . $field['fieldto'] . '" LIMIT 1) as ' . $selectAs);
                 array_push($customFieldsColumns, $selectAs);
                 $cus[$field['slug']] =  'ctable_' . $key . '.value as ' . $selectAs;
-                //array_push($aColumns, 'ctable_' . $key . '.value as ' . $selectAs);
                 array_push($join, 'LEFT JOIN '.db_prefix().'customfieldsvalues as ctable_' . $key . ' ON '.db_prefix().$fieldtois.' = ctable_' . $key . '.relid AND ctable_' . $key . '.fieldto="' . $field['fieldto'] . '" AND ctable_' . $key . '.fieldid=' . $field['id']);
             }
         }
@@ -3123,30 +3085,31 @@ class Tasks_model extends App_Model
                 $idkey = 1;
                 $aColumns[] = db_prefix() . 'tasks.id as id';
             }
-            
              if(isset($aColumns_temp[$ckey])){
                  $aColumns[] =$aColumns_temp[$ckey];
              }
-            //  pr($aColumns);
         }
         // Fix for big queries. Some hosting have max_join_limit
         if (count($custom_fields) > 4) {
-            @$this->db->query('SET SQL_BIG_SELECTS=1');
+            @$this->ci->db->query('SET SQL_BIG_SELECTS=1');
         }
-        //pre($idkey);
         if($idkey == 0) {
             $idkey = ','.db_prefix() . 'tasks.id as id';
         } else {
             $idkey = '';
         }
-        
         if($api ===true){
             $_POST['columns'] =array();
             foreach($aColumns as $key => $value){
                 $_POST['columns'][] =array('searchable'=>'true');
             }
         }
-        //pre($idkey);
+		$end_cond = $assign_cond = $last = '';
+		if(get_staff_user_id()!=''){
+			$end_cond = 'and staff_id=' . get_staff_user_id() . ' ';
+			$assign_cond = 'AND staffid=' . get_staff_user_id() . ' ';
+			$last = db_prefix() . 'tasks.addedfrom=' . get_staff_user_id() . ' AND ';
+		}
         $aColumns = hooks()->apply_filters('tasks_table_sql_columns', $aColumns);
         $result = data_tables_init(
             $aColumns,
@@ -3159,19 +3122,18 @@ class Tasks_model extends App_Model
                 'rel_id',
                 'contacts_id',
                 'tasktype as type_id',
-                'tblcontacts.email as contact_email',
-                'tblcontacts.phonenumber as contact_phone',
-                'tblcontacts.phone_country_code as contact_phone_country_code',
+                db_prefix().'contacts.email as contact_email',
+                db_prefix().'contacts.phonenumber as contact_phone',
                 'recurring',
                 tasks_rel_name_select_query() . ' as rel_name',
                 'billed',
-                '(SELECT staffid FROM tbltask_assigned WHERE taskid=tbltasks.id limit 1) as is_assigned',
-                '(SELECT id FROM tblcall_history WHERE task_id=tbltasks.id limit 1) as call_id',
-                '(SELECT filename FROM tblcall_history WHERE task_id=tbltasks.id and status = "answered" limit 1) as recorded',
+                '(SELECT staffid FROM '.db_prefix().'task_assigned WHERE taskid='.db_prefix().'tasks.id limit 1) as is_assigned',
+                '(SELECT id FROM '.db_prefix().'call_history WHERE task_id=tbltasks.id limit 1) as call_id',
+                '(SELECT filename FROM '.db_prefix().'call_history WHERE task_id='.db_prefix().'tasks.id and status = "answered" limit 1) as recorded',
                 get_sql_select_task_assignees_ids() . ' as assignees_ids',
-                '(SELECT MAX(id) FROM ' . db_prefix() . 'taskstimers WHERE task_id=' . db_prefix() . 'tasks.id and staff_id=' . get_staff_user_id() . ' and end_time IS NULL) as not_finished_timer_by_current_staff',
-                '(SELECT staffid FROM ' . db_prefix() . 'task_assigned WHERE taskid=' . db_prefix() . 'tasks.id AND staffid=' . get_staff_user_id() . ' group by tbltask_assigned.taskid) as current_user_is_assigned',
-                '(SELECT CASE WHEN '.db_prefix() . 'tasks.addedfrom=' . get_staff_user_id() . ' AND is_added_from_contact=0 THEN 1 ELSE 0 END) as current_user_is_creator'.$idkey,
+                '(SELECT MAX(id) FROM ' . db_prefix() . 'taskstimers WHERE task_id=' . db_prefix() . 'tasks.id '.$end_cond.' and end_time IS NULL) as not_finished_timer_by_current_staff',
+                '(SELECT staffid FROM ' . db_prefix() . 'task_assigned WHERE taskid=' . db_prefix() . 'tasks.id '.$assign_cond.' group by '.db_prefix().'task_assigned.taskid) as current_user_is_assigned',
+                '(SELECT CASE WHEN '.$last.' is_added_from_contact=0 THEN 1 ELSE 0 END) as current_user_is_creator'.$idkey,
             ],'','','taskpage',$wherewo
         );
         return $result;

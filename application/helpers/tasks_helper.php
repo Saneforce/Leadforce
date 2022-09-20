@@ -775,7 +775,7 @@ function tasks_summary_data($rel_id = null, $rel_type = null)
                 $tasks_my_where .= ' AND rel_id=' . $rel_id . ' AND rel_type="' . $rel_type . '"';
             }
         } else {
-			if($my_staffids){
+            if($my_staffids){
 				$tasks_where .= ' AND (' . db_prefix() . 'tasks.id in (select taskid from tbltask_assigned where staffid in (' . implode(',',$my_staffids) . ')) OR ' . db_prefix() . 'tasks.rel_id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')) )';
             	$tasks_my_where .= ' AND (' . db_prefix() . 'tasks.id in (select taskid from tbltask_assigned where staffid in (' . implode(',',$my_staffids) . ')) OR ' . db_prefix() . 'tasks.rel_id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')))';
 			}else{
@@ -787,29 +787,16 @@ function tasks_summary_data($rel_id = null, $rel_type = null)
 				$tasks_where .= $sqlProjectTasksWhere;
 				$tasks_my_where .= $sqlProjectTasksWhere;
 			}
-            
         }
         
-        // ROle based records
-        // $my_staffids = $CI->staff_model->get_my_staffids();
-        // if($my_staffids){
-        //     $tasks_where .=  ' AND rel_id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ') OR  ' . db_prefix() . 'projects.teamleader in (' . implode(',',$my_staffids) . ') )';
-        //     $tasks_my_where .=  ' AND rel_id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ') OR  ' . db_prefix() . 'projects.teamleader in (' . implode(',',$my_staffids) . ') )';
-        // }
-        
-		
-		//$tasks_where = 'rel_type = "project" AND '.$tasks_where;
-		//$tasks_my_where = 'rel_type = "project" AND '.$tasks_my_where;
 		$tasks_where =$tasks_where;
         $tasks_my_where = $tasks_my_where;
         $summary                   = [];
         $summary['total_tasks']    = total_rows(db_prefix() . 'tasks', $tasks_where);
-        //echo $CI->db->last_query(); exit;
         $summary['total_my_tasks'] = total_rows(db_prefix() . 'tasks', $tasks_my_where);
         $summary['color']          = $status['color'];
         $summary['name']           = $status['name'];
         $summary['status_id']      = $status['id'];
-        //pr($summary); 
         $tasks_summary[]           = $summary;
     }
     $b = array(2, 1, 0, 3); // rule indicating new key order
@@ -2667,8 +2654,6 @@ function get_public($report_id){
 	}
 	echo $req_out;
 }
-
-
 function get_tasks_need_fields(){
 	$fields = get_option('deal_fields');
 	$data =array();
@@ -2676,7 +2661,6 @@ function get_tasks_need_fields(){
 	if(!empty($fields) && $fields != 'null'){
 		$req_fields = json_decode($fields);
 		if(!empty($req_fields)){
-			
 			foreach($req_fields as $req_field11){
 				if($req_field11 == 'clientid'){
 					$data['need_fields'][] = 'company';
@@ -2694,16 +2678,26 @@ function get_tasks_need_fields(){
 				else if($req_field11 == 'startdate'){
 					$data['need_fields'][]= 'startdate';
 				}
-				
 			}
 		}
 	}
 	return $data;
 }
-
+function task_values(){
+	$CI   = &get_instance();
+	$colarr = task_all_columns(); 
+	$custom_fields = get_table_custom_fields('tasks');
+	$cus_1 = array();
+	foreach($custom_fields as $cfkey=>$cfval){
+		$cus_1[$cfval['slug']] =  array("ins"=>$cfval['name'],"ll"=>$cfval['name']);
+	}
+	$req_out = array('all_clmns'=>$colarr,'cus_flds'=>$cus_1);
+	return json_encode($req_out);
+}
 function get_tasks_all_fields()
 {
 	$aColumns_temp = array(
+		'id'=>db_prefix() . 'tasks.id as id',
 		'task_name'=>db_prefix() . 'tasks.name as task_name',
 		'project_name'=>db_prefix() . 'projects.name as project_name',
 		'project_status'=>db_prefix() . 'projects_status.name as project_status',
@@ -2717,7 +2711,7 @@ function get_tasks_all_fields()
 		'dateadded'=>'dateadded', 
 		'datemodified'=>'datemodified', 
 		'datefinished'=>'datefinished', 
-		'assignees'=>'(SELECT GROUP_CONCAT(CONCAT(firstname, \' \', lastname) SEPARATOR ",") FROM tblstaff where staffid IN (select staffid from tbltask_assigned where taskid = tbltasks.id)) as assignees',
+		'assignees'=>'(SELECT GROUP_CONCAT(CONCAT(firstname, \' \', lastname) SEPARATOR ",") FROM '.db_prefix().'staff where staffid IN (select staffid from tbltask_assigned where taskid = '.db_prefix().'tasks.id)) as assignees',
 		'tags'=>'(SELECT GROUP_CONCAT(name SEPARATOR ",") FROM ' . db_prefix() . 'taggables JOIN ' . db_prefix() . 'tags ON ' . db_prefix() . 'taggables.tag_id = ' . db_prefix() . 'tags.id WHERE rel_id = ' . db_prefix() . 'tasks.id and rel_type="task" ORDER by tag_order ASC) as tags',
 		'priority'=>'priority',
 		'description'=>db_prefix() . 'tasks.description as description',
@@ -2725,7 +2719,52 @@ function get_tasks_all_fields()
 	);
 	return $aColumns_temp;
 }
-
+function task_get_fields(){
+	$colarr = array(
+		"id"=>_l("the_number_sign"),
+		"task_name"=>_l("tasks_dt_name"),
+		"status"=>_l("task_status"),
+		"description"=>_l("description"),
+		"startdate"=>_l("scheduled_date"),
+		"dateadded"=>_l("create_date"),
+		"datemodified"=>_l("modified_date"),
+		"datefinished"=>_l("finished_date"),
+		"assignees"=>_l("task_assigned"),
+		"tags"=>_l("tags"),
+		"project_name"=>_l("project_name"),
+		"project_status"=>_l("project_status"),
+		"project_pipeline"=>_l("pipeline"),
+		"company"=>_l("client"),
+		"teamleader"=>_l("teamleader"),
+		"project_contacts"=>_l("project_contacts"),
+		"priority"=>_l("tasks_list_priority"),
+		"rel_type"=>_l("Type"),
+	); 
+	return $colarr;
+}
+function task_all_columns(){
+	$colarr = array(
+		"id"=>array("ins"=>"id","ll"=>"the_number_sign"),
+		"task_name"=>array("ins"=>"task_name","ll"=>"tasks_dt_name"),
+		"status"=>array("ins"=>"status","ll"=>"task_status"),
+		"description"=>array("ins"=>"description","ll"=>"description"),
+		"startdate"=>array("ins"=>"startdate","ll"=>"scheduled_date"),
+		"dateadded"=>array("ins"=>"dateadded","ll"=>"create_date"),
+		"datemodified"=>array("ins"=>"modified_date","ll"=>"modified_date"),
+		"datefinished"=>array("ins"=>"finished_date","ll"=>"finished_date"),
+		"assignees"=>array("ins"=>"assignees","ll"=>"task_assigned"),
+		"tags"=>array("ins"=>"tags","ll"=>"tags"),
+		"project_name"=>array("ins"=>"project_name","ll"=>"project_name"),
+		"project_status"=>array("ins"=>"project_status","ll"=>"project_status"),
+		"project_pipeline"=>array("ins"=>"project_pipeline","ll"=>"pipeline"),
+		"company"=>array("ins"=>"company","ll"=>"client"),
+		"teamleader"=>array("ins"=>"teamleader","ll"=>"teamleader"),
+		"project_contacts"=>array("ins"=>"project_contacts","ll"=>"project_contacts"),
+		"priority"=>array("ins"=>"priority","ll"=>"tasks_list_priority"),
+		"rel_type"=>array("ins"=>"type","ll"=>"Type"),
+	); 
+	return $colarr;
+}
 function task_relatedto_list()
 {
 	$relatedto =array();
