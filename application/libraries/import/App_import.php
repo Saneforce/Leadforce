@@ -556,12 +556,6 @@ abstract class App_import
                 case 'clientid':
                     $required_db_fields [] ='organization_name';
                     break;
-                case 'project_contacts[]':
-                    $required_db_fields [] ='deal_followers';
-                    break;
-                // case 'primary_contact':
-                //     $required_db_fields [] ='deal_followers';
-                //     break;
                 case 'pipeline_id':
                     $required_db_fields [] ='deal_pipeline';
                     break;
@@ -582,6 +576,10 @@ abstract class App_import
                     break;
                 case 'description':
                     $required_db_fields [] ='deal_description';
+                    break;
+                case 'project_contacts[]':
+                case 'primary_contact':
+                    $required_db_fields [] ='person_fullname';
                     break;
                 default:
                     # code...
