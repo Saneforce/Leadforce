@@ -1497,30 +1497,37 @@ class Projects extends AdminController
         
         if (has_permission('projects', '', 'edit') || has_permission('projects', '', 'create')) {
             $data = $this->input->post();
-            
-            if(isset($data['clientid_copy_project']) && !empty($data['clientid_copy_project'])){
-                $success = $this->projects_model->update(array('clientid'=>$data['clientid_copy_project'],'project_modified'=>date('Y-m-d H:i:s'),'modified_by'=>get_staff_user_id()), $data['project_id']);
-            }elseif(isset($data['pipeline_id']) && !empty($data['pipeline_id'])){
-                $success = $this->projects_model->update(array('pipeline_id'=>$data['pipeline_id'],'project_modified'=>date('Y-m-d H:i:s'),'modified_by'=>get_staff_user_id()), $data['project_id']);
-            }elseif(isset($data['teamleader']) && !empty($data['teamleader'])){
-                $success = $this->projects_model->update(array('teamleader'=>$data['teamleader'],'project_modified'=>date('Y-m-d H:i:s'),'modified_by'=>get_staff_user_id()), $data['project_id']);
-            }elseif(isset($data['project_cost']) && !empty($data['project_cost'])){
-                $success = $this->projects_model->update(array('project_cost'=>$data['project_cost'],'project_modified'=>date('Y-m-d H:i:s'),'modified_by'=>get_staff_user_id()), $data['project_id']);
-            }elseif(isset($data['name']) && !empty($data['name'])){
-                $success = $this->projects_model->update(array('name'=>$data['name'],'project_modified'=>date('Y-m-d H:i:s'),'modified_by'=>get_staff_user_id()), $data['project_id']);
-            }elseif(isset($data['deadline']) && !empty($data['deadline'])){
-                $checkdeadline = $this->projects_model->checkdeadline($data['deadline'], $data['project_id']);
-                if($checkdeadline) {
-                    $success = $this->projects_model->update(array('deadline'=>$data['deadline'],'project_modified'=>date('Y-m-d H:i:s'),'modified_by'=>get_staff_user_id()), $data['project_id']);
-                } else {
-                    $error = 'Close date should not be lesser than Start date.';
-                }
-            }elseif(isset($data['date_finished']) && !empty($data['date_finished'])){
-                $success = $this->projects_model->update(array('date_finished'=>$data['date_finished'],'project_modified'=>date('Y-m-d H:i:s'),'modified_by'=>get_staff_user_id()), $data['project_id']);
-            }elseif(isset($data['status']) && !empty($data['status'])){
-                
-                $success = $this->projects_model->update(array('status'=>$data['status'],'project_modified'=>date('Y-m-d H:i:s'),'modified_by'=>get_staff_user_id()), $data['project_id']);
-            }
+            if(isset($data['custom_field'])){
+				if(is_array($data['f_val'])){
+					$data['f_val']	= implode(',',$data['f_val']);
+				}
+				$success = $this->projects_model->update_custom_val($data['project_id'],$data['slug'],$data['f_val']);
+			}
+			else{
+				if(isset($data['clientid_copy_project']) && !empty($data['clientid_copy_project'])){
+					$success = $this->projects_model->update(array('clientid'=>$data['clientid_copy_project'],'project_modified'=>date('Y-m-d H:i:s'),'modified_by'=>get_staff_user_id()), $data['project_id']);
+				}elseif(isset($data['pipeline_id']) && !empty($data['pipeline_id'])){
+					$success = $this->projects_model->update(array('pipeline_id'=>$data['pipeline_id'],'project_modified'=>date('Y-m-d H:i:s'),'modified_by'=>get_staff_user_id()), $data['project_id']);
+				}elseif(isset($data['teamleader']) && !empty($data['teamleader'])){
+					$success = $this->projects_model->update(array('teamleader'=>$data['teamleader'],'project_modified'=>date('Y-m-d H:i:s'),'modified_by'=>get_staff_user_id()), $data['project_id']);
+				}elseif(isset($data['project_cost']) && !empty($data['project_cost'])){
+					$success = $this->projects_model->update(array('project_cost'=>$data['project_cost'],'project_modified'=>date('Y-m-d H:i:s'),'modified_by'=>get_staff_user_id()), $data['project_id']);
+				}elseif(isset($data['name']) && !empty($data['name'])){
+					$success = $this->projects_model->update(array('name'=>$data['name'],'project_modified'=>date('Y-m-d H:i:s'),'modified_by'=>get_staff_user_id()), $data['project_id']);
+				}elseif(isset($data['deadline']) && !empty($data['deadline'])){
+					$checkdeadline = $this->projects_model->checkdeadline($data['deadline'], $data['project_id']);
+					if($checkdeadline) {
+						$success = $this->projects_model->update(array('deadline'=>$data['deadline'],'project_modified'=>date('Y-m-d H:i:s'),'modified_by'=>get_staff_user_id()), $data['project_id']);
+					} else {
+						$error = 'Close date should not be lesser than Start date.';
+					}
+				}elseif(isset($data['date_finished']) && !empty($data['date_finished'])){
+					$success = $this->projects_model->update(array('date_finished'=>$data['date_finished'],'project_modified'=>date('Y-m-d H:i:s'),'modified_by'=>get_staff_user_id()), $data['project_id']);
+				}elseif(isset($data['status']) && !empty($data['status'])){
+					
+					$success = $this->projects_model->update(array('status'=>$data['status'],'project_modified'=>date('Y-m-d H:i:s'),'modified_by'=>get_staff_user_id()), $data['project_id']);
+				}
+			}
             if ($success) {
                 $data['message'] = _l('updated_successfully', _l('project'));
             }
@@ -3809,7 +3816,7 @@ class Projects extends AdminController
 		$req_project = $_REQUEST['pipeline'];
 		$req_out = array();
 		$stages = $this->projects_model->pipelinestagebypipelineid($req_project);
-		$stage_option = '<option value="">Select status</option>';
+		$stage_option = '<option value="">'._l('select_stage').'</option>';
 		if(!empty($stages)){
 			foreach($stages as $stage12){
 				$stage_option .= "<option value='".$stage12['id']."'>".$stage12['name']."</option>";

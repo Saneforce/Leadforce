@@ -11,7 +11,7 @@
 			</div>
 		<?php
 		} 
-		$record_val = end($this->uri->segment_array());
+		//$record_val = end($this->uri->segment_array());
 		?>
 		<div class="panel_s project-menu-panel" style="margin-bottom:0px;">
 			<div class="panel-body">
@@ -29,8 +29,14 @@
 			<div class="panel-body">
 				<div class="col-md-12">
 					<div id="overlay_deal" style="display: none;"><div class="spinner"></div></div>
-					<?php //echo $tab_view;?>
-								<?php $this->load->view('admin/reports/deal_table_html'); ?>
+					<?php 
+					if($type =='deal'){
+						$this->load->view('admin/reports/deal_table_html'); 
+					}
+					else{
+						$this->load->view('admin/reports/task_table_html'); 
+					}
+					?>
 				</div>
 				<div class="clearfix"></div>
 			</div>
@@ -43,12 +49,22 @@
 <?php init_tail(); app_admin_ajax_search_function();?>
 <script>
 $(function(){
+	<?php 
+	if($type == 'deal'){
+	?>
      var ProjectsServerParams = {};
      $.each($('._hidden_inputs._filters input'),function(){
          ProjectsServerParams[$(this).attr('name')] = '[name="'+$(this).attr('name')+'"]';
      });
-     initDataTable('.table-projects', admin_url+'reports/deal_table/<?php echo $id;?>?call=share', undefined, [0], ProjectsServerParams, <?php echo hooks()->apply_filters('projects_table_default_order', json_encode(array())); ?>);
-     init_ajax_search('customer', '#clientid_copy_project.ajax-search');
+     initDataTable('.table-projects', admin_url+'reports/deal_table/<?php echo $id;?>?call=share&type=<?php echo $type;?>', undefined, [0], ProjectsServerParams, <?php echo hooks()->apply_filters('projects_table_default_order', json_encode(array())); ?>);
+    // init_ajax_search('customer', '#clientid_copy_project.ajax-search');
+	<?php }else{?>
+		var TasksServerParams = {};
+		 $.each($('._hidden_inputs._filters input'),function(){
+			 TasksServerParams[$(this).attr('name')] = '[name="'+$(this).attr('name')+'"]';
+		 });
+		 initDataTable('.table-tasks_order', admin_url+'reports/deal_table/<?php echo $id;?>?type=<?php echo $type;?>', undefined, [0], TasksServerParams, <?php echo hooks()->apply_filters('tasks_table_default_order', json_encode(array())); ?>);
+	<?php }?>
 });
 </script>
 <style>

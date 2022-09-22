@@ -196,12 +196,743 @@ function get_req_val($req_val,$sel_val,$s_val,$d_val,$key,$all_val,$out_type){
 					<option value="tomorrow" '.$tomorrow.' >Tomorrow</option>
 					<option value="custom_period" '.$cus_pr.'>Custom Period</option>';
 		$req_out .= '</select></div>';
-		$req_out .= '<div class="col-md-7"><div class="col-md-5" id="'.$req_val.'_3_filter"  '.$req_disp.'><input type="text" class="form-control" id="start_date_edit_'.$req_val.'" value="'.$filters3[$req_val-1].'" name="filter_4[]"></div>';
-		$req_out .= '<div class="col-md-5" id="'.$req_val.'_4_filter"  '.$req_disp.'><input type="text" class="form-control" id="end_date_edit_'.$req_val.'" value="'.$filters4[$req_val-1].'" name="filter_5[]" ></div>';
+		if(!empty($this_yr) || (!empty($filters3[$req_val-1]) && !empty($filters4[$req_val-1]) )){
+			$req_out .= '<div class="col-md-7"><div class="col-md-5" id="'.$req_val.'_3_filter"  '.$req_disp.'><input type="text" class="form-control" id="start_date_edit_'.$req_val.'" value="'.$filters3[$req_val-1].'" name="filter_4[]"></div>';
+			$req_out .= '<div class="col-md-5" id="'.$req_val.'_4_filter"  '.$req_disp.'><input type="text" class="form-control" id="end_date_edit_'.$req_val.'" value="'.$filters4[$req_val-1].'" name="filter_5[]" ></div>';
+		}
+		else{
+			$req_out .= '<div class="col-md-7"><div class="col-md-5" id="'.$req_val.'_3_filter"  '.$req_disp.'><input type="text" class="form-control" id="start_date_edit_'.$req_val.'" value="01-01-'.date('Y').'" name="filter_4[]"></div>';
+			$req_out .= '<div class="col-md-5" id="'.$req_val.'_4_filter"  '.$req_disp.'><input type="text" class="form-control" id="end_date_edit_'.$req_val.'" value="31-12-'.date('Y').'" name="filter_5[]" ></div>';
+		}
 		$del_val ="'".$req_val."'";
 		$req_out .= '<div><div class="col-md-2" >
 					<a href="javascript:void(0);" onclick="del_filter('.$del_val.')"  style="margin-left:-5px;"><i class="fa fa-trash" style="color:red;font-size: 20px;margin-top: 5px;" title="'._l('delete').'"></i></a>
 				</div></div>';
 	}
 	return $req_out;
+}
+function get_activity_filters($req_filters,$check_data=''){
+	$CI			= 	& get_instance();
+	$needed = get_tasks_need_fields();
+	$where 		= 	array();
+	$req_cond	=	'';
+	$filters	=	$req_filters['filters'];
+	$filters1	=	$req_filters['filters1'];
+	$filters2	=	$req_filters['filters2'];
+	$filters3	=	$req_filters['filters3'];
+	$filters4	=	$req_filters['filters4'];
+	if(!empty($filters))
+	{
+		$i1 = 0;
+		$s_group_by = '';
+		$table = db_prefix().'filter';
+		$custom_fields = get_table_custom_fields('tasks');
+		$customs = array_column($custom_fields, 'slug');
+		
+		foreach($filters as $filter12){
+			if ((!empty($needed['need_fields']) && in_array($filter12, $needed['need_fields'])) || in_array($filter12, $customs)){
+				$check_cond = filter_cond($filters2[$i1]);
+				$activity_vals 	= $CI->db->query("SELECT filter_name,filter_cond,filter_type,date_field,filter FROM ".$table." where filter_name = '".$filter12."' and filter_type= '".$filters1[$i1]."' and filter = 'activity' ")->result_array();
+				if(!empty($activity_vals)){
+					$cur_cond = $activity_vals[0]['filter_cond'];
+					$cur_cond = str_replace('db_prefix()', db_prefix(), $cur_cond);
+					if(($filters1[$i1]=='is' || $filters1[$i1]=='is_more_than' || $filters1[$i1]=='is_less_than') && $activity_vals[0]['date_field'] ==0){
+						if($check_cond){
+							$cur_cond = str_replace('$$cond1', "'".$filters2[$i1]."'", $cur_cond);
+						}
+						else{
+							$cur_cond = '';
+						}
+					}
+					if($filters1[$i1]=='is_any_of'){
+						if($check_cond){
+							$req_arrs = explode(',',$filters2[$i1]);
+							$req_arr = '';
+							if(!empty($req_arrs)){
+								foreach($req_arrs as $req_arr1){
+									$req_arr .= "'".$req_arr1."',";
+								}
+							}
+							$req_arr = rtrim($req_arr,",");
+							$cur_cond = str_replace('$$in_cond', $req_arr, $cur_cond);
+						}
+						else{
+							$cur_cond = '';
+						}
+					}
+					if (str_contains($cur_cond, '$$date1')) {
+						$date1 = "'".date('Y-m-d',strtotime($filters3[$i1]))."'";
+						$cur_cond = str_replace('$$date1', $date1, $cur_cond);
+					}
+					if (str_contains($cur_cond, '$$date2')) {
+						$date2 = "'".date('Y-m-d',strtotime($filters4[$i1]))."'";
+						
+						$cur_cond = str_replace('$$date2', $date2, $cur_cond);
+					}
+					$req_cond .= $cur_cond;
+					array_push($where, $cur_cond);
+				}
+				else if(in_array($filter12, $customs)){
+					if($filters1[$i1]=='is'){
+						if($check_cond ){
+							$cur_cond = " AND ( p.id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where cv.value  = '".$filters2[$i1]."' and c.slug = '".$filter12."' and cv.fieldid = c.id) )";
+							$req_cond .= $cur_cond;
+							array_push($where, $cur_cond);
+						}else{
+							$cur_cond = " AND ( p.id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where value  > '".date('Y-m-d',strtotime($filters3[$i1]))."' AND value < '".date('Y-m-d',strtotime($filters4[$i1]))."' and c.slug = '".$filter12."' and cv.fieldid = c.id ) )";
+							$req_cond .= $cur_cond;
+							array_push($where, $cur_cond);
+						}
+					}
+					else if($filters1[$i1]=='is_empty'){
+						$cur_cond = " AND ( p.id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where (cv.value  = '' or cv.value = '0' or cv.value = '0000-00-00') and c.slug = '".$filter12."' and cv.fieldid = c.id) )";
+						$req_cond .= $cur_cond;
+						array_push($where, $cur_cond);
+					}
+					else if($filters1[$i1]=='is_not_empty'){
+						$cur_cond = " AND ( p.id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where cv.value  != '' AND cv.value != '0' AND cv.value != '0000-00-00' AND cv.fieldto = 'projects' and c.slug = '".$filter12."' and cv.fieldid = c.id) )";
+						$req_cond .= $cur_cond;
+						array_push($where, $cur_cond);
+					}
+					else if($filters1[$i1]=='is_not'){
+						$cur_cond = " AND ( p.id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c  where cv.value  != '".$filters2[$i1]."' and c.slug = '".$filter12."' and cv.fieldid = c.id) )";
+						$req_cond .= $cur_cond;
+						array_push($where, $cur_cond);
+					}
+					else if($filters1[$i1]=='is_any_of'  && $filters2[$i1]!=''){
+						$req_arrs = explode(',',$filters2[$i1]);
+						$req_arr = '';
+						if(!empty($req_arrs)){
+							foreach($req_arrs as $req_arr1){
+								$req_arr .= "'".$req_arr1."',";
+							}
+						}
+						$req_arr = rtrim($req_arr,",");
+						$cur_cond = " AND ( p.id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where cv.value  in(".$req_arr.") and c.slug = '".$filter12."' and cv.fieldid = c.id ) )";
+						$req_cond .= $cur_cond;
+						array_push($where, $cur_cond);
+					}
+					else if($filters1[$i1]=='is_more_than' && $filters2[$i1]!=''){
+						$cur_cond = " AND ( p.id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where value  > ".$filters2[$i1]." and c.slug = '".$filter12."' and cv.fieldid = c.id) )";
+						$req_cond .= $cur_cond;
+						array_push($where, $cur_cond);
+					}
+					else if($filters1[$i1]=='is_less_than'  && $filters2[$i1]!=''){
+						$cur_cond = " AND ( p.id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where cv.value  < ".$filters2[$i1]." and c.slug = '".$filter12."' and cv.fieldid = c.id) )";
+						$req_cond .= $cur_cond;
+						array_push($where, $cur_cond);
+					}
+				}
+				$i1++;
+			}
+		}
+	}
+	if(!empty($check_data)){
+		$req_cond = str_replace('p.', db_prefix().'projects.', $req_cond);
+	}
+	return $req_cond;
+}
+function get_task_vals($fields,$fields1,$table,$qry_cond,$filters = array()){
+	 $CI	= & get_instance();
+	 $conds = get_activity_filters($filters);
+	 $type_cond = '';
+	 if(str_contains($filters['report_name'], 'Call Performance')){
+		$type_cond = ' AND '.db_prefix().'tasks.tasktype = (select id from '.db_prefix().'tasktype where name="Call" and status ="Active" )';
+	}
+	if(str_contains($filters['report_name'], 'Email Performance')){
+		$type_cond = ' AND '.db_prefix().'tasks.tasktype = (select id from '.db_prefix().'tasktype where name="E-mail" and status ="Active" )';
+	}
+	 if(!empty($qry_cond)){
+			$qry_cond = " where ".db_prefix()."tasks.id !='' ".$conds.$type_cond." AND ".$qry_cond;
+	 }else{
+		  $qry_cond = " where ".db_prefix()."tasks.id !='' ".$conds.$type_cond;
+	 }
+	 if(!empty($fields)){
+		 $fields = $fields.",";
+	 }
+	  if(!empty($fields1)){
+		 $fields1 = "".$fields1;
+	 }
+	 $my_staffids = $CI->staff_model->get_my_staffids();
+	 if(!is_admin(get_staff_user_id()) && $my_staffids){
+		 $table .= " ,".db_prefix()."task_assigned ta1 ";
+		 $qry_cond .= " and ((ta1.taskid = ".db_prefix()."tasks.id and ta1.staffid in(" . implode(',',$my_staffids) . ") ) or ( OR ".db_prefix()."tasks.rel_id IN(SELECT ".db_prefix()."projects.id FROM ". db_prefix()."projects join ".db_prefix()."project_members  on ".db_prefix()."project_members.project_id = " .db_prefix()."projects.id WHERE ".db_prefix()."project_members.staff_id in (". implode(',',$my_staffids)."))))";
+	 }
+	 $CI			= & get_instance();
+	 $task_vals 	= $CI->db->query("SELECT ".$fields."COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '1',".db_prefix(). "tasks.id,NULL)) AS upcoming,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '2',".db_prefix(). "tasks.id,NULL)) AS overdue,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '3',".db_prefix(). "tasks.id,NULL)) AS today,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '4',".db_prefix(). "tasks.id,NULL)) AS in_progress,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '5',".db_prefix(). "tasks.id,NULL)) AS completed ".$fields1." FROM ".$table.$qry_cond)->result_array();
+	return $task_vals;
+ }
+ function get_task_data($view_by,$cur_rows,$task_vals){
+	$i = $upcoming = $today = $overdue  = $in_progress = $completed = $tot_cnt = $tot_val = $avg_task = $tot_avg  =0;
+	$data = array();
+	foreach($task_vals as $task_val1){
+		$data[$i] = tasks_counts($task_val1['upcoming'],$task_val1['overdue'],$task_val1['today'],$task_val1['in_progress'],$task_val1['completed'],$task_val1['tot_val'],$view_by,$cur_rows,$task_val1);
+		$upcoming		=	$upcoming + $task_val1['upcoming'];
+		$overdue		=	$overdue + $task_val1['overdue'];
+		$today			=	$today + $task_val1['today'];
+		$in_progress	=	$in_progress + $task_val1['in_progress'];
+		$completed		=	$completed + $task_val1['completed'];
+		$tot_cnt=	$tot_cnt + $task_val1['upcoming'] + $task_val1['overdue'] + $task_val1['today'] + $task_val1['in_progress'] + $task_val1['completed'];
+		$tot_val=	$tot_val + $task_val1['tot_val'];
+		$tot_avg	=	$tot_avg + get_decimal($data[$i]['avg_task']);
+		$i++;
+	}
+	$data[$i] = $avg_task = task_avg($upcoming,$overdue,$today,$in_progress,$completed,$tot_cnt,$tot_val,$view_by,$i,$tot_avg);
+	$i++;
+	$data[$i] = task_total($upcoming,$overdue,$today,$in_progress,$completed,$tot_cnt,$tot_val,$view_by,$tot_avg);
+	
+	return $data;
+}
+function task_avg($upcoming,$overdue,$today,$in_progress,$completed,$tot_cnt,$tot_val,$view_by,$num,$tot_avg)
+{
+	$data['upcoming']	= 	$data['overdue']	= 	$data['today'] = 	$data['in_progress']	= 	$data['completed']	= 	$data['total_cnt_task']	=  $data['total_val_task']	= $data['avg_task']		= 	$data['avg_tot'] =  0;
+	if($tot_cnt>0){
+		$data['upcoming']		= 	get_decimal($upcoming/$num);
+		$data['overdue']		= 	get_decimal($overdue/$num);
+		$data['today']			= 	get_decimal($today/$num);
+		$data['in_progress']	= 	get_decimal($in_progress/$num);
+		$data['completed']		= 	get_decimal($completed/$num);
+		$data['total_cnt_task']	= 	get_decimal($tot_cnt/$num);
+		$data['total_val_task']	= 	get_decimal($tot_val/$num);
+		$data['avg_task']		=	get_decimal($tot_avg/$num);
+		$data['avg_tot'] 		=	$data['avg_task'] + $data['avg_tot'];
+	}
+	$data[$view_by]	= 	$data['rows']	=	'Average';
+	return $data;
+}
+function task_total($upcoming,$overdue,$today,$in_progress,$completed,$tot_cnt,$tot_val,$view_by,$tot_avg)
+{
+	$data['upcoming']		= 	get_decimal($upcoming);
+	$data['overdue']		= 	get_decimal($overdue);
+	$data['today']			= 	get_decimal($today);
+	$data['in_progress']	= 	get_decimal($in_progress);
+	$data['completed']		= 	get_decimal($completed);
+	$data['total_cnt_task']	= 	$tot_cnt;
+	$data['total_val_task']	= 	get_decimal($tot_val);
+	$data['avg_task']		= 	0;
+	if($tot_cnt>0){
+		$data['avg_task']	=	get_decimal($tot_avg);
+	}
+	$data[$view_by]	= 	$data['rows']	=	'Total';
+	return $data;
+}
+function get_join_task_tables(){
+	$CI		= & get_instance();
+	$join 	= array(db_prefix().'tasktype',db_prefix().'projects',db_prefix().'projects_status',db_prefix().'pipeline',db_prefix().'clients',db_prefix().'contacts');
+	$join_cond = array(db_prefix().'tasktype  as '.db_prefix().'tasktype ON '.db_prefix().'tasktype.id = ' .db_prefix() . 'tasks.tasktype',db_prefix().'projects  as '.db_prefix().'projects ON '.db_prefix().'projects.id = ' .db_prefix() . 'tasks.rel_id AND ' .db_prefix() . 'tasks.rel_type ="project"',db_prefix().'projects_status  as '.db_prefix().'projects_status ON '.db_prefix().'projects_status.id = ' .db_prefix() . 'projects.status',db_prefix().'pipeline  as '.db_prefix().'pipeline ON '.db_prefix().'pipeline.id = ' .db_prefix() . 'projects.pipeline_id',db_prefix().'clients  as '.db_prefix().'clients ON '.db_prefix().'clients.userid = ' .db_prefix() . 'projects.clientid',db_prefix().'contacts  as '.db_prefix().'contacts ON ('.db_prefix().'contacts.id = ' .db_prefix() . 'tasks.contacts_id  OR (' .db_prefix() . 'tasks.rel_type ="contact" AND '.db_prefix().'contacts.id = ' .db_prefix() . 'tasks.rel_id) )');
+	$report_task_list_column_order = (array)json_decode(get_option('report_task_list_column_order')); 
+	$custom_fields = get_table_custom_fields('tasks');
+       $customFieldsColumns= $locationCustomFields = $cus = [];
+	foreach ($custom_fields as $key => $field) {
+		$fieldtois= 'clients.userid';
+		if($field['fieldto'] =='projects'){
+			$fieldtois= 'projects.id';
+		}elseif($field['fieldto'] =='contacts'){
+			$fieldtois= 'contacts.id';
+		}
+		elseif($field['fieldto'] =='tasks'){
+			$fieldtois= 'tasks.id';
+		}
+		if(isset($report_task_list_column_order[$field['slug']])){
+			if($field['type'] =='location'){
+				array_push($locationCustomFields, 'cvalue_' .$field['slug']);
+			}
+			$selectAs = 'cvalue_' .$field['slug'];
+			array_push($customFieldsColumns, $selectAs);
+			$cus[$field['slug']] =  'ctable_' . $key . '.value as ' . $selectAs;
+			array_push($join, 'LEFT JOIN '.db_prefix().'customfieldsvalues as ctable_' . $key . ' ON '.db_prefix().$fieldtois.' = ctable_' . $key . '.relid AND ctable_' . $key . '.fieldto="' . $field['fieldto'] . '" AND ctable_' . $key . '.fieldid=' . $field['id']);
+		}
+	}
+	$fields = db_prefix().'tasks.id as id,
+    '.db_prefix().'tasks.status as status,
+    '.db_prefix().'tasks.name as task_name,
+    '.db_prefix().'projects.name as project_name,
+    '.db_prefix().'tasktype.name as tasktype,
+    '.db_prefix().'contacts.firstname as project_contacts,
+	'.db_prefix().'tasks.description as description,
+	(SELECT GROUP_CONCAT(CONCAT(firstname," ",lastname) SEPARATOR ",") FROM '.db_prefix().'staff where staffid IN (select staffid from '.db_prefix().'task_assigned where taskid = '.db_prefix().'tasks.id)) as assignees,
+	(SELECT GROUP_CONCAT(name SEPARATOR ",") FROM '.db_prefix().'taggables JOIN '.db_prefix().'tags ON '.db_prefix().'taggables.tag_id = '.db_prefix().'tags.id WHERE rel_id = '.db_prefix().'tasks.id and rel_type="task" ORDER by tag_order ASC) as tags,priority,'.db_prefix().'projects.teamleader as p_teamleader,startdate,dateadded,datefinished,datemodified,rel_type,rel_id,contacts_id,tasktype as type_id,'.db_prefix().'projects_status.name as project_status,'.db_prefix().'pipeline.name as project_pipeline,'.db_prefix().'clients.company as company,'.db_prefix().'contacts.email as contact_email,'.db_prefix().'contacts.phonenumber as contact_phone,recurring,(CASE rel_type WHEN "contract" THEN (SELECT subject FROM '.db_prefix().'contracts WHERE '.db_prefix().'contracts.id = '.db_prefix().'tasks.rel_id) WHEN "estimate" THEN (SELECT id FROM '.db_prefix().'estimates WHERE '.db_prefix().'estimates.id = '.db_prefix().'tasks.rel_id) WHEN "proposal" THEN (SELECT id FROM '.db_prefix().'proposals WHERE '.db_prefix().'proposals.id = '.db_prefix().'tasks.rel_id) WHEN "invoice" THEN (SELECT id FROM '.db_prefix().'invoices WHERE '.db_prefix().'invoices.id = '.db_prefix().'tasks.rel_id) WHEN "ticket" THEN (SELECT CONCAT(CONCAT("#",'.db_prefix().'tickets.ticketid), " - ", '.db_prefix().'tickets.subject) FROM '.db_prefix().'tickets WHERE '.db_prefix().'tickets.ticketid='.db_prefix().'tasks.rel_id) WHEN "lead" THEN (SELECT CASE '.db_prefix().'leads.email WHEN "" THEN '.db_prefix().'leads.name ELSE CONCAT('.db_prefix().'leads.name, " - ", '.db_prefix().'leads.email) END FROM '.db_prefix().'leads WHERE '.db_prefix().'leads.id='.db_prefix().'tasks.rel_id) WHEN "customer" THEN (SELECT CASE company WHEN "" THEN (SELECT CONCAT(firstname, " ", lastname) FROM '.db_prefix().'contacts WHERE userid = '.db_prefix().'clients.userid and is_primary = 1) ELSE company END FROM '.db_prefix().'clients WHERE '.db_prefix().'clients.userid='.db_prefix().'tasks.rel_id) WHEN "project" THEN (SELECT CONCAT(CONCAT(CONCAT("#",'.db_prefix().'projects.id)," - ",'.db_prefix().'projects.name), " - ", (SELECT CASE company WHEN "" THEN (SELECT CONCAT(firstname, " ", lastname) FROM '.db_prefix().'contacts WHERE userid = '.db_prefix().'clients.userid and is_primary = 1) ELSE company END FROM '.db_prefix().'clients WHERE userid='.db_prefix().'projects.clientid)) FROM '.db_prefix().'projects WHERE '.db_prefix().'projects.id='.db_prefix().'tasks.rel_id) WHEN "expense" THEN (SELECT CASE expense_name WHEN "" THEN '.db_prefix().'expenses_categories.name ELSE CONCAT('.db_prefix().'expenses_categories.name, " (",'.db_prefix().'expenses.expense_name,")") END FROM '.db_prefix().'expenses JOIN '.db_prefix().'expenses_categories ON '.db_prefix().'expenses_categories.id = '.db_prefix().'expenses.category WHERE '.db_prefix().'expenses.id='.db_prefix().'tasks.rel_id)
+        ELSE NULL
+        END) as rel_name,billed,
+	(SELECT staffid FROM '.db_prefix().'task_assigned WHERE taskid='.db_prefix().'tasks.id limit 1) as is_assigned,
+	(SELECT id FROM '.db_prefix().'call_history WHERE task_id='.db_prefix().'tasks.id limit 1) as call_id,
+	(SELECT filename FROM '.db_prefix().'call_history WHERE task_id='.db_prefix().'tasks.id and status = "answered" limit 1) as recorded,
+	(SELECT GROUP_CONCAT(staffid SEPARATOR ",") FROM '.db_prefix().'task_assigned WHERE taskid='.db_prefix().'tasks.id ORDER BY '.db_prefix().'task_assigned.staffid) as assignees_ids,
+	(SELECT MAX(id) FROM '.db_prefix().'taskstimers WHERE task_id='.db_prefix().'tasks.id and staff_id=1 and end_time IS NULL) as not_finished_timer_by_current_staff,
+	(SELECT staffid FROM '.db_prefix().'task_assigned WHERE taskid='.db_prefix().'tasks.id AND staffid=1 group by '.db_prefix().'task_assigned.taskid) as current_user_is_assigned,(SELECT CASE WHEN '.db_prefix().'tasks.addedfrom=1 AND is_added_from_contact=0 THEN 1 ELSE 0 END) as current_user_is_creator';
+	$return_arr = array('join'=>$join,'join_cond'=>$join_cond,'cus'=>$cus,'fields'=>$fields);
+	return $return_arr;
+}
+function get_task_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$filters){
+	$CI		= & get_instance();
+	$qry_cond = check_year_week($view_by);
+	if(empty($_REQUEST['edit_id'])){
+		$report_name	=	$CI->session->userdata('report_type');
+	}
+	else{
+		$reports1 = $CI->db->query("SELECT report_type,folder_id FROM " . db_prefix() . "report WHERE id = '".$_REQUEST['edit_id']."' ")->row();
+		$report_name	=	$reports1->report_type;
+	}
+	if(str_contains($report_name, 'Call Performance')){
+		$qry_cond .= ' and '.db_prefix().'tasks.tasktype = (select id from '.db_prefix().'tasktype where name="Call" and status ="Active" )';
+	}
+	if(str_contains($report_name, 'Email Performance')){
+		$qry_cond .= ' and '.db_prefix().'tasks.tasktype = (select id from '.db_prefix().'tasktype where name="E-mail" and status ="Active" )';
+	}
+	$conds  = get_activity_filters($filters);
+	$where_in = array();
+	$req_projects = 1;
+	if(!empty($conds) || !empty($qry_cond)){
+		$i = 0;
+		$tasks = array();
+		$req_cond = '';
+		if(!empty($conds)){
+			$req_cond .= $conds;
+		}
+		if(!empty($qry_cond)){
+			$req_cond .= $qry_cond;
+		}
+		$ress = $CI->db->query("SELECT id FROM " . db_prefix() . "tasks where id != '0' ".$req_cond)->result_array();
+		if(!empty($ress)){
+			foreach($ress as $res1){
+				$tasks[$i] = $res1['id'];
+				$i++;
+			}
+		}
+		if(!empty($tasks)){
+			$where_in[db_prefix().'tasks.id']   =  $tasks;
+		}
+		else{
+			$req_projects = 0;
+		}
+	}
+	$aColumns_temp = get_tasks_all_fields();
+	$sIndexColumn = 'id';
+	$sTable       = db_prefix() . 'tasks ';
+	$req_tables	  = get_join_task_tables();
+	$cus		  = $req_tables['cus'];
+	$join		  = $req_tables['join'];
+	$aColumns = array();
+	$aColumns_temp = array_merge($aColumns_temp,$cus);
+	$idkey = 0;
+	$report_task_list_column = json_decode(get_option('report_task_list_column_order'),true); 
+	foreach($report_task_list_column as $ckey=>$cval){
+		if($ckey == 'id') {
+			$idkey = 1;
+		}
+		if(isset($aColumns_temp[$ckey])){
+			$aColumns[] =$aColumns_temp[$ckey];
+		}
+		
+	}
+	$fields = implode(',',$aColumns);
+	$fields	= $req_tables['fields'];
+	$join_cond	= $req_tables['join_cond'];
+	$my_staffids = $CI->staff_model->get_my_staffids();
+	if(!empty($my_staffids) && !is_admin(get_staff_user_id())){
+		$where_in[db_prefix().'projects.teamleader']  = $my_staffids;
+	}
+	$req_view_by = $view_by;
+	if(strtolower($clmn) == 'completed'){
+		$req_status = 5;
+		$where[db_prefix().'tasks.status']  =  '5';
+	}
+	else if(strtolower($clmn) == 'today'){
+		$req_status = 3;
+		$where[db_prefix().'tasks.status']  =  '3';
+	}
+	else if(strtolower($clmn) == 'overdue'){
+		$req_status = 2;
+		$where[db_prefix().'tasks.status']  =  '2';
+	}
+	else if(strtolower($clmn) == 'upcoming'){
+		$req_status = 1;
+		$where[db_prefix().'tasks.status']  =  '1';
+	}
+	switch($view_by){
+		case'startdate':
+			break;
+		case'dateadded':
+			break;
+		case'datemodified':
+			break;
+		case'datefinished':
+			break;
+		case'status':
+			$where[db_prefix().'tasks.status']   =  $sum_id;
+			break;
+		case'assignees':
+			$cond2 = (!empty($req_status))?" and t.status = '".$req_status."' ":'';
+			
+			if(!empty($where_in[db_prefix().'tasks.id'])){
+				$ids = implode(',',$where_in[db_prefix().'tasks.id']);
+				if(!empty($ids)){
+					$cond2 .= " and ta.taskid in($ids)";
+				}
+			}
+			$sql = " select ta.taskid from ".db_prefix()."task_assigned ta,".db_prefix()."tasks t  where ta.staffid = '".$sum_id."' and t.id = ta.taskid".$cond2;
+			$query = $CI->db->query($sql);
+			$results = $query->result_array();
+			$tasks = array();
+			if(!empty($results)){
+				$i = 0;
+				foreach($results as $res1){
+					$tasks[$i] = $res1['taskid'];
+					$i++;
+				}
+				$where_in[db_prefix().'tasks.id']   =  $tasks;
+			}
+			else{
+				$req_projects   =  0;
+			}
+			break;
+		case'tags':
+			$cond2 = (!empty($req_status))?" and ts.status = '".$req_status."'":'';
+			if(!empty($where_in[db_prefix().'tasks.id'])){
+				$ids = implode(',',$where_in[db_prefix().'tasks.id']);
+				if(!empty($ids)){
+					$cond2 .= " and ta.rel_id in($ids)";
+				}
+			}
+			$sql = " select ta.rel_id from ".db_prefix()."tags t,".db_prefix()."taggables ta,".db_prefix()."tasks ts where t.id = '".$sum_id."' and ta.tag_id = t.id and ta.rel_type='task' and ts.id = ta.rel_id ".$cond2;
+			$query = $CI->db->query($sql);
+			$results = $query->result_array();
+			$tags_ids = array();
+			if(!empty($results)){
+				$i = 0;
+				foreach($results as $res1){
+					$tags_ids[$i] = $res1['rel_id'];
+					$i++;
+				}
+				$where_in[db_prefix().'tasks.id']   =  $tags_ids;
+			}
+			else{
+				$req_projects   =  0;
+			}
+			break;
+		case'project_status':
+			$cond2 = (!empty($req_status))?" and t.status = '".$req_status."'":'';
+			if(!empty($where_in[db_prefix().'tasks.id'])){
+				$ids = implode(',',$where_in[db_prefix().'tasks.id']);
+				if(!empty($ids)){
+					$cond2 .= " and t.id in($ids)";
+				}
+			}
+			$sql = " select t.id from ".db_prefix()."tasks t,".db_prefix()."projects p,".db_prefix()."projects_status ps where t.rel_id = p.id and ps.id = p.status and p.deleted_status = 0 and p.status = '".$sum_id."'".$cond2;
+			$query = $CI->db->query($sql);
+			$results = $query->result_array();
+			$projects = array();
+			if(!empty($results)){
+				$i = 0;
+				foreach($results as $res1){
+					$projects[$i] = $res1['id'];
+					$i++;
+				}
+				$where_in[db_prefix().'tasks.id']   =  $projects;
+			}
+			else{
+				$req_projects   =  0;
+			}
+			break;
+		case'project_pipeline':
+			$cond2 = (!empty($req_status))?" and t.status = '".$req_status."'":'';
+			if(!empty($where_in[db_prefix().'tasks.id'])){
+				$ids = implode(',',$where_in[db_prefix().'tasks.id']);
+				if(!empty($ids)){
+					$cond2 .= " and t.id in($ids)";
+				}
+			}
+			$sql = " select t.id from ".db_prefix()."tasks t,".db_prefix()."projects p,".db_prefix()."pipeline pi where t.rel_id = p.id and pi.id = p.pipeline_id and p.deleted_status = 0 and p.pipeline_id = '".$sum_id."'".$cond2;
+			$query = $CI->db->query($sql);
+			$results = $query->result_array();
+			$projects = array();
+			if(!empty($results)){
+				$i = 0;
+				foreach($results as $res1){
+					$projects[$i] = $res1['id'];
+					$i++;
+				}
+				$where_in[db_prefix().'tasks.id']   =  $projects;
+			}	
+			else{
+				$req_projects   =  0;
+			}
+			break;
+		case 'company':
+			$where[db_prefix().'tasks.rel_type']   =  'customer';
+			$where[db_prefix().'tasks.rel_id']   =  $sum_id;
+			$where[db_prefix().'tasks.status']   =  $req_status;
+			break;
+		case'teamleader':
+			$cond2 = (!empty($req_status))?" and t.status = '".$req_status."' ":'';
+			if(!empty($where_in[db_prefix().'tasks.id'])){
+				$ids = implode(',',$where_in[db_prefix().'tasks.id']);
+				if(!empty($ids)){
+					$cond2 .= " and t.id in($ids)";
+				}		
+			}
+			$sql = " select t.id from ".db_prefix()."tasks t,".db_prefix()."projects p where p.teamleader = '".$sum_id."' and t.rel_type = 'project' and t.rel_id = p.id and p.deleted_status='0' ".$cond2;
+			$query = $CI->db->query($sql);
+			$results = $query->result_array();
+			$projects = array();
+			if(!empty($results)){
+				$i = 0;
+				foreach($results as $res1){
+					$projects[$i] = $res1['id'];
+					$i++;
+				}
+				$where_in[db_prefix().'tasks.id']   =  $projects;
+			}
+			else{
+				$req_projects   =  0;
+			}
+			break;
+		case'project_contacts':
+			$cond2 = (!empty($req_status))?" and t.status = '".$req_status."'":'';
+			if(!empty($where_in[db_prefix().'tasks.id'])){
+				$ids = implode(',',$where_in[db_prefix().'tasks.id']);
+				if(!empty($ids)){
+					$cond2 .= "  and t.id in($ids)";
+				}
+			}
+			$sql = " select t.id from ".db_prefix()."contacts c,".db_prefix()."project_contacts pc,".db_prefix()."projects p,".db_prefix()."tasks t where pc.project_id = p.id and p.deleted_status = 0 and c.id = pc.contacts_id and t.rel_id = p.id and c.id = '".$sum_id."' ".$cond2;
+			$query = $CI->db->query($sql);
+			$results = $query->result_array();
+			$projects = array();
+			if(!empty($results)){
+				$i = 0;
+				foreach($results as $res1){
+					$projects[$i] = $res1['id'];
+					$i++;
+				}
+				$where_in[db_prefix().'tasks.id']   =  $projects;
+			}
+			else{
+				$req_projects   =  0;
+			}
+			break;
+		case'priority':
+			$where[db_prefix().'tasks.priority']   =  $sum_id;
+			if($clmn!='total_val_task'){
+				$where[db_prefix().'tasks.status'] =  $req_status;
+			}
+			break;
+		default:
+			$cond2 = (!empty($req_status))?" and t.status = '".$req_status."'":'';
+			if(!empty($where_in[db_prefix().'tasks.id'])){
+				$ids = implode(',',$where_in[db_prefix().'tasks.id']);
+				if(!empty($ids)){
+					$cond2 .= " and c.relid in($ids)";
+				}
+			}
+			$sql = " select c.relid from ".db_prefix()."customfieldsvalues c,".db_prefix()."tasks t, where c.fieldto = 'tasks' and t.id = c.relid and c.fieldid = '".$sum_id.$cond2."' ";
+			$query = $CI->db->query($sql);
+			$results = $query->result_array();
+			$projects = array();
+			if(!empty($results)){
+				$i = 0;
+				foreach($results as $res1){
+					$projects[$i] = $res1['relid'];
+					$i++;
+				}
+				$where_in[db_prefix().'tasks.id']   =  $projects;
+			}
+			else{
+				$req_projects   =  0;
+			}
+			break;
+	}
+	if($view_type == 'date' && ($view_by == 'startdate' || $view_by == 'dateadded' || $view_by == 'datemodified' || $view_by == 'datefinished')){
+		if($date_range == 'Monthly'){
+			$where['month('.db_prefix().'tasks.'.$req_view_by.')']  =  $crow;
+		}
+		$where['year('.db_prefix().'tasks.'.$req_view_by.')']   =  date('Y');
+		if($date_range == 'Quarterly'){
+			if (str_contains($crow, 'Q1')) {
+				$where_in['month('.db_prefix().'tasks.'.$req_view_by.')']   =  array(1,2,3);
+			}
+			else if (str_contains($crow, 'Q2')) {
+				$where_in['month('.db_prefix().'tasks.'.$req_view_by.')']   =  array(4,5,6);
+			}
+			else if (str_contains($crow, 'Q3')) {
+				$where_in['month('.db_prefix().'tasks.'.$req_view_by.')']   =  array(7,8,9);
+			}
+			else if (str_contains($crow, 'Q4')) {
+				$where_in['month('.db_prefix().'tasks.'.$req_view_by.')']   =  array(10,11,12);
+			}
+			
+		}
+	}
+	if($req_projects == 1){
+		$result = select_join_query($fields,$sTable,$join,$join_cond,'left',$where,$where_in);
+	}else{
+		$result = array();
+	}
+	return $result;
+}
+function get_task_table_fields($view_by){
+	$data = array();
+	switch($view_by){
+		case 'status':
+			$data['tables']		= db_prefix() . "tasks ".db_prefix().'tasks ';
+			$data['fields']		= ",".db_prefix()."tasks.status,count(".db_prefix()."tasks.status) tot_val,".db_prefix()."tasks.status req_id";
+			$data['qry_cond']   = db_prefix()."tasks.status != '' group by ".db_prefix()."tasks.status order by ".db_prefix()."tasks.status asc  ";
+			$data['cur_rows']	= "status";
+			break;
+		case 'assignees':
+			$data['tables']		= db_prefix()."task_assigned ta,".db_prefix()."tasks,".db_prefix()."staff s";
+			$data['fields']		= ",s.firstname,s.lastname,count(ta.staffid) tot_val,s.staffid req_id";
+			$data['qry_cond']   = " ta.taskid = ".db_prefix()."tasks.id and s.staffid = ta.staffid  group by ta.staffid  order by s.firstname asc";
+			$data['cur_rows']	= "firstname,lastname";
+			break;
+		case 'tags':
+			$data['tables']		= db_prefix() . "tasks, " . db_prefix() . "tags t, ". db_prefix() . "taggables ta ";
+			$data['fields']		= ",t.name,count(ta.tag_id) tot_val,ta.tag_id req_id ";
+			$data['qry_cond']   = " ta.rel_id = ".db_prefix()."tasks.id and t.id = ta.tag_id and ta.rel_type= 'task' group by ta.tag_id order by t.name asc";
+			$data['cur_rows']	= "name";
+			break;
+		case 'project_status':
+			$data['tables']		= db_prefix()."projects p,".db_prefix(). "projects_status ps, ". db_prefix() ."tasks";
+			$data['fields']		= ",ps.name,count(ps.id ) tot_val,ps.id req_id ";
+			$data['qry_cond']   = db_prefix()."tasks.rel_id = p.id and ps.id = p.status and ".db_prefix()."tasks.rel_type= 'project' and p.deleted_status = 0 group by p.status order by ps.name asc";
+			$data['cur_rows']	= "name";
+			break;
+		case 'project_pipeline':
+			$data['tables']		= db_prefix() . "projects p, " . db_prefix() . "pipeline pi, ". db_prefix() ."tasks";
+			$data['fields']		= ",pi.name,count(p.id ) tot_val,pi.id req_id ";
+			$data['qry_cond']   = db_prefix()."tasks.rel_id = p.id and ".db_prefix()."tasks.rel_type= 'project' and pi.id = p.pipeline_id and p.deleted_status = 0 group by p.pipeline_id order by pi.name asc";
+			$data['cur_rows']	= "name";
+			break;
+		case 'company':
+			$data['tables']		= db_prefix()."clients c, ".db_prefix()."tasks";
+			$data['fields']		= ",c.company,count(".db_prefix()."tasks.rel_id ) tot_val,".db_prefix()."tasks.rel_id req_id ";
+			$data['qry_cond']   = db_prefix()."tasks.rel_type = 'customer' and c.userid =  ".db_prefix()."tasks.rel_id group by  ".db_prefix()."tasks.rel_id order by c.company asc";
+			$data['cur_rows']	= "company";
+			break;
+		case 'teamleader':
+			$data['tables']		= db_prefix() . "projects p, " . db_prefix() . "staff s,".db_prefix()."tasks";
+			$data['qry_cond']   = db_prefix()."tasks.rel_id = p.id and ".db_prefix()."tasks.rel_type = 'project' and s.staffid = p.teamleader and p.deleted_status = 0 group by s.staffid order by s.firstname asc";
+			$data['fields']		= ",s.firstname,s.lastname,count(".db_prefix()."tasks.rel_id) tot_val,s.staffid req_id ";
+			$data['cur_rows']	= "firstname,lastname";
+			break;
+		case 'project_contacts':
+			$data['tables']		= db_prefix() . "projects p, " . db_prefix() . "project_contacts pc," . db_prefix() . "contacts c,".db_prefix()."tasks";
+			$data['fields']		= ",c.firstname,c.lastname,count(p.id ) tot_val,pc.contacts_id req_id ";
+			$data['qry_cond']   = "pc.project_id = p.id and c.id = pc.contacts_id and c.is_primary = '1' and ".db_prefix()."tasks.rel_id = p.id and p.deleted_status = 0 group by pc.contacts_id order by c.firstname asc";
+			$data['cur_rows']	= "firstname,lastname";
+			break;
+		case 'priority':
+			$data['tables']		= db_prefix() . "tasks";
+			$data['fields']		= ",priority,count(priority ) tot_val,priority req_id ";
+			$data['qry_cond']   = " priority!='' group by priority";
+			$data['cur_rows']	= "priority";
+			break;
+		default:
+			$data['tables']		= db_prefix()."projects p,".db_prefix(). "customfields cf,".db_prefix()."customfieldsvalues cv";
+			$data['fields']		= ",cv.value,count(p.id ) num_deal,cv.fieldid req_id ";
+			$data['qry_cond']   = " and cf.slug ='".$view_by."' and cv.fieldid = cf.id and cv.relid = p.id and p.deleted_status = 0 group by cv.relid order by cv.value asc";
+			$data['cur_rows']	= "value";
+			break;
+	}
+	return $data;
+}
+function tasks_counts($upcoming,$overdue,$today,$in_progress,$completed,$tot_val,$view_by,$cur_rows,$tasks_vals){
+	$data = array();
+	$data['upcoming']			=	(!empty($upcoming) && $upcoming!=0)?get_decimal($upcoming):0;
+	$data['overdue']			=	(!empty($overdue) && $overdue!=0)?get_decimal($overdue):0;
+	$data['today']				=	(!empty($today) && $today!=0)?get_decimal($today):0;
+	$data['in_progress']		=	(!empty($in_progress) && $in_progress!=0)?get_decimal($in_progress):0;
+	$data['completed']			=	(!empty($completed) && $completed!=0)?get_decimal($completed):0;
+	$data['tot_cnt'] 			= 	$tot_cnt = $tasks_vals['upcoming'] + $tasks_vals['overdue']+ $tasks_vals['today']+ $tasks_vals['in_progress']+ $tasks_vals['completed'];
+	$data['total_cnt_task']		=	$tot_cnt;
+	$total_tasks				= 	$upcoming + $overdue + $today + $in_progress + $completed;
+	$data['total_val_task']		= 	$data['total_val_prdt'] = get_decimal($tot_val);
+	$data['avg_task']			=	$data['avg_prdt_val'] = 0;
+	if(!empty($tasks_vals['req_id'])){
+		$data['req_id']			=	$tasks_vals['req_id'];
+	}
+	if($tot_cnt>0){
+		$data['avg_task']		=	$data['avg_prdt_val'] = get_decimal($tot_val/$tot_cnt);
+	}
+	if(str_contains($cur_rows, ',')){
+		$req_row  = '';
+		$req_rows = explode(',',$cur_rows);
+		if(!empty($req_rows)){
+			foreach($req_rows as $cur_row1){
+				$req_row .= $tasks_vals[$cur_row1].' ';
+			}
+			$req_row = rtrim($req_row.' ');
+		}
+		$data[$view_by] 	= $data['rows']	=	$req_row;
+	}
+	else{
+		if(!empty($tasks_vals[$cur_rows]) ){
+			$data[$view_by]	= 	$data['rows']	=	$tasks_vals[$cur_rows];
+		}
+		else{
+			$data[$view_by]	= 	$data['rows']	=	$cur_rows;
+		}
+	}
+	return $data;
+}
+function get_report_folder($folder_type){
+	$CI		= & get_instance();
+	$fields = "id,folder";
+	$condition = array('folder_type'=>$folder_type);
+	$CI->db->select($fields);
+	$CI->db->from(db_prefix().'folder');
+	$CI->db->where($condition); 
+	$CI->db->order_by('folder','asc');
+	$query = $CI->db->get();
+	$res = $query->result_array();
+	return $res;
+}
+function check_task_date($view_by){
+	if($view_by == 'startdate' || $view_by == 'dateadded' || $view_by == 'datemodified' || $view_by == 'datefinished'){
+		return true;
+	}
+	return false;
+}
+function set_activity_summary($type){
+	if($type == 'deal'){
+		$colarrs = deal_all_fields();
+		unset($colarrs['name']);
+		unset($colarrs['product_qty']);
+		unset($colarrs['product_amt']);
+		unset($colarrs['project_cost']);
+		$fields = deal_needed_fields();
+		$needed = json_decode($fields,true);
+		if(!empty($colarrs)){
+		 foreach($colarrs as $ckey=>$cval){
+			 if((!empty($needed['need_fields']) && in_array($ckey, $needed['need_fields']))  ){
+				 $filter_data['view_by'] = $ckey;
+			 }
+		}
+		 $filter_data['view_type']	= '';
+		 if($filter_data['view_by'] == 'date' && ($filter_data['view_by'] == 'start_date' || $filter_data['view_by'] == 'project_deadline' || $filter_data['view_by'] == 'won_date' || $filter_data['view_by'] == 'lost_date' || $filter_data['view_by'] == 'project_created' || $filter_data['view_by'] == 'project_modified')){
+			$filter_data['view_type']	=	'date';
+			$filter_data['date_range1']	=	_l('weekly');
+		 }
+		 $filter_data['sel_measure']	=_l('deal_val');
+		}
+	}
+	else{
+		$colarrs = task_all_columns();
+		unset($colarrs['description']);
+		unset($colarrs['project_name']);
+		$needed = get_tasks_need_fields();
+		foreach($colarrs as $ckey=>$cval){
+			if((!empty($needed['need_fields']) && in_array($ckey, $needed['need_fields']))  ){
+				$filter_data['view_by'] = $ckey;
+				
+			}
+		}
+		$filter_data['view_type']	= '';
+		if($filter_data['view_by'] =='dateadded' || $filter_data['view_by'] == 'startdate' || $filter_data['view_by'] == 'datemodified'  || $filter_data['view_by'] == 'datefinished'){
+			$filter_data['view_type']	=	'date';
+			$filter_data['date_range1']	=	_l('weekly');
+		}
+		$filter_data['sel_measure']	= _l('number');
+	}
+	return $filter_data;
 }

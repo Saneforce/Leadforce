@@ -4112,3 +4112,26 @@ $lang['vendor'] ='Vendor';
 $lang['ivr_name'] ='IVR Name';
 $lang['enable_call'] = 'Enable call';
 $lang['agents'] ='Agents';
+
+//for activity report
+$lang['activity_performance']	=	'Activity Performance';
+$lang['call_performance']		=	'Call Performance';
+$lang['close']					=	'Close';
+$lang['email_performance']		=	'Email Performance';
+$lang['filters_applied']		=	'Filters Applied';
+$lang ['in_progress']			=	'In Progress';
+$lang['overdue']				= 	'Overdue';
+$lang['save_changes']			= 	'Save changes';
+$lang['save_new']				= 	'Save New';
+$lang ['send_reminder_customer']=	'Send Reminder to Customer';
+$lang['shared']					= 	'Shared';
+$lang['share_activity']			= 	'Shared Report Activity';
+$lang['share_deal']				= 	'Shared Report Deal';
+$lang['share_link']				= 	'Share Link';
+
+$lang ['number']				=	'Number';
+$lang ['total_val_task']		=	'Total';
+$lang['upcoming']				= 	'Upcoming';
+$lang['valid_name']				= 	'Please enter valid name';
+$lang['view_report_deal']		= 	'Deal View Report';
+$lang['view_report_activity']	= 	'Activity View Report';

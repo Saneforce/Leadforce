@@ -21,6 +21,8 @@ class Reports extends AdminController
 		$this->load->model('clients_model');
 		$this->load->model('pipeline_model');
 		$this->load->model('callsettings_model');
+		$this->load->helper('report_summary');
+		$this->load->helper('reports');
     }
 
     /* No access on this url */
@@ -152,6 +154,7 @@ class Reports extends AdminController
 			$needed = json_decode($fields,true);
 			$need_fields = $needed['need_fields'];
 		}
+		$type = '';
 		if($report_12_id == 'performance'){
 			if (in_array('project_start_date', $need_fields)){
 				$filter_data['filters'][0]	=	'project_start_date';  
@@ -165,6 +168,7 @@ class Reports extends AdminController
 				$filter_data['date_range1']	=	'Monthly';
 				$filter_data['sel_measure']	=	_l('num_deals');
 			}
+			$type = 'deal';
 		}
 		else if($report_12_id == 'conversion'){
 			$i = 0 ;
@@ -188,6 +192,7 @@ class Reports extends AdminController
 				$filter_data['filters1'][$i]	=	'is';  
 				$filter_data['filters2'][$i]	=	$pipelines[0]['id']; 
 			}
+			$type = 'deal';
 		}
 		else if($report_12_id == 'duration'){
 			$i = 0;
@@ -208,6 +213,7 @@ class Reports extends AdminController
 				$filter_data['filters1'][2]	=	'is_any_of';  
 				$filter_data['filters2'][2]	=	'WON,LOST'; 
 			}
+			$type = 'deal';
 		}
 		else if($report_12_id == 'progress'){
 			if (in_array('project_start_date', $need_fields)){
@@ -217,13 +223,15 @@ class Reports extends AdminController
 				$filter_data['filters3'][0]	=	'01-01-'.date('Y');  
 				$filter_data['filters4'][0]	=	'31-12-'.date('Y'); 
 			}
+			$type = 'deal';
 		}
 		else if($report_12_id == 'activity_performance'){
 			$filter_data['activity_filters'][0]		=	'dateadded';  
 			$filter_data['activity_filters1'][0]	=	'is';  
 			$filter_data['activity_filters2'][0]	=	'this_month';  
 			$filter_data['activity_filters3'][0]	=	'01-'.date('m').'-'.date('Y');  
-			$filter_data['activity_filters4'][0]	=	date('t').'-'.date('m').'-'.date('Y');  
+			$filter_data['activity_filters4'][0]	=	date('t').'-'.date('m').'-'.date('Y'); 
+			$type = 'activity';
 		}
 		else if($report_12_id == 'email_performance'){
 			$filter_data['activity_filters'][0]		=	'dateadded';  
@@ -231,22 +239,20 @@ class Reports extends AdminController
 			$filter_data['activity_filters2'][0]	=	'this_month';  
 			$filter_data['activity_filters3'][0]	=	'01-'.date('m').'-'.date('Y');
 			$filter_data['activity_filters4'][0]	=	date('t').'-'.date('m').'-'.date('Y'); 
-			
-			$filter_data['activity_filters'][1]		=	'datefinished';  
-			$filter_data['activity_filters1'][1]	=	'is';  
-			$filter_data['activity_filters2'][1]	=	'this_month';  
-			$filter_data['activity_filters3'][1]	=	'01-'.date('m').'-'.date('Y');
-			$filter_data['activity_filters4'][1]	=	date('t').'-'.date('m').'-'.date('Y'); 
+			$type = 'activity';
 		}
 		else if($report_12_id == 'call_performance'){
 			$filter_data['activity_filters'][0]		=	'dateadded';  
 			$filter_data['activity_filters1'][0]	=	'is';  
 			$filter_data['activity_filters2'][0]	=	'this_month';  
 			$filter_data['activity_filters3'][0]	=	'01-'.date('m').'-'.date('Y');
-			$filter_data['activity_filters4'][0]	=	date('t').'-'.date('m').'-'.date('Y');   
+			$filter_data['activity_filters4'][0]	=	date('t').'-'.date('m').'-'.date('Y');  
+			$type = 'activity';
 		}
 		$filter_data['report_type'] = _l($report_12_id);
+		$summary_filter = set_activity_summary($type);
 		$this->session->set_userdata($filter_data);
+		$this->session->set_userdata($summary_filter);
 		if($report_12_id == 'activity_performance' || $report_12_id == 'email_performance' || $report_12_id == 'call_performance'){
 			redirect(admin_url('activity_reports/add'));
 		}else{
@@ -268,41 +274,77 @@ class Reports extends AdminController
 		redirect(admin_url('reports/add'));
 	}
 	public function edit_deal_report($id,$shared_id = ''){
-		$filters = $this->db->query("SELECT filter_1,filter_2,filter_3,filter_4,filter_5 FROM " . db_prefix() . "report_filter where report_id = '".$id."'")->result_array();
+		$type = $_GET['type'];
+		$type = ($type=='')?'deal':$type;
+		if(empty($type) || ( $type!='deal' && $type!='activity')){
+			redirect(admin_url());
+		}
+		$req_filter = ($type=='deal')?'':'activity_';
+		$fields = "filter_1,filter_2,filter_3,filter_4,filter_5";
+		$condition = array('report_id'=>$id);
+		$this->db->select($fields);
+		$this->db->from(db_prefix() . "report_filter");
+		$this->db->where($condition); 
+		$query = $this->db->get();
+		$filters = $query->result_array();
+		
+		$fields = "report_type";
+		$condition = array('id'=>$id);
+		$this->db->select($fields);
+		$this->db->from(db_prefix() . "report");
+		$this->db->where($condition); 
+		$query = $this->db->get();
+		$reports = $query->result_array();
 		$filter_data = array();
+		$filter_data['report_type']	=	$reports[0]['report_type'];
 		if(!empty($filters)){
 			$i = 0;
 			foreach($filters as $filter12){
-				$filter_data['filters_edit_'.$id][$i]	=	$filter12['filter_1'];
-				$filter_data['filters1_edit_'.$id][$i]	=	$filter12['filter_2'];
-				$filter_data['filters2_edit_'.$id][$i]	=	$filter12['filter_3'];
-				$filter_data['filters3_edit_'.$id][$i]	=	$filter12['filter_4'];
-				$filter_data['filters4_edit_'.$id][$i]	=	$filter12['filter_5'];
+				$filter_data[$req_filter.'filters_edit_'.$id][$i]	=	$filter12['filter_1'];
+				$filter_data[$req_filter.'filters1_edit_'.$id][$i]	=	$filter12['filter_2'];
+				$filter_data[$req_filter.'filters2_edit_'.$id][$i]	=	$filter12['filter_3'];
+				$filter_data[$req_filter.'filters3_edit_'.$id][$i]	=	$filter12['filter_4'];
+				$filter_data[$req_filter.'filters4_edit_'.$id][$i]	=	$filter12['filter_5'];
 				$i++;
 			}
 		}
+		$summary_filter = set_activity_summary($type);
 		$this->session->set_userdata($filter_data);
+		$this->session->set_userdata($summary_filter);
 		if(empty($shared_id)){
-			redirect(admin_url('reports/edit/'.$id));
+			if($type == 'deal'){
+				redirect(admin_url('reports/edit/'.$id));
+			}
+			else{
+				redirect(admin_url('activity_reports/edit/'.$id));
+			}
 		}
 		else{
-			redirect(admin_url('reports/view_shared/'.$shared_id));
+			redirect(admin_url('reports/view_shared/'.$shared_id.'/'.$type));
 		}
 	}
 	public function deal_table($clientid = '')
     {
-		$this->load->helper('report_summary');
 		$cur_id =  '';
 		if(!empty($clientid)){
 			$cur_id = '_edit_'.$clientid;
 		}
-		$data['filters']	=	$this->session->userdata('filters'.$cur_id);
-		$data['filters1']	=	$this->session->userdata('filters1'.$cur_id);
-		$data['filters2']	=	$this->session->userdata('filters2'.$cur_id);
-		$data['filters3']	=	$this->session->userdata('filters3'.$cur_id);
-		$data['filters4']	=	$this->session->userdata('filters4'.$cur_id);
-		$fields = deal_needed_fields();
-		$needed = json_decode($fields,true);
+		$type = $_REQUEST['type'];
+		$req_url = ($type == 'deal')?'':'activity_';
+		$data['filters']	=	$this->session->userdata($req_url.'filters'.$cur_id);
+		$data['filters1']	=	$this->session->userdata($req_url.'filters1'.$cur_id);
+		$data['filters2']	=	$this->session->userdata($req_url.'filters2'.$cur_id);
+		$data['filters3']	=	$this->session->userdata($req_url.'filters3'.$cur_id);
+		$data['filters4']	=	$this->session->userdata($req_url.'filters4'.$cur_id);
+		if($type == 'deal'){
+			$fields = deal_needed_fields();
+			$needed = json_decode($fields,true);
+		}
+		else{
+			$needed = get_tasks_need_fields();
+			$reports1 = $this->db->query("SELECT report_name,report_type,folder_id FROM " . db_prefix() . "report WHERE id = '".$clientid."' ")->row();
+			$data['report_name'] = $reports1->report_type;
+		}
 		if (($key = array_search('id', $needed['need_fields'])) !== false) {
 			unset($needed['need_fields'][$key]);
 		}
@@ -317,7 +359,12 @@ class Reports extends AdminController
 		$data['need_fields_edit']	=	$needed['need_fields_edit'];
 		$data['mandatory_fields1']	=	$needed['mandatory_fields1'];
 		$data['clientid'] = $clientid;
-        $this->app->get_table_data('report_deal', $data);
+		if($type == 'deal'){
+			$this->app->get_table_data('report_deal', $data);
+		}
+		else{
+			$this->app->get_table_data('report_activity', $data);
+		}
     }
 	public function check_view_by(){
 		if ($this->input->is_ajax_request()) {
@@ -397,6 +444,7 @@ class Reports extends AdminController
 		$data['need_fields_label']	=	$needed['need_fields_label'];
 		$data['need_fields_edit']	=	$needed['need_fields_edit'];
 		$data['mandatory_fields1']	=	$needed['mandatory_fields1'];
+		$data['report_page'] = 'deal';
 		$data['report_filter'] =  $this->load->view('admin/reports/filter', $data,true);
 		$data['report_footer'] =  $this->load->view('admin/reports/report_footer', $data,true);
 		$data['teamleaders'] = $this->staff_model->get('', [ 'active' => 1]);
@@ -417,7 +465,6 @@ class Reports extends AdminController
 			$deals['filters2']	=	$this->session->userdata('filters2'.$cur_id);
 			$deals['filters3']	=	$this->session->userdata('filters3'.$cur_id);
 			$deals['filters4']	=	$this->session->userdata('filters4'.$cur_id);
-			$this->load->helper('report_summary');
 			$data = $_REQUEST;
 			$fields = deal_needed_fields();
 			$needed = json_decode($fields,true);
@@ -459,7 +506,6 @@ class Reports extends AdminController
 		}
 	}
 	public function performance_summary($filters){
-		$this->load->helper('report_summary');
 		$cur_year  = date('Y');
 		$data = array();
 		$data['rows']			=	array();
@@ -783,16 +829,17 @@ class Reports extends AdminController
 			$needed = json_decode($fields,true);
 		}
 		$data['id'] = $id;
+		$data['type']= 'activity';
 		$check_report = $this->db->query("SELECT id FROM " . db_prefix() . "report WHERE id = '".$id."' ")->row();
 		if(empty($check_report)){
 			redirect(admin_url('reports/view_deal_folder'));
 			exit;
 		}
-		$data['filters']	=	$filters = $this->session->userdata('filters_edit_'.$id);
-		$data['filters1']	=	$this->session->userdata('filters1_edit_'.$id);
-		$data['filters2']	=	$this->session->userdata('filters2_edit_'.$id);
-		$data['filters3']	=	$this->session->userdata('filters3_edit_'.$id);
-		$data['filters4']	=	$this->session->userdata('filters4_edit_'.$id);
+		$data['filters']	=	$filters = $this->session->userdata('activity_filters_edit_'.$id);
+		$data['filters1']	=	$this->session->userdata('activity_filters1_edit_'.$id);
+		$data['filters2']	=	$this->session->userdata('activity_filters2_edit_'.$id);
+		$data['filters3']	=	$this->session->userdata('activity_filters3_edit_'.$id);
+		$data['filters4']	=	$this->session->userdata('activity_filters4_edit_'.$id);
 		if(!empty($filters)){
 			$i = 0;
 			foreach($filters as $filter1){
@@ -825,6 +872,7 @@ class Reports extends AdminController
 		$data['need_fields_label']	=	$needed['need_fields_label'];
 		$data['need_fields_edit']	=	$needed['need_fields_edit'];
 		$data['mandatory_fields1']	=	$needed['mandatory_fields1'];
+		$data['report_page'] = 'deal';
 		$data['report_filter'] =  $this->load->view('admin/reports/filter', $data,true);
 		$data['report_footer'] =  $this->load->view('admin/reports/report_footer', $data,true);
 		$shares = $this->db->query("SELECT share_type,id FROM " . db_prefix() ."shared where  report_id = '".$id."'")->result_array();
@@ -885,6 +933,7 @@ class Reports extends AdminController
 				$ins_share = array();
 				$ins_share['report_id']		= $_REQUEST['report_id'];
 				$ins_share['share_type']	= $_REQUEST['shared'];
+				$ins_share['shared_source']	= $_REQUEST['folder_type'];
 				$this->db->insert(db_prefix() . 'shared', $ins_share);
 				$share_id	=	$this->db->insert_id();
 				$ins_share = array();
@@ -958,7 +1007,6 @@ class Reports extends AdminController
 		$this->session->set_userdata($filter_data);
 	}
 	public function save_filter_report(){
-		$this->load->helper('report_summary');
 		$cur_id =  '';
 		if(!empty($_REQUEST['cur_id121'])){
 			$cur_id = '_edit_'.$_REQUEST['cur_id121'];
@@ -1318,7 +1366,6 @@ class Reports extends AdminController
 		return true;
 	}
 	public function set_filters($cur_val='',$cur_num1=''){
-		$this->load->helper('report_summary');
 		$cur_id12 = '';
 		if(!empty($_REQUEST['cur_id12'])){
 			$cur_id12 = '_edit_'.$_REQUEST['cur_id12'];
@@ -1629,8 +1676,6 @@ class Reports extends AdminController
 		echo json_encode($req_val);
 	}
 	public function get_filters($cur_val='',$req_val=''){
-		$this->load->helper('report_summary');
-		$this->load->helper('reports');
 		$cur_id12 = '';
 		if(!empty($_REQUEST['cur_id12'])){
 			$cur_id12 = '_edit_'.$_REQUEST['cur_id12'];
@@ -1962,8 +2007,9 @@ class Reports extends AdminController
 		if ($this->input->is_ajax_request()) {
 			$ins_section = array();
 			$ins_section['folder'] = $_REQUEST['name1'];
+			$ins_section['folder_type'] = $_REQUEST['folder_type'];
 			$this->db->insert(db_prefix() . 'folder', $ins_section);
-			$data =  $this->db->query('SELECT id,folder FROM ' . db_prefix() . 'folder order by folder asc')->result_array();
+			$data =  get_report_folder($_REQUEST['folder_type']);
 			$options = '';
 			foreach($data as $val) {
 				$options .= '<option value="'.$val['id'].'">'.$val['folder'].'</option>';
@@ -1982,17 +2028,19 @@ class Reports extends AdminController
 		$data = array();
 		$this->load->view('admin/reports/public',$data);
 	}
-	public function update_report($req_id){
+	public function update_report($req_id,$type=''){
 		$cur_id12 = '_edit_'.$req_id;
+		$type = ($type=='')?'deal':$type;
+		$req_filter = ($type=='deal')?'':'activity_';
 		$condition = array('report_id'=>$req_id);
 		$table = db_prefix() . 'report_filter';
 		$this->db->where($condition);
 		$result = $this->db->delete($table);
-		$filters	=	$this->session->userdata('filters'.$cur_id12);
-		$filters1	=	$this->session->userdata('filters1'.$cur_id12);
-		$filters2	=	$this->session->userdata('filters2'.$cur_id12);
-		$filters3	=	$this->session->userdata('filters3'.$cur_id12);
-		$filters4	=	$this->session->userdata('filters4'.$cur_id12);
+		$filters	=	$this->session->userdata($req_filter.'filters'.$cur_id12);
+		$filters1	=	$this->session->userdata($req_filter.'filters1'.$cur_id12);
+		$filters2	=	$this->session->userdata($req_filter.'filters2'.$cur_id12);
+		$filters3	=	$this->session->userdata($req_filter.'filters3'.$cur_id12);
+		$filters4	=	$this->session->userdata($req_filter.'filters4'.$cur_id12);
 		if(!empty($filters)){
 			$i = 0;
 			foreach($filters as $filter12){
@@ -2012,13 +2060,13 @@ class Reports extends AdminController
 		}
 		$reports =  $this->db->query("SELECT folder_id FROM " . db_prefix() . "report WHERE id = '".$req_id."'")->result_array();
 		$folder = $reports[0]['folder_id'];
-		$this->session->unset_userdata('filters'.$cur_id12);
-		$this->session->unset_userdata('filters1'.$cur_id12);
-		$this->session->unset_userdata('filters2'.$cur_id12);
-		$this->session->unset_userdata('filters3'.$cur_id12);
-		$this->session->unset_userdata('filters4'.$cur_id12);
+		$this->session->unset_userdata($req_filter.'filters'.$cur_id12);
+		$this->session->unset_userdata($req_filter.'filters1'.$cur_id12);
+		$this->session->unset_userdata($req_filter.'filters2'.$cur_id12);
+		$this->session->unset_userdata($req_filter.'filters3'.$cur_id12);
+		$this->session->unset_userdata($req_filter.'filters4'.$cur_id12);
 		set_alert('success', _l('updated_successfully', _l('report')));
-		redirect(admin_url('reports/view_deal_report/'.$folder));
+		redirect(admin_url('reports/view_deal_report/'.$folder.'/'.$type));
 	}
 	public function delete_link(){
 		$report_id = $_REQUEST['cur_id12'];
@@ -2061,31 +2109,32 @@ class Reports extends AdminController
 		$result = $this->db->update(db_prefix() . "report_public", $upd_data, $cond);
 		return true;
 	}
-	public function save_report(){
+	public function save_report($type=''){
 		$cur_id12 = '';
 		extract($_POST);
-		
 		if(!empty($_REQUEST['cur_id12'])){
 			$cur_id12 = '_edit_'.$_REQUEST['cur_id12'];
 		}
-		$filters	=	$this->session->userdata('filters'.$cur_id12);
-		$filters1	=	$this->session->userdata('filters1'.$cur_id12);
-		$filters2	=	$this->session->userdata('filters2'.$cur_id12);
-		$filters3	=	$this->session->userdata('filters3'.$cur_id12);
-		$filters4	=	$this->session->userdata('filters4'.$cur_id12);
+		$report_from = '';
+		if($folder_type == 'activity'){
+			$report_from = 'activity_';
+		}
+		$filters	=	$this->session->userdata($report_from.'filters'.$cur_id12);
+		$filters1	=	$this->session->userdata($report_from.'filters1'.$cur_id12);
+		$filters2	=	$this->session->userdata($report_from.'filters2'.$cur_id12);
+		$filters3	=	$this->session->userdata($report_from.'filters3'.$cur_id12);
+		$filters4	=	$this->session->userdata($report_from.'filters4'.$cur_id12);
 		$ins_report = array();
 		$ins_report['folder_id']	=	$folder;
 		$ins_report['report_name']	=	$name;
 		if(empty($cur_id12))
 			$ins_report['report_type']	=	$this->session->userdata('report_type');
 		else{
-			$report = $this->db->query("SELECT report_type FROM " . db_prefix() . "report WHERE id = '".$cur_id12."' ")->row();
+			$report = $this->db->query("SELECT report_type FROM " . db_prefix() . "report WHERE id = '".$_REQUEST['cur_id12']."' ")->row();
 			$ins_report['report_type']	=	$report->report_type;
 		}
 		$this->db->insert(db_prefix() . 'report', $ins_report);
-		
 		$report_id	=	$this->db->insert_id();
-		
 		if(!empty($filters)){
 			$i = 0;
 			foreach($filters as $filter12){
@@ -2103,47 +2152,61 @@ class Reports extends AdminController
 				$i++;;
 			}
 		}
-		
-		$this->session->unset_userdata('filters'.$cur_id12);
-		$this->session->unset_userdata('filters1'.$cur_id12);
-		$this->session->unset_userdata('filters2'.$cur_id12);
-		$this->session->unset_userdata('filters3'.$cur_id12);
-		$this->session->unset_userdata('filters4'.$cur_id12);
+		$this->session->unset_userdata($report_from.'filters'.$cur_id12);
+		$this->session->unset_userdata($report_from.'filters1'.$cur_id12);
+		$this->session->unset_userdata($report_from.'filters2'.$cur_id12);
+		$this->session->unset_userdata($report_from.'filters3'.$cur_id12);
+		$this->session->unset_userdata($report_from.'filters4'.$cur_id12);
 		set_alert('success', _l('added_successfully', _l('report')));
-		redirect(admin_url('reports/view_deal_report/'.$folder));
+		redirect(admin_url('reports/view_deal_report/'.$folder.'/'.$folder_type));
 	}
-	public function view_deal_folder(){
+	public function view_deal_folder($type=''){
 		if (!has_permission('reports', '', 'view')) {
             access_denied('reports');
         }
+		$type = ($type=='')?'deal':$type;
+		if(empty($type) || ( $type!='deal' && $type!='activity')){
+			redirect(admin_url());
+		}
 		$data = array();
-		$data['title']    =  _l('view_report');
+		$data['title']   =  _l('view_report');
+		$data['type']    =  $type;
 		$this->load->view('admin/reports/folder_deal', $data);
 	}
-	public function all_share(){
+	public function all_share($type=''){
 		if (!has_permission('reports', '', 'view')) {
             access_denied('reports');
         }
+		$type = ($type=='')?'deal':$type;
+		if(empty($type) || ( $type!='deal' && $type!='activity')){
+			redirect(admin_url());
+		}
 		$data = array();
-		$data['title']    =  _l('shared_list');
+		$data['title']   =  _l('shared_list');
+		$data['type']    =  $type;
 		$this->load->view('admin/reports/shared_list', $data);
 	}
-	public function view_shared($id){
+	public function view_shared($id,$type=''){
+		$type = ($type=='')?'deal':$type;
+		if(empty($type) || ( $type!='deal' && $type!='activity')){
+			redirect(admin_url());
+		}
+		$req_url = ($type=='deal')?'':'activity_';
 		$this->load->model('pipeline_model');
 		$data = array();
 		$data['title'] = _l('add_report');
 		$deal_val = deal_values();
 		$data =  json_decode($deal_val, true);
-		$data['filters']	=	$this->session->userdata('filters_edit_'.$id);
-		$data['filters1']	=	$this->session->userdata('filters1_edit_'.$id);
-		$data['filters2']	=	$this->session->userdata('filters2_edit_'.$id);
-		$data['filters3']	=	$this->session->userdata('filters3_edit_'.$id);
-		$data['filters4']	=	$this->session->userdata('filters4_edit_'.$id);
+		$data['filters']	=	$this->session->userdata($req_url.'filters_edit_'.$id);
+		$data['filters1']	=	$this->session->userdata($req_url.'filters1_edit_'.$id);
+		$data['filters2']	=	$this->session->userdata($req_url.'filters2_edit_'.$id);
+		$data['filters3']	=	$this->session->userdata($req_url.'filters3_edit_'.$id);
+		$data['filters4']	=	$this->session->userdata($req_url.'filters4_edit_'.$id);
 		
 		$shares = $this->db->query("SELECT report_id FROM " . db_prefix() . "shared WHERE id = '".$id."' ")->row();
 		$id = $shares->report_id;
 		if(empty($id)){
-			redirect(admin_url('reports/view_deal_folder/'));
+			redirect(admin_url('reports/view_deal_folder/'.$type));
 			exit;
 		}
 		$data['id'] = $id;
@@ -2151,8 +2214,13 @@ class Reports extends AdminController
 		
 		$data['report_name']		=	$reports1->report_name.'('.$reports1->report_type.')';
 		$data['folder_id']			=	$reports1->folder_id;
-		$fields = deal_needed_fields();
-		$needed = json_decode($fields,true);
+		if($type == 'deal'){
+			$fields = deal_needed_fields();
+			$needed = json_decode($fields,true);
+		}
+		else{
+			$needed = get_tasks_need_fields();
+		}
 		if (($key = array_search('id', $needed['need_fields'])) !== false) {
 			unset($needed['need_fields'][$key]);
 		}
@@ -2162,6 +2230,7 @@ class Reports extends AdminController
 		if (($key = array_search('product_count', $needed['need_fields'])) !== false ) {
 			unset($needed['need_fields'][$key]);
 		}
+		$data['type']				=	$type;
 		$data['need_fields']		=	$needed['need_fields'];
 		$data['need_fields_label']	=	$needed['need_fields_label'];
 		$data['need_fields_edit']	=	$needed['need_fields_edit'];
@@ -2209,18 +2278,27 @@ class Reports extends AdminController
 			]);
 		}
 	}
-	public function view_deal_report($id=''){
+	public function view_deal_report($id='',$type=''){
 		if (!has_permission('reports', '', 'view')) {
             access_denied('reports');
         }
+		$type = ($type=='')?'deal':$type;
+		if(empty($type) || ( $type!='deal' && $type!='activity')){
+			redirect(admin_url());
+		}
 		$data = array();
 		$data['id']		  =	 $id;
-		$folder = $this->db->query("SELECT folder FROM " . db_prefix() . "folder WHERE id = '".$id."' ")->row();
-		$data['title']    =  _l('view_report').' Of '.$folder->folder;
+		$data['type']	  =	 $type;
+		$folder = $this->db->query("SELECT folder FROM " . db_prefix() . "folder WHERE id = '".$id."' and folder_type = '".$type."' ")->row();
+		$data['title']    =  _l('view_report_'.$type).' Of '.$folder->folder;
 		$this->load->view('admin/reports/report_deal', $data);
 	}
 	
-	public function delete_report($id){
+	public function delete_report($id,$type=''){
+		$type = ($type=='')?'deal':$type;
+		if(empty($type) || ( $type!='deal' && $type!='activity')){
+			redirect(admin_url());
+		}
 		$reports =  $this->db->query("SELECT folder_id FROM " . db_prefix() . "report WHERE id = '".$id."'")->result_array();
 		$folder = $reports[0]['folder_id'];
 		if(empty($folder)){
@@ -2242,7 +2320,7 @@ class Reports extends AdminController
 		$this->db->where($cond);
 		$result = $this->db->delete($table);
 		set_alert('success', _l('deleted_successfully', _l('report')));
-		redirect(admin_url('reports/view_deal_report/'.$folder));
+		redirect(admin_url('reports/view_deal_report/'.$folder.'/'.$type));
 	}
 	public function folder_deal_view(){
 		if (!has_permission('reports', '', 'view')) {
@@ -2251,11 +2329,12 @@ class Reports extends AdminController
         $this->app->get_table_data('folder_deal_view');
 	}
 	
-	public function report_deal_view($id){
+	public function report_deal_view($id,$type=''){
 		if (!has_permission('reports', '', 'view')) {
             ajax_access_denied();
         }
 		$data['id'] = $id;
+		$data['type'] = $type;
         $this->app->get_table_data('report_deal_view',$data);
 	}
     /* deals reportts */

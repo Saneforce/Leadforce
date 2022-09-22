@@ -1,4 +1,11 @@
-<?php echo form_open(admin_url('reports/save_filter_report'),array('id'=>'save_filter_report')); ?>
+<?php 
+if($report_page == 'deal'){
+	echo form_open(admin_url('reports/save_filter_report'),array('id'=>'save_filter_report'));
+}
+else{
+	echo form_open(admin_url('activity_reports/save_filter_report'),array('id'=>'save_filter_report'));
+}
+ ?>
 	<div class="panel_s project-menu-panel" style="margin-top:-1px;">
 		<div class="panel-body">
 			<div class="horizontal-tabs">

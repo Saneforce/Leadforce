@@ -322,6 +322,31 @@ class Settings extends AdminController
 		$this->load->library('user_agent');
 		redirect($this->agent->referrer().$cond);
     }
+	public function report_task_list_column()
+    {
+		if (!has_permission('settings', '', 'view')) {
+            access_denied('settings');
+        }
+		
+		if ($this->input->post()) {
+            if (!has_permission('settings', '', 'edit')) {
+                access_denied('settings');
+            }
+            $post_data = $this->input->post();
+			if (isset($post_data['settings']['report_task_list_column'])) {
+                $post_data['settings']['report_task_list_column_order'] = json_encode($post_data['settings']['report_task_list_column']);
+            }
+			$success = $this->settings_model->update($post_data);
+		}
+		if(str_contains($this->agent->referrer(), 'filter_tab')){
+			$cond = '';
+		}
+		else{
+			$cond = '?filter_tab=2';
+		}
+		$this->load->library('user_agent');
+		redirect($this->agent->referrer().$cond);
+    }
 	public function target_list_column()
     {
 		if (!has_permission('settings', '', 'view')) {

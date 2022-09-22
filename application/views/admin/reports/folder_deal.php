@@ -4,6 +4,24 @@
 	<div class="content"> 
 		<div class="row">
 			<div class="panel_s project-menu-panel">
+			<div class="panel-body">
+				<div class="horizontal-tabs">
+					<ul class="nav nav-tabs no-margin project-tabs nav-tabs-horizontal" role="tablist">
+						<li class="<?php if($type=='deal'){?>active<?php }?>">
+							<a data-group="deal" role="tab" href="<?php echo admin_url('reports/view_deal_folder/deal'); ?>">
+								<i class="fa fa-usd  fa-fw fa-lg" aria-hidden="true"></i><?php echo _l('view_report_deal');?>
+							</a>
+						</li>
+						<li class="<?php if($type=='activity'){?>active<?php }?>">
+							<a data-group="activity" role="tab" href="<?php echo admin_url('reports/view_deal_folder/activity'); ?>">
+								<i class="fa fa-tasks  fa-fw fa-lg" aria-hidden="true"></i><?php echo _l('view_report_activity');?>                               
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+			<div class="panel_s project-menu-panel">
 				<div class="panel-body">
 					<div class="col-md-12">
 						<div class="panel_s">
@@ -58,7 +76,7 @@
 <script>
 $(function(){
 	var notSortableAndSearchableItemColumns = [];
-    initDataTable('.table-folder_deal_view', admin_url+'reports/folder_deal_view', notSortableAndSearchableItemColumns, notSortableAndSearchableItemColumns,'undefined',[0,'asc']);
+    initDataTable('.table-folder_deal_view', admin_url+'reports/folder_deal_view?type=<?php echo $type;?>', notSortableAndSearchableItemColumns, notSortableAndSearchableItemColumns,'undefined',[0,'asc']);
 });
 function check_validate(a){
 	var name_val = $('#'+a.id).val();
