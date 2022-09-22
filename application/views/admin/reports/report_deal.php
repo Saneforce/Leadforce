@@ -9,7 +9,7 @@
 						<div class="panel_s">
 							<div class="panel-body">
 								<h4 class="no-margin" style="position: relative;top: -4px;">
-									<a href="<?php echo admin_url('reports/view_deal_folder');?>" title="Back"><i class="fa fa-arrow-circle-left fa-6" style="font-size: 22px;padding-right: 10px;top: 4px;position: relative"></i></a>
+									<a href="<?php echo admin_url('reports/view_deal_folder/'.$type);?>" title="Back"><i class="fa fa-arrow-circle-left fa-6" style="font-size: 22px;padding-right: 10px;top: 4px;position: relative"></i></a>
 									<?php echo $title; ?>
 								</h4>
 								<hr class="hr-panel-heading">
@@ -139,7 +139,7 @@ function check_name(a){
 }
 $(function(){
 	var notSortableAndSearchableItemColumns = [];
-    initDataTable('.table-report_deal_view', admin_url+'reports/report_deal_view/<?php echo $id;?>', notSortableAndSearchableItemColumns, notSortableAndSearchableItemColumns,'undefined',[0,'asc']);
+    initDataTable('.table-report_deal_view', admin_url+'reports/report_deal_view/<?php echo $id.'/'.$type;?>', notSortableAndSearchableItemColumns, notSortableAndSearchableItemColumns,'undefined',[0,'asc']);
 });
 $( function() {
     $( "#sortable" ).sortable();

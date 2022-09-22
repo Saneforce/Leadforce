@@ -1,39 +1,64 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
+if($type == 'deal'){
+	$table_datas =  deal_get_fields();
+	$table_data_temp = array();
+	foreach($table_datas as $ckey=>$cval){ 
+		$req_key = $ckey;
+		if($req_key == 'start_date'){
+			$req_key = 'project_start_date';
+		}
+		if($req_key == 'deadline'){
+			$req_key = 'project_deadline';
+		}
+		if(!empty($need_fields) && in_array($req_key, $need_fields)){
+			$table_data_temp[$ckey] = $cval;
+		}
+	}
+	$custom_fields = get_custom_fields('projects', ['show_on_table' => 1]);
+	$check_cus = array();
+	foreach ($custom_fields  as $cfkey=>$cfval) {
+		$table_data_temp[$cfval['slug']] = $cfval['name'];
+	}
 
-$table_datas =  deal_get_fields();
-$table_data_temp = array();
-foreach($table_datas as $ckey=>$cval){ 
-	$req_key = $ckey;
-	if($req_key == 'start_date'){
-		$req_key = 'project_start_date';
+	$custom_fields = get_custom_fields('customers', ['show_on_table' => 1]);
+	foreach ($custom_fields  as $cfkey=>$cfval) {
+		$table_data_temp[$cfval['slug']] = $cfval['name'];
 	}
-	if($req_key == 'deadline'){
-		$req_key = 'project_deadline';
-	}
-	if(!empty($need_fields) && in_array($req_key, $need_fields)){
-		$table_data_temp[$ckey] = $cval;
-	}
-}
-$custom_fields = get_custom_fields('projects', ['show_on_table' => 1]);
-$check_cus = array();
-foreach ($custom_fields  as $cfkey=>$cfval) {
-    $table_data_temp[$cfval['slug']] = $cfval['name'];
-}
-
-$custom_fields = get_custom_fields('customers', ['show_on_table' => 1]);
-foreach ($custom_fields  as $cfkey=>$cfval) {
-    $table_data_temp[$cfval['slug']] = $cfval['name'];
-}
-$report_deal_list_column = (array)json_decode(get_option('report_deal_list_column_order')); 
-$table_data = array();
-$req_datas = array();
- foreach($report_deal_list_column as $ckey=>$cval){
-	 if(isset($table_data_temp[$ckey])){
-			$table_data[] = $table_data_temp[$ckey];
-			$req_datas[$ckey] = $table_data_temp[$ckey];
+	$report_deal_list_column = (array)json_decode(get_option('report_deal_list_column_order')); 
+	$table_data = array();
+	$req_datas = array();
+	 foreach($report_deal_list_column as $ckey=>$cval){
+		 if(isset($table_data_temp[$ckey])){
+				$table_data[] = $table_data_temp[$ckey];
+				$req_datas[$ckey] = $table_data_temp[$ckey];
+		 }
 	 }
- }
-$table_data = hooks()->apply_filters('projects_table_columns', $table_data);
+	$table_data = hooks()->apply_filters('projects_table_columns', $table_data);
+}
+else{
+	$table_datas =  get_tasks_need_fields();
+	$table_data_temp = array();
+	foreach($table_datas as $ckey=>$cval){ 
+		$req_key = $ckey;
+		if(!empty($need_fields) && in_array($req_key, $need_fields)){
+			$table_data_temp[$ckey] = $cval;
+		}
+	}
+	$custom_fields = get_custom_fields('tasks', ['show_on_table' => 1]);
+	$check_cus = array();
+	foreach ($custom_fields  as $cfkey=>$cfval) {
+		$table_data_temp[$cfval['slug']] = $cfval['name'];
+	}
+	$task_list_columns = (array)json_decode(get_option('report_task_list_column_order')); 
+	$table_data = array();
+	$req_datas = array();
+	 foreach($task_list_columns as $ckey=>$cval){
+		$table_data[] = _l($ckey);
+		$req_datas[$ckey] = _l($ckey);
+	 }
+	$table_data = hooks()->apply_filters('task_table_columns', $table_data);
+
+}
 ?>
 <html lang="en">
 	<head>
@@ -139,13 +164,13 @@ $table_data = hooks()->apply_filters('projects_table_columns', $table_data);
 		  'serverSide': true,
 		  'serverMethod': 'post',
 		  'ajax': {
-			  'url':'<?php echo base_url('shared/deal_edit_table/'.$id);?>'
+			  'url':'<?php echo base_url('shared/deal_edit_table/'.$id.'?type='.$type);?>'
 		  },
 		  'columns': [
 			<?php if(!empty($req_datas)){
 				foreach($req_datas as $key => $req_data12){
 			?>
-					{ data: '<?php echo $key;?>' },
+					{ "name": '<?php echo $key;?>' },
 				<?php }
 			}?>
 		  ]

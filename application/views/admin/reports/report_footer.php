@@ -186,7 +186,11 @@ function get_deal(clmn,crow,view_by,measure,date_range,sum_id){
 	var data = {clmn:clmn,crow:crow,view_by:view_by,measure:measure,date_range:date_range,view_type:view_type,sum_id:sum_id,edit_id:cur_id12};
 	 var ajaxRequest = $.ajax({
 		type: 'POST',
-		url: admin_url + 'reports/get_deal_summary',
+		<?php if($report_page == 'deal'){?>
+			url: admin_url + 'reports/get_deal_summary',
+		<?php }else{?>
+			url: admin_url + 'activity_reports/get_task_summary',
+		<?php }?>
 		data: data,
 		dataType: '',
 		success: function(msg) {
@@ -202,7 +206,11 @@ function check_view_by(a){
 	var data = {view_by:a.value};
 	 var ajaxRequest = $.ajax({
 		type: 'POST',
-		url: admin_url + 'reports/check_view_by',
+		<?php if($report_page == 'deal'){?>
+			url: admin_url + 'reports/check_view_by',
+		<?php }else{?>
+			url: admin_url + 'activity_reports/check_view_by',
+		<?php }?>
 		data: data,
 		dataType: '',
 		success: function(msg) {
@@ -491,7 +499,11 @@ function add_filter(){
 		var data = {num_val:j,cur_id12:cur_id12,req_val:c1};
 		var ajaxRequest = $.ajax({
 			type: 'POST',
-			url: admin_url + 'reports/save_2_filter',
+			<?php if($report_page == 'deal'){?>
+				url: admin_url + 'reports/save_2_filter',
+			<?php }else{?>
+				url: admin_url + 'activity_reports/save_2_filter',
+			<?php }?>
 			data: data,
 			dataType: '',
 			success: function(msg) {
@@ -506,7 +518,11 @@ function add_filter(){
 	var data = {cur_num:cur_num,cur_id12:cur_id12};
 	 var ajaxRequest = $.ajax({
 		type: 'POST',
-		url: admin_url + 'reports/add_filter',
+		<?php if($report_page == 'deal'){?>
+			url: admin_url + 'reports/add_filter',
+		<?php }else{?>
+			url: admin_url + 'activity_reports/add_filter',
+		<?php }?>
 		data: data,
 		dataType: '',
 		success: function(msg) {
@@ -561,7 +577,11 @@ function del_filter(a){
 	var data = {req_val:a,cur_id12:cur_id12};
 	 var ajaxRequest = $.ajax({
 		type: 'POST',
-		url: admin_url + 'reports/del_filter',
+		<?php if($report_page == 'deal'){?>
+			url: admin_url + 'reports/del_filter',
+		<?php }else{?>
+			url: admin_url + 'activity_reports/del_filter',
+		<?php }?>
 		data: data,
 		dataType: '',
 		success: function(msg) {
@@ -579,7 +599,11 @@ function check_filter(a){
 	var data = {cur_val:a.value,req_val:req_val,cur_id12:cur_id12};
 	var ajaxRequest = $.ajax({
 		type: 'POST',
-		url: admin_url + 'reports/set_first_filters/'+a.value+'/'+req_val,
+		<?php if($report_page == 'deal'){?>
+			url: admin_url + 'reports/set_first_filters/'+a.value+'/'+req_val,
+		<?php }else{?>
+			url: admin_url + 'activity_reports/set_first_filters/'+a.value+'/'+req_val,
+		<?php }?>
 		data: data,
 		dataType: '',
 		success: function(msg) {
@@ -602,7 +626,11 @@ function change_filter(a){
 	var data = {cur_val:cur_val,req_val:req_val,cur_id12:cur_id12};
 	 var ajaxRequest = $.ajax({
 		type: 'POST',
-		url: admin_url + 'reports/set_filters',
+		<?php if($report_page == 'deal'){?>
+			url: admin_url + 'reports/set_filters',
+		<?php }else{?>
+			url: admin_url + 'activity_reports/set_filters',
+		<?php }?>
 		data: data,
 		dataType: '',
 		success: function(msg) {
@@ -626,12 +654,20 @@ function change_filter1(a,b){
 	var data = {cur_val:cur_val,req_val:req_val,cur_id12:cur_id12};
 	 var ajaxRequest = $.ajax({
 		type: 'POST',
-		url: admin_url + 'reports/get_filters',
+		<?php if($report_page == 'deal'){?>
+			url: admin_url + 'reports/get_filters',
+		<?php }else{?>
+			url: admin_url + 'activity_reports/get_filters',
+		<?php }?>
 		data: data,
 		dataType: '',
 		success: function(msg) {
 			$('#ch_dr_'+req_val).html(msg);
-			if(cur_val=='project_start_date' || cur_val == 'project_deadline'){
+			<?php if($report_page == 'deal'){?>
+				if(cur_val=='project_start_date' || cur_val == 'project_deadline'){
+			<?php }else{?>
+				if(cur_val=='dateadded' || cur_val == 'startdate' || cur_val == 'datemodified'  || cur_val == 'datefinished'){
+			<?php }?>	
 				$('#end_date_edit_'+req_val).datepicker({
 					 dateFormat:'dd-mm-yy',
 					 calendarWeeks: true,
@@ -674,30 +710,51 @@ function change_filter1(a,b){
 				liveSearch: true
 			 });
 			$('#filter_option_'+req_val).selectpicker('refresh');
-			if(cur_val=='name'){
-				project_ajax_search('project', '#year_'+req_val+'.ajax-search');
-			}
-			if(cur_val=='tags'){
-				init_ajax_search('tags', '#year_'+req_val+'.ajax-search');
-			}
-			if(cur_val=='company'){
-				init_ajax_search('customer', '#year_'+req_val+'.ajax-search');
-			}
-			if(cur_val=='contact_name' ){
-				init_ajax_search('contacts', '#year_'+req_val+'.ajax-search');
-			}
-			if(cur_val=='teamleader_name'){
-				init_ajax_search('manager', '#year_'+req_val+'.ajax-search');
-			}
-			if(cur_val=='members'|| cur_val=='modified_by' || cur_val=='created_by'){
-				init_ajax_search('staff', '#year_'+req_val+'.ajax-search');
-			}
-			if(cur_val=='contact_email1'){
-				init_ajax_search('staff_email', '#year_'+req_val+'.ajax-search');
-			}
-			if(cur_val=='contact_phone1'){
-				init_ajax_search('staff_phone', '#year_'+req_val+'.ajax-search');
-			}
+			<?php if($report_page == 'deal'){?>
+				if(cur_val=='name'){
+					project_ajax_search('project', '#year_'+req_val+'.ajax-search');
+				}
+				if(cur_val=='tags'){
+					init_ajax_search('tags', '#year_'+req_val+'.ajax-search');
+				}
+				if(cur_val=='company'){
+					init_ajax_search('customer', '#year_'+req_val+'.ajax-search');
+				}
+				if(cur_val=='contact_name' ){
+					init_ajax_search('contacts', '#year_'+req_val+'.ajax-search');
+				}
+				if(cur_val=='teamleader_name'){
+					init_ajax_search('manager', '#year_'+req_val+'.ajax-search');
+				}
+				if(cur_val=='members'|| cur_val=='modified_by' || cur_val=='created_by'){
+					init_ajax_search('staff', '#year_'+req_val+'.ajax-search');
+				}
+				if(cur_val=='contact_email1'){
+					init_ajax_search('staff_email', '#year_'+req_val+'.ajax-search');
+				}
+				if(cur_val=='contact_phone1'){
+					init_ajax_search('staff_phone', '#year_'+req_val+'.ajax-search');
+				}
+			<?php }else{?>
+				if(cur_val=='project_name'){
+					project_ajax_search('project', '#year_'+req_val+'.ajax-search');
+				}
+				if(cur_val=='tags'){
+					init_ajax_search('tags', '#year_'+req_val+'.ajax-search');
+				}
+				if(cur_val=='company'){
+					init_ajax_search('customer', '#year_'+req_val+'.ajax-search');
+				}
+				if(cur_val=='project_contacts' ){
+					init_ajax_search('contacts', '#year_'+req_val+'.ajax-search');
+				}
+				if(cur_val=='teamleader'){
+					init_ajax_search('manager', '#year_'+req_val+'.ajax-search');
+				}
+				if(cur_val=='assignees'){
+					init_ajax_search('staff', '#year_'+req_val+'.ajax-search');
+				}
+			<?php }?>
 			document.getElementById('overlay_deal').style.display = 'none';
 			return true;
 		}
@@ -721,7 +778,11 @@ function change_2_filter(a){
 		var data = {cur_val:cur_val,req_val:req_val,cur_id12:cur_id12};
 		var ajaxRequest = $.ajax({
 			type: 'POST',
-			url: admin_url + 'reports/set_second_filters',
+			<?php if($report_page == 'deal'){?>
+				url: admin_url + 'reports/set_second_filters',
+			<?php }else{?>
+				url: admin_url + 'activity_reports/set_second_filters',
+			<?php }?>
 			data: data,
 			dataType: '',
 			success: function(msg) {
@@ -760,10 +821,18 @@ $(function(){
 	 $( "#sortable" ).sortable();
     $( "#sortable" ).disableSelection();
      var ProjectsServerParams = {};
-     $.each($('._hidden_inputs._filters input'),function(){
-         ProjectsServerParams[$(this).attr('name')] = '[name="'+$(this).attr('name')+'"]';
-     });
-     initDataTable('.table-projects', admin_url+'reports/deal_table/<?php echo $id;?>', undefined, [0], ProjectsServerParams, <?php echo hooks()->apply_filters('projects_table_default_order', json_encode(array())); ?>);
-     init_ajax_search('customer', '#clientid_copy_project.ajax-search');
+	 <?php if($report_page == 'deal'){?>
+		 $.each($('._hidden_inputs._filters input'),function(){
+			 ProjectsServerParams[$(this).attr('name')] = '[name="'+$(this).attr('name')+'"]';
+		 });
+		 initDataTable('.table-projects', admin_url+'reports/deal_table/<?php echo $id;?>?type=deal', undefined, [0], ProjectsServerParams, <?php echo hooks()->apply_filters('projects_table_default_order', json_encode(array())); ?>);
+		 init_ajax_search('customer', '#clientid_copy_project.ajax-search');
+	 <?php }else{?>
+		var TasksServerParams = {};
+		 $.each($('._hidden_inputs._filters input'),function(){
+			 TasksServerParams[$(this).attr('name')] = '[name="'+$(this).attr('name')+'"]';
+		 });
+		 initDataTable('.table-tasks_order', admin_url+'activity_reports/activity_table/<?php echo $id;?>', undefined, [0], TasksServerParams, <?php echo hooks()->apply_filters('tasks_table_default_order', json_encode(array())); ?>);
+	 <?php }?>
 });
 </script>

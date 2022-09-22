@@ -1,6 +1,4 @@
-<?php $colarr = deal_all_fields();
-
-?>
+<?php $colarr = deal_all_fields();?>
 <div class="row">
 	<div class="col-md-12 m-bt-10">
 		<table class="table" cellspacing="0">

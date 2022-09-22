@@ -1,33 +1,32 @@
 <?php set_time_limit(0);
-
 defined('BASEPATH') or exit('No direct script access allowed');
-
 class Shared extends App_Controller
 {
     public function __construct()
     {
         parent::__construct();
-
-        
-
         hooks()->do_action('admin_auth_init');
+		$this->load->helper('report_summary');
+		$this->load->helper('reports');
     }
-
     public function index($shared)
     {
 		$data = array();
         $links = $this->db->query("SELECT id,report_id,link_name,share_link FROM " . db_prefix() . "report_public WHERE share_link = '".$shared."' ")->result_array();
-		
-		
 		$data['id'] = $links[0]['report_id'];
 		$reports1 = $this->db->query("SELECT report_name,report_type,folder_id FROM " . db_prefix() . "report WHERE id = '".$data['id']."' ")->row();
-		if(empty($reports1)){
-			redirect(admin_url('reports/view_deal_folder/'));
-			exit;
-		}
+		
+		$folder = $this->db->query("SELECT id,folder_type FROM " . db_prefix() . "folder WHERE id = '".$reports1->folder_id."' ")->row();
+		
+		$data['type']	=	$folder->folder_type;
 		$data['report_name'] =	$reports1->report_name.'('.$reports1->report_type.')';
-		$fields = deal_needed_fields();
-		$needed = json_decode($fields,true);
+		if($data['type'] == 'deal'){
+			$fields = deal_needed_fields();
+			$needed = json_decode($fields,true);
+		}
+		else{
+			$needed = get_tasks_need_fields();
+		}
 		if (($key = array_search('id', $needed['need_fields'])) !== false) {
 			unset($needed['need_fields'][$key]);
 		}
@@ -40,7 +39,8 @@ class Shared extends App_Controller
     }
 	public function deal_edit_table($id = '')
     {
-		$this->load->helper('report_summary');
+		$type = $_REQUEST['type'];
+		
 		$filters = $this->db->query("SELECT filter_1,filter_2,filter_3,filter_4,filter_5 FROM " . db_prefix() . "report_filter where report_id = '".$id."'")->result_array();
 		if(!empty($filters)){
 			$i = 0;
@@ -53,12 +53,20 @@ class Shared extends App_Controller
 				$i++;
 			}
 		}
-		$fields = deal_needed_fields();
-		$needed = array();
-		if(!empty($fields) && $fields != 'null'){
-			$needed = json_decode($fields,true);
+		if($type == 'deal'){
+			$fields = deal_needed_fields();
+			$needed = array();
+			if(!empty($fields) && $fields != 'null'){
+				$needed = json_decode($fields,true);
+			}
+			$custom_fields = get_table_custom_fields('projects');
 		}
-		$custom_fields = get_table_custom_fields('projects');
+		else{
+			$needed = get_tasks_need_fields();
+			$custom_fields = get_table_custom_fields('tasks');
+			$reports1 = $this->db->query("SELECT report_type,folder_id FROM " . db_prefix() . "report WHERE id = '".$id."' ")->row();
+			$data['report_name']	=	$reports1->report_type;
+		}
 		$customs = array_column($custom_fields, 'slug');
 		if(!empty($filters)){
 			$i = 0;
@@ -82,7 +90,11 @@ class Shared extends App_Controller
 		$data['need_fields_edit']	=	$needed['need_fields_edit'];
 		$data['mandatory_fields1']	=	$needed['mandatory_fields1'];
 		$data['clientid'] = '';
-        $this->app->get_table_data('report_deal_public', $data);
-        
+		if($type == 'deal'){
+			$this->app->get_table_data('report_deal', $data);
+		}
+		else{
+			$this->app->get_table_data('report_activity', $data);
+		}
     }
 }

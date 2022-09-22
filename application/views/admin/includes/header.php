@@ -30,8 +30,6 @@ ob_end_clean();
          hooks()->do_action('before_render_aside_menu');
          $isActive = false;
          $keycount = 0;
-         ?>
-      <?php
       foreach($sidebar_menu as $key => $item){
          $uri = $this->uri->segment(3);
          if(isset($uri) && $uri == 'view_contact') {
@@ -79,8 +77,7 @@ ob_end_clean();
 		 $staffid = get_staff_user_id();
 		  $cur_sql = "SELECT ".db_prefix()."shared.id FROM ".db_prefix()."shared LEFT JOIN ".db_prefix()."report ON ".db_prefix()."shared.report_id = ".db_prefix()."report.id WHERE ".db_prefix()."shared.share_type = 'Everyone' OR ".db_prefix()."shared.id in(SELECT share_id FROM ".db_prefix()."shared_staff where staff_id = '".$staffid."')";
 		 $ch_shared = $this->db->query($cur_sql)->result_array();
-		 ?>
-         <?php if(count($item['children']) > 0){ ?>
+		 if(count($item['children']) > 0){ ?>
          <ul class="dropdown-menu animated fadeIn" aria-expanded="false">
             <?php foreach($item['children'] as $submenu){
 				if($submenu['name'] !='Shared Report List' || !empty($ch_shared)){
@@ -137,21 +134,8 @@ ob_end_clean();
       <?php } 
 	  $staffid = get_staff_user_id();
 	  $ch_admin = is_admin($staffid);
-	  /*if(!$ch_admin){ ?>
-		<li class="icon header-email ">
-			<?php if(get_option('company_mail_server') != 'yes'){?>
-				<a href="<?php echo site_url().'/admin/company_mail/check_user_mail';?>">
-			<?php }else{?>
-				<a href="<?php echo site_url().'/admin/company_mail/check_company_mail';?>">
-			<?php }?>
-				<i class="fa fa-envelope  fa-fw fa-lg"></i>
-				<span class="menu-text"><?php  echo _l('Email');?></span>
-			</a>
-        </li>
-	  <?php }*/?>
-     
-      <?php hooks()->do_action('after_render_aside_menu'); ?>
-      <?php $this->load->view('admin/projects/pinned'); ?>
+	  hooks()->do_action('after_render_aside_menu');
+	  $this->load->view('admin/projects/pinned'); ?>
    </ul>
   
    <nav>
@@ -184,18 +168,9 @@ ob_end_clean();
          <div class="mobile-navbar collapse" id="mobile-collapse" aria-expanded="false" style="height: 0px;" role="navigation">
             <ul class="nav navbar-nav">
                <li class="header-my-profile"><a href="<?php echo admin_url('profile'); ?>"><?php echo _l('nav_my_profile'); ?></a></li>
-               <?php /* ?>
-               <li class="header-my-timesheets"><a href="<?php echo admin_url('staff/timesheets'); ?>"><?php echo _l('my_timesheets'); ?></a></li>
-                <?php */ ?>
                <li class="header-edit-profile"><a href="<?php echo admin_url('staff/edit_profile'); ?>"><?php echo _l('nav_edit_profile'); ?></a></li>
                 
                <?php if(is_staff_member()){ ?>
-               <?php /* ?>
-                  <li class="header-newsfeed">
-                   <a href="#" class="open_newsfeed mobile">
-                     <?php echo _l('whats_on_your_mind'); ?>
-                  </a>
-               </li><?php */ ?>
             <?php } ?>
             <li class="header-logout"><a href="#" onclick="logout(); return false;"><?php echo _l('nav_logout'); ?></a></li>
          </ul>
@@ -206,12 +181,11 @@ ob_end_clean();
       <?php
       if(!is_mobile()){
        echo $top_search_area;
-    } ?>
-    <?php hooks()->do_action('after_render_top_search'); ?>
+    } 
+	hooks()->do_action('after_render_top_search'); ?>
     <li class="icon header-user-profile" data-toggle="tooltip" title="<?php echo $staff_full_name = get_staff_full_name(); ?>" data-placement="bottom">
       <a href="#" class="dropdown-toggle profile" data-toggle="dropdown" aria-expanded="false">
-         <?php echo staff_profile_image($current_user->staffid,array('img','img-responsive','staff-profile-image-small','pull-left')); ?>
-		 <?php 
+         <?php echo staff_profile_image($current_user->staffid,array('img','img-responsive','staff-profile-image-small','pull-left')); 
 		 $ch_prof_name = $staff_full_name;
 			
 			$ch_prof_count = strlen($ch_prof_name);
@@ -226,13 +200,10 @@ ob_end_clean();
       </a>
       <ul class="dropdown-menu animated fadeIn">
          <li class="header-my-profile"><a href="<?php echo admin_url('profile'); ?>"><?php echo _l('nav_my_profile'); ?></a></li>
-          <?php /* ?>
-         <li class="header-my-timesheets"><a href="<?php echo admin_url('staff/timesheets'); ?>"><?php echo _l('my_timesheets'); ?></a></li>
-           * <?php */ ?>
          <li class="header-edit-profile"><a href="<?php echo admin_url('staff/edit_profile'); ?>"><?php echo _l('nav_edit_profile'); ?></a></li>
 		 <?php $staffid = get_staff_user_id();
 		  $ch_admin = is_admin($staffid);
-		  //if(!$ch_admin){ ?>
+		   ?>
 			<li class="header-edit-profile">
 				<?php if(get_option('company_mail_server') != 'yes'){?>
 					<a href="<?php echo admin_url('company_mail/email_settings'); ?>">
@@ -242,30 +213,15 @@ ob_end_clean();
 					<?php echo _l('Email Setting'); ?>
 				</a>
 			</li>
-		<?php //}?>
 		<?php if(get_option('reminder_settings') == 'user'){?>
 				<li class="header-edit-profile">
 					<a href="<?php echo admin_url('reminder/user'); ?>">
 						<?php echo _l('reminder_settings'); ?>
 					</a>
 				</li>
-		<?php }?>
-        <?php /* ?>
- <?php if(get_option('disable_language') == 0){ ?>
-            <li class="dropdown-submenu pull-left header-languages">
-               <a href="#" tabindex="-1"><?php echo _l('language'); ?></a>
-               <ul class="dropdown-menu dropdown-menu">
-                  <li class="<?php if($current_user->default_language == ""){echo 'active';} ?>"><a href="<?php echo admin_url('staff/change_language'); ?>"><?php echo _l('system_default_string'); ?></a></li>
-                  <?php foreach($this->app->get_available_languages() as $user_lang) { ?>
-                     <li<?php if($current_user->default_language == $user_lang){echo ' class="active"';} ?>>
-                     <a href="<?php echo admin_url('staff/change_language/'.$user_lang); ?>"><?php echo ucfirst($user_lang); ?></a>
-                  <?php } ?>
-               </ul>
-            </li>
-         <?php } ?>
-         * <?php */ ?>
-         <?php if($this->app->show_setup_menu() == true && ( is_admin())){ ?>
-      <li<?php if(get_option('show_setup_menu_item_only_on_hover') == 1) { echo ' style="display:none;"'; } ?> id="setup-menu-item">
+		<?php }
+		if($this->app->show_setup_menu() == true && ( is_admin())){ ?>
+      <li <?php if(get_option('show_setup_menu_item_only_on_hover') == 1) { echo ' style="display:none;"'; } ?> id="setup-menu-item">
          <a href="#" class="open-customizer">
          <span class="menu-text">
             <?php echo _l('setting_bar_heading'); ?>
@@ -283,29 +239,6 @@ ob_end_clean();
          </li>
       </ul>
    </li>
-   <?php if(is_staff_member()){ ?>
-   <?php /* ?>
-      <li class="icon header-newsfeed">
-         <a href="#" class="open_newsfeed desktop" data-toggle="tooltip" title="<?php echo _l('whats_on_your_mind'); ?>" data-placement="bottom"><i class="fa fa-share fa-fw fa-lg" aria-hidden="true"></i></a>
-      </li><?php */ ?>
-   <?php } ?>
-   <!-- <li class="icon header-todo">
-      <a href="<?php echo admin_url('todo'); ?>" data-toggle="tooltip" title="<?php echo _l('nav_todo_items'); ?>" data-placement="bottom"><i class="fa fa-check-square-o fa-fw fa-lg"></i>
-         <span class="label bg-warning icon-total-indicator nav-total-todos<?php if($current_user->total_unfinished_todos == 0){echo ' hide';} ?>"><?php echo $current_user->total_unfinished_todos; ?></span>
-      </a>
-   </li> -->
-   <?php /* ?>
-   <li class="icon header-timers timer-button" data-placement="bottom" data-toggle="tooltip" data-title="<?php echo _l('my_timesheets'); ?>">
-      <a href="#" id="top-timers" class="dropdown-toggle top-timers" data-toggle="dropdown">
-         <i class="fa fa-clock-o fa-fw fa-lg" aria-hidden="true"></i>
-         <span class="label bg-success icon-total-indicator icon-started-timers<?php if ($totalTimers = count($startedTimers) == 0){ echo ' hide'; }?>">
-            <?php echo count($startedTimers); ?>
-         </span>
-      </a>
-      <ul class="dropdown-menu animated fadeIn started-timers-top width350" id="started-timers-top">
-         <?php $this->load->view('admin/tasks/started_timers',array('startedTimers'=>$startedTimers)); ?>
-      </ul>
-   </li><?php */ ?>
    <li class="dropdown notifications-wrapper header-notifications" data-toggle="tooltip" title="<?php echo _l('nav_notifications'); ?>" data-placement="bottom">
       <?php $this->load->view('admin/includes/notifications'); ?>
    </li>
@@ -335,14 +268,17 @@ ob_end_clean();
 					<div class="col-md-12"style="border-bottom:2px solid #e5e5e5;margin-bottom:15px;">
 					<div class="col-md-5" style="margin-top:10px;">
 						<p class="p_head_1"><?php echo _l('choose_entity');?></p>
-						<div class="tabs active1_1" id="tab01" style="border-radius:10px;">
+						<div class="tabs active1_1 tabs_div_report" id="tab01" style="border-radius:10px;" onclick="tabs_div_report('tab01')">
 							<h6 class="text-muted_1"><span class="cur_deal_1"><i class="fa fa-dollar"></i></span><?php echo _l('deal');?><div class="pull-right dol_sym_1"><i class="fa fa-angle-right" style="font-size:40px;"></div></i></h6>
+						</div>
+						<div class="tabs tabs_div_report" id="tab02" style="border-radius:10px;" onclick="tabs_div_report('tab02')">
+							<h6 class="text-muted_1"><span class="cur_deal_1"><i class="fa fas fa-tasks"></i></span><?php echo _l('activity');?><div class="pull-right dol_sym_1"><i class="fa fa-angle-right" style="font-size:40px;"></div></i></h6>
 						</div>
 						<div class="modal-footer"></div>
 					</div>
 					<div class="col-md-7" style="border-left:2px solid #e5e5e5;margin-top:10px;">
 						<p class="p_head_1"><?php echo _l('choose_report_type');?></p>
-						<fieldset id="tab0113" class="show" style="display:block !important">
+						<fieldset id="tab011" class="show report_popup" >
 								<input type="hidden" id="report_12_id" name="report_12_id">
 								<input type="hidden" name="<?php echo $this->security->get_csrf_token_name();?>" value="<?php echo $this->security->get_csrf_hash();?>">
 								<div class="modal-body">
@@ -372,13 +308,36 @@ ob_end_clean();
 									</div>
 								</div>
 							
-						</fieldset>						 						
+						</fieldset>	
+						<fieldset id="tab021" class="hide report_popup" >
+								<div class="modal-body">
+									<div class="form-group">
+										<div class="full_cont_div_1 req_class" onclick="show_div_1('activity_div1','activity_performance')" id="activity_div1">
+											<div class="first_cont_div_1"><?php echo _l('activity_performance');?></div>
+											<div class="second_cont_div_1 req_class" id="activity_div11">How much did you start, win, or lose?</div>
+										</div>
+									</div>
+									<div class="form-group">
+										<div class="full_cont_div_1 req_class" onclick="show_div_1('activity_div2','email_performance')" id="activity_div2">
+											<div class="first_cont_div_1"><?php echo _l('email_performance');?></div>
+											<div class="second_cont_div_1 req_class" id="activity_div21">What is your win or loss rate?</div>
+										</div>
+									</div>
+									<div class="form-group">
+										<div class="full_cont_div_1 req_class" onclick="show_div_1('activity_div3','call_performance')" id="activity_div3">
+											<div class="first_cont_div_1"><?php echo _l('call_performance');?></div>
+											<div class="second_cont_div_1 req_class" id="activity_div31">How long is your sales cycle?</div>
+										</div>
+									</div>
+								</div>
+							
+						</fieldset>	
 					</div>
 					</div>
 					<div class="modal-footer" style="background:#f7f7f7">
 						<div>
 							<button type="button" class="btn pull-right1" onclick="report_cancel()"><?php echo _l('cancel');?></button>
-							<button type="submit" class="btn btn-primary pull-right1" disabled style="background-color:#61c786 !important;" ><?php echo _l('continue');?></button>
+							<button type="submit" class="btn btn-primary pull-right1" disabled style="background-color:#61c786 !important;" id="btn_report_popup"><?php echo _l('continue');?></button>
 						</div>
 					</div>
 					</form>
@@ -391,10 +350,19 @@ ob_end_clean();
 function report_cancel(){
 	$('#add_report_popup').modal('hide');
 }
+function tabs_div_report(a){
+	$('.tabs_div_report').removeClass('active1_1');
+	$('#'+a).addClass('active1_1');
+	$('.report_popup').removeClass('show');
+	$('.report_popup').addClass('hide');
+	$('.req_class').removeClass('active_new_1');
+	$('#'+a+'1').removeClass('hide');
+	$('#'+a+'1').addClass('show');
+	$('#btn_report_popup').prop('disabled', true);
+}
 function show_div_1(a,b){
 	$('#report_12_id').val(b);
 	$('#goal_txt').html(b);
-	//$('.error').hide();
 	$('label[class="error"]').hide();
 	$('#select_manger1').hide();
 	$('#assign_user_wise').hide();
@@ -474,7 +442,9 @@ function show_div_1(a,b){
 	padding-right:22px;
 	margin-left:12px;
 }
-
+.tabs_div_report{
+	cursor:pointer;
+}
 .cur_deal_1 {
     height: 35px;
     width: 35px;

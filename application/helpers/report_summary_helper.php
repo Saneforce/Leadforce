@@ -114,7 +114,20 @@ function date_summary($qry_cond,$week1,$measure,$view_by,$filters)
 		$req_fields = "*,sum(project_cost) as tot_val,sum( IF(stage_of = '1',(project_cost*(progress/100)),NULL)) AS own_price,sum( IF(stage_of = '0',(project_cost*(progress/100)),NULL)) AS open_price,sum( IF(stage_of = '2',(project_cost*(progress/100)),NULL)) AS lost_price";
 		$deal_vals = get_deal_vals($req_fields,'',$table,$qry_cond,$filters);
 		$data = get_weight_vals($deal_vals,$view_by,$week1);
-	}else{
+	}else if($measure == 'Number'){
+		$fields		= ",".db_prefix()."tasks.id";
+		$tables 	= db_prefix() . "tasks";
+		$task_vals  = get_task_vals('',$fields,$tables,$qry_cond,$filters);
+		
+		$upcoming	= (!empty($task_vals[0]['upcoming']))?$task_vals[0]['upcoming']:0;
+		$overdue	= (!empty($task_vals[0]['overdue']))?$task_vals[0]['overdue']:0;
+		$today		= (!empty($task_vals[0]['today']))?$task_vals[0]['today']:0;
+		$in_progress= (!empty($task_vals[0]['in_progress']))?$task_vals[0]['in_progress']:0;
+		$completed	= (!empty($task_vals[0]['completed']))?$task_vals[0]['completed']:0;
+		$tot_val	= $upcoming + $overdue + $today + $in_progress + $completed;
+		$data	   = tasks_counts($upcoming,$overdue,$today,$in_progress,$completed,$tot_val,$view_by,$week1,$task_vals);
+	}
+	else{
 		$table = db_prefix() . "projects p";
 		$qry_cond = "p.deleted_status = '0' ".$qry_cond;
 		$deal_vals = get_deal_vals('*,sum(p.project_cost) as tot_val','',$table,$qry_cond,$filters);
@@ -564,6 +577,9 @@ function check_year_week($view_by){
 						if($view_by == 'start_date' || $view_by == 'project_deadline' || $view_by == 'won_date' || $view_by == 'lost_date' || $view_by == 'project_created' || $view_by == 'project_modified'){
 							$qry_cond   .= " and ".$view_by." >= '".$start_date."'";
 						}
+						else if($view_by == 'startdate' || $view_by == 'dateadded' || $view_by == 'datemodified' || $view_by == 'datefinished' ){
+							$qry_cond   .= " and ".$view_by." >= '".$start_date."'";
+						}
 						else{
 							$customs   = $CI->db->query("SELECT relid  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and CONVERT(cv.value,date)  >='".$start_date."' and CONVERT(cv.value,date) <='".$end_date."' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
 							$cur_projects = '';
@@ -586,6 +602,10 @@ function check_year_week($view_by){
 						$start_date     = date('Y-m-d',strtotime($w_start_date.'-'.$months[$req_key+1].'-'.$cur_year));
 						$end_date	    = date('Y-m-d',strtotime($req_end_days.'-'.$months[$req_key+1].'-'.$cur_year));
 						if($view_by == 'start_date' || $view_by == 'project_deadline' || $view_by == 'won_date' || $view_by == 'lost_date' || $view_by == 'project_created' || $view_by == 'project_modified'){
+									
+							$qry_cond 	 .= "  and ".$view_by." <= '".$end_date."'";
+						}
+						else if($view_by == 'startdate' || $view_by == 'dateadded' || $view_by == 'datemodified' || $view_by == 'datefinished' ){
 									
 							$qry_cond 	 .= "  and ".$view_by." <= '".$end_date."'";
 						}else{
@@ -612,7 +632,7 @@ function check_year_week($view_by){
 						if($num_month >= $start_days){
 							$start_date  = date('Y-m-d',strtotime($w_start_date.'-'.$key.'-'.$cur_year));
 							$end_date	 = date('Y-m-d',strtotime($w_end_date.'-'.$key.'-'.$cur_year));
-							if($view_by == 'start_date' || $view_by == 'project_deadline' || $view_by == 'won_date' || $view_by == 'lost_date' || $view_by == 'project_created' || $view_by == 'project_modified'){
+						if($view_by == 'start_date' || $view_by == 'project_deadline' || $view_by == 'won_date' || $view_by == 'lost_date' || $view_by == 'project_created' || $view_by == 'project_modified' || $view_by == 'startdate' || $view_by == 'dateadded' || $view_by == 'datemodified' || $view_by == 'datefinished'){
 								$qry_cond 	 .= " and ".$view_by." >= '".$start_date."' and ".$view_by." <= '".$end_date."'";
 							}
 							else{
@@ -640,8 +660,6 @@ function check_year_week($view_by){
 			}
 		}
 		return $qry_cond;
-	}
-	if($_REQUEST['view_type'] == 'date' && $_REQUEST['date_range']=='Quarterly'){
 	}
 }
 function get_join_tables(){
@@ -946,10 +964,21 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 	if($view_type == 'date' && ($view_by == 'start_date' || $view_by == 'project_deadline' || $view_by == 'won_date' || $view_by == 'lost_date' || $view_by == 'project_created' || $view_by == 'project_modified')){
 		if($date_range == 'Monthly'){
 			$where['month('.db_prefix().'projects.'.$req_view_by.')']  =  $crow;
-			$where['year('.db_prefix().'projects.'.$req_view_by.')']   =  date('Y');
 		}
-		if($date_range == 'Yearly'){
-			$where['year('.db_prefix().'projects.'.$req_view_by.')']   =  date('Y');
+		$where['year('.db_prefix().'projects.'.$req_view_by.')']   =  date('Y');
+		if($date_range == 'Quarterly'){
+			if (str_contains($crow, 'Q1')) {
+				$where_in['month('.db_prefix().'projects.'.$req_view_by.')']   =  array(1,2,3);
+			}
+			else if (str_contains($crow, 'Q2')) {
+				$where_in['month('.db_prefix().'projects.'.$req_view_by.')']   =  array(4,5,6);
+			}
+			else if (str_contains($crow, 'Q3')) {
+				$where_in['month('.db_prefix().'projects.'.$req_view_by.')']   =  array(7,8,9);
+			}
+			else if (str_contains($crow, 'Q4')) {
+				$where_in['month('.db_prefix().'projects.'.$req_view_by.')']   =  array(10,11,12);
+			}
 		}
 	}
 	

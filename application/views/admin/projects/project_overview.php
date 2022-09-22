@@ -280,15 +280,11 @@
             </td>
          </tr>
 		   <?php }if(!empty($need_fields) && in_array("project_start_date", $need_fields)){?>
-         <!-- <tr class="project-overview-date-created">
-            <td class="bold"><?php echo _l('project_datecreated'); ?></td>
-            <td><?php echo _d($project->project_created); ?></td>
-         </tr> -->
          <tr class="project-overview-start-date">
             <td class="bold"><?php echo _l('project_start_date'); ?></td>
             <td><?php echo _d($project->start_date); ?></td>
          </tr>
-		   <?php }if(!empty($need_fields) && in_array("project_deadline", $need_fields)){//if($project->deadline){ ?>
+		   <?php }if(!empty($need_fields) && in_array("project_deadline", $need_fields)){?>
          <tr class="project-overview-deadline">
             <td class="bold"><?php echo _l('expected_closing_date'); ?></td>
             <td class='deadline'>
@@ -312,45 +308,8 @@
            
             </td>
          </tr>
-		   <?php }//} ?>
-         <?php /* if($project->date_finished){ ?>
-         <tr class="project-overview-date-finished">
-            <td class="bold"><?php echo _l('project_completed_date'); ?></td>
-            <td class="text-success date_finished">
-            
-            <div class="data_display">
-                     <span class="updated_text">
-                     <?php echo _d($project->date_finished); ?>
-                     </span>
-                     <button class="btn btn-link pull-right no-padding data_display_btn" data-val="date_finished" ><i class="fa fa-pencil"></i></button>
-                     </div>
-
-                     <div class="data_edit" style=" display:none;">
-                     
-                     <div class="input-group date">
-                     <input type="text" id="date_finished" name="date_finished" class="form-control datepicker" data-date-min-date="<?php echo (isset($project) ? $project->start_date : ' '); ?>" value="<?php echo (isset($project) ? $project->date_finished : ' '); ?>" autocomplete="off">
-                        
-                        <div class="input-group-addon" style="opacity: 1;"><a class=" data_edit_btn" data-val="date_finished"><i class="fa fa-check"></i></a></div></div>
-                        
-                      </div>
-            
-            </td>
-         </tr>
-         <?php //} */?>
-         <!--  
-         <?php if($project->estimated_hours && $project->estimated_hours != '0'){ ?>
-         <tr class="project-overview-estimated-hours">
-            <td class="bold<?php if(hours_to_seconds_format($project->estimated_hours) < (int)$project_total_logged_time){echo ' text-warning';} ?>"><?php echo _l('estimated_hours'); ?></td>
-            <td><?php echo str_replace('.', ':', $project->estimated_hours); ?></td>
-         </tr>
-         <?php } ?>
-         <?php if(has_permission('projects','','create')){ ?>
-         <tr class="project-overview-total-logged-hours">
-            <td class="bold"><?php echo _l('project_overview_total_logged_hours'); ?></td>
-            <td><?php echo seconds_to_time_format($project_total_logged_time); ?></td>
-         </tr>
-         -->
-         <?php } ?>
+		   <?php }?>
+     
          <?php $custom_fields = get_custom_fields('projects');
          if(count($custom_fields) > 0){ ?>
          <?php foreach($custom_fields as $field){ ?>
@@ -361,7 +320,152 @@
          if($value == ''){continue;} ?>
          <tr>
             <td class="bold"><?php echo ucfirst($field['name']); ?></td>
-            <td><?php echo $value; ?></td>
+            <td class="<?php echo $field['slug'];?>">
+				<div class="data_display" >
+					<?php echo $value; ?>
+					<?php if($field['type']!='link'){?>
+						<button class="btn btn-link pull-right no-padding data_display_btn"
+					data-val="<?php echo $field['slug'];?>" >
+							<i class="fa fa-pencil"></i>
+						</button>
+					<?php }?>
+				</div>
+				<div class="data_edit" style=" display:none;">
+					<?php
+					switch($field['type']){
+						case 'textarea':
+					?>
+							<div class="input-group">
+								<textarea id="<?php echo $field['slug'];?>" name="<?php echo $field['slug'];?>" class="form-control "><?php echo (isset($value) ? $value : ' '); ?></textarea>
+								<div class="input-group-addon" style="opacity: 1;">
+									<a class=" data_edit_btn_custom" data-val="<?php echo $field['slug'];?>"><i class="fa fa-check"></i></a>
+								</div>
+							</div>
+					<?php 
+							break;
+						case 'date_picker':
+					?>
+							<div class="input-group date">
+								<input type="text" id="<?php echo $field['slug'];?>" name="<?php echo $field['slug'];?>" class="form-control datepicker"  value="<?php echo (isset($value) ? date('d-m-Y',strtotime($value)) : ' '); ?>" autocomplete="off" readonly>
+								<div class="input-group-addon" style="opacity: 1;">
+									<a class=" data_edit_btn_custom" data-val="<?php echo $field['slug'];?>"><i class="fa fa-check"></i></a>
+								</div>
+							</div>
+					<?php
+							break;
+						case 'date_range':
+					?>
+							<div class="input-group date">
+								<input type="text" id="<?php echo $field['slug'];?>" name="<?php echo $field['slug'];?>" class="form-control daterangepicker"  value="<?php echo (isset($value) ? date('d-m-Y',strtotime($value)) : ' '); ?>" autocomplete="off" readonly>
+								<div class="input-group-addon" style="opacity: 1;">
+									<a class=" data_edit_btn_custom" data-val="<?php echo $field['slug'];?>"><i class="fa fa-check"></i></a>
+								</div>
+							</div>
+					<?php
+							break;
+					case 'date_time_range':
+					?>
+							<div class="input-group date">
+								<input type="text" id="<?php echo $field['slug'];?>" name="<?php echo $field['slug'];?>" class="form-control datetimerangepicker"  value="<?php echo (isset($value) ? date('d-m-Y',strtotime($value)) : ' '); ?>" autocomplete="off" readonly>
+								<div class="input-group-addon" style="opacity: 1;">
+									<a class=" data_edit_btn_custom" data-val="<?php echo $field['slug'];?>"><i class="fa fa-check"></i></a>
+								</div>
+							</div>
+					<?php
+							break;
+						case 'time_picker':
+					?>
+							<div class="input-group date">
+								<input type="text" id="<?php echo $field['slug'];?>" name="<?php echo $field['slug'];?>" class="form-control daterangepicker"  value="<?php echo (isset($value) ? date('d-m-Y',strtotime($value)) : ' '); ?>" autocomplete="off" readonly>
+								<div class="input-group-addon" style="opacity: 1;">
+									<a class=" data_edit_btn_custom" data-val="<?php echo $field['slug'];?>"><i class="fa fa-check"></i></a>
+								</div>
+							</div>
+					<?php
+							break;
+						case 'number':
+					?>
+							<div class="input-group">
+								<input type="number" id="<?php echo $field['slug'];?>" name="<?php echo $field['slug'];?>" class="form-control "  value="<?php echo (isset($value) ? $value : ' '); ?>">
+								<div class="input-group-addon" style="opacity: 1;">
+									<a class=" data_edit_btn_custom" data-val="<?php echo $field['slug'];?>"><i class="fa fa-check"></i></a>
+								</div>
+							</div>
+					<?php
+							break;
+						case 'input':
+					?>
+							<div class="input-group">
+								<input type="text" id="<?php echo $field['slug'];?>" name="<?php echo $field['slug'];?>" class="form-control "  value="<?php echo (isset($value) ? $value : ' '); ?>">
+								<div class="input-group-addon" style="opacity: 1;">
+									<a class=" data_edit_btn_custom" data-val="<?php echo $field['slug'];?>"><i class="fa fa-check"></i></a>
+								</div>
+							</div>
+					<?php
+							break;
+						case 'select':
+					?>
+							<div class="input-group">
+								<select id="<?php echo $field['slug'];?>" name="<?php echo $field['slug'];?>" data-live-search="true" data-width="100%"  class=" selectpicker _select_input_group">
+									<?php 
+									$all_vals = explode(',',$field['options']);
+									foreach($all_vals as $all_val1){
+									   $selected = '';
+									   if($all_val1 == $value){
+										  $selected = 'selected="selected"';
+									   }
+									   echo '<option value="'.$all_val1.'" '.$selected.'>'.$all_val1.'</option>';
+									}
+									?>
+								 </select>
+								<div class="input-group-addon" style="opacity: 1;">
+									<a class=" data_edit_btn_custom" data-val="<?php echo $field['slug'];?>"><i class="fa fa-check"></i></a>
+								</div>
+							</div>
+					<?php
+							break;
+						case 'multiselect':
+					?>
+							<div class="input-group">
+								<select id="<?php echo $field['slug'];?>" name="<?php echo $field['slug'];?>" multiple="1" data-live-search="true" data-width="100%"  class=" selectpicker form-control  custom-field-multi-select">
+									<?php 
+									$all_vals = explode(',',$field['options']);
+									foreach($all_vals as $all_val1){
+										$all_val1 = trim($all_val1);
+									   $selected = '';
+									   if($all_val1 == $value){
+										  $selected = 'selected="selected"';
+									   }
+									   else{
+										   $cur_vals = explode(',',$value);
+										   if(!empty($cur_vals)){
+											   if(in_array(trim($all_val1),$cur_vals)){
+												   echo $all_val1;
+												   $selected = 'selected="selected"';
+											   }
+										   }
+									   }
+									   echo '<option value="'.$all_val1.'" '.$selected.'>'.$all_val1.'</option>';
+									}
+									?>
+								 </select>
+								<div class="input-group-addon" style="opacity: 1;">
+									<a class=" data_edit_btn_custom" data-val="<?php echo $field['slug'];?>"><i class="fa fa-check"></i></a>
+								</div>
+							</div>
+					<?php
+							break;
+						case 'link':
+					?>
+							<div class="input-group">
+								<a id="custom_fields_<?php echo $field['fieldto'] .'_'.$field['id'] . '_popover'?>" type="button" href="javascript:void(0)"><?php echo _l('cf_translate_input_link_tip');?></a>
+							</div>
+					<?php
+							break;
+					} 
+					?>
+                </div>
+			</td>
          </tr>
          <?php } ?>
          <?php } ?>

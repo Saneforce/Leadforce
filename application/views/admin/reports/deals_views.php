@@ -25,9 +25,10 @@
 					<?php echo form_open('admin/reports/save_report',array('id'=>'clientid_add_group_modal')); ?>
 					<div class="modal-body">
 						<input type="hidden" id="cur_id12" value="<?php echo $id;?>" name="cur_id12">
+						<input type="hidden" name="folder_type" value="<?php echo $report_page;?>">
 							<?php $attrs = array('autofocus'=>true, 'required'=>true,'onblur'=>"check_name(this)",'onkeyup'=>"check_validate(this)", 'maxlength'=>"150"); ?>
 							<?php echo render_input( 'name', 'name','','text',$attrs); ?>
-							<div class="text-danger" id="name_id" style="display:none">Please enter valid name</div>
+							<div class="text-danger" id="name_id" style="display:none"><?php echo _l('valid_name');?></div>
 							<div id="companyname_exists_info" class="hide"></div>
 							<div class="form-group select-placeholder contactsdiv" >
 								<label for="project_contacts_selectpicker"
@@ -62,7 +63,10 @@
 							<span class="edit-title"><?php echo _l('add_new',_l('folder')); ?></span>
 						</h4>
 					</div>
-					<?php echo form_open('admin/reports/add_folder',array('id'=>'section_add')); ?>
+					<?php 
+					echo form_open('admin/reports/add_folder',array('id'=>'section_add')); 
+					?>
+					<input type="hidden" name="folder_type" value="<?php echo $report_page;?>">
 					<div class="modal-body">
 						<div class="row">
 							<div class="col-md-12">
@@ -92,7 +96,7 @@
 					<?php if(!empty($report_name)){?>
 						<h1>
 							<?php if(!empty($folder_id)){?>
-								<a href="<?php echo admin_url('reports/view_deal_report/'.$folder_id);?>" title="<?php echo _l('back');?>"><i class="fa fa-arrow-circle-left fa-6" style="font-size: 45px;padding-right: 10px;top: 4px;position: relative;"></i></a>
+								<a href="<?php echo admin_url('reports/view_deal_report/'.$folder_id.'/'.$report_page);?>" title="<?php echo _l('back');?>"><i class="fa fa-arrow-circle-left fa-6" style="font-size: 45px;padding-right: 10px;top: 4px;position: relative;"></i></a>
 							<?php }?>
 							<?php echo $report_name;?>
 						</h1>
@@ -113,10 +117,9 @@
 						<div class="float-right" style="float:right">
 							<?php if($ch_admin){?>
 								<button type="button" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" data-toggle="modal" data-target="#shared_add_modal" onclick="load_share('<?php echo $id;?>')"><?php echo _l('shared');?></button>
-							
 								<button type="button" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" data-toggle="modal" data-target="#public_add_modal" onclick="load_public('<?php echo $id;?>')"><?php echo _l('public_link');?></button>
 							<?php }?>
-							<a href="<?php echo admin_url('reports/update_report/'.$id);?>" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" ><?php echo _l('submit');?></a>
+							<a href="<?php echo admin_url('reports/update_report/'.$id.'/'.$report_page);?>" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" ><?php echo _l('submit');?></a>
 							<button type="button" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" data-toggle="modal" data-target="#clientid_add_modal"><?php echo _l('save_new');?></button>
 						</div>
 					<?php }?>
@@ -199,6 +202,7 @@
 							</h4>
 						</div>
 						<?php echo form_open('admin/reports/share_report',array('id'=>'share_report1')); ?>
+							<input type="hidden" name="folder_type" value="<?php echo $report_page;?>">
 							<div class="modal-body">
 								<div id="shared_all">
 									<input type="hidden" name="report_id" value="<?php echo $id;?>">
@@ -246,7 +250,7 @@
 							<a data-toggle="pill" href="#summary_table" onclick="tab_summary('1');"><?php echo _l('summary');?></a>
 						</li>
 						<li class="<?php if(!empty($_GET['filter_tab']) && $_GET['filter_tab'] == 2){ echo 'active';}?>">
-							<a data-toggle="pill" href="#report_table" onclick="tab_summary('2');"><?php echo _l('deals');?></a>
+							<a data-toggle="pill" href="#report_table" onclick="tab_summary('2');"><?php echo ($report_page=='deal')? _l('deals'):_l('activity');?></a>
 						</li>
 						
 					</ul>
@@ -264,15 +268,30 @@
 								if($report_page == 'deal'){
 									$this->load->view('admin/reports/deal_list_column');
 								}
-								if($report_page == 'activity'){
+								else if($report_page == 'activity'){
 									$this->load->view('admin/reports/activity_list_column');
 								}
 								?>
 					
-								<?php $this->load->view('admin/reports/deal_table_html'); ?>
+								<?php 
+								if($report_page == 'deal'){
+									$this->load->view('admin/reports/deal_table_html');
+								}
+								else if($report_page == 'activity'){
+									$this->load->view('admin/reports/task_table_html');
+								}
+								?>
 						</div>
 						<div id="summary_table" class="tab_summary tab-pane fade <?php if(empty($_GET['filter_tab']) || $_GET['filter_tab'] == 1){ echo 'in active';}?> ">
-							<?php $this->load->view('admin/reports/deal_summary',$data); ?>
+							<?php 
+							if($report_page == 'deal'){
+								$this->load->view('admin/reports/deal_summary',$data); 
+							}
+							else{
+								$data['report_name'] = $report_name;
+								$this->load->view('admin/reports/activity_summary',$data);
+							}								
+								?>
 						</div>
 					</div>
 				</div>
