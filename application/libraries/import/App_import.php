@@ -462,7 +462,7 @@ abstract class App_import
                 $firstLine = fgets($f); //get first line of csv file
                 fclose($f); // close file    
 //pre($dbFieldKeys); exit;
-                $foundHeaders = array_filter(str_getcsv(trim($firstLine), ',', '"'));
+                $foundHeaders = array_filter(str_getcsv(trim($firstLine,"\xEF\xBB\xBF"), ',', '"'));
   //   pre($foundHeaders);          exit;
 				 $output = array_merge(array_diff($foundHeaders, $dbFieldKeys), array_diff($dbFieldKeys, $foundHeaders));
 				 if(count($output) == 0) {
@@ -626,7 +626,14 @@ abstract class App_import
         }
         foreach ($this->getCustomFields() as $field) {
             $objPHPExcel->getActiveSheet()->SetCellValue($key.$totalSampleFields, $this->formatFieldNameForHeading($field['name']));
-            
+            if($field['required']) {
+                $styleArray = array(
+                    'font'  => array(
+                        'bold'  => true,
+                        'color' => array('rgb' => 'fa0505')
+                    ));
+                $objPHPExcel->getActiveSheet()->getStyle($key.$totalSampleFields)->applyFromArray($styleArray);
+            }
             //$totalSampleFields++;
             $key++;
             $identifycnt++;
@@ -879,7 +886,49 @@ abstract class App_import
 
         $key = 'A';
         $identifycnt = 0;
-        $mandatory = array('deals_id','person_fullname','organization_name','deal_name','deal_deadline','deal_project_currency','deal_pipeline','deal_pipeline_stage','deal_owner','activity_name','activity_tasktype','activity_startdate','activity_assignedto');
+        
+        $required_fields =get_option('deal_mandatory');
+        if($required_fields && is_string($required_fields)){
+            $required_fields = json_decode($required_fields);
+        }
+        $required_db_fields =array('deal_name','deal_owner');
+        foreach($required_fields as $rfield){
+            switch ($rfield) {
+                case 'clientid':
+                    $required_db_fields [] ='organization_name';
+                    break;
+                case 'pipeline_id':
+                    $required_db_fields [] ='deal_pipeline';
+                    break;
+                case 'status':
+                    $required_db_fields [] ='deal_pipeline_stage';
+                    break;
+                case 'project_members':
+                    $required_db_fields [] ='deal_followers';
+                    break;
+                case 'project_cost':
+                    $required_db_fields [] ='deal_project_cost';
+                    break;
+                case 'project_start_date':
+                    $required_db_fields [] ='deal_start_date';
+                    break;
+                case 'project_deadline':
+                    $required_db_fields [] ='deal_deadline';
+                    break;
+                case 'description':
+                    $required_db_fields [] ='deal_description';
+                    break;
+                case 'project_contacts[]':
+                case 'primary_contact':
+                    $required_db_fields [] ='person_fullname';
+                    break;
+                default:
+                    # code...
+                    break;
+            }
+        }
+
+        $mandatory = $required_db_fields;
         //pre($this->getImportableDatabaseFields());
         foreach ($dbFields as $field) {
             if(in_array($field, $mandatory)) {
@@ -913,7 +962,14 @@ abstract class App_import
 
         foreach ($this->getCustomFields() as $field) {
             $objPHPExcel->getActiveSheet()->SetCellValue($key.$totalSampleFields, $this->formatFieldNameForHeading($field['name']));
-            
+            if($field['required']) {
+                $styleArray = array(
+                    'font'  => array(
+                        'bold'  => true,
+                        'color' => array('rgb' => 'fa0505')
+                    ));
+                $objPHPExcel->getActiveSheet()->getStyle($key.$totalSampleFields)->applyFromArray($styleArray);
+            }
             //$totalSampleFields++;
             $key++;
             $identifycnt++;
