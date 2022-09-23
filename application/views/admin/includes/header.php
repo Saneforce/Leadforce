@@ -268,17 +268,17 @@ ob_end_clean();
 					<div class="col-md-12"style="border-bottom:2px solid #e5e5e5;margin-bottom:15px;">
 					<div class="col-md-5" style="margin-top:10px;">
 						<p class="p_head_1"><?php echo _l('choose_entity');?></p>
-						<div class="tabs active1_1 tabs_div_report" id="tab01" style="border-radius:10px;" onclick="tabs_div_report('tab01')">
+						<div class="tabs active1_1 tabs_div_report" id="tab012" style="border-radius:10px;" onclick="tabs_div_report('tab012')">
 							<h6 class="text-muted_1"><span class="cur_deal_1"><i class="fa fa-dollar"></i></span><?php echo _l('deal');?><div class="pull-right dol_sym_1"><i class="fa fa-angle-right" style="font-size:40px;"></div></i></h6>
 						</div>
-						<div class="tabs tabs_div_report" id="tab02" style="border-radius:10px;" onclick="tabs_div_report('tab02')">
+						<div class="tabs tabs_div_report" id="tab022" style="border-radius:10px;" onclick="tabs_div_report('tab022')">
 							<h6 class="text-muted_1"><span class="cur_deal_1"><i class="fa fas fa-tasks"></i></span><?php echo _l('activity');?><div class="pull-right dol_sym_1"><i class="fa fa-angle-right" style="font-size:40px;"></div></i></h6>
 						</div>
 						<div class="modal-footer"></div>
 					</div>
 					<div class="col-md-7" style="border-left:2px solid #e5e5e5;margin-top:10px;">
 						<p class="p_head_1"><?php echo _l('choose_report_type');?></p>
-						<fieldset id="tab011" class="show report_popup" >
+						<fieldset id="tab0121" class="show report_popup" >
 								<input type="hidden" id="report_12_id" name="report_12_id">
 								<input type="hidden" name="<?php echo $this->security->get_csrf_token_name();?>" value="<?php echo $this->security->get_csrf_hash();?>">
 								<div class="modal-body">
@@ -309,7 +309,7 @@ ob_end_clean();
 								</div>
 							
 						</fieldset>	
-						<fieldset id="tab021" class="hide report_popup" >
+						<fieldset id="tab0221" class="hide report_popup" >
 								<div class="modal-body">
 									<div class="form-group">
 										<div class="full_cont_div_1 req_class" onclick="show_div_1('activity_div1','activity_performance')" id="activity_div1">
