@@ -12,8 +12,7 @@ class Cronjob extends CI_Controller
 		$this->load->model('base');
         $this->load->model('projects_model');
         $this->load->model('tasktype_model');
-        $this->load->model('callsettings_model');
-		// $this->load->model('knowlarity_model');
+		$this->load->model('callsettings_model');
         
     }
 
@@ -276,6 +275,7 @@ class Cronjob extends CI_Controller
 									$response1 = json_decode($response1, true);
 									$sQuery1 = "select * from ".db_prefix()."outlookmsgid where staff_id = '".$staff_id."' order by id desc ";
 									$rResults12 = $this->db->query($sQuery1)->result_array();
+									$msg_ids	 = array_column($rResults12, 'msg_id'); 
 									$req_msg_id = '';
 									if(!empty($rResults12[0]['msg_id'])){
 										$req_msg_id = $rResults12[0]['msg_id'];
@@ -285,7 +285,7 @@ class Cronjob extends CI_Controller
 										
 										foreach ($response1["value"] as $mail) {
 											$source_from1 = $source_from2 = array();
-											if(!empty($req_msg_id) && $req_msg_id == $mail['Id']){
+											if(!empty($req_msg_id) && ($req_msg_id == $mail['Id'] || in_array($mail['Id'],$msg_ids))){
 												break;
 											}
 											if(!empty($mail['HasAttachments']) && $mail["HasAttachments"] == 1){
@@ -301,18 +301,16 @@ class Cronjob extends CI_Controller
 											if(empty($req_project_id)){
 												$req_project_id = get_deal_id_otheruser(get_option('deal_map'),$mail["From"]["EmailAddress"]["Address"],$mail["CcRecipients"]["EmailAddress"]["Address"],$mail["BccRecipients"]["EmailAddress"]["Address"]);
 											}
-											
 											$req_project_id = json_decode($req_project_id);
-											
 											$req_project_id = $req_project_id->project_id;
 											if(!empty($req_project_id) && !empty($mail['Id'])){
 												$i = $j2 = 0;
 												$cur_project12 = $this->projects_model->get_project($req_project_id);
-												$req_msg[$i]['project_id']	= $req_project_id;
-												$req_msg[$i]['task_id']		= $req_project_id;
-												$req_msg[$i]['staff_id'] 	= $staff_id;
-												$req_msg[$i]['from_email'] 	= $mail['From']['EmailAddress']['Address'];
-												$req_msg[$i]['from_name'] 	= $mail['From']['EmailAddress']['Name'];
+												$req_msg['project_id']	= $req_project_id;
+												$req_msg['task_id']		= $req_project_id;
+												$req_msg['staff_id'] 	= $staff_id;
+												$req_msg['from_email'] 	= $mail['From']['EmailAddress']['Address'];
+												$req_msg['from_name'] 	= $mail['From']['EmailAddress']['Name'];
 												$mail_to = $mail_cc = $mail_bcc = array();
 												if(!empty($mail['ToRecipients'])){
 													foreach($mail['ToRecipients'] as $mail1){
@@ -322,7 +320,6 @@ class Cronjob extends CI_Controller
 													}
 												}
 												$j2 = 0;
-												
 												if(!empty($mail['CcRecipients']['EmailAddress']['Address'])){
 													foreach($mail['CcRecipients'] as $mail1){
 														$mail_cc[$j2]['email']	= $mail1['EmailAddress']['Address'];
@@ -338,27 +335,27 @@ class Cronjob extends CI_Controller
 														$j2++;
 													}
 												}
-												$req_msg[$i]['mail_to']		= json_encode($mail_to);
-												$req_msg[$i]['cc']			= json_encode($mail_cc);
-												$req_msg[$i]['bcc']			= json_encode($mail_bcc);
-												$req_msg[$i]['reply_to']	= json_encode($mail['ReplyTo']);
-												$req_msg[$i]['message_id']	= $mail['Id'];
-												$req_msg[$i]['in_reply_to']	= json_encode($mail['ReplyTo']);
-												$req_msg[$i]['date']		= $mail['ReceivedDateTime'];
-												$req_msg[$i]['udate']		= strtotime($mail['SentDateTime']);
-												$req_msg[$i]['subject']		= $mail['Subject'];
+												$req_msg['mail_to']		= json_encode($mail_to);
+												$req_msg['cc']			= json_encode($mail_cc);
+												$req_msg['bcc']			= json_encode($mail_bcc);
+												$req_msg['reply_to']	= json_encode($mail['ReplyTo']);
+												$req_msg['message_id']	= $mail['Id'];
+												$req_msg['in_reply_to']	= json_encode($mail['ReplyTo']);
+												$req_msg['date']		= $mail['ReceivedDateTime'];
+												$req_msg['udate']		= strtotime($mail['SentDateTime']);
+												$req_msg['subject']		= $mail['Subject'];
 												
-												$req_msg[$i]['mail_read']	= $mail['IsRead'];
-												$req_msg[$i]['answered']	= $mail['IsRead'];
-												$req_msg[$i]['flagged']		= $mail['Flag']['FlagStatus'];
-												$req_msg[$i]['attachements']= json_encode($source_from1);
-												$req_msg[$i]['attachment_id']= json_encode($source_from2);
-												$req_msg[$i]['body_html']	= $mail['Body']['Content'];
-												$req_msg[$i]['body_plain']	= $mail['BodyPreview'];
-												$req_msg[$i]['folder']	= 'inbox';
-												$req_msg[$i]['mail_by']	= 'outlook';
+												$req_msg['mail_read']	= $mail['IsRead'];
+												$req_msg['answered']	= $mail['IsRead'];
+												$req_msg['flagged']		= $mail['Flag']['FlagStatus'];
+												$req_msg['attachements']= json_encode($source_from1);
+												$req_msg['attachment_id']= json_encode($source_from2);
+												$req_msg['body_html']	= $mail['Body']['Content'];
+												$req_msg['body_plain']	= $mail['BodyPreview'];
+												$req_msg['folder']		= 'inbox';
+												$req_msg['mail_by']		= 'outlook';
 												$table = db_prefix() . 'localmailstorage';
-												$this->db->insert_batch($table, $req_msg);
+												$this->db->insert($table, $req_msg);
 											}
 										}
 									}
@@ -397,11 +394,14 @@ class Cronjob extends CI_Controller
 		$expurl = explode('/admin',admin_url());
 		//echo $_SERVER['HTTP_HOST'];
 		//exit;
+		$post = json_decode(file_get_contents("php://input"), true);
+		//pre($post);
+		$dbname = explode('.leadforce.mobi',$_SERVER['HTTP_HOST']);	
 		$this->dynamicDB = array(
-			'hostname' => 'localhost',
-			'username' => 'root',
-			'password' => '',
-			'database' => 'perfexcrm',
+			'hostname' => APP_DB_HOSTNAME,
+			'username' => APP_DB_USERNAME,
+			'password' => APP_DB_PASSWORD,
+			'database' => APP_DB_NAME.'_'.$dbname[0],
 			'dbdriver' => 'mysqli',
 			'dbprefix' => 'tbl',
 			'pconnect' => FALSE,
@@ -543,11 +543,14 @@ exit;
 		
 		//echo $_SERVER['HTTP_HOST'];
 		//exit;
+		$post = json_decode(file_get_contents("php://input"), true);
+		//pre($post);
+		$dbname = explode('.leadforce.mobi',$_SERVER['HTTP_HOST']);	
 		$this->dynamicDB = array(
-			'hostname' => 'localhost',
-			'username' => 'root',
-			'password' => '',
-			'database' => 'perfexcrm',
+			'hostname' => APP_DB_HOSTNAME,
+			'username' => APP_DB_USERNAME,
+			'password' => APP_DB_PASSWORD,
+			'database' => APP_DB_NAME.'_'.$dbname[0],
 			'dbdriver' => 'mysqli',
 			'dbprefix' => 'tbl',
 			'pconnect' => FALSE,
@@ -683,10 +686,10 @@ exit;
 		$dbname = explode('.leadforce.mobi',$_SERVER['HTTP_HOST']);	
 			 
 		$this->dynamicDB = array(	
-			'hostname' => 'localhost',	
-			'username' => 'root',	
-			'password' => 'opc@345Pass',	
-			'database' => 'dev_crm_'.$dbname[0],	
+			'hostname' => APP_DB_HOSTNAME,	
+			'username' => APP_DB_USERNAME,	
+			'password' => APP_DB_PASSWORD,	
+			'database' => APP_DB_NAME.'_'.$dbname[0],	
 			'dbdriver' => 'mysqli',	
 			'dbprefix' => 'tbl',	
 			'pconnect' => FALSE,	
@@ -789,19 +792,20 @@ exit;
 	}
 
 	public function webhook_call_history() {
-		
+
 		if($json = json_decode(file_get_contents("php://input"), true)) {
 			$post = $json;
 		} else {
-			$post = $_POST;
+			$post = $_REQUEST;
 		}
+		//	 pr($post);
 		$dbname = explode('.leadforce.mobi',$_SERVER['HTTP_HOST']);	
 			 
 		$this->dynamicDB = array(	
-			'hostname' => 'localhost',	
-			'username' => 'root',	
-			'password' => 'opc@345Pass',	
-			'database' => 'dev_crm_'.$dbname[0],	
+			'hostname' => APP_DB_HOSTNAME,	
+			'username' => APP_DB_USERNAME,	
+			'password' => APP_DB_PASSWORD,	
+			'database' => APP_DB_NAME.'_'.$dbname[0],	
 			'dbdriver' => 'mysqli',	
 			'dbprefix' => 'tbl',	
 			'pconnect' => FALSE,	
@@ -864,7 +868,7 @@ exit;
 					}
 				}
 
-
+				
 
 				$this->db2->where('phonenumber',$phone); 
 				$this->db2->where('deleted_status',0); 
@@ -997,6 +1001,27 @@ exit;
 			}
 
  		}
+		
+		if (date("i") == "00" || date("i") == "30") {
+           
+            
+			$url = 'https://leadforce.mobi/admin/cronjob/indiamart_leads';
+			$ch = curl_init($url);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			$rr = curl_exec($ch);
+			//pr($rr);
+			curl_close($ch);
+
+			$companies = $this->base->getAll('tblcompany');
+			foreach ($companies as $company) {
+				$url = 'https://' . $company->shortcode . '.leadforce.mobi/admin/cronjob/indiamart_leads';
+				$ch = curl_init($url);
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+				$rr = curl_exec($ch);
+				curl_close($ch);
+			}
+
+ 		}
 		//reminder settting  cron job
 		$url = 'https://leadforce.mobi/admin/cronjob/reminder_mail';
 		$ch = curl_init($url);
@@ -1034,10 +1059,10 @@ exit;
 			'dbcollat' => 'utf8_general_ci'
 		);*/
 		$this->dynamicDB = array(	
-			'hostname' => 'localhost',	
-			'username' => 'root',	
-			'password' => 'opc@345Pass',	
-			'database' => 'dev_crm_'.$dbname[0],	
+			'hostname' => APP_DB_HOSTNAME,	
+			'username' => APP_DB_USERNAME,	
+			'password' => APP_DB_PASSWORD,	
+			'database' => APP_DB_NAME.'_'.$dbname[0],	
 			'dbdriver' => 'mysqli',	
 			'dbprefix' => 'tbl',	
 			'pconnect' => FALSE,	
@@ -1178,7 +1203,6 @@ exit;
 		$ch_remind_status = get_option('remind_status');
 		$ch_req_time =  date('Y-m-d H:i:s');
 		$staffid = null;
-		
 		if( $ch_remind_status == 'enable' && get_option('reminder_settings') != 'user' && !empty($staffs) ){
 			foreach($staffs as $staff1){
 				$staffid = $staff1['staffid'];
@@ -1556,10 +1580,10 @@ exit;
 		$dbname = explode('.leadforce.mobi',$_SERVER['HTTP_HOST']);	
 			 
 		$this->dynamicDB = array(	
-			'hostname' => 'localhost',	
-			'username' => 'root',	
-			'password' => 'opc@345Pass',	
-			'database' => 'dev_crm_'.$dbname[0],	
+			'hostname' => APP_DB_HOSTNAME,	
+			'username' => APP_DB_USERNAME,	
+			'password' => APP_DB_PASSWORD,	
+			'database' => APP_DB_NAME.'_'.$dbname[0],	
 			'dbdriver' => 'mysqli',	
 			'dbprefix' => 'tbl',	
 			'pconnect' => FALSE,	
@@ -1571,40 +1595,44 @@ exit;
 
 		$this->db2->where('slug', 'indiamart');
 		$this->db2->select('*');
-	    $this->db2->from('tblleads_sources');
+	    $this->db2->from(db_prefix().'leads_sources');
 		$query = $this->db2->get();
 		if ( $query->num_rows() > 0 )
     	{
 			$row = $query->row_array();
 			$fvs = json_decode($row['fields']);
-			//pre($name[0]);
+			//pre($row);
 			if($row['user_account'] != '' && $row['unique_key'] != '') {
 				if($row['last_date']) {
 					$start = $row['last_date'];
+					$start = date('d-M-Y',strtotime($row['last_date']));
 				} else {
 					$start = date('d-M-Y');
+					
 				}
 				$end = date('d-M-Y');
-
+				//$start = $start.' 00:00:00';
+			//	$end = $end.' 23:59:00';
 				$lastUpdate = array();
 				$lastUpdate['last_date'] = $end;
 				$this->db2->where('slug','indiamart');
-				$this->db2->update('tblleads_sources', $lastUpdate);
-				//echo 'https://mapi.indiamart.com/wservce/enquiry/listing/GLUSR_MOBILE/'.$row['user_account'].'/GLUSR_MOBILE_KEY/'.$row['unique_key'].'/Start_Time/'.$start.'/End_Time/'.$end.'/'; exit;
-				$ch = curl_init('https://mapi.indiamart.com/wservce/enquiry/listing/GLUSR_MOBILE/'.$row['user_account'].'/GLUSR_MOBILE_KEY/'.$row['unique_key'].'/Start_Time/'.$start.'/End_Time/'.$end.'/');
+				$this->db2->update(db_prefix().'leads_sources', $lastUpdate);
+				$url1 = 'https://mapi.indiamart.com/wservce/crm/crmListing/v2/?glusr_crm_key='.$row['unique_key'].'&start_time='.$start.'&end_time='.$end;
+				$ch = curl_init($url1);
 				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 				$data = curl_exec($ch);
 				curl_close($ch);
 				$result = json_decode($data);
-				//pre($result);
+				$result = $result->RESPONSE;
 				foreach($result as $val) {
 					if(isset($val->Error_Message)) {
 						echo $val->Error_Message;
 						exit;
 					} else {
-						$this->db2->where('query_id', $val->QUERY_ID);
+						//$this->db2->where('query_id', $val->QUERY_ID);
+						$this->db2->where('query_id', $val->UNIQUE_QUERY_ID);
 						$this->db2->select('*');
-						$this->db2->from('tblleads');
+						$this->db2->from(db_prefix().'leads');
 						$query1 = $this->db2->get();
 						$lexist = $query1->row_array();
 						if(empty($lexist)) {
@@ -1653,7 +1681,7 @@ exit;
 							if($val->$country) {
 								$this->db2->where('iso2', $val->$country);
 								$this->db2->select('*');
-								$this->db2->from('tblcountries');
+								$this->db2->from(db_prefix().'countries');
 								$query2 = $this->db2->get();
 								$cntry = $query2->row();
 								$country = $cntry->country_id;
@@ -1672,9 +1700,19 @@ exit;
 							$insertData['state'] = $val->$state;
 							$insertData['country'] = $country;
 							$insertData['zip'] = $val->$zip;
-							$insertData['query_id'] = $val->QUERY_ID;
+							//$insertData['query_id'] = $val->QUERY_ID;
+							$insertData['query_id'] = $val->UNIQUE_QUERY_ID;
 							$insertData['assigned'] = $assigned;
 							$insertData['source'] = $row['id'];
+							$insertData['teamleader'] = 0;
+							$insertData['status'] = 0;
+							$insertData['pipeline_id'] = 0;
+							$insertData['startdate'] = date('Y-m-d',strtotime($start));
+							$insertData['enddate'] =  date('Y-m-d',strtotime($end));
+							$insertData['currency'] = 0;
+							$insertData['rate'] = 0;
+							$insertData['project_id'] = 0;
+							$insertData['deleted_status'] = 0;
 
 							$insertData['dateadded'] = date('Y-m-d H:i:s');
 							$custFields = array();
@@ -1683,7 +1721,7 @@ exit;
 									$custFields['leads'][$fkey] = $val->$fval;
 								}
 							}
-							// pr($insertData);
+							 //pre($insertData);
 							// pr($custFields);
 
 							$this->db2->insert(db_prefix() . 'leads', $insertData);
@@ -1724,22 +1762,5 @@ exit;
 		}
 	}
 	
-	public function webhook_knowlarity_history()
-	{
-		$post = json_decode(file_get_contents("php://input"), true);
-		if(isset($_GET['printdata'])){
-			$myfile = fopen("knowlarity_callback_log.txt", "r") or die("Unable to open file!");
-			echo fread($myfile,filesize("knowlarity_callback_log.txt"));
-			fclose($myfile);
-		}else{
-			$myfile = fopen("knowlarity_callback_log.txt", "a") or die("Unable to open file!");
-			$txt = json_encode($post)."\n";
-			fwrite($myfile, $txt);
-			fclose($myfile);
-			echo 'callback loged successfully';
-		}
-		
-		return ;
-		$this->knowlarity_model->webhookHandler($post);
-	}
+	
 }

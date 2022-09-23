@@ -377,7 +377,7 @@ function app_init_admin_sidebar_menu_items() {
         //     'href' => admin_url('reports/sales'),
         //     'position' => 5,
         // ]);
-        $CI->app_menu->add_sidebar_children_item('reports', [
+        /* $CI->app_menu->add_sidebar_children_item('reports', [
             'slug' => 'Deals',
             'name' => _l('projects'),
             'href' => admin_url('reports/deals'),
@@ -388,7 +388,7 @@ function app_init_admin_sidebar_menu_items() {
             'name' => _l('tasks'),
             'href' => admin_url('reports/activities'),
             'position' => 6,
-        ]);
+        ]); */
 		$CI->app_menu->add_sidebar_children_item('reports', [
             'slug' => 'add-report',
             'name' => _l('add_report'),

@@ -1594,6 +1594,25 @@ function copyToClipboard(element) {
 var header = document.getElementById("myHeader");
 var sticky = header.offsetTop;
 
+function sync_mail(){
+	document.getElementById('overlay').style.display = ''; 
+	$.ajax({
+			url: BASE_URL+'admin/cronjob/store_local_mails',
+			type: 'POST',
+			data: { },
+			success: function(data) {
+					alert_float('success', 'Mail Fetched Successfully');
+					document.getElementById('overlay').style.display = 'none';
+				}
+			,
+			error: function(data) {
+				document.getElementById('overlay').style.display = 'none';
+			}
+		}
+		);
+	 
+}
+
 function myFunction() {
   if (window.pageYOffset > sticky) {
     header.classList.add("sticky");
@@ -2548,30 +2567,39 @@ $(document).ready(function(){
     $('.'+f+' .data_edit').show();
     });
     $('.data_edit_btn').click(function(e) {
-    var f = $(this).attr("data-val");
-        //   var data = {project_id:<?php echo ($project->id); ?>,f:$('.'+f+' data_edit').val()};
-            var data = {project_id:<?php echo ($project->id); ?>,status:$('#status').val()};
-            data['status'] = $('#status').val();
-            data[f] =$('#'+f).val();
-            $.ajax({
-                type: 'POST',
-                url: admin_url + 'projects/dyfieldupdate',
-                data: data,
-                dataType: 'json',
-                success: function(msg){
-                    if(msg.err) {
-                        alert_float('warning', msg.err);
-                    }
-                    if(msg.message) {
-                        alert_float('success', msg.message);
-                    }
-                $('.'+f+' .data_edit').hide();
-                $('.'+f+' .data_display .updated_text').html(msg.updated_text);
-                $('.'+f+' .data_display').show();
-                location.reload();
-
-                }
-            });
+		var f = $(this).attr("data-val");
+		var data = {project_id:<?php echo ($project->id); ?>,status:$('#status').val()};
+		data['status'] = $('#status').val();
+		data[f] =$('#'+f).val();
+	   field_update(data,f);
+    });
+	function field_update(data,f){
+		$.ajax({
+			type: 'POST',
+			url: admin_url + 'projects/dyfieldupdate',
+			data: data,
+			dataType: 'json',
+			success: function(msg){
+				if(msg.err) {
+					alert_float('warning', msg.err);
+				}
+				if(msg.message) {
+					alert_float('success', msg.message);
+				}
+				$('.'+f+' .data_edit').hide();
+				$('.'+f+' .data_display .updated_text').html(msg.updated_text);
+				$('.'+f+' .data_display').show();
+				setTimeout(function() {
+					location.reload();
+				 }, 1500);
+			}
+		});
+	}
+	$('.data_edit_btn_custom').click(function(e) {
+			var f = $(this).attr("data-val");
+			var f_val = $('#'+f).val();
+            var data = {project_id:<?php echo ($project->id); ?>,slug:f,f_val:f_val,custom_field:'2'};
+			field_update(data,f);
     });
     $('.getcontactsbyorg').click(function(e) {
         //   var data = {project_id:<?php echo ($project->id); ?>,f:$('.'+f+' data_edit').val()};

@@ -1513,7 +1513,7 @@ class Projects_model extends App_Model
         $data = hooks()->apply_filters('before_update_project', $data, $id);
 
         $this->db->where('id', $id);
-        $this->db->update(db_prefix() . 'projects', $data);
+        $this->db->update(db_prefix().'projects', $data);
         //echo $this->db->last_query(); exit;
         if ($this->db->affected_rows() > 0) {
             if (isset($mark_all_tasks_as_completed)) {
@@ -1606,7 +1606,7 @@ class Projects_model extends App_Model
     {
         $this->db->select('status');
         $this->db->where('id', $data['project_id']);
-        $old_status = $this->db->get(db_prefix() . 'projects')->row()->status;
+        $old_status = $this->db->get(db_prefix().'projects')->row()->status;
 
         $progress = $this->getprogressstatus($data['status_id']);
 
@@ -4900,6 +4900,33 @@ public function all_activiites()
 		$cond = array('id'=>$project_id);
 		$upd_data['description'] = $desc['description'];
 		$result = $this->db->update(db_prefix() . 'projects', $upd_data, $cond);
+		return true;
+	}
+	public function update_custom_val($project_id,$slug,$value){
+		$this->db->select('id');
+        $this->db->where('slug', $slug);
+        $customs =  $this->db->get(db_prefix().'customfields')->row();
+		
+		$this->db->select('relid');
+        $this->db->where('relid', $project_id);
+        $this->db->where('fieldid', $customs->id);
+        $this->db->where('fieldto', 'projects');
+        $custom_vals =  $this->db->get(db_prefix().'customfieldsvalues')->row();
+		if(!empty($custom_vals)){
+			$cond = array('relid'=>$project_id,'fieldid'=>$customs->id,'fieldto'=>'projects');
+			$upd_data['value'] = $value;
+			if($customs->type == 'date_picker'){
+				$upd_data['value'] = date('Y-m-d',strtotime($value));
+			}
+			$result = $this->db->update(db_prefix().'customfieldsvalues', $upd_data, $cond);
+		}
+		else{
+			$ins_data['relid']		= $project_id;
+			$ins_data['fieldid']	= $customs->id;
+			$ins_data['fieldto']	= 'projects';
+			$ins_data['value']		= $value;
+			$this->db->insert(db_prefix() . 'customfieldsvalues', $ins_data);
+		}
 		return true;
 	}
 

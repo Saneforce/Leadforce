@@ -4135,3 +4135,10 @@ $lang['upcoming']				= 	'Upcoming';
 $lang['valid_name']				= 	'Please enter valid name';
 $lang['view_report_deal']		= 	'Deal View Report';
 $lang['view_report_activity']	= 	'Activity View Report';
+
+$lang['select_stage']	        =	'Select Stage';
+
+//Mail
+$lang['sync_mail_help_text']    =	"Help text : Once Synced all the Deal's mail will be Fetched";
+$lang['compose_email']			=	"COMPOSE EMAIL";
+$lang['sync_mail']				=	"SYNC MAIL";

@@ -309,7 +309,6 @@
             </td>
          </tr>
 		   <?php }?>
-     
          <?php $custom_fields = get_custom_fields('projects');
          if(count($custom_fields) > 0){ ?>
          <?php foreach($custom_fields as $field){ ?>
@@ -317,7 +316,7 @@
          if($field['type'] =='location'){
             $value ='<iframe src = "https://maps.google.com/maps?q='.$value.'&hl=es;z=14&output=embed"></iframe>'; 
          }
-         if($value == ''){continue;} ?>
+         /* if($value == ''){continue;} */ ?>
          <tr>
             <td class="bold"><?php echo ucfirst($field['name']); ?></td>
             <td class="<?php echo $field['slug'];?>">
@@ -346,7 +345,7 @@
 						case 'date_picker':
 					?>
 							<div class="input-group date">
-								<input type="text" id="<?php echo $field['slug'];?>" name="<?php echo $field['slug'];?>" class="form-control datepicker"  value="<?php echo (isset($value) ? date('d-m-Y',strtotime($value)) : ' '); ?>" autocomplete="off" readonly>
+								<input type="text" id="<?php echo $field['slug'];?>" name="<?php echo $field['slug'];?>" class="form-control datepicker"  value="<?php echo (!empty($value) ? date('d-m-Y',strtotime($value)) : ' '); ?>" autocomplete="off" readonly>
 								<div class="input-group-addon" style="opacity: 1;">
 									<a class=" data_edit_btn_custom" data-val="<?php echo $field['slug'];?>"><i class="fa fa-check"></i></a>
 								</div>
@@ -356,27 +355,37 @@
 						case 'date_range':
 					?>
 							<div class="input-group date">
-								<input type="text" id="<?php echo $field['slug'];?>" name="<?php echo $field['slug'];?>" class="form-control daterangepicker"  value="<?php echo (isset($value) ? date('d-m-Y',strtotime($value)) : ' '); ?>" autocomplete="off" readonly>
+								<input type="text" id="<?php echo $field['slug'];?>" name="<?php echo $field['slug'];?>" class="form-control daterangepicker"  value="<?php echo (!empty($value) ? date('d-m-Y',strtotime($value)) : ' '); ?>" autocomplete="off" readonly>
 								<div class="input-group-addon" style="opacity: 1;">
 									<a class=" data_edit_btn_custom" data-val="<?php echo $field['slug'];?>"><i class="fa fa-check"></i></a>
 								</div>
 							</div>
 					<?php
 							break;
-					case 'date_time_range':
+							case 'date_picker_time':
 					?>
-							<div class="input-group date">
-								<input type="text" id="<?php echo $field['slug'];?>" name="<?php echo $field['slug'];?>" class="form-control datetimerangepicker"  value="<?php echo (isset($value) ? date('d-m-Y',strtotime($value)) : ' '); ?>" autocomplete="off" readonly>
-								<div class="input-group-addon" style="opacity: 1;">
-									<a class=" data_edit_btn_custom" data-val="<?php echo $field['slug'];?>"><i class="fa fa-check"></i></a>
+								<div class="input-group date">
+									<input type="text" id="<?php echo $field['slug'];?>" name="<?php echo $field['slug'];?>" class="form-control datetimepicker"  value="<?php echo (!empty($value) ? date('d-m-Y H:i:s',strtotime($value)) : ' '); ?>" autocomplete="off" readonly>
+									<div class="input-group-addon" style="opacity: 1;">
+										<a class=" data_edit_btn_custom" data-val="<?php echo $field['slug'];?>"><i class="fa fa-check"></i></a>
+									</div>
 								</div>
-							</div>
+					<?php
+							break;
+							case 'date_time_range':
+					?>
+								<div class="input-group date">
+									<input type="text" id="<?php echo $field['slug'];?>" name="<?php echo $field['slug'];?>" class="form-control datetimerangepicker"  value="<?php echo (!empty($value) ? date('d-m-Y',strtotime($value)) : ' '); ?>" autocomplete="off" readonly>
+									<div class="input-group-addon" style="opacity: 1;">
+										<a class=" data_edit_btn_custom" data-val="<?php echo $field['slug'];?>"><i class="fa fa-check"></i></a>
+									</div>
+								</div>
 					<?php
 							break;
 						case 'time_picker':
 					?>
 							<div class="input-group date">
-								<input type="text" id="<?php echo $field['slug'];?>" name="<?php echo $field['slug'];?>" class="form-control daterangepicker"  value="<?php echo (isset($value) ? date('d-m-Y',strtotime($value)) : ' '); ?>" autocomplete="off" readonly>
+								<input type="text" id="<?php echo $field['slug'];?>" name="<?php echo $field['slug'];?>" class="form-control daterangepicker"  value="<?php echo (!empty($value) ? date('d-m-Y',strtotime($value)) : ' '); ?>" autocomplete="off" readonly>
 								<div class="input-group-addon" style="opacity: 1;">
 									<a class=" data_edit_btn_custom" data-val="<?php echo $field['slug'];?>"><i class="fa fa-check"></i></a>
 								</div>
@@ -440,7 +449,6 @@
 										   $cur_vals = explode(',',$value);
 										   if(!empty($cur_vals)){
 											   if(in_array(trim($all_val1),$cur_vals)){
-												   echo $all_val1;
 												   $selected = 'selected="selected"';
 											   }
 										   }

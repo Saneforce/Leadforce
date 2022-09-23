@@ -8,12 +8,15 @@
 	<div class="col-md-12">
 		<div class="col-md-2">
 			<?php if(empty($url1)){?>
-				<a class="btn btn-block btn-primary composebtn" data-toggle="modal" data-target="#compose-modal" onclick="tab_opon_popup()"><i class="fa fa-pencil" ></i>&nbsp;&nbsp;COMPOSE EMAIL</a>
+				<a class="btn btn-block btn-primary composebtn" data-toggle="modal" data-target="#compose-modal" onclick="tab_opon_popup()"><i class="fa fa-pencil" ></i>&nbsp;&nbsp;<?php echo _l('compose_email');?></a>
 			<?php }else{?>
-				<a class="btn btn-block btn-primary composebtn" href="<?php echo $url1;?>"><i class="fa fa-pencil" ></i>&nbsp;&nbsp;COMPOSE EMAIL</a>
+				<a class="btn btn-block btn-primary composebtn" href="<?php echo $url1;?>"><i class="fa fa-pencil" ></i>&nbsp;&nbsp;<?php echo _l('compose_email');?></a>
 			<?php }?>
 		</div>
-		<div class="col-md-10">
+		<div class="col-md-10" >
+			<div class="col-md-2" style="float:right">
+				<a class="btn btn-block btn-primary composebtn" href="javascript:void(0)" onclick="sync_mail()" title="<?php echo _l('sync_mail_help_text');?>"><i class="fa fa-pencil" ></i>&nbsp;&nbsp;<?php echo _l('sync_mail');?></a>
+			</div>
 			<div  class="header" id="myHeader" style="display:none;">
 				<div class="col-md-12" style="background: #fff;">
 					<div class="col-md-2" style="width:auto">
