@@ -803,7 +803,7 @@ function handle_staff_profile_image_upload($staff_id = '')
     }
     if (isset($_FILES['profile_image']['name']) && $_FILES['profile_image']['name'] != '') {
         hooks()->do_action('before_upload_staff_profile_image');
-        $path = get_upload_path_by_type('staff') . $staff_id . '/';
+        $path = get_upload_path_by_type('staff') . $staff_id;
         // Get the temp file path
         $tmpFilePath = $_FILES['profile_image']['tmp_name'];
         // Make sure we have a filepath
@@ -852,7 +852,7 @@ function handle_staff_profile_image_upload($staff_id = '')
                     'profile_image' => $filename,
                 ]);
                 // Remove original image
-                unlink($newFilePath);
+                // unlink($newFilePath);
 
                 return true;
             }

@@ -303,7 +303,11 @@ function staff_profile_image($id, $classes = ['staff-profile-image'], $type = 's
     }
 
     if ($result && $result->profile_image !== null) {
-        $profileImagePath = 'uploads/staff_profile_images/' . $id . '/' . $type . '_' . $result->profile_image;
+        if($type !=null)
+            $profileImagePath = 'uploads/staff_profile_images/' . $id . '/' . $type . '_' . $result->profile_image;
+        else
+            $profileImagePath = 'uploads/staff_profile_images/' . $id . '/' . $result->profile_image;
+
         if (file_exists($profileImagePath)) {
             $profile_image = '<img ' . $_attributes . ' src="' . base_url($profileImagePath) . '" class="' . implode(' ', $classes) . '" />';
         } else {
