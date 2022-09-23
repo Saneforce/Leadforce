@@ -563,6 +563,7 @@ abstract class App_import
                     $required_db_fields [] ='deal_pipeline_stage';
                     break;
                 case 'project_members':
+                case 'project_members[]':
                     $required_db_fields [] ='deal_followers';
                     break;
                 case 'project_cost':
@@ -904,6 +905,7 @@ abstract class App_import
                     $required_db_fields [] ='deal_pipeline_stage';
                     break;
                 case 'project_members':
+                case 'project_members[]':
                     $required_db_fields [] ='deal_followers';
                     break;
                 case 'project_cost':
