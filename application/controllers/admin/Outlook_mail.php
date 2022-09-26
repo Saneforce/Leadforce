@@ -541,7 +541,9 @@ class Outlook_mail extends AdminController
 			$response = runCurl($req_url, $request, $headers);
 			
 			if(!empty($response)){
+				sleep(3);
 				$messages = $this->last_sent_item();
+				
 				if (!empty($attachments)) {
 					$list_attachment = $this->list_attachment($messages['Id']);
 					$source_from2 = array_column($list_attachment, 'Id'); 

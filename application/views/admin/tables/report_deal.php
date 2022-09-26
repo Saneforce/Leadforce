@@ -9,7 +9,7 @@ $aColumns_temp = [
     'id'=>'p.id as id',
     'name'=>'p.name as name',
     'teamleader_name'=>'(SELECT GROUP_CONCAT(CONCAT(firstname, \' \', lastname) SEPARATOR ",") FROM ' . db_prefix() . 'staff WHERE tblstaff.staffid=p.teamleader) as teamleader_name',
-    'contact_name'=>'(SELECT GROUP_CONCAT(CONCAT(firstname, \' \', lastname) SEPARATOR ",") FROM ' . db_prefix() . 'project_contacts JOIN ' . db_prefix() . 'contacts on ' . db_prefix() . 'contacts.id = ' . db_prefix() . 'project_contacts.contacts_id WHERE '.db_prefix() .'project_contacts.project_id=p.id AND '.db_prefix().'project_contacts.is_primary = 1) as contact_name',
+    'contact_name'=>'(SELECT GROUP_CONCAT(CONCAT(firstname, \' \', lastname) SEPARATOR ",") FROM ' . db_prefix() . 'project_contacts JOIN ' . db_prefix() . 'contacts on ' . db_prefix() . 'contacts.id = ' . db_prefix() . 'project_contacts.contacts_id WHERE '.db_prefix() .'project_contacts.project_id=p.id AND '.db_prefix().'project_contacts.is_primary = 1 limit 1) as contact_name',
     'project_cost'=>'project_cost',
     'product_qty'=>'(SELECT sum(quantity) FROM '.db_prefix().'project_products WHERE projectid = p.id) as product_qty',
     'product_count'=>'(SELECT count(quantity) FROM '.db_prefix().'project_products WHERE projectid = p.id) as product_count',
@@ -22,8 +22,8 @@ $aColumns_temp = [
    'status'=> 'p.status as status',
    'project_status'=> 'p.stage_of as project_status',
    'pipeline_id'=> 'pipeline_id',
-   'contact_email1'=>'(SELECT ' . db_prefix() . 'contacts.email FROM ' . db_prefix() . 'project_contacts JOIN ' . db_prefix() . 'contacts on ' . db_prefix() . 'contacts.id = ' . db_prefix() . 'project_contacts.contacts_id WHERE ' . db_prefix() . 'project_contacts.project_id=p.id AND ' . db_prefix() . 'project_contacts.is_primary = 1) as contact_email1',
-   'contact_phone1'=>'(SELECT ' . db_prefix() . 'contacts.phonenumber FROM ' . db_prefix() . 'project_contacts JOIN ' . db_prefix() . 'contacts on ' . db_prefix() . 'contacts.id = ' . db_prefix() . 'project_contacts.contacts_id WHERE ' . db_prefix() . 'project_contacts.project_id=p.id AND ' . db_prefix() . 'project_contacts.is_primary = 1) as contact_phone1',
+   'contact_email1'=>'(SELECT ' . db_prefix() . 'contacts.email FROM ' . db_prefix() . 'project_contacts JOIN ' . db_prefix() . 'contacts on ' . db_prefix() . 'contacts.id = ' . db_prefix() . 'project_contacts.contacts_id WHERE ' . db_prefix() . 'project_contacts.project_id=p.id AND ' . db_prefix() . 'project_contacts.is_primary = 1 limit 1) as contact_email1',
+   'contact_phone1'=>'(SELECT ' . db_prefix() . 'contacts.phonenumber FROM ' . db_prefix() . 'project_contacts JOIN ' . db_prefix() . 'contacts on ' . db_prefix() . 'contacts.id = ' . db_prefix() . 'project_contacts.contacts_id WHERE ' . db_prefix() . 'project_contacts.project_id=p.id AND ' . db_prefix() . 'project_contacts.is_primary = 1 limit 1) as contact_phone1',
     'won_date'=>'stage_on as won_date',
     'lost_date'=>'stage_on as lost_date',
     'loss_reason_name'=>'(SELECT ' . db_prefix() . 'deallossreasons.name FROM ' . db_prefix() . 'deallossreasons  WHERE ' . db_prefix() . 'deallossreasons.id=p.loss_reason) as loss_reason_name',
@@ -199,9 +199,9 @@ $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
     'clientid',
     '(SELECT GROUP_CONCAT(staff_id SEPARATOR ",") FROM ' . db_prefix() . 'project_members WHERE project_id=p.id ORDER BY staff_id) as members_ids'.$idkey,
     'p.teamleader',
-    '(SELECT contacts_id FROM ' . db_prefix() . 'project_contacts WHERE project_id=p.id AND is_primary = 1) as primary_id',
-    '(select email from '.db_prefix().'contacts where id = (SELECT contacts_id FROM ' . db_prefix() . 'project_contacts WHERE project_id=p.id AND is_primary = 1)) as contact_email',
-    '(select phonenumber from '.db_prefix().'contacts where id = (SELECT contacts_id FROM ' . db_prefix() . 'project_contacts WHERE project_id=p.id AND is_primary = 1)) as contact_phone',
+    '(SELECT contacts_id FROM ' . db_prefix() . 'project_contacts WHERE project_id=p.id AND is_primary = 1 limit 1) as primary_id',
+    '(select email from '.db_prefix().'contacts where id = (SELECT contacts_id FROM ' . db_prefix() . 'project_contacts WHERE project_id=p.id AND is_primary = 1 limit 1)) as contact_email',
+    '(select phonenumber from '.db_prefix().'contacts where id = (SELECT contacts_id FROM ' . db_prefix() . 'project_contacts WHERE project_id=p.id AND is_primary = 1 limit 1)) as contact_phone',
 ],$s_group_by);
 $output  = $result['output'];
 $rResult = $result['rResult'];

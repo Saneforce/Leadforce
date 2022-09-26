@@ -1602,6 +1602,7 @@ function sync_mail(){
 			data: { },
 			success: function(data) {
 					alert_float('success', 'Mail Fetched Successfully');
+					location.reload();
 					document.getElementById('overlay').style.display = 'none';
 				}
 			,
