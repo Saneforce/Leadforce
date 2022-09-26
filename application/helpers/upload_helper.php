@@ -1162,6 +1162,6 @@ function get_upload_path_by_type($type)
 
         break;
     }
-
+	$path = str_replace('uploads/',SUB_DOMAIN_NAME.'/uploads/',$path );
     return hooks()->apply_filters('get_upload_path_by_type', $path, $type);
 }
