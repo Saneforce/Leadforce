@@ -378,15 +378,24 @@ class Import_deals extends App_import
     }
 
     public function checkDataToSkip($data) {
+        
         $reason = '';
+        
 		$fields1 = get_option('deal_mandatory');
 		$mandatory_fields = array();
 		if(!empty($fields1) && $fields1 != 'null'){
 			$mandatory_fields = json_decode($fields1);
-		}		
+		}
 		array_unshift($mandatory_fields,"name");
         if(!$data['person_fullname'] && (in_array("project_contacts[]", $mandatory_fields) || in_array("primary_contact", $mandatory_fields) )) {
             $reason = 'Person Name is empty';
+        }
+
+        if(in_array('project_members[]',$mandatory_fields) && (!isset($data['deal_followers']) || strlen(trim($data['deal_followers']))==0)){
+            if($reason){
+                $reason .= ', ';
+            }
+            $reason .= 'Deal followers cannot be empty';
         }
         if($data['person_phonenumber']) {
            
@@ -526,6 +535,15 @@ class Import_deals extends App_import
                 }
             }
             
+        }
+        
+        foreach ($this->getCustomFields() as $field) {
+            if($field['required'] && (!isset($data[$field['slug']]) || strlen(trim($data[$field['slug']]))==0 )){
+                if($reason){
+                    $reason .= ', ';
+                }   
+                $reason .= $field['name'].' is empty.'; 
+            }
         }
 
 		
