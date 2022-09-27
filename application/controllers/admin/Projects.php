@@ -14,6 +14,7 @@ class Projects extends AdminController
         $this->load->model('DealLossReasons_model');
         $this->load->model('callsettings_model');
         $this->load->helper('date');
+        $this->load->helper('upload');
         $this->load->library('user_agent');
     }
 
@@ -1056,7 +1057,7 @@ class Projects extends AdminController
         ]);
         
         $data['pipelines'] = $this->pipeline_model->getPipeline();
-       
+      
         $this->load->view('admin/projects/kanbans', $data);
     }
     public function kanbans()
@@ -1629,6 +1630,7 @@ class Projects extends AdminController
 
     public function upload_file($project_id)
     {
+		
         handle_project_file_uploads($project_id);
     }
 

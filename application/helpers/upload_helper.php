@@ -83,9 +83,9 @@ function handle_newsfeed_post_attachments($postid)
  */
 function handle_project_file_uploads($project_id)
 {
+	
     $filesIDS = [];
     $errors   = [];
-
     if (isset($_FILES['file']['name'])
         && ($_FILES['file']['name'] != '' || is_array($_FILES['file']['name']) && count($_FILES['file']['name']) > 0)) {
         hooks()->do_action('before_upload_project_attachment', $project_id);
@@ -1083,8 +1083,15 @@ function _file_attachments_index_fix($index_name)
 function _maybe_create_upload_path($path)
 {
     if (!file_exists($path)) {
-        mkdir($path, 0755);
-        fopen(rtrim($path, '/') . '/' . 'index.html', 'w');
+		$dirs = explode('/',$path);
+		$temppath = '';
+		foreach($dirs as $dir){
+			$temppath .= $dir.'/';
+			if (!file_exists($temppath)) {
+				mkdir($temppath, 0777);
+				fopen(rtrim($temppath, '/') . '/' . 'index.html', 'w');
+			}
+		}
     }
 }
 
@@ -1162,6 +1169,6 @@ function get_upload_path_by_type($type)
 
         break;
     }
-	$path = str_replace('uploads/',SUB_DOMAIN_NAME.'/uploads/',$path );
+	$path = str_replace('uploads/','uploads/'.SUB_DOMAIN_NAME.'/',$path );
     return hooks()->apply_filters('get_upload_path_by_type', $path, $type);
 }
