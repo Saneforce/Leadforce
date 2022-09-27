@@ -22,6 +22,7 @@ if(!$CI->input->is_ajax_request()){
  */
 app_js_alerts();
 ?>
+<script src="<?php echo base_url('assets/js/call_phone.js'); ?>"></script>
 <?php
 /**
  * Check pusher real time notifications
@@ -681,4 +682,8 @@ $(document).ready(function(){
 	});
 <?php }?>
 </script>
+<input type="hidden" id="call_app_token" value="<?php echo CALL_APP_TOKEN;?>">
+<input type="hidden" id="call_app_id" value="<?php echo CALL_APP_ID;?>">
+<input type="hidden" id="call_app_secret" value="<?php echo CALL_APP_SECRET;?>">
+<input type="hidden" id="call_source_from" value="<?php echo CALL_SOURCE_FROM;?>">
 <?php app_admin_footer(); ?>

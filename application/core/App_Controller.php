@@ -9,7 +9,12 @@ class App_Controller extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-		$call = $this->db->get(db_prefix() . 'call_settings')->row();
+		$this->db->select();
+		$this->db->from(db_prefix() . 'call_settings c');
+		$this->db->join(db_prefix() . 'agents a','c.id = a.ivr_id', 'left');
+		$this->db->where('a.staff_id =', get_staff_user_id());
+		$call = $this->db->get()->row();
+		//$call = $this->db->get(db_prefix() . 'call_settings')->row();
 		
 		define('CALL_SOURCE_FROM', (($call->source_from)?$call->source_from:''));
 		define('CALL_APP_ID', (($call->app_id)?$call->app_id:''));
