@@ -84,7 +84,8 @@
         </td>
         <td data-order="<?php echo $file['file_name']; ?>">
           <a href="#" onclick="view_project_file(<?php echo $file['id']; ?>,<?php echo $file['project_id']; ?>); return false;">
-            <?php if(is_image(PROJECT_ATTACHMENTS_FOLDER .$project->id.'/'.$file['file_name']) || (!empty($file['external']) && !empty($file['thumbnail_link']))){
+            <?php 
+			if(is_image(get_upload_path_by_type('project') .$project->id.'/'.$file['file_name']) || (!empty($file['external']) && !empty($file['thumbnail_link']))){
               echo '<div class="text-left"><i class="fa fa-spinner fa-spin mtop30"></i></div>';
               echo '<img class="project-file-image img-table-loading" src="#" data-orig="'.project_file_url($file,true).'" width="100">';
               echo '</div>';

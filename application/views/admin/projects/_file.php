@@ -35,9 +35,9 @@
                      <br />
                   <?php } ?>
                   <?php
-                     $path = PROJECT_ATTACHMENTS_FOLDER .$file->project_id.'/'.$file->file_name;
+                     $path = get_upload_path_by_type('project') .$file->project_id.'/'.$file->file_name;
                      if(is_image($path)){ ?>
-                  <img src="<?php echo base_url('uploads/projects/'.$file->project_id.'/'.$file->file_name); ?>" class="img img-responsive">
+                  <img src="<?php echo project_file_url((array) $file,true); ?>" class="img img-responsive">
                   <?php } else if(!empty($file->external) && !empty($file->thumbnail_link) && $file->external == 'dropbox'){ ?>
                   <img src="<?php echo optimize_dropbox_thumbnail($file->thumbnail_link); ?>" class="img img-responsive">
                   <?php } else if(strpos($file->filetype,'pdf') !== false && empty($file->external)){ ?>
