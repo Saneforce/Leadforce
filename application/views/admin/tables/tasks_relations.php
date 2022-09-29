@@ -76,6 +76,13 @@ if($rel_type == 'lead' || $rel_type == 'invoice' || $rel_type == 'estimate' || $
     if (count($custom_fields) > 4) {
         @$this->ci->db->query('SET SQL_BIG_SELECTS=1');
     }
+	
+	$where_cond = task_count_cond();
+	if(!empty($where_cond)){
+		$where_cond = str_replace("where","and",$where_cond);
+		array_push($where, $where_cond);
+	}
+	
     
     $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
         'billed',

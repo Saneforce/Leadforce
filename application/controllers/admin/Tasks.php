@@ -62,6 +62,9 @@ class Tasks extends AdminController
         //pr($_REQUEST); exit;
         $this->app->get_table_data('tasks');
     }
+	public function table_summary(){
+		$this->tasks_model->get_task_summary();
+	}
 
     public function kanban()
     {
@@ -532,6 +535,8 @@ class Tasks extends AdminController
         if (!has_permission('tasks', '', 'edit') && !has_permission('tasks', '', 'create')) {
             ajax_access_denied();
         }
+
+        
         // $updateactiv['tasktype'] = 1; 
         // $this->db->where('tasktype', 0);
         // $this->db->update(db_prefix() . 'tasks', $updateactiv);
@@ -549,7 +554,7 @@ class Tasks extends AdminController
         }
 		
 		if(isset($_GET['rel_type']) && !empty($_GET['rel_type']) && $_GET['rel_type'] == 'project_task'){
-			// $_GET['rel_type'] = 'project';
+			//$_GET['rel_type'] = 'project';
 			if(!empty($_GET['rel_id'])){
 				$project_task = $this->tasks_model->get($_GET['rel_id']);
 				$_GET['rel_id'] = $project_task->rel_id;
@@ -564,11 +569,9 @@ class Tasks extends AdminController
         }
         if ($this->input->post()) {
             $data                = $this->input->post();
-
-            if($data['rel_type'] =='contact'){
+			if($data['rel_type'] =='contact'){
                 $data['contacts_id'] =$data['rel_id'];
             }
-            
             $data['description'] = $this->input->post('description', false);
 			
             $validation =$this->tasks_model->validate_task_form_data($data,$id);
@@ -721,6 +724,9 @@ class Tasks extends AdminController
 		if(!empty($fields) && $fields != 'null'){
 			$data['need_fields'] = json_decode($fields);
 		}
+		$this->load->model('payment_modes_model');
+		$this->load->model('settings_model');
+		$data['reminder_settings']   = $this->settings_model->get_reminder_settings(null);
         $this->load->view('admin/tasks/task', $data);
     }
 	

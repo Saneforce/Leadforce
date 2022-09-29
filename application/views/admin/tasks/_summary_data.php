@@ -7,8 +7,9 @@
           <?php echo $summary['name']; ?>
       </a>
       </p>
-      <p class="font-medium-xs no-mbot text-muted">
+      <p class="font-medium-xs no-mbot text-muted" id="me_<?php echo $summary['name']; ?>">
         <?php echo _l('tasks_view_assigned_to_user'); ?>: <?php echo $summary['total_my_tasks']; ?>
       </p>
     </div>
     <?php } ?>
+<input type="hidden" id="assign_me_text" value="<?php echo _l('tasks_view_assigned_to_user'); ?>">

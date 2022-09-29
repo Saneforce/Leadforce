@@ -3015,7 +3015,150 @@ class Tasks_model extends App_Model
                 || $this->staff_has_commented_on_task($staffid, $taskid));
     }
 
-
+	public function get_task_summary($where_cond = ''){
+		$sTable	=	db_prefix().'tasks ';
+		$where = $join  = $wherewo = [];
+        array_push($join, 'LEFT JOIN '.db_prefix().'tasktype  as '.db_prefix().'tasktype ON '.db_prefix().'tasktype.id = ' .db_prefix() . 'tasks.tasktype');
+        array_push($join, 'LEFT JOIN '.db_prefix().'projects  as '.db_prefix().'projects ON '.db_prefix().'projects.id = ' .db_prefix() . 'tasks.rel_id AND ' .db_prefix() . 'tasks.rel_type ="project" ');
+        array_push($join, 'LEFT JOIN '.db_prefix().'projects_status  as '.db_prefix().'projects_status ON '.db_prefix().'projects_status.id = ' .db_prefix() . 'projects.status');
+        array_push($join, 'LEFT JOIN '.db_prefix().'pipeline  as '.db_prefix().'pipeline ON '.db_prefix().'pipeline.id = ' .db_prefix() . 'projects.pipeline_id');
+        array_push($join, 'LEFT JOIN '.db_prefix().'clients  as '.db_prefix().'clients ON '.db_prefix().'clients.userid = ' .db_prefix() . 'projects.clientid');
+		array_push($join, 'LEFT JOIN '.db_prefix().'contacts  as '.db_prefix().'contacts ON ('.db_prefix().'contacts.id = ' .db_prefix() . 'tasks.contacts_id  OR (' .db_prefix() . 'tasks.rel_type ="contact" AND '.db_prefix().'contacts.id = ' .db_prefix() . 'tasks.rel_id) )');
+		$my_staffids = $this->staff_model->get_my_staffids();
+        
+		if($my_staffids){
+			array_push($where, ' AND ('.db_prefix().'tasks.id in (select taskid from '.db_prefix().'task_assigned where staffid in ('.implode(',',$my_staffids).')) OR '. db_prefix().'tasks.rel_id IN (SELECT '.db_prefix().'projects.id FROM '.db_prefix(). 'projects join '.db_prefix().'project_members  on '.db_prefix().'project_members.project_id = '.db_prefix().'projects.id WHERE '.db_prefix(). 'project_members.staff_id in ('.implode(',',$my_staffids).')) OR  '.db_prefix(). 'projects.teamleader in ('.implode(',',$my_staffids).') )');
+		}
+		if(!empty($where_cond)){
+			array_push($where, $where_cond);
+		}
+		$custom_fields = get_table_custom_fields('tasks');
+        $customFieldsColumns= $locationCustomFields = $cus = [];
+        foreach ($custom_fields as $key => $field) {
+            $fieldtois= 'clients.userid';
+            if($field['fieldto'] =='projects'){
+                $fieldtois= 'projects.id';
+            }elseif($field['fieldto'] =='contacts'){
+                $fieldtois= 'contacts.id';
+            }
+            elseif($field['fieldto'] =='tasks'){
+                $fieldtois= 'tasks.id';
+            }
+            if(isset($tasks_list_column_order[$field['slug']])){
+                if($field['type'] =='location'){
+                    array_push($locationCustomFields, 'cvalue_' .$field['slug']);
+                }
+                $selectAs = 'cvalue_' .$field['slug'];
+                array_push($customFieldsColumns, $selectAs);
+                $cus[$field['slug']] =  'ctable_'.$key.'.value as '.$selectAs;
+                array_push($join, 'LEFT JOIN '.db_prefix().'customfieldsvalues as ctable_' . $key.' ON '.db_prefix().$fieldtois.' = ctable_'.$key.'.relid AND ctable_' . $key.'.fieldto="'.$field['fieldto'].'" AND ctable_'.$key.'.fieldid='.$field['id']);
+            }
+        }
+		$join = implode(' ', $join);
+		$sWhere = '';
+		if(!empty($where)){
+			$where = implode(' ', $where);
+			$where = trim($where);
+			if (startsWith($where, 'AND') || startsWith($where, 'OR')) {
+				if (startsWith($where, 'OR')) {
+					$where = substr($where, 2);
+				} else {
+					$where = substr($where, 3);
+				}
+				
+				$sWhere = 'WHERE ' . $where;
+					
+			}
+		}
+		$where_cond = '';
+		if(!empty($_REQUEST['cur_val']) && $_REQUEST['cur_val']=='today_tasks'){
+			$req_cond = (!empty($sWhere))?" and ":" where ";
+			$sWhere .= $req_cond.db_prefix()."tasks.dateadded like '%".date('Y-m-d')."%' ";
+		}
+		if(!empty($_REQUEST['cur_val']) && $_REQUEST['cur_val']=='tomorrow_tasks'){
+			$tomorrow = date("Y-m-d", strtotime("+1 day"));
+			$req_cond = (!empty($sWhere))?" and ":" where ";
+			$sWhere  .= $req_cond.db_prefix()."tasks.dateadded like '%".$tomorrow."%' ";
+		}
+		if(!empty($_REQUEST['cur_val']) && $_REQUEST['cur_val']=='yesterday_tasks'){
+			$yesterday= date("Y-m-d", strtotime("-1 day"));
+			$req_cond = (!empty($sWhere))?" and ":" where ";
+			$sWhere  .= $req_cond.db_prefix()."tasks.dateadded like '%".$yesterday."%' ";
+		}
+		if(!empty($_REQUEST['cur_val']) && $_REQUEST['cur_val']=='thisweek_tasks'){
+			$week_start = date('Y-m-d',strtotime('sunday this week')).' 00:00:00';
+			$week_end = date('Y-m-d',strtotime('saturday this week')).' 23:59:59';
+			$req_cond = (!empty($sWhere))?" and ":" where ";
+			$sWhere  .= $req_cond.db_prefix()."tasks.dateadded >= '".$week_start."' and ".db_prefix()."tasks.dateadded >= '".$week_end."' ";
+		}
+		if(!empty($_REQUEST['cur_val']) && $_REQUEST['cur_val']=='lastweek_tasks'){
+			$week_start = date('Y-m-d',strtotime('sunday this week',strtotime("-1 week +1 day"))).' 00:00:00';
+			$week_end = date('Y-m-d',strtotime('saturday this week',strtotime("-1 week +1 day"))).' 23:59:59';
+			$req_cond = (!empty($sWhere))?" and ":" where ";
+			$sWhere  .= $req_cond.db_prefix()."tasks.dateadded >= '".$week_start."' and ".db_prefix()."tasks.dateadded >= '".$week_end."' ";
+		} 
+		if(!empty($_REQUEST['cur_val']) && $_REQUEST['cur_val']=='nextweek_tasks'){
+			$week_start = date('Y-m-d',strtotime('sunday this week',strtotime("+1 week +1 day"))).' 00:00:00';
+			$week_end = date('Y-m-d',strtotime('saturday this week',strtotime("+1 week +1 day"))).' 23:59:59';
+			$req_cond = (!empty($sWhere))?" and ":" where ";
+			$sWhere  .= $req_cond.db_prefix()."tasks.dateadded >= '".$week_start."' and ".db_prefix()."tasks.dateadded >= '".$week_end."' ";
+		}
+		if(!empty($_REQUEST['cur_val']) && $_REQUEST['cur_val']=='thismonth_tasks'){
+			$req_cond = (!empty($sWhere))?" and ":" where ";
+			$sWhere  .= $req_cond." month(".db_prefix()."tasks.dateadded) = '".date('m')."' and year(".db_prefix()."tasks.dateadded) = '".date('Y')."' ";
+		}
+		if(!empty($_REQUEST['cur_val']) && $_REQUEST['cur_val']=='lastmonth_tasks'){
+			$month = date('m',strtotime('last month'));
+			$year  = date('Y',strtotime('last month'));
+			$req_cond = (!empty($sWhere))?" and ":" where ";
+			$sWhere  .= $req_cond." month(".db_prefix()."tasks.dateadded) = '".$month."' and year(".db_prefix()."tasks.dateadded) = '".$year."' ";
+		}
+		if(!empty($_REQUEST['cur_val']) && $_REQUEST['cur_val']=='nextmonth_tasks'){
+			$date = date('01-m-Y');
+			$month = date("m", strtotime ('+1 month',strtotime($date)));
+			$year = date("Y", strtotime ('+1 month',strtotime($date)));
+			$req_cond = (!empty($sWhere))?" and ":" where ";
+			$sWhere  .= $req_cond." month(".db_prefix()."tasks.dateadded) = '".$month."' and year(".db_prefix()."tasks.dateadded) = '".$year."' ";
+		}  
+		if(!empty($_REQUEST['cur_val']) && $_REQUEST['cur_val']=='custom_tasks'){
+			$month_start = date('Y-m-d',strtotime($_REQUEST['period_from'])).' 00:00:00';
+			$month_end   = date('Y-m-d',strtotime($_REQUEST['period_to'])).' 23:59:59';
+			$req_cond = (!empty($sWhere))?" and ":" where ";
+			$sWhere  .= $req_cond.db_prefix()."tasks.dateadded >= '".$month_start."' and ".db_prefix()."tasks.dateadded <= '".$month_end."' ";
+		}
+		if(!empty($_REQUEST['cur_val']) && $_REQUEST['cur_val']=='upcoming_tasks'){
+			$req_cond = (!empty($sWhere))?" and ":" where ";
+			$sWhere  .= $req_cond.db_prefix()."tasks.status = '1' ";
+		}
+		if(!empty($_REQUEST['cur_val']) && $_REQUEST['cur_val']=='my_tasks'){
+			$req_cond = (!empty($sWhere))?" and ":" where ";
+			$sWhere  .= $req_cond.db_prefix()."tasks.id IN(SELECT taskid FROM ".db_prefix(). "task_assigned WHERE staffid=".get_staff_user_id().") ";
+		}
+		if(!empty($_REQUEST['task_type']) ){
+			$_REQUEST['task_type'] = trim($_REQUEST['task_type'],",");
+			$req_cond = (!empty($sWhere))?" and ":" where ";
+			$sWhere  .= $req_cond.db_prefix()."tasks.tasktype IN(".$_REQUEST['task_type'].") ";
+		}
+		if(!empty($_REQUEST['task_assign']) ){
+			$_REQUEST['task_assign'] = trim($_REQUEST['task_assign'],",");
+			$req_cond = (!empty($sWhere))?" and ":" where ";
+			$sWhere  .= $req_cond.db_prefix()."tasks.id IN(select taskid from ".db_prefix()."task_assigned where staffid IN(".$_REQUEST['task_assign'].")) ";
+		}
+		if(!empty($_REQUEST['task_project']) ){
+			$req_cond = (!empty($sWhere))?" and ":" where ";
+			$sWhere  .= $req_cond.db_prefix()."tasks.rel_id = '".$_REQUEST['task_project']."' and rel_type = 'project' ";
+		}
+		$cur_staff_id = get_staff_user_id();
+		$fields = "COUNT(DISTINCT IF(".db_prefix()."tasks.status = '1',".db_prefix(). "tasks.id,NULL)) AS upcoming,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '2',".db_prefix(). "tasks.id,NULL)) AS overdue,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '3',".db_prefix(). "tasks.id,NULL)) AS today,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '4',".db_prefix(). "tasks.id,NULL)) AS in_progress,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '5',".db_prefix(). "tasks.id,NULL)) AS completed,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '2' and ".db_prefix(). "tasks.id in(select taskid from ".db_prefix()."task_assigned where staffid = '".$cur_staff_id."'),".db_prefix(). "tasks.id,NULL)) AS overdue_me,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '1' and ".db_prefix(). "tasks.id in(select taskid from ".db_prefix()."task_assigned where staffid = '".$cur_staff_id."'),".db_prefix(). "tasks.id,NULL)) AS upcoming_me,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '3' and ".db_prefix(). "tasks.id in(select taskid from ".db_prefix()."task_assigned where staffid = '".$cur_staff_id."'),".db_prefix(). "tasks.id,NULL)) AS today_me,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '4' and ".db_prefix(). "tasks.id in(select taskid from ".db_prefix()."task_assigned where staffid = '".$cur_staff_id."'),".db_prefix(). "tasks.id,NULL)) AS in_progress_me,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '5' and ".db_prefix(). "tasks.id in(select taskid from ".db_prefix()."task_assigned where staffid = '".$cur_staff_id."'),".db_prefix(). "tasks.id,NULL)) AS completed_me";
+		
+		$taskQry = "SELECT ".$fields." FROM ".$sTable.$join.$sWhere;
+		$rResult = $this->db->query($taskQry)->result_array();
+		$output = array();
+		if(!empty($rResult)){
+			$output = $rResult[0];
+		}
+		echo json_encode($output);
+	}
     public function get_tasks_list($api =false,$where_cond = '')
     {
 

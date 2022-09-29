@@ -84,10 +84,8 @@
 "status"=>array("ins"=>"status","ll"=>"task_status"),
 "tasktype"=>array("ins"=>"tasktype","ll"=>"tasktype"),
 "description"=>array("ins"=>"description","ll"=>"description"),
-"startdate"=>array("ins"=>"startdate","ll"=>"scheduled_date"),
-"dateadded"=>array("ins"=>"dateadded","ll"=>"create_date"),
-"datemodified"=>array("ins"=>"datemodified","ll"=>"modified_date"),
-"datefinished"=>array("ins"=>"datefinished","ll"=>"finished_date"),
+"startdate"=>array("ins"=>"startdate","ll"=>"create_date"),
+"dateadded"=>array("ins"=>"dateadded","ll"=>"dateadded"),
 "assignees"=>array("ins"=>"assignees","ll"=>"task_assigned"),
 "tags"=>array("ins"=>"tags","ll"=>"tags"),
 "priority"=>array("ins"=>"priority","ll"=>"tasks_list_priority"),
@@ -250,7 +248,7 @@ echo form_input($form_hidden_var);
     <?php } ?>
     <?php if(has_permission('tasks','','view')){ ?>
 	
-	    <?php if(count($tasks_filter_tasktype)){ ?>
+	    <?php if(count($tasks_filter_tasktype) && ((empty($_REQUEST['group']) || $_REQUEST['group'] != 'project_tasks_bycall') )){ ?>
     <div class="clearfix"></div>
     <li class="divider"></li>
     <li class="dropdown-submenu pull-left">
@@ -264,8 +262,6 @@ echo form_input($form_hidden_var);
     </ul>
 </li>
 <?php } ?>
-
-	
     <?php if(count($tasks_filter_assignees)){ ?>
     <div class="clearfix"></div>
     <li class="divider"></li>
@@ -372,12 +368,9 @@ echo form_input($form_hidden_var);
         </a>
             </div>
         </div>
-        
     </li>
-    
 </ul>
 </div>
-
 <style>
 .period{
     padding: 0px 0px 0 20px;

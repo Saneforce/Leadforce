@@ -1,6 +1,13 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <!-- Project Tasks -->
 <?php
+	echo form_hidden('req_task_type');
+	echo form_hidden('req_task_assign');
+	$form_hidden_var = array();
+    $form_hidden_var['id'] =  $form_hidden_var['name'] = 'task_project';
+    $form_hidden_var['value'] =$project->id;
+    $form_hidden_var['type'] = 'hidden';
+	echo form_input($form_hidden_var);
     if($project->settings->hide_tasks_on_main_tasks_table == '1') {
         echo '<i class="fa fa-exclamation fa-2x pull-left" data-toggle="tooltip" data-title="'._l('project_hide_tasks_settings_info').'"></i>';
     }

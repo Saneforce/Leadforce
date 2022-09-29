@@ -36,9 +36,90 @@ foreach ($custom_fields as $key => $field) {
         array_push($customFieldsColumns, $selectAs);
     }
 }
+$where_cond = '';
+if(!empty($_REQUEST['today_tasks'])){
+	$where_cond = " where ".db_prefix()."tasks.dateadded like '%".date('Y-m-d')."%' ";
+}
+if(!empty($_REQUEST['tomorrow_tasks'])){
+	$tomorrow = date("Y-m-d", strtotime("+1 day"));
+	$where_cond = " where ".db_prefix()."tasks.dateadded like '%".$tomorrow."%' ";
+}
+if(!empty($_REQUEST['yesterday_tasks'])){
+	$yesterday = date("Y-m-d", strtotime("-1 day"));
+	$where_cond = " where ".db_prefix()."tasks.dateadded like '%".$yesterday."%' ";
+}
+if(!empty($_REQUEST['thisweek_tasks'])){
+	$week_start = date('Y-m-d',strtotime('sunday this week')).' 00:00:00';
+	$week_end = date('Y-m-d',strtotime('saturday this week')).' 23:59:59';
+	$where_cond = " where ".db_prefix()."tasks.dateadded >= '".$week_start."' and ".db_prefix()."tasks.dateadded >= '".$week_end."' ";
+}
+if(!empty($_REQUEST['lastweek_tasks'])){
+	$week_start = date('Y-m-d',strtotime('sunday this week',strtotime("-1 week +1 day"))).' 00:00:00';
+	$week_end = date('Y-m-d',strtotime('saturday this week',strtotime("-1 week +1 day"))).' 23:59:59';
+	$where_cond = " where ".db_prefix()."tasks.dateadded >= '".$week_start."' and ".db_prefix()."tasks.dateadded >= '".$week_end."' ";
+} 
+if(!empty($_REQUEST['nextweek_tasks'])){
+	$week_start = date('Y-m-d',strtotime('sunday this week',strtotime("+1 week +1 day"))).' 00:00:00';
+	$week_end = date('Y-m-d',strtotime('saturday this week',strtotime("+1 week +1 day"))).' 23:59:59';
+	$where_cond = " where ".db_prefix()."tasks.dateadded >= '".$week_start."' and ".db_prefix()."tasks.dateadded >= '".$week_end."' ";
+}
+if(!empty($_REQUEST['thismonth_tasks'])){
+	$where_cond = " where month(".db_prefix()."tasks.dateadded) = '".date('m')."' and year(".db_prefix()."tasks.dateadded) = '".date('Y')."' ";
+}
+if(!empty($_REQUEST['lastmonth_tasks'])){
+	$month = date('m',strtotime('last month'));
+	$year  = date('Y',strtotime('last month'));
+	$where_cond = " where month(".db_prefix()."tasks.dateadded) = '".$month."' and year(".db_prefix()."tasks.dateadded) = '".$year."' ";
+}
+if(!empty($_REQUEST['nextmonth_tasks'])){
+	$date = date('01-m-Y');
+	$month = date("m", strtotime ('+1 month',strtotime($date)));
+	$year = date("Y", strtotime ('+1 month',strtotime($date)));
+	$where_cond = " where  month(".db_prefix()."tasks.dateadded) = '".$month."' and year(".db_prefix()."tasks.dateadded) = '".$year."' ";
+}  
+if(!empty($_REQUEST['custom_tasks'])){
+	$month_start = date('Y-m-d',strtotime($_REQUEST['custom_date_start_tasks'])).' 00:00:00';
+	$month_end   = date('Y-m-d',strtotime($_REQUEST['custom_date_end_tasks'])).' 23:59:59';
+	$where_cond = " where ".db_prefix()."tasks.dateadded >= '".$month_start."' and ".db_prefix()."tasks.dateadded <= '".$month_end."' ";
+}
+if(!empty($_REQUEST['upcoming_tasks'])){
+	$where_cond = " where ".db_prefix()."tasks.status = '1' ";
+}
+$fields = "id,name";
+$cond	= array('status'=>'Active');
+$CI->db->select($fields);
+$CI->db->from(db_prefix()."tasktype");
+$CI->db->where($cond); 
+$query = $CI->db->get();
+$types = $query->result_array();
+if(!empty($types)){
+	$i = 0;
+	$req_where = '';
+	foreach($types as $type1){
+		if(!empty($_REQUEST['task_tasktype_'.$type1['id']])){
+			if(empty($where_cond)){
+				 $req_where =  1;
+				$where_cond =" where ( ".db_prefix()."tasks.tasktype = (select id from ".db_prefix()."tasktype where name='".$type1['name']."' and status ='Active') ";
+			}
+			else{
+				if(empty($req_where)){
+					$req_where = 1;
+					$where_cond .= " and ( ".db_prefix()."tasks.tasktype = (select id from ".db_prefix()."tasktype where name='".$type1['name']."' and status ='Active') ";
+				}
+				else{
+					$req_where = 1;
+					$where_cond .= " or ".db_prefix()."tasks.tasktype = (select id from ".db_prefix()."tasktype where name='".$type1['name']."' and status ='Active') ";
+				}
+			}
+			$i++;
+		}
+	}
+	if(!empty($req_where)){
+		$where_cond .= " )";
+	}
+}
+$result =$CI->tasks_model->get_tasks_list(false,$where_cond);
 
-
-$result =$CI->tasks_model->get_tasks_list();
 $output  = $result['output'];
 $rResult = $result['rResult'];
 $allow_to_call = $this->ci->callsettings_model->accessToCall();

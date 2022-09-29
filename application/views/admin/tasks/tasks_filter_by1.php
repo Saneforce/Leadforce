@@ -34,6 +34,7 @@
 
     /* Related task filter - used in customer profile */
     echo form_hidden('tasks_related_to');
+    echo form_hidden('task_project');
 
     if(has_permission('tasks','','view')){
         foreach($tasks_filter_assignees as $tf_assignee){
@@ -44,6 +45,7 @@
         foreach($tasks_filter_tasktype as $tf_tasktype){
             echo form_hidden('task_tasktype_'.$tf_tasktype['id']);
         }
+		echo form_hidden('req_task_type');
     }
     foreach($task_statuses as $status){
         $val = 'true';
@@ -52,6 +54,7 @@
         }
         echo form_hidden('task_status_'.$status['id'],$val);
     }
+	echo form_hidden('req_task_assign');
     ?>
 </div>
 
@@ -331,7 +334,7 @@ echo form_input($form_hidden_var);
         </a>
     </li>
     <li class="filter-group" data-filter-group="group-date">
-        <a href="#" data-cview="thismonth_tasks" onclick="dt_custom_view('thismonth_tasks','<?php echo $view_table_name; ?>','thismonth_tasks'); return false;">
+        <a href="#" data-cview="thismonth_tasks"  onclick="dt_custom_view('thismonth_tasks','<?php echo $view_table_name; ?>','thismonth_tasks'); ">
             <?php echo _l('thismonth_tasks'); ?>
         </a>
     </li>
@@ -374,18 +377,14 @@ echo form_input($form_hidden_var);
         </a>
             </div>
         </div>
-        
     </li>
-    
 </ul>
 </div>
-
 <style>
 .period{
     padding: 0px 0px 0 20px;
-margin: 0 -20px 0 10px;
+	margin: 0 -20px 0 10px;
 }
-
 .period .datepicker{
     padding: 6px;
 }
