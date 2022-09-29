@@ -12,7 +12,7 @@
     
 
 <hr class="hr-panel-heading">
-<h4 class="mbot15">Files</h2>
+<?php /*<h4 class="mbot15">Files</h2>
 <a href="#" data-toggle="modal" data-target="#project_files_bulk_actions" class="bulk-actions-btn table-btn hide" data-table=".table-project-files">
   <?php echo _l('bulk_actions'); ?>
 </a>
@@ -106,7 +106,7 @@
      </tbody>
    </table>
    <div id="project_file_data"></div>
-   <?php include_once(APPPATH . 'views/admin/clients/modals/send_file_modal.php'); ?>
+   <?php include_once(APPPATH . 'views/admin/clients/modals/send_file_modal.php'); */?>
 
 
 
