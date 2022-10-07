@@ -2866,5 +2866,5 @@ function task_count_cond(){
 			$where_cond .= " )";
 		}
 	}
-	echo $where_cond;
+	return $where_cond;
 }

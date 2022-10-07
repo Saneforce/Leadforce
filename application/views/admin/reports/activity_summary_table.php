@@ -55,7 +55,15 @@
 										}
 										else if(_l($colarr[$ckey]['ll']) !='Status'){
 											 if(isset($row_1[$ckey]) || $row_1[$ckey]!=''){
-												 echo $row_1[$ckey];
+												if($row_1[$ckey] == 'project'){
+													echo _l('deal');
+												}
+												else if($row_1[$ckey] == 'customer') {
+													echo  _l('client');
+												}
+												else{
+													echo $row_1[$ckey];
+												}
 											 }
 											 else if(isset($row_1['cvalue_'.$ckey]) || $row_1['cvalue_'.$ckey]!=''){
 												 echo $row_1['cvalue_'.$ckey];

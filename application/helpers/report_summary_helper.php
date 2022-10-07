@@ -152,7 +152,6 @@ function summary_val($tables,$fields,$qry_cond,$measure,$view_by,$cur_rows,$filt
 			$tables = $tables.','.db_prefix()."project_products pp ";
 			$deal_vals = get_deal_vals($req_fields,$fields,$tables,$qry_cond,$filters);
 			$data = get_sumary_product_vals($deal_vals,$view_by,$cur_rows);
-			
 		}
 		else if($measure == 'Deal Value'){
 			$req_fields = "*,sum(p.project_cost) as tot_val,sum(IF(p.stage_of = '1',p.project_cost,NULL)) AS own_price,sum(IF(p.stage_of = '0',p.project_cost,NULL)) AS open_price";
@@ -221,7 +220,7 @@ function get_flters($req_filters,$check_data=''){
 				if(!empty($deal_vals)){
 					$cur_cond = $deal_vals[0]['filter_cond'];
 					$cur_cond = str_replace('db_prefix()', db_prefix(), $cur_cond);
-					if(($filters1[$i1]=='is' || $filters1[$i1]=='is_more_than' || $filters1[$i1]=='is_less_than') && $deal_vals[0]['date_field'] ==0){
+					if(($filters1[$i1]=='is' || $filters1[$i1]=='is_more_than' || $filters1[$i1]=='is_less_than' || $filters1[$i1]=='is_not') && $deal_vals[0]['date_field'] ==0){
 						if($check_cond){
 							$cur_cond = str_replace('$$cond1', "'".$filters2[$i1]."'", $cur_cond);
 						}
@@ -429,8 +428,8 @@ function get_sumary_product_vals($deal_vals,$view_by,$cur_rows){
 			$tot_val =  $deal_val1['own_price'] + $deal_val1['open_price'];
 			$tot_val =  $deal_val1['own_price'] + $deal_val1['open_price'];
 			$all_tot =  $all_tot + $deal_val1['own_price'] + $deal_val1['open_price'];
-			$tot_cnt =	$tot_cnt + $deal_val1['own_count'] + $deal_val1['open_count'];
-			$data[$i]= get_counts($deal_val1['own_price'],$deal_val1['open_price'],0,$tot_val,$view_by,$cur_rows,$deal_val1,1);
+			$tot_cnt =	$tot_cnt + $deal_val1['own_count'] + $deal_val1['open_count'] + $deal_val1['lost_count'];
+			$data[$i]= get_counts($deal_val1['own_price'],$deal_val1['open_price'],0,$tot_val,$view_by,$cur_rows,$deal_val1,'');
 			$tot_avg =	$tot_avg + get_decimal($data[$i]['avg_deal']);
 			$i++;
 		}
@@ -574,10 +573,7 @@ function check_year_week($view_by){
 					if($num_month >= $start_days && $num_month <= $end_days){
 						$start_date	= date('Y-m-d',strtotime($w_start_date.'-'.$key.'-'.$cur_year));
 						$end_date   = date('Y-m-d',strtotime($req_month.'-'.$key.'-'.$cur_year));
-						if($view_by == 'start_date' || $view_by == 'project_deadline' || $view_by == 'won_date' || $view_by == 'lost_date' || $view_by == 'project_created' || $view_by == 'project_modified'){
-							$qry_cond   .= " and ".$view_by." >= '".$start_date."'";
-						}
-						else if($view_by == 'startdate' || $view_by == 'dateadded' || $view_by == 'datemodified' || $view_by == 'datefinished' ){
+						if(check_activity_date($view_by)){
 							$qry_cond   .= " and ".$view_by." >= '".$start_date."'";
 						}
 						else{
@@ -601,11 +597,7 @@ function check_year_week($view_by){
 						$w_end_date		= $req_end_days;
 						$start_date     = date('Y-m-d',strtotime($w_start_date.'-'.$months[$req_key+1].'-'.$cur_year));
 						$end_date	    = date('Y-m-d',strtotime($req_end_days.'-'.$months[$req_key+1].'-'.$cur_year));
-						if($view_by == 'start_date' || $view_by == 'project_deadline' || $view_by == 'won_date' || $view_by == 'lost_date' || $view_by == 'project_created' || $view_by == 'project_modified'){
-									
-							$qry_cond 	 .= "  and ".$view_by." <= '".$end_date."'";
-						}
-						else if($view_by == 'startdate' || $view_by == 'dateadded' || $view_by == 'datemodified' || $view_by == 'datefinished' ){
+						if(check_activity_date($view_by)){
 									
 							$qry_cond 	 .= "  and ".$view_by." <= '".$end_date."'";
 						}else{
@@ -632,7 +624,7 @@ function check_year_week($view_by){
 						if($num_month >= $start_days){
 							$start_date  = date('Y-m-d',strtotime($w_start_date.'-'.$key.'-'.$cur_year));
 							$end_date	 = date('Y-m-d',strtotime($w_end_date.'-'.$key.'-'.$cur_year));
-						if($view_by == 'start_date' || $view_by == 'project_deadline' || $view_by == 'won_date' || $view_by == 'lost_date' || $view_by == 'project_created' || $view_by == 'project_modified' || $view_by == 'startdate' || $view_by == 'dateadded' || $view_by == 'datemodified' || $view_by == 'datefinished'){
+						if(check_activity_date($view_by)){
 								$qry_cond 	 .= " and ".$view_by." >= '".$start_date."' and ".$view_by." <= '".$end_date."'";
 							}
 							else{
@@ -924,9 +916,15 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 			if(!empty($ids)){
 				$cond2 = " and relid in($ids)";
 			}
-			$sql = " select relid from ".db_prefix()."customfieldsvalues where fieldid = '".$sum_id.$cond2."' ";
-			$query = $CI->db->query($sql);
-			$results = $query->result_array();
+			if(!empty($sum_id)){
+				$cond2 .= " and value = '".$crow."' ";
+				$sql = " select relid from ".db_prefix()."customfieldsvalues where fieldid = '".$sum_id."' ".$cond2." ";
+				$query = $CI->db->query($sql);
+				$results = $query->result_array();
+			}
+			else{
+				$results = get_custom_res($view_by,$view_type,$date_range,$crow,$cond2);
+			}
 			$projects = array();
 			if(!empty($results)){
 				$i = 0;
@@ -935,6 +933,9 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 					$i++;
 				}
 				$where_in[db_prefix().'projects.id']   =  $projects;
+			}
+			else{
+				$where[db_prefix().'projects.id']  =  '';
 			}
 			break;
 	}
@@ -961,7 +962,7 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 			$where[db_prefix().'projects.id']   =  '0';
 		}
 	}
-	if($view_type == 'date' && ($view_by == 'start_date' || $view_by == 'project_deadline' || $view_by == 'won_date' || $view_by == 'lost_date' || $view_by == 'project_created' || $view_by == 'project_modified')){
+	if($view_type == 'date' && (check_activity_date($view_by))){
 		if($date_range == 'Monthly'){
 			$where['month('.db_prefix().'projects.'.$req_view_by.')']  =  $crow;
 		}
@@ -1260,4 +1261,51 @@ function get_stage_report(){
 		$all_status = $CI->projects_model->get_project_statuses();
 	}
 	return $all_status;
+}
+function check_activity_date($cur_filter){
+	if($cur_filter == 'startdate' || $cur_filter == 'dateadded' || $cur_filter == 'datemodified' || $cur_filter == 'datefinished'){
+		return true;
+	}
+	else if($cur_filter == 'project_start_date' || $cur_filter == 'project_deadline' || $cur_filter == 'won_date' || $cur_filter == 'lost_date' || $cur_filter == 'project_created' || $cur_filter == 'project_modified'){
+		return true;
+	}
+	else if($cur_filter == 'date_picker' || $cur_filter == 'date_picker_time' || $cur_filter == 'date_range'){
+		return true;
+	}
+	return false;
+}
+function get_custom_res($view_by,$view_type,$date_range,$crow,$cond2){
+	$CI		= & get_instance();
+	$sql1 = " select id from ".db_prefix()."customfields where slug = '".$view_by."' ";
+	$query1 = $CI->db->query($sql1);
+	$results1 = $query1->result_array();
+	if(!empty($results1)){
+		if($view_type == 'date'){
+			if($date_range == 'Monthly'){
+				$cond2	.=  " and month(value) = '".$crow."'";
+			}
+			$cond2	.=  " and year(value) = '".date('Y')."'";
+			if($date_range == 'Quarterly'){
+				if (str_contains($crow, 'Q1')) {
+					$cond2	.=  " and month(value) in(1,2,3)";
+				}
+				else if (str_contains($crow, 'Q2')) {
+					$cond2	.=  " and month(value) in(4,5,6)";
+				}
+				else if (str_contains($crow, 'Q3')) {
+					$cond2	.=  " and month(value) in(7,8,9)";
+				}
+				else if (str_contains($crow, 'Q4')) {
+					$cond2	.=  " and month(value) in(10,11,12)";
+				}
+			}
+		}
+		$sql = " select relid from ".db_prefix()."customfieldsvalues where fieldid = '".$results1[0]['id']."' ".$cond2." ";
+		$query = $CI->db->query($sql);
+		$results = $query->result_array();
+	}
+	else{
+		$results = array();
+	}
+	return $results;
 }

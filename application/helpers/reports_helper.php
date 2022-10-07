@@ -6,6 +6,33 @@ defined('BASEPATH') or exit('No direct script access allowed');
  * @param  mixed $id
  * @return string
  */
+function get_default_val($cur_val,$req_val,$type1){
+	$CI		= & get_instance();
+	$fields =  $CI->db->query("SELECT type,options FROM " . db_prefix() . "customfields where slug = '".$cur_val."' ")->row();
+	if($fields->type == 'date_picker' || $fields->type == 'date_picker_time' || $fields->type == 'date_range'){
+		$req_out = get_req_val($req_val,'date','','','','',$type1);
+	}
+	else if($fields->type == 'select' || $fields->type=='multiselect'){
+		$req_array = array();
+		if (str_contains($fields->options, ',')) { 
+			$options = explode(',',$fields->options);
+			foreach($options as $option1){
+				$req_array[$option1] = $option1;
+			}
+		}
+		else{
+			$req_array[$fields->options] = $fields->options;
+		}
+		$req_out = get_req_val($req_val,'select','','','key',$req_array,$type1);
+	}
+	else if($fields->type == 'number'){
+		$req_out = get_req_val($req_val,'number','','','','',$type1);
+	}
+	else{
+		$req_out = get_req_val($req_val,'text','','','','',$type1);
+	}
+	return $req_out;
+}
 function get_req_val($req_val,$sel_val,$s_val,$d_val,$key,$all_val,$out_type){
 	$CI		= & get_instance();
 	$cur_id12 = '';
@@ -236,7 +263,7 @@ function get_activity_filters($req_filters,$check_data=''){
 				if(!empty($activity_vals)){
 					$cur_cond = $activity_vals[0]['filter_cond'];
 					$cur_cond = str_replace('db_prefix()', db_prefix(), $cur_cond);
-					if(($filters1[$i1]=='is' || $filters1[$i1]=='is_more_than' || $filters1[$i1]=='is_less_than') && $activity_vals[0]['date_field'] ==0){
+					if(($filters1[$i1]=='is' || $filters1[$i1]=='is_more_than' || $filters1[$i1]=='is_less_than' || $filters1[$i1]=='is_not') && $activity_vals[0]['date_field'] ==0){
 						if($check_cond){
 							$cur_cond = str_replace('$$cond1', "'".$filters2[$i1]."'", $cur_cond);
 						}
@@ -275,27 +302,27 @@ function get_activity_filters($req_filters,$check_data=''){
 				else if(in_array($filter12, $customs)){
 					if($filters1[$i1]=='is'){
 						if($check_cond ){
-							$cur_cond = " AND ( p.id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where cv.value  = '".$filters2[$i1]."' and c.slug = '".$filter12."' and cv.fieldid = c.id) )";
+							$cur_cond = " AND ( ".db_prefix().'tasks'.".id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where cv.value  = '".$filters2[$i1]."' and c.slug = '".$filter12."' and cv.fieldid = c.id) )";
 							$req_cond .= $cur_cond;
 							array_push($where, $cur_cond);
 						}else{
-							$cur_cond = " AND ( p.id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where value  > '".date('Y-m-d',strtotime($filters3[$i1]))."' AND value < '".date('Y-m-d',strtotime($filters4[$i1]))."' and c.slug = '".$filter12."' and cv.fieldid = c.id ) )";
+							$cur_cond = " AND ( ".db_prefix().'tasks'.".id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where value  > '".date('Y-m-d',strtotime($filters3[$i1]))."' AND value < '".date('Y-m-d',strtotime($filters4[$i1]))."' and c.slug = '".$filter12."' and cv.fieldid = c.id ) )";
 							$req_cond .= $cur_cond;
 							array_push($where, $cur_cond);
 						}
 					}
 					else if($filters1[$i1]=='is_empty'){
-						$cur_cond = " AND ( p.id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where (cv.value  = '' or cv.value = '0' or cv.value = '0000-00-00') and c.slug = '".$filter12."' and cv.fieldid = c.id) )";
+						$cur_cond = " AND ( ".db_prefix().'tasks'.".id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where (cv.value  = '' or cv.value = '0' or cv.value = '0000-00-00') and c.slug = '".$filter12."' and cv.fieldid = c.id) )";
 						$req_cond .= $cur_cond;
 						array_push($where, $cur_cond);
 					}
 					else if($filters1[$i1]=='is_not_empty'){
-						$cur_cond = " AND ( p.id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where cv.value  != '' AND cv.value != '0' AND cv.value != '0000-00-00' AND cv.fieldto = 'projects' and c.slug = '".$filter12."' and cv.fieldid = c.id) )";
+						$cur_cond = " AND ( ".db_prefix().'tasks'.".id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where cv.value  != '' AND cv.value != '0' AND cv.value != '0000-00-00' AND cv.fieldto = 'tasks' and c.slug = '".$filter12."' and cv.fieldid = c.id) )";
 						$req_cond .= $cur_cond;
 						array_push($where, $cur_cond);
 					}
 					else if($filters1[$i1]=='is_not'){
-						$cur_cond = " AND ( p.id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c  where cv.value  != '".$filters2[$i1]."' and c.slug = '".$filter12."' and cv.fieldid = c.id) )";
+						$cur_cond = " AND ( ".db_prefix().'tasks'.".id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c  where cv.value  != '".$filters2[$i1]."' and c.slug = '".$filter12."' and cv.fieldid = c.id) )";
 						$req_cond .= $cur_cond;
 						array_push($where, $cur_cond);
 					}
@@ -308,17 +335,17 @@ function get_activity_filters($req_filters,$check_data=''){
 							}
 						}
 						$req_arr = rtrim($req_arr,",");
-						$cur_cond = " AND ( p.id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where cv.value  in(".$req_arr.") and c.slug = '".$filter12."' and cv.fieldid = c.id ) )";
+						$cur_cond = " AND ( ".db_prefix().'tasks'.".id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where cv.value  in(".$req_arr.") and c.slug = '".$filter12."' and cv.fieldid = c.id ) )";
 						$req_cond .= $cur_cond;
 						array_push($where, $cur_cond);
 					}
 					else if($filters1[$i1]=='is_more_than' && $filters2[$i1]!=''){
-						$cur_cond = " AND ( p.id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where value  > ".$filters2[$i1]." and c.slug = '".$filter12."' and cv.fieldid = c.id) )";
+						$cur_cond = " AND ( ".db_prefix().'tasks'.".id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where value  > ".$filters2[$i1]." and c.slug = '".$filter12."' and cv.fieldid = c.id) )";
 						$req_cond .= $cur_cond;
 						array_push($where, $cur_cond);
 					}
 					else if($filters1[$i1]=='is_less_than'  && $filters2[$i1]!=''){
-						$cur_cond = " AND ( p.id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where cv.value  < ".$filters2[$i1]." and c.slug = '".$filter12."' and cv.fieldid = c.id) )";
+						$cur_cond = " AND ( ".db_prefix().'tasks'.".id in(SELECT cv.relid FROM ".db_prefix() ."customfieldsvalues cv,".db_prefix() ."customfields c where cv.value  < ".$filters2[$i1]." and c.slug = '".$filter12."' and cv.fieldid = c.id) )";
 						$req_cond .= $cur_cond;
 						array_push($where, $cur_cond);
 					}
@@ -337,13 +364,26 @@ function get_task_vals($fields,$fields1,$table,$qry_cond,$filters = array()){
 	 $conds = get_activity_filters($filters);
 	 $type_cond = '';
 	 if(str_contains($filters['report_name'], 'Call Performance')){
-		$type_cond = ' AND '.db_prefix().'tasks.tasktype = (select id from '.db_prefix().'tasktype where name="Call" and status ="Active" )';
+		$type_cond = db_prefix().'tasks.tasktype = (select id from '.db_prefix().'tasktype where name="Call" and status ="Active" )';
 	}
 	if(str_contains($filters['report_name'], 'Email Performance')){
-		$type_cond = ' AND '.db_prefix().'tasks.tasktype = (select id from '.db_prefix().'tasktype where name="E-mail" and status ="Active" )';
+		$type_cond = db_prefix().'tasks.tasktype = (select id from '.db_prefix().'tasktype where name="E-mail" and status ="Active" )';
 	}
+	
 	 if(!empty($qry_cond)){
-			$qry_cond = " where ".db_prefix()."tasks.id !='' ".$conds.$type_cond." AND ".$qry_cond;
+		 if(!empty($type_cond)){
+			 
+			 $type_cond .= 'AND '.$type_cond." AND " ;
+		 }
+		 else{
+			$type_cond = " " ;
+			if(!empty($qry_cond)){
+				$type_cond = " AND " ;
+			}
+			$qry_cond = ltrim($qry_cond,"and ");
+			$qry_cond = ltrim($qry_cond,"AND ");
+		 }
+			$qry_cond = " where ".db_prefix()."tasks.id !='' ".$conds.$type_cond.$qry_cond;
 	 }else{
 		  $qry_cond = " where ".db_prefix()."tasks.id !='' ".$conds.$type_cond;
 	 }
@@ -440,7 +480,8 @@ function get_join_task_tables(){
 			$selectAs = 'cvalue_' .$field['slug'];
 			array_push($customFieldsColumns, $selectAs);
 			$cus[$field['slug']] =  'ctable_' . $key . '.value as ' . $selectAs;
-			array_push($join, 'LEFT JOIN '.db_prefix().'customfieldsvalues as ctable_' . $key . ' ON '.db_prefix().$fieldtois.' = ctable_' . $key . '.relid AND ctable_' . $key . '.fieldto="' . $field['fieldto'] . '" AND ctable_' . $key . '.fieldid=' . $field['id']);
+			array_push($join, db_prefix().'customfieldsvalues as ctable_' . $key );
+			array_push($join_cond, db_prefix().$fieldtois.' = ctable_' . $key . '.relid AND ctable_' . $key . '.fieldto="' . $field['fieldto'] . '" AND ctable_' . $key . '.fieldid=' . $field['id']);
 		}
 	}
 	$fields = db_prefix().'tasks.id as id,
@@ -526,7 +567,7 @@ function get_task_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_
 		
 	}
 	$fields = implode(',',$aColumns);
-	$fields	= $req_tables['fields'];
+	//$fields	= $req_tables['fields'];
 	$join_cond	= $req_tables['join_cond'];
 	$my_staffids = $CI->staff_model->get_my_staffids();
 	if(!empty($my_staffids) && !is_admin(get_staff_user_id())){
@@ -718,16 +759,22 @@ function get_task_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_
 			}
 			break;
 		default:
-			$cond2 = (!empty($req_status))?" and t.status = '".$req_status."'":'';
+			$cond2 = '';
+			$cond3 = (!empty($req_status))?" and t.status = '".$req_status."'":'';
 			if(!empty($where_in[db_prefix().'tasks.id'])){
 				$ids = implode(',',$where_in[db_prefix().'tasks.id']);
 				if(!empty($ids)){
 					$cond2 .= " and c.relid in($ids)";
 				}
 			}
-			$sql = " select c.relid from ".db_prefix()."customfieldsvalues c,".db_prefix()."tasks t, where c.fieldto = 'tasks' and t.id = c.relid and c.fieldid = '".$sum_id.$cond2."' ";
-			$query = $CI->db->query($sql);
-			$results = $query->result_array();
+			if(!empty($sum_id)){
+				$sql = " select c.relid from ".db_prefix()."customfieldsvalues c,".db_prefix()."tasks t where c.fieldto = 'tasks' and t.id = c.relid and c.fieldid = '".$sum_id."' ".$cond2.$cond3;
+				$query = $CI->db->query($sql);
+				$results = $query->result_array();
+			}
+			else{
+				$results = get_custom_res($view_by,$view_type,$date_range,$crow,$cond2);
+			}
 			$projects = array();
 			if(!empty($results)){
 				$i = 0;
@@ -742,7 +789,7 @@ function get_task_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_
 			}
 			break;
 	}
-	if($view_type == 'date' && ($view_by == 'startdate' || $view_by == 'dateadded' || $view_by == 'datemodified' || $view_by == 'datefinished')){
+	if($view_type == 'date' && (check_activity_date($view_by))){
 		if($date_range == 'Monthly'){
 			$where['month('.db_prefix().'tasks.'.$req_view_by.')']  =  $crow;
 		}
@@ -843,7 +890,7 @@ function tasks_counts($upcoming,$overdue,$today,$in_progress,$completed,$tot_val
 	$data['today']				=	(!empty($today) && $today!=0)?get_decimal($today):0;
 	$data['in_progress']		=	(!empty($in_progress) && $in_progress!=0)?get_decimal($in_progress):0;
 	$data['completed']			=	(!empty($completed) && $completed!=0)?get_decimal($completed):0;
-	$data['tot_cnt'] 			= 	$tot_cnt = $tasks_vals['upcoming'] + $tasks_vals['overdue']+ $tasks_vals['today']+ $tasks_vals['in_progress']+ $tasks_vals['completed'];
+	$data['tot_cnt'] 		= 	$tot_cnt = $tasks_vals['upcoming'] + $tasks_vals['overdue']+ $tasks_vals['today']+ $tasks_vals['in_progress']+ $tasks_vals['completed'];
 	$data['total_cnt_task']		=	$tot_cnt;
 	$total_tasks				= 	$upcoming + $overdue + $today + $in_progress + $completed;
 	$data['total_val_task']		= 	$data['total_val_prdt'] = get_decimal($tot_val);
@@ -887,12 +934,6 @@ function get_report_folder($folder_type){
 	$res = $query->result_array();
 	return $res;
 }
-function check_task_date($view_by){
-	if($view_by == 'startdate' || $view_by == 'dateadded' || $view_by == 'datemodified' || $view_by == 'datefinished'){
-		return true;
-	}
-	return false;
-}
 function set_activity_summary($type){
 	if($type == 'deal'){
 		$colarrs = deal_all_fields();
@@ -902,14 +943,19 @@ function set_activity_summary($type){
 		unset($colarrs['project_cost']);
 		$fields = deal_needed_fields();
 		$needed = json_decode($fields,true);
-		if(!empty($colarrs)){
-		 foreach($colarrs as $ckey=>$cval){
-			 if((!empty($needed['need_fields']) && in_array($ckey, $needed['need_fields']))  ){
-				 $filter_data['view_by'] = $ckey;
-			 }
+		if((!empty($needed['need_fields']) && in_array('project_start_date', $needed['need_fields']))  ){
+			 $filter_data['view_by'] = 'project_start_date';
+		}
+		else{
+			if(!empty($colarrs)){
+			 foreach($colarrs as $ckey=>$cval){
+				 if((!empty($needed['need_fields']) && in_array($ckey, $needed['need_fields']))  ){
+					 $filter_data['view_by'] = $ckey;
+				 }
+			}
 		}
 		 $filter_data['view_type']	= '';
-		 if($filter_data['view_by'] == 'date' && ($filter_data['view_by'] == 'start_date' || $filter_data['view_by'] == 'project_deadline' || $filter_data['view_by'] == 'won_date' || $filter_data['view_by'] == 'lost_date' || $filter_data['view_by'] == 'project_created' || $filter_data['view_by'] == 'project_modified')){
+		 if($filter_data['view_by'] == 'date' && (check_activity_date($filter_data['view_by']))){
 			$filter_data['view_type']	=	'date';
 			$filter_data['date_range1']	=	_l('weekly');
 		 }
@@ -928,11 +974,237 @@ function set_activity_summary($type){
 			}
 		}
 		$filter_data['view_type']	= '';
-		if($filter_data['view_by'] =='dateadded' || $filter_data['view_by'] == 'startdate' || $filter_data['view_by'] == 'datemodified'  || $filter_data['view_by'] == 'datefinished'){
+		if(check_activity_date($filter_data['view_by'])){
 			$filter_data['view_type']	=	'date';
 			$filter_data['date_range1']	=	_l('weekly');
 		}
 		$filter_data['sel_measure']	= _l('number');
 	}
 	return $filter_data;
+}
+function set_filter($type='',$all_clmns,$cus_flds){
+	$CI		= & get_instance();
+	$cur_id12 = '';
+	if(!empty($_REQUEST['cur_id12'])){
+		$cur_id12 = '_edit_'.$_REQUEST['cur_id12'];
+	}
+	$cur_num1	=	$_REQUEST['cur_num'];
+	$cur_num	=	$_REQUEST['cur_num'] +1;
+	$filter_data = array();
+	$filters	=	$CI->session->userdata($type.'filters'.$cur_id12);
+	if(!empty($filters)){
+		$i = 0;
+		foreach($filters as $key12 => $filter12){
+			$filter_data[$type.'filters'.$cur_id12][$i]	=	$filter12;  
+			$i++;
+		}
+	}
+	$filters2	=	$CI->session->userdata($type.'filters2'.$cur_id12);
+	$filters3	=	$CI->session->userdata($type.'filters3'.$cur_id12);
+	$filters4	=	$CI->session->userdata($type.'filters4'.$cur_id12);
+	if(!empty($filters2)){
+		$i1 = 0;
+		foreach($filters2 as $key12 => $filter1){
+			$filter_data[$type.'filters2'.$cur_id12][$i1]	=	$filter1; 
+			$i1++;
+		}
+	}
+	if(!empty($filters3)){
+		$i1 = 0;
+		foreach($filters3 as $key12 => $filter1){
+			$filter_data[$type.'filters3'.$cur_id12][$i1]	=	$filter1;  
+			$i1++;
+		}
+	}
+	if(!empty($filters4)){
+		$i1 = 0;
+		foreach($filters4 as $key12 => $filter1){
+			$filter_data[$type.'filters4'.$cur_id12][$i1]	=	$filter1;  
+			$i1++;
+		}
+	}
+	if(!empty($filters)){
+		foreach($filters as $key12 => $filter1){
+			if(!empty($all_clmns[$filter1])){
+				unset($all_clmns[$filter1]);
+			}if(!empty($cus_flds[$filter1])){
+				unset($cus_flds[$filter1]);
+			}
+			if(check_activity_date($filter1)){
+				if(empty($filter_data[$type.'filters1'.$cur_id12][$key12]))
+					$filter_data[$type.'filters1'.$cur_id12][$key12]	=	'is';
+				if(empty($filter_data[$type.'filters2'.$cur_id12][$key12]))
+					$filter_data[$type.'filters2'.$cur_id12][$key12]	=	'this_year';
+				if(empty($filter_data[$type.'filters3'.$cur_id12][$key12]))
+					$filter_data[$type.'filters3'.$cur_id12][$key12]	=	'01-01-'.date('Y');
+				if(empty($filter_data[$type.'filters4'.$cur_id12][$key12]))
+					$filter_data[$type.'filters4'.$cur_id12][$key12]	=	'31-12-'.date('Y');
+			}
+			else{
+				$fields =  $CI->db->query("SELECT type,options FROM " . db_prefix() . "customfields where slug = '".$filter1."' ")->row();
+				if(!empty($fields)){
+					if($fields->type == 'number'){
+						$filter_data[$type.'filters1'.$cur_id12][$key12]	= 'is_more_than';
+					}
+					else if(check_activity_date($fields->type)){
+						if(empty($filter_data[$type.'filters1'.$cur_id12][$key12]))
+							$filter_data[$type.'filters1'.$cur_id12][$key12]	=	'is';
+						if(empty($filter_data[$type.'filters2'.$cur_id12][$key12]))
+							$filter_data[$type.'filters2'.$cur_id12][$key12]	=	'this_year';
+						if(empty($filter_data[$type.'filters3'.$cur_id12][$key12])){
+							$filter_data[$type.'filters3'.$cur_id12][$key12]	=	'01-01-'.date('Y');
+						}
+						if(empty($filter_data[$type.'filters4'.$cur_id12][$key12]))
+							$filter_data[$type.'filters4'.$cur_id12][$key12]	=	'31-12-'.date('Y');
+					}
+					else{
+						$filter_data[$type.'filters1'.$cur_id12][$key12]	= 'is';
+					}
+				}
+			}
+			$filter_data[$type.'filters'.$cur_id12][$key12]	=	$filter1;
+		}
+	}
+	if(!empty($filters1)){
+		foreach($filters1 as $key1 => $filter12){
+			$filter_data[$type.'filters1'.$cur_id12][$key1]	=	$filter12;
+		}
+	}
+	if(!empty($all_clmns)){
+		foreach($all_clmns as $key => $all_clmn1){
+			$filter_data[$type.'filters'.$cur_id12][$cur_num1]	=	$key; 
+			if($key == 'project_cost' || $key == 'product_qty' || $key == 'product_amt'){
+				$filter_data[$type.'filters1'.$cur_id12][$cur_num1]	= 'is_more_than';
+			}
+			else{
+				$filter_data[$type.'filters1'.$cur_id12][$cur_num1]	=	'is';
+			}
+			break;
+		}
+	}
+	else if(!empty($cus_flds)){
+		foreach($cus_flds as $key => $cus_fld1){
+			$filter_data[$type.'filters'.$cur_id12][$cur_num1]	=	$key;
+			$fields =  $CI->db->query("SELECT type,options FROM " . db_prefix() . "customfields where slug = '".$key."' ")->row();
+			if($fields->type == 'number'){
+				$filter_data[$type.'filters1'.$cur_id12][$cur_num1]	= 'is_more_than';
+			}
+			else if(check_activity_date($fields->type)){
+				if(empty($filter_data[$type.'filters1'.$cur_id12][$key12]))
+					$filter_data[$type.'filters1'.$cur_id12][$cur_num1]	=	'is';
+				if(empty($filter_data[$type.'filters2'.$cur_id12][$key12]))
+					$filter_data[$type.'filters2'.$cur_id12][$cur_num1]	=	'this_year';
+				if(empty($filter_data[$type.'filters3'.$cur_id12][$key12]))
+					$filter_data[$type.'filters3'.$cur_id12][$cur_num1]	=	'01-01-'.date('Y');
+				if(empty($filter_data[$type.'filters4'.$cur_id12][$key12]))
+					$filter_data[$type.'filters4'.$cur_id12][$cur_num1]	=	'31-12-'.date('Y');
+			}
+			else{
+				$filter_data[$type.'filters1'.$cur_id12][$cur_num1]	= 'is';
+			}
+			break;
+		}
+	}
+	return $filter_data;
+}
+function get_edit_data($type,$id){
+	$type = ($type == 'deal')?'deal':'activity';
+	$CI		= & get_instance();
+	$data 	= array();
+	$data['title'] = _l('add_report');
+	if($type == 'deal'){
+		$deal_val = deal_values();
+		$data =  json_decode($deal_val, true);
+		$fields = deal_needed_fields();
+		$needed = array();
+		if(!empty($fields) && $fields != 'null'){
+			$needed = json_decode($fields,true);
+		}
+	}
+	else{
+		$deal_val = task_values();
+		$data =  json_decode($deal_val, true);
+		$needed = get_tasks_need_fields();
+	}
+	$data['id'] = $id;
+	$data['type']= 'activity';
+	$check_report = $CI->db->query("SELECT id FROM " . db_prefix() . "report WHERE id = '".$id."' ")->row();
+	if(empty($check_report)){
+		redirect(admin_url('reports/view_deal_folder'));
+		exit;
+	}
+	$data['filters']	=	$filters = $CI->session->userdata('filters_edit_'.$id);
+	$data['filters1']	=	$CI->session->userdata('filters1_edit_'.$id);
+	$data['filters2']	=	$CI->session->userdata('filters2_edit_'.$id);
+	$data['filters3']	=	$CI->session->userdata('filters3_edit_'.$id);
+	$data['filters4']	=	$CI->session->userdata('filters4_edit_'.$id);
+	if(!empty($filters) && $type == 'deal'){
+		$i = 0;
+		foreach($filters as $filter1){
+			if (!empty($needed['need_fields']) && !in_array($filter1, $needed['need_fields'])){
+				unset($data['filters'][$i]);
+				unset($data['filters1'][$i]);
+				unset($data['filters2'][$i]);
+				unset($data['filters3'][$i]);
+				unset($data['filters4'][$i]);
+			}
+			$i++;
+		}
+	}
+	$data['folders']	=	get_report_folder($type);
+	$data['teamleaders'] = $CI->staff_model->get('', [ 'active' => 1]);
+	$data['links'] = $CI->db->query("SELECT report_id,link_name,link_name FROM " . db_prefix() . "report_public WHERE report_id = '".$id."' ")->result_array();
+	$reports1 = $CI->db->query("SELECT report_name,report_type,folder_id FROM " . db_prefix() . "report WHERE id = '".$id."' ")->row();
+	if (($key = array_search('id', $needed['need_fields'])) !== false) {
+		unset($needed['need_fields'][$key]);
+	}
+	if (($key = array_search('project_created', $needed['need_fields'])) !== false ) {
+		unset($needed['need_fields'][$key]);
+	}
+	if (($key = array_search('product_count', $needed['need_fields'])) !== false ) {
+		unset($needed['need_fields'][$key]);
+	}
+	if(empty($reports1)){
+		redirect(admin_url());exit;
+	}
+	$data['report_name']		=	$reports1->report_name.'('.$reports1->report_type.')';
+	$data['folder_id']			=	$reports1->folder_id;
+	$data['need_fields']		=	$needed['need_fields'];
+	$data['need_fields_label']	=	$needed['need_fields_label'];
+	$data['need_fields_edit']	=	$needed['need_fields_edit'];
+	$data['mandatory_fields1']	=	$needed['mandatory_fields1'];
+	$data['report_page'] = 'deal';
+	$data['report_filter'] =  $CI->load->view('admin/reports/filter', $data,true);
+	$data['report_footer'] =  $CI->load->view('admin/reports/report_footer', $data,true);
+	$shares = $CI->db->query("SELECT share_type,id FROM " . db_prefix() ."shared where  report_id = '".$id."'")->result_array();
+	$data['share_types'] = $data['share_persons'] = array();
+	$share_id = '';
+	if(!empty($shares)){
+		$i = 0;
+		foreach($shares as $share12){
+			$data['share_types'][$i] = $share12['share_type'];
+			$share_id = $share12['id'];
+			$i++;
+		}
+	}
+	$share_persons = $CI->db->query("SELECT staff_id FROM " . db_prefix() ."shared_staff where  share_id = '".$share_id."'")->result_array();
+	if(!empty($share_persons)){
+		$i = 0;
+		foreach($share_persons as $share_person12){
+			$data['share_persons'][$i] = $share_person12['staff_id'];
+			$i++;
+		}
+	}
+	return $data;
+}
+function get_th_column($view_by,$type){
+	$CI		= & get_instance();
+	$custom_fields = get_table_custom_fields($type);
+	$customs = array_column($custom_fields, 'slug');
+	$view_by1 = $view_by;
+	if(in_array($view_by,$customs)){
+		$req_key = array_search ($view_by, $customs);
+		$view_by1 = $custom_fields[$req_key]['name'];
+	}
+	return $view_by1;
 }

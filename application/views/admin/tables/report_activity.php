@@ -2,7 +2,6 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 $hasPermissionEdit   = has_permission('tasks', '', 'edit');
 $hasPermissionDelete = has_permission('tasks', '', 'delete');
-$CI = &get_instance();
 $tasks_list_column_order = (array)json_decode(get_option('report_task_list_column_order')); 
 $custom_fields = get_table_custom_fields('tasks');
 $customFieldsColumns= $locationCustomFields = $cus = [];
@@ -46,7 +45,7 @@ if(str_contains($report_name, 'Call Performance')){
 if(str_contains($report_name, 'Email Performance')){
 	$req_filters .= $fiter_type.db_prefix().'tasks.tasktype = (select id from '.db_prefix().'tasktype where name="E-mail" and status ="Active" )';
 }
-$result =$CI->tasks_model->get_tasks_list(false,$req_filters);
+$result =$this->ci->tasks_model->get_tasks_list(false,$req_filters);
 $output  = $result['output'];
 $rResult = $result['rResult'];
 foreach ($rResult as $aRow) {
@@ -71,25 +70,27 @@ foreach ($rResult as $aRow) {
 	}
     $row_temp['project_pipeline']  = ' ';
     if(isset($aRow['project_pipeline']) && !empty($aRow['project_pipeline'])){
-	    $row_temp['project_pipeline'] =$aRow['project_pipeline'];
+	    $row_temp['project_pipeline'] = $aRow['project_pipeline'];
     }
 	$row_temp['company']  = ' ';
 	if(isset($aRow['company']) && !empty($aRow['company'])){
 		$row_temp['company'] =   $aRow['company'] ;
 	}
-    
     $row_temp['rel_type']  = ' ';
 	if(isset($aRow['rel_type']) && !empty($aRow['rel_type'])){
         if($aRow['rel_type'] == 'project') {
             $row_temp['rel_type'] =  'Deal';
-        } else {
+        }
+		else if($aRow['rel_type'] == 'customer') {
+            $row_temp['rel_type'] =  _l('client');
+        }
+		else {
             $row_temp['rel_type'] =  ucfirst($aRow['rel_type']);
         }
     }
-    
 	$row_temp['teamleader']  = ' ';
 	if(isset($aRow['p_teamleader']) && !empty($aRow['p_teamleader'])){
-		$p_teamleader = $CI->staff_model->get($aRow['p_teamleader']);
+		$p_teamleader = $this->ci->staff_model->get($aRow['p_teamleader']);
 		$row_temp['teamleader'] =  isset($p_teamleader->firstname)?$p_teamleader->firstname:' ';
 	}
 	

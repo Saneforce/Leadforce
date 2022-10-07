@@ -1,10 +1,5 @@
 <?php 
-if($report_page == 'deal'){
-	echo form_open(admin_url('reports/save_filter_report'),array('id'=>'save_filter_report'));
-}
-else{
-	echo form_open(admin_url('activity_reports/save_filter_report'),array('id'=>'save_filter_report'));
-}
+	echo form_open(admin_url('reports/save_filter_report/'.$report_page),array('id'=>'save_filter_report'));
  ?>
 	<div class="panel_s project-menu-panel" style="margin-top:-1px;">
 		<div class="panel-body">
@@ -24,8 +19,13 @@ else{
 									<div  class="col-md-2" >
 										<select data-live-search="true" class="selectpicker" id="filter_<?php echo $i1;?>" onchange="change_filter(this)">
 											<?php $cur_val ='';
-											if(!empty($all_clmns)){ ?>
-												<optgroup label="Deal Master" data-max-options="2">
+											if(!empty($all_clmns)){ 
+												if($report_page == 'deal'){
+											?>
+													<optgroup label="Deal Master" data-max-options="2">
+												<?php }else{?>
+													<optgroup label="Activity Master" data-max-options="2">
+												<?php }?>
 												<?php foreach ($all_clmns as $key1 => $all_val1){
 													if(($key1==$filter1 || !in_array($key1, $filters)) &&  in_array($key1, $need_fields) ){ 
 													?>

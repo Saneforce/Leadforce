@@ -221,7 +221,7 @@
 									</div>
 									<div class="form-group select-placeholder contactsdiv" id="ch_staff" <?php if(in_array('Everyone',$share_types) || empty($share_types)){?>style="display:none" <?php }?>>
 										<label for="project_contacts_selectpicker"
-										class="control-label"><small class="req text-danger">* </small><?php echo _l('staff'); ?></label>
+										class="control-label"><small class="req text-danger"> </small><?php echo _l('staff'); ?></label>
 										 <div class="input-group input-group-select ">
 										 <?php 
 										 echo render_select('teamleader12[]', $teamleaders, array('staffid', array('firstname', 'lastname')),false, $share_persons, array('multiple'=>true,'onchange'=>'ch_staff(this)','required'),array(),'','',false);?>

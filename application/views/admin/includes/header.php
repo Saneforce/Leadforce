@@ -314,19 +314,19 @@ ob_end_clean();
 									<div class="form-group">
 										<div class="full_cont_div_1 req_class" onclick="show_div_1('activity_div1','activity_performance')" id="activity_div1">
 											<div class="first_cont_div_1"><?php echo _l('activity_performance');?></div>
-											<div class="second_cont_div_1 req_class" id="activity_div11">How much did you start, win, or lose?</div>
+											<div class="second_cont_div_1 req_class" id="activity_div11">How many activities were Added ,Completed and Planned?</div>
 										</div>
 									</div>
 									<div class="form-group">
 										<div class="full_cont_div_1 req_class" onclick="show_div_1('activity_div2','email_performance')" id="activity_div2">
 											<div class="first_cont_div_1"><?php echo _l('email_performance');?></div>
-											<div class="second_cont_div_1 req_class" id="activity_div21">What is your win or loss rate?</div>
+											<div class="second_cont_div_1 req_class" id="activity_div21">How many Email activities were Added ,Completed and Planned?</div>
 										</div>
 									</div>
 									<div class="form-group">
 										<div class="full_cont_div_1 req_class" onclick="show_div_1('activity_div3','call_performance')" id="activity_div3">
 											<div class="first_cont_div_1"><?php echo _l('call_performance');?></div>
-											<div class="second_cont_div_1 req_class" id="activity_div31">How long is your sales cycle?</div>
+											<div class="second_cont_div_1 req_class" id="activity_div31">How many Call activities were Added ,Completed and Planned?</div>
 										</div>
 									</div>
 								</div>
