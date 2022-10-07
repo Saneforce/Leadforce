@@ -875,9 +875,9 @@ function get_task_table_fields($view_by){
 			$data['cur_rows']	= "priority";
 			break;
 		default:
-			$data['tables']		= db_prefix()."projects p,".db_prefix(). "customfields cf,".db_prefix()."customfieldsvalues cv";
-			$data['fields']		= ",cv.value,count(p.id ) num_deal,cv.fieldid req_id ";
-			$data['qry_cond']   = " and cf.slug ='".$view_by."' and cv.fieldid = cf.id and cv.relid = p.id and p.deleted_status = 0 group by cv.relid order by cv.value asc";
+			$data['tables']		= db_prefix()."tasks,".db_prefix(). "customfields cf,".db_prefix()."customfieldsvalues cv ";
+			$data['fields']		= ",cv.value,count(".db_prefix()."tasks.id ) num_deal,cv.fieldid req_id ";
+			$data['qry_cond']   = " and cf.slug ='".$view_by."' and cv.fieldid = cf.id and cv.relid = ".db_prefix()."tasks.id group by cv.relid order by cv.value asc";
 			$data['cur_rows']	= "value";
 			break;
 	}
