@@ -1201,10 +1201,9 @@ function get_th_column($view_by,$type){
 	$CI		= & get_instance();
 	$custom_fields = get_table_custom_fields($type);
 	$customs = array_column($custom_fields, 'slug');
-	$view_by1 = $view_by;
 	if(in_array($view_by,$customs)){
 		$req_key = array_search ($view_by, $customs);
-		$view_by1 = $custom_fields[$req_key]['name'];
+		$view_by = $custom_fields[$req_key]['name'];
 	}
-	return $view_by1;
+	return $view_by;
 }

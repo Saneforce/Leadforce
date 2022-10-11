@@ -155,6 +155,7 @@ class Reports extends AdminController
 			$need_fields = $needed['need_fields'];
 		}
 		$type = '';
+		$filter_data['filters'] = array();
 		if($report_12_id == 'performance'){
 			if (in_array('project_start_date', $need_fields)){
 				$filter_data['filters'][0]	=	'project_start_date';  

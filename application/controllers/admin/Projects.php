@@ -1503,6 +1503,9 @@ class Projects extends AdminController
 					$data['f_val']	= implode(',',$data['f_val']);
 				}
 				$success = $this->projects_model->update_custom_val($data['project_id'],$data['slug'],$data['f_val']);
+				if($success){
+					$success = $this->projects_model->update(array('project_modified'=>date('Y-m-d H:i:s'),'modified_by'=>get_staff_user_id()), $data['project_id']);
+				}
 			}
 			else{
 				if(isset($data['clientid_copy_project']) && !empty($data['clientid_copy_project'])){
@@ -1630,7 +1633,6 @@ class Projects extends AdminController
 
     public function upload_file($project_id)
     {
-		
         handle_project_file_uploads($project_id);
     }
 
