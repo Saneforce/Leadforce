@@ -7,6 +7,9 @@
 		top: 0;
 		z-index: 2;
 	}
+	ul.dropdown-menu li:first-child {
+	display: block !important;
+}
 </style>
 <div id="wrapper">
 	<div class="content">

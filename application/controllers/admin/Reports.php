@@ -596,7 +596,7 @@ class Reports extends AdminController
 								$qry_cond   = " and id in(".$cur_projects.")";
 							}
 							else{
-								$qry_cond   = " and id=''";
+								$qry_cond   = " and id !=''";
 							}
 							$cur_row    = ($month1).' '.$cur_year;
 							$sum_data[$i]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);

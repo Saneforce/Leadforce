@@ -388,6 +388,8 @@ li.subactions a {
 .show_noprob {
   display: none;
 }
-  
+ ul.dropdown-menu li:first-child {
+	display: block !important;
+}   
 
 </style>
