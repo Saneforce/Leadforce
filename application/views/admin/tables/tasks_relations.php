@@ -4,7 +4,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 $hasPermissionEdit   = has_permission('tasks', '', 'edit');
 $hasPermissionDelete = has_permission('tasks', '', 'delete');
 $tasksPriorities     = get_tasks_priorities();
-$CI = &get_instance();
+$CI = &get_instance(); 
 if($rel_type == 'lead' || $rel_type == 'invoice' || $rel_type == 'estimate' || $rel_type == 'ticket' || $rel_type == 'expense' || $rel_type == 'proposal' ) {
     $aColumns = [
         1,
@@ -20,7 +20,7 @@ if($rel_type == 'lead' || $rel_type == 'invoice' || $rel_type == 'estimate' || $
     
     $sIndexColumn = 'id';
     $sTable       = db_prefix() . 'tasks';
-    
+   
     $where = [];
     include_once(APPPATH . 'views/admin/tables/includes/tasks_filter.php');
     
@@ -82,7 +82,6 @@ if($rel_type == 'lead' || $rel_type == 'invoice' || $rel_type == 'estimate' || $
 		$where_cond = str_replace("where","and",$where_cond);
 		array_push($where, $where_cond);
 	}
-	
     
     $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
         'billed',
@@ -291,7 +290,10 @@ else {
         }elseif($rel_type == 'contact') {
             array_push($where, ' AND ((rel_type="contact" AND rel_id ='.$rel_id.') OR (contacts_id IN (' . $rel_id . ') ))');
         }elseif($rel_type == 'project_call' || (isset($_GET['call']) && $_GET['call'] =='bycall')) {
-            array_push($where, 'AND rel_id="' . $rel_id . '" AND rel_type="project" AND call_request_id != ""');
+			//$cur_qry = " SELECT id FROM ".db_prefix()."tasktype WHERE name= 'Call'";
+           array_push($where, 'AND rel_id="' . $rel_id . '" AND rel_type="project" ');
+			
+			//array_push($where, ' AND '.db_prefix().'tasks.tasktype  = ('.$cur_qry.' ) ');
         }else{
             if($my_staffids){
                 array_push($where, 'AND rel_id="' . $rel_id . '" AND rel_type="' . $rel_type . '" ');
@@ -336,7 +338,9 @@ else {
         array_push($where, $rel_to_query);
     }
     if($_GET['call']) {
-       array_push($where, ' AND tbltasks.call_request_id != ""');
+       //array_push($where, ' AND tbltasks.call_request_id != ""');
+	   $call = " AND ".db_prefix()."tasks.tasktype = (SELECT id FROM ".db_prefix()."tasktype WHERE name= 'Call') ";
+      array_push($where, $call);
     }
 
     $join = [];
@@ -378,7 +382,6 @@ else {
     if (count($custom_fields) > 4) {
         @$this->ci->db->query('SET SQL_BIG_SELECTS=1');
     }
-
     $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
         'billed',
         db_prefix() .'tasks.tasktype as type_id',
@@ -398,7 +401,6 @@ else {
     $output  = $result['output'];
     $rResult = $result['rResult'];
 	//echo $this->ci->db->last_query();
-	//pre($rResult);
     $allow_to_call = $this->ci->callsettings_model->accessToCall();
     foreach ($rResult as $aRow) {
         $row = [];

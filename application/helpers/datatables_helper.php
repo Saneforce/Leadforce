@@ -396,7 +396,10 @@ function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = [], $where 
     } elseif ($taskpage == 'taskrelation') {
         $call = $req_task_type = '';
         if($_GET['call']) {
-            $call = ' AND tbltasks.call_request_id != "" ';
+            //$call = ' AND tbltasks.call_request_id != "" ';
+			$call = " AND ".db_prefix()."tasks.tasktype = (SELECT id FROM ".db_prefix()."tasktype WHERE name= 'Call') ";
+			//$cur_qry = " SELECT id FROM ".db_prefix()."tasktype WHERE name= 'Call'";
+            //array_push($where, ' AND tasktype = "('.$cur_qry.')"');
         }
 		$tasktypes  = $CI->misc_model->get_tasks_distinct_tasktype();
 		$_tasktypes = [];

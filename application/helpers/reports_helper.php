@@ -373,7 +373,7 @@ function get_task_vals($fields,$fields1,$table,$qry_cond,$filters = array()){
 	 if(!empty($qry_cond)){
 		 if(!empty($type_cond)){
 			 
-			 $type_cond .= 'AND '.$type_cond." AND " ;
+			 $type_cond = 'AND '.$type_cond." AND " ;
 		 }
 		 else{
 			$type_cond = " " ;
@@ -383,8 +383,14 @@ function get_task_vals($fields,$fields1,$table,$qry_cond,$filters = array()){
 			$qry_cond = ltrim($qry_cond,"and ");
 			$qry_cond = ltrim($qry_cond,"AND ");
 		 }
+			if(!empty($conds)){
+				$conds = " AND " ;
+			}
 			$qry_cond = " where ".db_prefix()."tasks.id !='' ".$conds.$type_cond.$qry_cond;
 	 }else{
+			if(!empty($conds)){
+				$conds = " AND " ;
+			}
 		  $qry_cond = " where ".db_prefix()."tasks.id !='' ".$conds.$type_cond;
 	 }
 	 if(!empty($fields)){
@@ -399,6 +405,7 @@ function get_task_vals($fields,$fields1,$table,$qry_cond,$filters = array()){
 		 $qry_cond .= " and ((ta1.taskid = ".db_prefix()."tasks.id and ta1.staffid in(" . implode(',',$my_staffids) . ") ) or ( OR ".db_prefix()."tasks.rel_id IN(SELECT ".db_prefix()."projects.id FROM ". db_prefix()."projects join ".db_prefix()."project_members  on ".db_prefix()."project_members.project_id = " .db_prefix()."projects.id WHERE ".db_prefix()."project_members.staff_id in (". implode(',',$my_staffids)."))))";
 	 }
 	 $CI			= & get_instance();
+	
 	 $task_vals 	= $CI->db->query("SELECT ".$fields."COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '1',".db_prefix(). "tasks.id,NULL)) AS upcoming,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '2',".db_prefix(). "tasks.id,NULL)) AS overdue,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '3',".db_prefix(). "tasks.id,NULL)) AS today,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '4',".db_prefix(). "tasks.id,NULL)) AS in_progress,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '5',".db_prefix(). "tasks.id,NULL)) AS completed ".$fields1." FROM ".$table.$qry_cond)->result_array();
 	return $task_vals;
  }
@@ -948,18 +955,18 @@ function set_activity_summary($type){
 		}
 		else{
 			if(!empty($colarrs)){
-			 foreach($colarrs as $ckey=>$cval){
-				 if((!empty($needed['need_fields']) && in_array($ckey, $needed['need_fields']))  ){
-					 $filter_data['view_by'] = $ckey;
-				 }
+				foreach($colarrs as $ckey=>$cval){
+					if((!empty($needed['need_fields']) && in_array($ckey, $needed['need_fields']))){
+						$filter_data['view_by'] = $ckey;
+					}
+				}
 			}
-		}
-		 $filter_data['view_type']	= '';
-		 if($filter_data['view_by'] == 'date' && (check_activity_date($filter_data['view_by']))){
+			$filter_data['view_type']	= '';
+			if($filter_data['view_by'] == 'date' && (check_activity_date($filter_data['view_by']))){
 			$filter_data['view_type']	=	'date';
 			$filter_data['date_range1']	=	_l('weekly');
-		 }
-		 $filter_data['sel_measure']	=_l('deal_val');
+			}
+			$filter_data['sel_measure']	=_l('deal_val');
 		}
 	}
 	else{
