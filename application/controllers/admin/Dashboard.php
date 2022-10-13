@@ -1,5 +1,4 @@
 <?php
-
 defined('BASEPATH') or exit('No direct script access allowed');
 
 class Dashboard extends AdminController
@@ -76,8 +75,18 @@ class Dashboard extends AdminController
         $data['user_dashboard_visibility'] = json_encode($data['user_dashboard_visibility']);
 
 		$this->load->model('pipeline_model');
-		
-        $data['dash_form_data'] = $_POST;
+		if(isset($_POST['apply_sumbit'])){
+			$cur_data['dash_form_data'] = $_POST;
+			$this->session->set_userdata($cur_data);
+			redirect(admin_url());
+			exit;
+		}
+		if(isset($_GET['clear'])){
+			$this->session->unset_userdata('dash_form_data');
+		}
+		if(!empty($this->session->userdata('dash_form_data'))){
+			$data['dash_form_data'] = $this->session->userdata('dash_form_data');
+		}
         
 //pre($data['dash_form_data']);
 //pre(get_staff_user_id());

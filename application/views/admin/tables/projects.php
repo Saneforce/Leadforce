@@ -66,7 +66,7 @@ if(isset($_REQUEST['last_order_identifier']) && strpos($_REQUEST['last_order_ide
     }
     array_push($where, ' AND ' . db_prefix() . 'projects.id IN (SELECT project_id FROM '.db_prefix().'project_contacts WHERE contacts_id='.$exp[1].')');
     if (count($statusIds1) > 0) {
-        array_push($filter, 'OR tblprojects.status IN (' . implode(', ', $statusIds1) . ')');
+        array_push($filter, 'OR '.db_prefix().'projects.status IN (' . implode(', ', $statusIds1) . ')');
         array_push($where, 'AND (' . prepare_dt_filter($filter) . ')');
     }
 } elseif(isset($_REQUEST['last_order_identifier']) && strpos($_REQUEST['last_order_identifier'], 'products_projects') !== false) {
@@ -97,13 +97,16 @@ foreach ($this->ci->projects_model->get_project_statuses() as $status) {
 }
 
 if (count($statusIds) > 0) {
-    array_push($filter, 'OR tblprojects.status IN (' . implode(', ', $statusIds) . ')');
+    array_push($filter, 'OR '.db_prefix().'projects.status IN (' . implode(', ', $statusIds) . ')');
+}
+if(!empty($_REQUEST['status'])){
+	
+	array_push($where, "AND ".db_prefix()."projects.status = '".$_REQUEST['status']."' " );
 }
 
 if (count($filter) > 0) {
     array_push($where, 'AND (' . prepare_dt_filter($filter) . ')');
 }
-
 $custom_fields = get_table_custom_fields('projects');
 $req_fields = array_column($custom_fields, 'slug'); 
 $req_cnt = count($req_fields);
@@ -229,7 +232,6 @@ if($idkey == 0) {
 } else {
     $idkey = '';
 }
-//pre($aColumns);exit;
 $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
     'clientid',
     '(SELECT GROUP_CONCAT(staff_id SEPARATOR ",") FROM ' . db_prefix() . 'project_members WHERE project_id=' . db_prefix() . 'projects.id ORDER BY staff_id) as members_ids'.$idkey,

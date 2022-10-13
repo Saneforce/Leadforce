@@ -339,7 +339,7 @@ foreach($custom_fields as $cfkey=>$cfval){
 							 <select id="<?php echo $need_fields_label[$i];?>" name="sel_<?php echo $need_field12;?>" data-live-search="true" data-width="100%" class="selectpicker "
 								data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>" >
 								<?php 
-								if(!empty($client_contacts)){
+								if(!empty($client_contacts) && !in_array('project_contacts[]',$need_fields_edit)){
 									foreach($client_contacts as $client_contact1){
 										echo '<option value="'.$client_contact1['id'].'" >'.$client_contact1['firstname'].' '.$client_contact1['lastname'].'</option>';
 									} 
@@ -455,7 +455,9 @@ foreach($custom_fields as $cfkey=>$cfval){
 </div>
 
 <?php $this->load->view('admin/projects/copy_settings'); ?>
-<?php init_tail(); ?>
+<?php init_tail(); 
+$status1 = (!empty($_REQUEST['status']))?'?status='.$_REQUEST['status']:'';
+?>
 <script>
 $(function(){
      var ProjectsServerParams = {};
@@ -464,7 +466,7 @@ $(function(){
          ProjectsServerParams[$(this).attr('name')] = '[name="'+$(this).attr('name')+'"]';
      });
 
-     initDataTable('.table-projects', admin_url+'projects/table', undefined, [0], ProjectsServerParams, <?php echo hooks()->apply_filters('projects_table_default_order', json_encode(array())); ?>);
+     initDataTable('.table-projects', admin_url+'projects/table<?php echo $status1;?>', undefined, [0], ProjectsServerParams, <?php echo hooks()->apply_filters('projects_table_default_order', json_encode(array())); ?>);
 
      init_ajax_search('customer', '#clientid_copy_project.ajax-search');
 });
@@ -575,6 +577,10 @@ $(function(){
 			$('#project_contacts').empty();
 			$('#project_contacts').append(myArr.persons);
 			$('#project_contacts').selectpicker('refresh');
+			
+			$('#project_primary_contacts').empty();
+			$('#project_primary_contacts').append(myArr.persons);
+			$('#project_primary_contacts').selectpicker('refresh');
 	  }});
 	}
 	function get_primary_person(){

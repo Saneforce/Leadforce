@@ -1180,7 +1180,7 @@ function get_edit_data($type,$id){
 	$data['need_fields_label']	=	$needed['need_fields_label'];
 	$data['need_fields_edit']	=	$needed['need_fields_edit'];
 	$data['mandatory_fields1']	=	$needed['mandatory_fields1'];
-	$data['report_page'] = 'deal';
+	$data['report_page'] = $type;
 	$data['report_filter'] =  $CI->load->view('admin/reports/filter', $data,true);
 	$data['report_footer'] =  $CI->load->view('admin/reports/report_footer', $data,true);
 	$shares = $CI->db->query("SELECT share_type,id FROM " . db_prefix() ."shared where  report_id = '".$id."'")->result_array();

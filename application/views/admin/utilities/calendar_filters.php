@@ -153,8 +153,8 @@
    
 */ ?>
    <div class="col-md-3 text-right">
-        <a class="btn btn-default" href="<?php echo site_url($this->uri->uri_string()); ?>"><?php echo _l('clear'); ?></a>
-        <button class="btn btn-success" type="submit"><?php echo _l('apply'); ?></button>
+        <a class="btn btn-default" href="<?php echo site_url($this->uri->uri_string()); ?>?clear=1"><?php echo _l('clear'); ?></a>
+        <button class="btn btn-success" type="submit" name="apply_sumbit"><?php echo _l('apply'); ?></button>
     </div>
 
 </div>
