@@ -383,12 +383,12 @@ function get_task_vals($fields,$fields1,$table,$qry_cond,$filters = array()){
 			$qry_cond = ltrim($qry_cond,"and ");
 			$qry_cond = ltrim($qry_cond,"AND ");
 		 }
-			if(!empty($conds)){
-				$conds = " AND " ;
+			if(empty($conds)){
+					$conds = " AND " ;
 			}
 			$qry_cond = " where ".db_prefix()."tasks.id !='' ".$conds.$type_cond.$qry_cond;
 	 }else{
-			if(!empty($conds)){
+			if(empty($conds)){
 				$conds = " AND " ;
 			}
 		  $qry_cond = " where ".db_prefix()."tasks.id !='' ".$conds.$type_cond;
