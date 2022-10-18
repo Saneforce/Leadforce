@@ -126,11 +126,11 @@ function app_init_settings_tabs()
 {
     $CI = &get_instance();
 
-    $CI->app_tabs->add_settings_tab('general', [
+    /* $CI->app_tabs->add_settings_tab('general', [
         'name'     => _l('settings_group_general'),
         'view'     => 'admin/settings/includes/general',
         'position' => 5,
-    ]);
+    ]); */
 
     $CI->app_tabs->add_settings_tab('company', [
         'name'     => _l('company_information'),
