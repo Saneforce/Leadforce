@@ -2830,8 +2830,31 @@ function task_count_cond(){
 		$month_end   = date('Y-m-d',strtotime($_REQUEST['custom_date_end_tasks'])).' 23:59:59';
 		$where_cond = " where ".db_prefix()."tasks.dateadded >= '".$month_start."' and ".db_prefix()."tasks.dateadded <= '".$month_end."' ";
 	}
+	$in_cond = '';
 	if(!empty($_REQUEST['upcoming_tasks'])){
 		$where_cond = " where ".db_prefix()."tasks.status = '1' ";
+	}
+	if(!empty($_REQUEST['task_status_1'])){
+		$in_cond .= '1,';
+	}
+	if(!empty($_REQUEST['task_status_2'])){
+		$in_cond .= '2,';
+	}
+	if(!empty($_REQUEST['task_status_3'])){
+		$in_cond .= '3,';
+	}
+	if(!empty($_REQUEST['task_status_4'])){
+		$in_cond .= '4,';
+	}
+	if(!empty($_REQUEST['task_status_5'])){
+		$in_cond .= '5,';
+	}
+	if(!empty($in_cond)){
+		$in_cond= rtrim($in_cond, ',');
+		if(!empty($where_cond))
+			$where_cond .= " and ".db_prefix()."tasks.status in(".$in_cond.") ";
+		else
+			$where_cond = " where ".db_prefix()."tasks.status in(".$in_cond.") ";
 	}
 	$fields = "id,name";
 	$cond	= array('status'=>'Active');
