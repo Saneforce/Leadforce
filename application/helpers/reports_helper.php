@@ -241,6 +241,7 @@ function get_req_val($req_val,$sel_val,$s_val,$d_val,$key,$all_val,$out_type){
 function get_activity_filters($req_filters,$check_data=''){
 	$CI			= 	& get_instance();
 	$needed = get_tasks_need_fields();
+	$needed['need_fields'][] = 'rel_type';
 	$where 		= 	array();
 	$req_cond	=	'';
 	$filters	=	$req_filters['filters'];
@@ -255,7 +256,6 @@ function get_activity_filters($req_filters,$check_data=''){
 		$table = db_prefix().'filter';
 		$custom_fields = get_table_custom_fields('tasks');
 		$customs = array_column($custom_fields, 'slug');
-		
 		foreach($filters as $filter12){
 			if ((!empty($needed['need_fields']) && in_array($filter12, $needed['need_fields'])) || in_array($filter12, $customs)){
 				$check_cond = filter_cond($filters2[$i1]);
@@ -377,18 +377,18 @@ function get_task_vals($fields,$fields1,$table,$qry_cond,$filters = array()){
 		 }
 		 else{
 			$type_cond = " " ;
-			if(!empty($qry_cond)){
+			if(!empty($filters)){
 				$type_cond = " AND " ;
 			}
 			$qry_cond = ltrim($qry_cond,"and ");
 			$qry_cond = ltrim($qry_cond,"AND ");
 		 }
-			if(empty($conds)){
-					$conds = " AND " ;
+			if(empty($type_cond) && !empty($filters)){
+				$conds = " AND " ;
 			}
 			$qry_cond = " where ".db_prefix()."tasks.id !='' ".$conds.$type_cond.$qry_cond;
 	 }else{
-			if(empty($conds)){
+			if(empty($type_cond) && !empty($filters)){
 				$conds = " AND " ;
 			}
 		  $qry_cond = " where ".db_prefix()."tasks.id !='' ".$conds.$type_cond;
@@ -1213,4 +1213,7 @@ function get_th_column($view_by,$type){
 		$view_by = $custom_fields[$req_key]['name'];
 	}
 	return $view_by;
+}
+function random_color() {
+	return $rand = '#'.str_pad(dechex(rand(0x000000, 0xFFFFFF)), 6, 0, STR_PAD_LEFT);
 }

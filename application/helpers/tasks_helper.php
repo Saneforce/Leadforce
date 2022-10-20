@@ -2746,6 +2746,7 @@ function task_all_columns(){
 	$colarr = array(
 		"id"=>array("ins"=>"id","ll"=>"the_number_sign"),
 		"task_name"=>array("ins"=>"task_name","ll"=>"tasks_dt_name"),
+		"tasktype"=>array("ins"=>"tasktype","ll"=>"task_type"),
 		"status"=>array("ins"=>"status","ll"=>"task_status"),
 		"description"=>array("ins"=>"description","ll"=>"description"),
 		"startdate"=>array("ins"=>"startdate","ll"=>"scheduled_date"),
@@ -2761,7 +2762,7 @@ function task_all_columns(){
 		"teamleader"=>array("ins"=>"teamleader","ll"=>"teamleader"),
 		"project_contacts"=>array("ins"=>"project_contacts","ll"=>"project_contacts"),
 		"priority"=>array("ins"=>"priority","ll"=>"tasks_list_priority"),
-		"rel_type"=>array("ins"=>"type","ll"=>"Type"),
+		"rel_type"=>array("ins"=>"type","ll"=>"rel_type"),
 	); 
 	return $colarr;
 }
@@ -2828,7 +2829,7 @@ function task_count_cond(){
 	if(!empty($_REQUEST['custom_tasks'])){
 		$month_start = date('Y-m-d',strtotime($_REQUEST['custom_date_start_tasks'])).' 00:00:00';
 		$month_end   = date('Y-m-d',strtotime($_REQUEST['custom_date_end_tasks'])).' 23:59:59';
-		$where_cond = " where ".db_prefix()."tasks.dateadded >= '".$month_start."' and ".db_prefix()."tasks.dateadded <= '".$month_end."' ";
+		$where_cond  = " where ".db_prefix()."tasks.dateadded >= '".$month_start."' and ".db_prefix()."tasks.dateadded <= '".$month_end."' ";
 	}
 	$in_cond = '';
 	if(!empty($_REQUEST['upcoming_tasks'])){
@@ -2854,7 +2855,7 @@ function task_count_cond(){
 		if(!empty($where_cond))
 			$where_cond .= " and ".db_prefix()."tasks.status in(".$in_cond.") ";
 		else
-			$where_cond = " where ".db_prefix()."tasks.status in(".$in_cond.") ";
+			$where_cond  = " where ".db_prefix()."tasks.status in(".$in_cond.") ";
 	}
 	$fields = "id,name";
 	$cond	= array('status'=>'Active');
@@ -2870,7 +2871,7 @@ function task_count_cond(){
 			if(!empty($_REQUEST['task_tasktype_'.$type1['id']])){
 				if(empty($where_cond)){
 					 $req_where =  1;
-					$where_cond =" where ( ".db_prefix()."tasks.tasktype = (select id from ".db_prefix()."tasktype where name='".$type1['name']."' and status ='Active') ";
+					$where_cond = " where ( ".db_prefix()."tasks.tasktype = (select id from ".db_prefix()."tasktype where name='".$type1['name']."' and status ='Active') ";
 				}
 				else{
 					if(empty($req_where)){
