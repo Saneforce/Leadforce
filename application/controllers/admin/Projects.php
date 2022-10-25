@@ -586,6 +586,8 @@ class Projects extends AdminController
             $data['statuses']                      = $this->projects_model->get_project_statuses();
             $data['all_deallossreasons']            = $this->DealLossReasons_model->getDealLossReasons();
             $group = !$this->input->get('group') ? 'project_tasks' : $this->input->get('group');
+            if($project->approved==0)
+                $group = !$this->input->get('group') ? 'project_overview' : $this->input->get('group');
 
             // Unable to load the requested file: admin/projects/project_tasks#.php - FIX
             if (strpos($group, '#') !== false) {
@@ -936,6 +938,7 @@ class Projects extends AdminController
             $this->db->where('rel_type','projects');
             $this->db->where('rel_id',$id);
             $this->db->where('status',0);
+            $this->db->where('reopened',0);
             $this->db->select('count(id) as rejected');
             $deal_rejected_details =$this->db->get(db_prefix().'approval_history')->row();
             if($deal_rejected_details)
@@ -3917,5 +3920,18 @@ class Projects extends AdminController
                 )
             );
         }
+    }
+
+    public function approvalReopen($deal_id)
+    {
+        if (!has_permission('projects', '', 'edit')) {
+            access_denied($this->moudle_permission_name);
+        }
+
+        $this->db->where('rel_type','projects');
+        $this->db->where('rel_id',$deal_id);
+        $this->db->update(db_prefix().'approval_history',['reopened'=>1]);
+        set_alert('success', 'Reopened Successfully');
+        redirect(admin_url('projects/view/'.$deal_id));
     }
 }

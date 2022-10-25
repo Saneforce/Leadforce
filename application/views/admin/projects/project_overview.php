@@ -4,9 +4,14 @@ $can_user_edit =false;
 if(is_admin(get_staff_user_id()) || $project->teamleader == get_staff_user_id() || in_array(get_staff_user_id(),$ownerHierarchy) || (!empty($my_staffids) && in_array($project->teamleader,$my_staffids) && !in_array($project->teamleader,$viewIds))){
    $can_user_edit =true;
 }
-if($project->approved==0 && count($approval_history)>0){
+if($project->approved==0 && !$deal_rejected){
    $can_user_edit =false;
 }
+
+if($project->approved==0 && $deal_rejected && get_staff_user_id() != $project->created_by){
+   $can_user_edit =false;
+}
+
 ?>
 <style>
 .feed-item{
@@ -774,62 +779,11 @@ if($project->approved==0 && count($approval_history)>0){
 </div>
 <?php else: ?>
    <?php if($deal_rejected): ?>
-      <p class="project-info bold font-size-14">Approval Status</p>
-      <div class="activity-feed">
-      <?php foreach($approval_history as $history_key => $history): 
-         $currentHistory =$approval_history[$history_key];
-         if($history->status ==1){
-            $approval_status ='approved';
-         }else{
-            $approval_status ='rejected';
-         }
-         $currentLevelStaff =$this->staff_model->get($history->approved_by);
-         ?>
-         
-         <div class="feed-item <?php echo ($approval_status =='approved')?'approved-status':'pending-status'; ?>">
-            <div class="row">
-                  <div class="col-md-8">
-
-                     <?php if($approval_status =='approved'): ?>
-                        <div class="date"><span class="text-has-action text-success" data-toggle="tooltip" data-title="<?php echo _dt($currentHistory->approved_at); ?>" data-original-title="" title="">Approved -  <?php echo time_ago($currentHistory->approved_at); ?></span></div>
-                     <?php elseif($approval_status =='rejected'): ?>
-                        <div class="date"><span class="text-has-action text-danger" data-toggle="tooltip" data-title="<?php echo _dt($currentHistory->approved_at); ?>" data-original-title="" title="">Rejected -  <?php echo time_ago($currentHistory->approved_at); ?></span></div>
-                     <?php else: ?>
-                        <div class="date">Pending</div>
-                     <?php endif; ?>
-                     
-                     <div class="text">
-                        <?php if($currentLevelStaff): ?>
-                        <div style="display: flex;">
-                           <div>
-                              <a href="<?php echo admin_url('profile/'.$currentLevelStaff->staffid) ?>"><?php echo staff_profile_image($currentLevelStaff->staffid,array('staff-profile-image-small','media-object')); ?></a>
-                           </div>
-                           <div>
-                              <p class="mbot10 no-mtop"><?php echo $currentLevelStaff->full_name; ?></p>
-                              <p class="text-muted"><?php echo $currentLevelStaff->designation_name ?></p>
-                              <?php if($approval_status =='approved'): ?>
-                              <p class="mbot10 no-mtop"><?php echo $currentHistory->remarks ?></p>
-                              <?php elseif($approval_status =='rejected'): ?>
-                              <p class="mbot10 no-mtop"><?php echo $currentHistory->remarks ?></p>
-                              <?php endif; ?>
-                           </div>
-                        </div>
-                        
-
-                        <?php else: ?>
-                           <p class="mtop10 no-mbot">Auto approval</b></p>
-                        <?php endif; ?>
-                     </div>
-                     
-                  </div>
-                  <div class="clearfix"></div>
-                  <div class="col-md-12">
-                     <hr class="hr-10">
-                  </div>
-            </div>
-         </div>
-      <?php endforeach; ?>
-   </div>
+      <?php approvalFlowTree($approval_history) ?>
+      <?php $reopenedHistory =$this->approval_model->getReopenedHistory('projects',$project->id); ?>
+      <?php if($reopenedHistory):?>
+         <?php approvalFlowTree($reopenedHistory,'Previous History') ?>
+      <?php endif;?>
    <?php elseif($approval_flow): 
       $approval_count =$lastApprovalLevel =0;
       if($approval_history){
@@ -917,6 +871,10 @@ if($project->approved==0 && count($approval_history)>0){
       <?php if($approval_status =='rejected'){break;} ?>
    <?php endforeach; ?>
    </div>
+   <?php $reopenedHistory =$this->approval_model->getReopenedHistory('projects',$project->id); ?>
+   <?php if($reopenedHistory):?>
+      <?php approvalFlowTree($reopenedHistory,'Previous History') ?>
+   <?php endif;?>
    <?php else: ?>
       <h3>Approval doesnot provided</h3>
    <?php endif; ?>

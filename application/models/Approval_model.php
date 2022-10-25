@@ -15,6 +15,15 @@ class Approval_model extends App_Model
     {
         $this->db->where('rel_type',$rel_type);
         $this->db->where('rel_id',$rel_id);
+        $this->db->where('reopened',0);
+        return $this->db->get(db_prefix().'approval_history')->result_object();
+    }
+
+    public function getReopenedHistory($rel_type,$rel_id)
+    {
+        $this->db->where('rel_type',$rel_type);
+        $this->db->where('rel_id',$rel_id);
+        $this->db->where('reopened',1);
         return $this->db->get(db_prefix().'approval_history')->result_object();
     }
 

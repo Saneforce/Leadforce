@@ -4145,7 +4145,10 @@ $lang['sync_mail']				=	"SYNC MAIL";
 
 // approval
 $lang['approval']				=	"Approval";
-
+$lang['approval_projects']      =   "Approval Pending Deals";
+$lang['rejected_projects']      =   "Rejected Deals";
+$lang['approval_reopen']      =     "Reopen";
+$lang['deal_approval_list']      =  "Deal approval list";
 # Deal Rejection Reasons
 $lang['new_DealRejectionReasons']				= 'New Deal Rejection Reasons';
 $lang['all_DealRejectionReasons']				= 'All Deal Rejection Reasons';

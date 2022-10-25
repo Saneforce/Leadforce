@@ -15,9 +15,6 @@ if(isset($_SESSION['approvalList']) && $_SESSION['approvalList'] ==1){
     $approvalList =0;
     $approval_where =' AND ' . db_prefix() . 'projects.approved = 1';
 }
-if($approvalList==1){
-    $hasPermissionEdit =false;
-}
 
 $aColumns_temp = [
     'id'=>db_prefix() . 'projects.id as id',
@@ -66,7 +63,15 @@ $filter = [];
 
 //array_push($where, ' AND ' . db_prefix() . 'projects_status.id = ' . db_prefix() . 'projects.status AND ' . db_prefix() . 'projects_status.status = 0');
 if (!has_permission('projects', '', 'view') || $this->ci->input->post('my_projects')) {
-    array_push($where, ' AND ' . db_prefix() . 'projects.id IN (SELECT project_id FROM ' . db_prefix() . 'project_members WHERE staff_id=' . get_staff_user_id() .$approval_where. ')');
+    array_push($where, ' AND ' . db_prefix() . 'projects.id IN (SELECT project_id FROM ' . db_prefix() . 'project_members WHERE staff_id=' . get_staff_user_id() . ')');
+}
+
+if ($this->ci->input->post('approval_projects')) {
+    array_push($where, ' AND ' . db_prefix() . 'projects.id NOT IN (SELECT rel_id FROM ' . db_prefix() . 'approval_history WHERE rel_type="projects" AND status =0 AND reopened=0)');
+}
+
+if ($this->ci->input->post('rejected_projects')) {
+    array_push($where, ' AND ' . db_prefix() . 'projects.id IN (SELECT rel_id FROM ' . db_prefix() . 'approval_history WHERE rel_type="projects" AND status =0  AND reopened=0)');
 }
 
 $statusIds = $statusIds1 = [];
@@ -281,28 +286,40 @@ foreach ($rResult as $aRow) {
 		$checkbox = "<input type='checkbox' id='check_".$aRow['id']."' class='check_mail' onclick='check_header()' value='".$aRow['id']."'>";
 	}
 
+    $name_style ='';
+    $rejectedDeal =false;
+    if(isset($_SESSION['approvalList']) && $_SESSION['approvalList'] ==1){
+        $this->ci->db->where('rel_type','projects');
+        $this->ci->db->where('rel_id',$aRow['id']);
+        $this->ci->db->where('status',0);
+        $this->ci->db->where('reopened',0);
+        $rejectedDeal =$this->ci->db->get(db_prefix().'approval_history')->row();
+        if($rejectedDeal){
+            $name_style ='style="color:red"';
+        }
+    }
+
     // $row[] = '<a href="' . $link . '">' . $aRow['id'] . '</a>';
-    $row_temp['id']  = '<a href="' . $link . '">' . $aRow['id'] . '</a>';
+    $row_temp['id']  = '<a href="' . $link . '" '.$name_style.'>' . $aRow['id'] . '</a>';
 
-    $name = '<a href="' . $link . '">' . $aRow['name'] . '</a>';
+    
 
+    $name = '<a href="' . $link . '" '.$name_style.'>' . $aRow['name'] . '</a>';
+
+    
     $name .= '<div class="row-options">';
-    if($approvalList==0)
-        $name .= '<a href="' . $link . '">' . _l('view') . '</a>';
+
+    $name .= '<a href="' . $link . '">' . _l('view') . '</a>';
 
     if ($hasPermissionCreate && !$clientid) {
         //$name .= ' | <a href="#" onclick="copy_project(' . $aRow['id'] . ');return false;">' . _l('copy_project') . '</a>';
     }
 
-    if ($hasPermissionEdit && $approvalList==0) {
+    if ($hasPermissionEdit && ($approvalList==0 || $rejectedDeal)) {
         $name .= ' | <a href="' . $link . '?group=project_overview">' . _l('edit') . '</a>';
-    }else{
-        $name .= '<a href="' . $link . '?group=project_overview">' . _l('View') . '</a>';
     }
-    @$this->ci->db->where('rel_type','projects');
-    @$this->ci->db->where('rel_id',$aRow['id']);
-    $has_approval_history =@$this->ci->db->get(db_prefix().'approval_history')->row();
-    if (($approvalList==0 || !$has_approval_history )&& (($hasPermissionDelete && (!empty($my_staffids) && in_array($aRow['teamleader'],$my_staffids) && !in_array($aRow['teamleader'],$view_ids))) || is_admin(get_staff_user_id()) || $aRow['teamleader'] == get_staff_user_id())) {
+    
+    if (($approvalList==0 || $rejectedDeal)&& (($hasPermissionDelete && (!empty($my_staffids) && in_array($aRow['teamleader'],$my_staffids) && !in_array($aRow['teamleader'],$view_ids))) || is_admin(get_staff_user_id()) || $aRow['teamleader'] == get_staff_user_id())) {
         $name .= ' | <a href="' . admin_url('projects/delete/' . $aRow['id']) . '" class="text-danger _delete">' . _l('delete') . '</a>';
     }
 

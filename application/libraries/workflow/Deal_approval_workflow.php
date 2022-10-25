@@ -70,6 +70,7 @@ class Deal_approval_workflow extends App_workflow
             $approvalLevel =0;
             $CI->db->select('count(id) as level');
             $CI->db->where('rel_type','project');
+            $CI->db->where('reopned',0);
             $CI->db->where('rel_id',$deal_id);
             $approvedRow =$CI->db->get(db_prefix().'approval_history')->row();
             $approvedLevel =0;
@@ -171,24 +172,24 @@ class Deal_approval_workflow extends App_workflow
 
                                     }
                                 }
-                                $CI->db->where('id',$deal_id);
-                                $CI->db->update(db_prefix().'projects',['deleted_status'=>1]);
-                                if($project->lead_id){
-                                    $leadid = $project->lead_id;
-                                    $CI->db->where('id', $deal_id);
-                                    $CI->db->update(db_prefix() . 'projects', ['deleted_status' => 1]);
+                                // $CI->db->where('id',$deal_id);
+                                // $CI->db->update(db_prefix().'projects',['deleted_status'=>1]);
+                                // if($project->lead_id){
+                                //     $leadid = $project->lead_id;
+                                //     $CI->db->where('id', $deal_id);
+                                //     $CI->db->update(db_prefix() . 'projects', ['deleted_status' => 1]);
 
-                                    $CI->db->where('rel_id', $deal_id);
-                                    $CI->db->where('rel_type', 'project');
-                                    $CI->db->update(db_prefix() . 'tasks', ['rel_type' => 'lead', 'rel_id' => $leadid]);
+                                //     $CI->db->where('rel_id', $deal_id);
+                                //     $CI->db->where('rel_type', 'project');
+                                //     $CI->db->update(db_prefix() . 'tasks', ['rel_type' => 'lead', 'rel_id' => $leadid]);
 
-                                    $CI->db->where('rel_id', $deal_id);
-                                    $CI->db->where('rel_type', 'project');
-                                    $CI->db->update(db_prefix() . 'proposals', ['rel_type' => 'lead', 'rel_id' => $leadid]);
+                                //     $CI->db->where('rel_id', $deal_id);
+                                //     $CI->db->where('rel_type', 'project');
+                                //     $CI->db->update(db_prefix() . 'proposals', ['rel_type' => 'lead', 'rel_id' => $leadid]);
 
-                                    $CI->db->where('id',$project->lead_id);
-                                    $CI->db->update(db_prefix().'leads',['project_id'=>0,'deleted_status'=>0]);
-                                }
+                                //     $CI->db->where('id',$project->lead_id);
+                                //     $CI->db->update(db_prefix().'leads',['project_id'=>0,'deleted_status'=>0]);
+                                // }
                             }
                         }else{
                             return false;

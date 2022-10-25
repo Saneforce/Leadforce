@@ -77,6 +77,9 @@ if($project->approved==0){
                      <?php
                      if(is_admin(get_staff_user_id()) || $project->teamleader == get_staff_user_id() || in_array(get_staff_user_id(),$ownerHierarchy) || (!empty($my_staffids) && in_array($project->teamleader,$my_staffids) && !in_array($project->teamleader,$viewIds))) { ?>
                         <div class="btn-group">
+                            <?php if($deal_rejected && get_staff_user_id() == $project->created_by) { ?>
+                                <a href="<?php echo admin_url('projects/approvalReopen/'.$project->id); ?>" style="" class="btn btn-info"><?php echo _l('approval_reopen'); ?></a>
+                            <?php } ?>
                             <?php if($project->deleted_status == 1 && $project->approved ==1) { ?>
                                 <a href="<?php echo admin_url('projects/restore_project/'.$project->id); ?>" style="" class="btn btn-info"><?php echo _l('restore'); ?></a>
                             <?php } else { ?>
@@ -211,7 +214,7 @@ if($project->approved==0){
             <?php } */?>
             <div class="panel_s">
                <div class="panel-body">
-                  <?php echo $this->load->view(($project->approved ==1 && $tab ? $tab['view'] : 'admin/projects/project_overview')); ?>
+                  <?php echo $this->load->view(($project->approved ==1 && $tab['view'] ? $tab['view'] : 'admin/projects/project_overview')); ?>
                </div>
             </div>
          </div>

@@ -132,6 +132,18 @@ foreach($custom_fields as $cfkey=>$cfval){
                       <?php echo _l('home_my_projects'); ?>
                     </a>
                   </li>
+				  <li>
+				<?php if(isset($_GET['approvalList']) && $_GET['approvalList']==1): ?>
+                    <a href="#" data-cview="approval_projects" onclick="dt_custom_view('approval_projects','.table-projects','approval_projects'); return false;">
+                      <?php echo _l('approval_projects'); ?>
+                    </a>
+                  </li>
+				  <li>
+                    <a href="#" data-cview="rejected_projects" onclick="dt_custom_view('rejected_projects','.table-projects','rejected_projects'); return false;">
+                      <?php echo _l('rejected_projects'); ?>
+                    </a>
+                  </li>
+				<?php endif; ?>
                   <?php } ?>
                   <li class="divider"></li>
                   <?php foreach($statuses as $status){ ?>
@@ -149,7 +161,11 @@ foreach($custom_fields as $cfkey=>$cfval){
                 <div class="col-md-1 padding0">
 							<h4><?php echo _l('filter_by'); ?></h4>
 						</div>
+						<?php if(isset($_GET['approvalList']) && $_GET['approvalList']==1): ?>
+						<?php echo form_open(admin_url('projects/index_list?approvalList=1'), array('method'=>'get','id'=>'ganttFiltersForm')); ?>
+						<?php else: ?>
 						<?php echo form_open(admin_url('projects/index_list'), array('method'=>'get','id'=>'ganttFiltersForm')); ?>
+						<?php endif; ?>
 						<?php
 			            /**
 			             * Only show this filter if user has permission for projects view otherwise
@@ -205,6 +221,11 @@ foreach($custom_fields as $cfkey=>$cfval){
                 <div class="_filters _hidden_inputs">
                   <?php
                   echo form_hidden('my_projects');
+				  if(isset($_GET['approvalList']) && $_GET['approvalList']==1){
+					echo form_hidden('approval_projects');
+                  	echo form_hidden('rejected_projects');
+				  }
+                  
                   foreach($statuses as $status){
                    $value = $status['id'];
                      if($status['filter_default'] == 1 && !$this->input->get('status')){
