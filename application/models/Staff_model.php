@@ -385,8 +385,9 @@ class Staff_model extends App_Model
         if (is_staff_logged_in() && $id != '' && $id == get_staff_user_id()) {
             $select_str .= ',(SELECT COUNT(*) FROM ' . db_prefix() . 'notifications WHERE touserid=' . get_staff_user_id() . ' and isread=0) as total_unread_notifications, (SELECT COUNT(*) FROM ' . db_prefix() . 'todos WHERE finished=0 AND staffid=' . get_staff_user_id() . ') as total_unfinished_todos';
         }
-
+        $select_str .=','.db_prefix() . 'designations.name designation_name';
         $this->db->select($select_str);
+        $this->db->join(db_prefix() . 'designations', db_prefix() . 'designations.designationid=' . db_prefix() . 'staff.designation');
         $this->db->where($where);
         if(count($pmids) > 0){
             $this->db->where_in(db_prefix() . 'staff.staffid', $pmids);

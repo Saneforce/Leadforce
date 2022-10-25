@@ -3,8 +3,21 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 $hasPermissionEdit   = has_permission('projects', '', 'edit');
+
+
 $hasPermissionDelete = has_permission('projects', '', 'delete');
 $hasPermissionCreate = has_permission('projects', '', 'create');
+
+if(isset($_SESSION['approvalList']) && $_SESSION['approvalList'] ==1){
+    $approvalList =1;
+    $approval_where =' AND ' . db_prefix() . 'projects.approved = 0';
+}else{
+    $approvalList =0;
+    $approval_where =' AND ' . db_prefix() . 'projects.approved = 1';
+}
+if($approvalList==1){
+    $hasPermissionEdit =false;
+}
 
 $aColumns_temp = [
     'id'=>db_prefix() . 'projects.id as id',
@@ -53,7 +66,7 @@ $filter = [];
 
 //array_push($where, ' AND ' . db_prefix() . 'projects_status.id = ' . db_prefix() . 'projects.status AND ' . db_prefix() . 'projects_status.status = 0');
 if (!has_permission('projects', '', 'view') || $this->ci->input->post('my_projects')) {
-    array_push($where, ' AND ' . db_prefix() . 'projects.id IN (SELECT project_id FROM ' . db_prefix() . 'project_members WHERE staff_id=' . get_staff_user_id() . ')');
+    array_push($where, ' AND ' . db_prefix() . 'projects.id IN (SELECT project_id FROM ' . db_prefix() . 'project_members WHERE staff_id=' . get_staff_user_id() .$approval_where. ')');
 }
 
 $statusIds = $statusIds1 = [];
@@ -64,7 +77,7 @@ if(isset($_REQUEST['last_order_identifier']) && strpos($_REQUEST['last_order_ide
     foreach ($this->ci->projects_model->get_project_statuses() as $status) {
         array_push($statusIds1, $status['id']);
     }
-    array_push($where, ' AND ' . db_prefix() . 'projects.id IN (SELECT project_id FROM '.db_prefix().'project_contacts WHERE contacts_id='.$exp[1].')');
+    array_push($where, ' AND ' . db_prefix() . 'projects.id IN (SELECT project_id FROM '.db_prefix().'project_contacts WHERE contacts_id='.$exp[1].$approval_where.')');
     if (count($statusIds1) > 0) {
         array_push($filter, 'OR tblprojects.status IN (' . implode(', ', $statusIds1) . ')');
         array_push($where, 'AND (' . prepare_dt_filter($filter) . ')');
@@ -75,7 +88,7 @@ if(isset($_REQUEST['last_order_identifier']) && strpos($_REQUEST['last_order_ide
     foreach ($this->ci->projects_model->get_project_statuses() as $status) {
         array_push($statusIds1, $status['id']);
     }
-    array_push($where, ' AND ' . db_prefix() . 'projects.id IN (SELECT projectid FROM '.db_prefix().'project_products WHERE productid='.$exp[1].')');
+    array_push($where, ' AND ' . db_prefix() . 'projects.id IN (SELECT projectid FROM '.db_prefix().'project_products WHERE productid='.$exp[1].$approval_where.')');
     if (count($statusIds1) > 0) {
         array_push($filter, 'OR tblprojects.status IN (' . implode(', ', $statusIds1) . ')');
         array_push($where, 'AND (' . prepare_dt_filter($filter) . ')');
@@ -184,6 +197,15 @@ foreach($projects_list_column_order as $ckey=>$cval){
 //$aColumns = array_unique($aColumns);
 //pre($aColumns);
 //echo "<pre>"; print_r($_SESSION); exit;
+
+// for approval
+if($approvalList){
+    array_push($where, ' AND ' . db_prefix() . 'projects.approved = 0');
+}else{
+    array_push($where, ' AND ' . db_prefix() . 'projects.approved = 1');
+}
+
+
 $pipeline = $_SESSION['pipelines'];
 if (empty($pipeline)) {
     $pipeline = 0;
@@ -198,12 +220,12 @@ if(!empty($gsearch)){
 $my_staffids = $this->ci->staff_model->get_my_staffids();
 if ($_SESSION['member']) {
     $memb = $_SESSION['member'];
-    array_push($where, ' AND (' . db_prefix() . 'projects.id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . $memb . ')) OR  ' . db_prefix() . 'projects.teamleader in (' . $memb . ') )');
+    array_push($where, ' AND (' . db_prefix() . 'projects.id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . $memb . ')'.$approval_where.') OR  ' . db_prefix() . 'projects.teamleader in (' . $memb . ') )');
     //array_push($where, ' AND ' . db_prefix() . 'projects.id IN (SELECT project_id FROM ' . db_prefix() . 'project_members WHERE staff_id=' . $memb . ')');
     //array_push($where, ' AND ' . db_prefix() . 'projects.teamleader = ' . $memb);
 } else {
     if($my_staffids){
-        array_push($where, ' AND (' . db_prefix() . 'projects.id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')) OR  ' . db_prefix() . 'projects.teamleader in (' . implode(',',$my_staffids) . ') )');
+        array_push($where, ' AND (' . db_prefix() . 'projects.id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')'.$approval_where.') OR  ' . db_prefix() . 'projects.teamleader in (' . implode(',',$my_staffids) . ') )');
     }
 }
 array_push($where, ' AND ' . db_prefix() . 'projects.deleted_status = 0');
@@ -230,6 +252,7 @@ if($idkey == 0) {
     $idkey = '';
 }
 //pre($aColumns);exit;
+// pre($where);
 $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [
     'clientid',
     '(SELECT GROUP_CONCAT(staff_id SEPARATOR ",") FROM ' . db_prefix() . 'project_members WHERE project_id=' . db_prefix() . 'projects.id ORDER BY staff_id) as members_ids'.$idkey,
@@ -243,6 +266,7 @@ $output  = $result['output'];
 $rResult = $result['rResult'];
 $view_ids = $this->ci->staff_model->getFollowersViewList();
 $allow_to_call = $this->ci->callsettings_model->accessToCall();
+// pre($where);
 foreach ($rResult as $aRow) {
     
     $row = [];
@@ -253,7 +277,7 @@ foreach ($rResult as $aRow) {
     }
     $row_temp['project_status'] = $stage_of;
     $link = admin_url('projects/view/' . $aRow['id']);
-	if ($hasPermissionEdit) {
+	if ($hasPermissionEdit ) {
 		$checkbox = "<input type='checkbox' id='check_".$aRow['id']."' class='check_mail' onclick='check_header()' value='".$aRow['id']."'>";
 	}
 
@@ -263,18 +287,22 @@ foreach ($rResult as $aRow) {
     $name = '<a href="' . $link . '">' . $aRow['name'] . '</a>';
 
     $name .= '<div class="row-options">';
-
-    $name .= '<a href="' . $link . '">' . _l('view') . '</a>';
+    if($approvalList==0)
+        $name .= '<a href="' . $link . '">' . _l('view') . '</a>';
 
     if ($hasPermissionCreate && !$clientid) {
         //$name .= ' | <a href="#" onclick="copy_project(' . $aRow['id'] . ');return false;">' . _l('copy_project') . '</a>';
     }
 
-    if ($hasPermissionEdit) {
+    if ($hasPermissionEdit && $approvalList==0) {
         $name .= ' | <a href="' . $link . '?group=project_overview">' . _l('edit') . '</a>';
+    }else{
+        $name .= '<a href="' . $link . '?group=project_overview">' . _l('View') . '</a>';
     }
-
-    if (($hasPermissionDelete && (!empty($my_staffids) && in_array($aRow['teamleader'],$my_staffids) && !in_array($aRow['teamleader'],$view_ids))) || is_admin(get_staff_user_id()) || $aRow['teamleader'] == get_staff_user_id()) {
+    @$this->ci->db->where('rel_type','projects');
+    @$this->ci->db->where('rel_id',$aRow['id']);
+    $has_approval_history =@$this->ci->db->get(db_prefix().'approval_history')->row();
+    if (($approvalList==0 || !$has_approval_history )&& (($hasPermissionDelete && (!empty($my_staffids) && in_array($aRow['teamleader'],$my_staffids) && !in_array($aRow['teamleader'],$view_ids))) || is_admin(get_staff_user_id()) || $aRow['teamleader'] == get_staff_user_id())) {
         $name .= ' | <a href="' . admin_url('projects/delete/' . $aRow['id']) . '" class="text-danger _delete">' . _l('delete') . '</a>';
     }
 

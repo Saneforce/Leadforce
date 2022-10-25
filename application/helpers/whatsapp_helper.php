@@ -96,7 +96,7 @@ function whatsapp_send_template_message($to,$template,$variables)
         ));
     
         $response = curl_exec($curl);
-    
+        
         curl_close($curl);
     }
     

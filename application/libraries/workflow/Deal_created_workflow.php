@@ -6,6 +6,7 @@ class Deal_created_workflow extends App_workflow
     private static $action = 'deal_created';
     private static $name = 'Deal created';
     private static $description = 'Trigger when new deal created';
+    private static $icon ='<i class="fa fa-usd"></i>';
     private static $availableServices = [
         'whatsapp_staff_notification' => [
             'type' => 'notification',
@@ -19,7 +20,7 @@ class Deal_created_workflow extends App_workflow
     public function __construct()
     {
         parent::__construct();
-        $this->addWorkflow(self::$action, self::$name, self::$description, self::$availableServices);
+        $this->addWorkflow(self::$action, self::$name, self::$description, self::$availableServices,self::$icon);
     }
 
     public function getService($name)
@@ -35,7 +36,7 @@ class Deal_created_workflow extends App_workflow
 
         $CI = &get_instance();
         $CI->load->model('projects_model');
-        $flows = $CI->workflow_model->getflows('deal_created');
+        $flows = $CI->workflow_model->getflows(self::$action);
         $CI->load->library('merge_fields/deals_merge_fields');
         $deals_merge_fields = $CI->deals_merge_fields->format($deal_id);
         $deal = $CI->projects_model->get($deal_id);

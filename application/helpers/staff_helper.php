@@ -174,6 +174,12 @@ function get_available_staff_permissions($data = [])
                 'delete' => _l('permission_delete'),
             ],
         ],
+        'workflow' => [
+            'name'         => _l('workflow'),
+            'capabilities' => [
+                'edit' => _l('permission_configure'),
+            ],
+        ],
 
     ];
 

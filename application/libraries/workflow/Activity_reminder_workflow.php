@@ -6,6 +6,7 @@ class Activity_reminder_workflow extends App_workflow
     private static $action = 'activity_reminder';
     private static $name = 'Activity Reminder';
     private static $description = 'Trigger when activity reminder';
+    private static $icon ='<i class="fa fa-tty"></i>';
     private static $availableServices = [
         'whatsapp_staff_notification' => [
             'type' => 'notification',
@@ -26,7 +27,7 @@ class Activity_reminder_workflow extends App_workflow
     public function __construct()
     {
         parent::__construct();
-        $this->addWorkflow(self::$action, self::$name, self::$description, self::$availableServices);
+        $this->addWorkflow(self::$action, self::$name, self::$description, self::$availableServices,self::$icon);
     }
 
     public function getService($name)

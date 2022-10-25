@@ -16,6 +16,7 @@ class Projects extends AdminController
         $this->load->helper('date');
         $this->load->helper('upload');
         $this->load->library('user_agent');
+        $this->load->helper('approval_helper');
     }
 
     public function set_session_url()
@@ -56,6 +57,11 @@ class Projects extends AdminController
             $this->session->unset_userdata('member');
             $this->session->unset_userdata('gsearch');
         }
+
+        if(!isset($_GET['approvalList'])) {
+            $this->session->unset_userdata('approvalList');
+        }
+        $data['show_approval_list']    = $this->input->get('approval');
         $data['gsearch']    = $this->input->get('gsearch');
         $selected_statuses = [];
         $selectedMember    = null;
@@ -306,14 +312,8 @@ class Projects extends AdminController
                 unset($data['total']);
 				$data['progress'] = $this->projects_model->getprogressstatus($data['status']);
                 $data['created_by'] =get_staff_user_id();
-                $id = $this->projects_model->add($data);
+                $id = $this->projects_model->add($data,$products,$project_contacts,$primary_contact);
                 if ($id) {
-                    if($products) {
-                        $this->load->model('currencies_model');
-                        $this->products_model->add_deals_products($products, $id, $data['project_currency']);    
-                    }
-                    $this->projects_model->add_edit_contacts($project_contacts, $id);
-                    $this->projects_model->add_primary_contacts($primary_contact, $id);
                     set_alert('success', _l('added_successfully', _l('project')));
                     redirect(admin_url('projects/view/' . $id));
                 }
@@ -924,6 +924,25 @@ class Projects extends AdminController
                 }
             }
             $data['primarycont'] =  $primarycontact;
+
+            // for approval 
+            $this->load->model('workflow_model');
+            $this->load->model('approval_model');
+            $this->load->model('DealRejectionReasons_model');
+            $this->load->model('staff_model');
+            $data['all_dealrejectionreasons']            = $this->DealRejectionReasons_model->getDealRejectionReasons();
+            $data['approval_flow'] =$this->workflow_model->getflows('deal_approval');
+            $data['approval_history'] =(array) $this->approval_model->getHistory('projects',$id);
+            $this->db->where('rel_type','projects');
+            $this->db->where('rel_id',$id);
+            $this->db->where('status',0);
+            $this->db->select('count(id) as rejected');
+            $deal_rejected_details =$this->db->get(db_prefix().'approval_history')->row();
+            if($deal_rejected_details)
+                $data['deal_rejected'] =$deal_rejected_details->rejected;
+            else
+                $data['deal_rejected'] =0;
+            $data['staff_hierarchy'] =$this->approval_model->getDealReportingLevels($project->teamleader);
             $this->load->view('admin/projects/view', $data);
         } else {
             access_denied('Project View');
@@ -3853,4 +3872,50 @@ class Projects extends AdminController
 		$req_out['persons'] = $person_option;
 		echo json_encode($req_out);
 	}
+
+    public function approve($id)
+    {
+        if($this->input->post('status') ==0 && !$this->input->post('reason')){
+            echo json_encode(
+                array(
+                    'success'=>false,
+                    'msg'=>'Reason cannot be empty'
+                )
+            );
+            die;
+        }
+        
+        if($this->input->post('status') ==0 && strlen(trim($this->input->post('remarks')))==0){
+            echo json_encode(
+                array(
+                    'success'=>false,
+                    'msg'=>'Remarks cannot be empty'
+                )
+            );
+            die;
+        }
+        
+        $success =approve_deal($id);
+        if($success){
+            if($this->input->post('status')==1){
+                $msg ='Deal approved successfully';
+            }else{
+                $msg ='Deal rejected successfully';
+            }
+            echo json_encode(
+                array(
+                    'success'=>true,
+                    'msg'=>$msg
+                )
+            );
+            die;
+        }else{
+            echo json_encode(
+                array(
+                    'success'=>false,
+                    'msg'=>'Could not approve this deal'
+                )
+            );
+        }
+    }
 }

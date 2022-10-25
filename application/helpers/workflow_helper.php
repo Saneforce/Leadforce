@@ -1,6 +1,5 @@
 <?php
 
-
 hooks()->add_action('app_init', 'app_init_workflow_actions');
 
 function app_init_workflow_actions()
@@ -10,9 +9,10 @@ function app_init_workflow_actions()
     
     $actions = [
         'workflow/app_workflow',
-        'workflow/lead_created_workflow',
-        'workflow/deal_created_workflow',
-        'workflow/activity_reminder_workflow',
+        // 'workflow/lead_created_workflow',
+        // 'workflow/deal_created_workflow',
+        // 'workflow/activity_reminder_workflow',
+        'workflow/deal_approval_workflow',
     ];
 
     foreach ($actions as $action) {
@@ -39,3 +39,13 @@ function workflow_deal_created($deal_id)
     $CI->deal_created_workflow->trigger($deal_id);
 }
 
+hooks()->add_action('after_add_project_approval','workflow_deal_created_approval');
+
+function workflow_deal_created_approval($deal_id)
+{
+   
+    $CI = &get_instance();
+    $CI->load->model('workflow_model');
+    $CI->deal_approval_workflow->trigger($deal_id);
+    redirect(admin_url('projects/index_list'));
+}

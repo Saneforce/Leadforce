@@ -1,25 +1,21 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
+<?php $approvalLevel =0; ?>
 <?php init_head(); ?>
 <style>
     div.lineHorizontal {
         border-left: 3px dashed gray;
         height: 50px;
-        left: 10%;
-        margin-left: 10%;
+        left: 13%;
+        margin-left:13%;
     }
 
-    div#openFlowsWrapper {
-        margin-left: 5%;
+    div.openFlowsWrapper {
+        margin-left: 8%;
         width: 10%;
         text-align: center;
-        padding: 15px;
-        border-radius: 50px;
-        background-color: white;
-        font-size: 18px;
-
     }
 
-    div#openFlowsWrapper .btn {
+    div.openFlowsWrapper .btn {
         background-color: white;
     }
 
@@ -35,11 +31,15 @@
     .addflow:hover .panel-body {
         border-color: black;
     }
+
+    .flow .badge-success{
+        background-color: #84c529;
+    }
 </style>
 <div id="wrapper">
     <div class="content">
         <div class="row">
-            <div class="col-md-6 col-md-offset-3">
+            <div class="col-md-8 col-md-offset-2">
 
                 <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
@@ -61,12 +61,12 @@
                         <div class="panel_s flow">
                             <div class="panel-body">
                                 <div class="row">
-                                    <div class="col-xs-3">
-                                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHcAAAB3CAMAAAAO5y+4AAAAbFBMVEX///8AAAD8/PzIyMi9vb3Nzc3f39/q6uq0tLT5+fnz8/Pt7e3FxcUMDAzn5+fCwsLW1taBgYFVVVUzMzNERESlpaU8PDyLi4taWloTExOVlZV7e3usrKxycnItLS2cnJxoaGglJSVLS0sbGxtvtC+wAAAFDUlEQVRoge1a67KyOgx1IyCgIggIosjF93/HT9lNSaFIguwzc2ZYP7Xpork3sNmsWLFixYoVS8B44T8l9PxtGVbZ+Y2sSJ1g5/45p+uXVfTTR3Nz9n/JaqdDTkCWeH/E6jSjpL8orOVJjXKCtMXltDBtQmFtmZc8czBu1iGqpezspv2t66zIE+ewPTllWjXX3r9HcxFaO1Z2fVT3YI8Thruz8rPKfFvgyI6yY2bqA9VOLnhZ7H9Lm6PdrqH9YeU2w7r+0r1uaK9wN7HYwur+ysgV0vCnswJM5GPOIrTEXYzbAifu9ojpaf/QEc+0cZejbhwxv5Zys7x6K8VznqAnAz6aEce7J0iXXFFD+nXB561m075SmCRmO/UdJFM+7UvVkL2OTBPvIBCzObSvvAlWqnhyhRB7zM3wJ9AXqxMIQCqYSbvZQPG8cJpd8Aslgu5xXUd0c4OJ73RaC7SMn7VgeijoLKIfGCoatg3orSFvAz5CztM2UKDfTJm9yFnXFwIxVQBq/bb7yaslLz0HQV2hOudRGAb9hPrYKzkVgN6IvghehT0Id08JlXcDFwzaavAglDL2iJYRkeAUNEXXQztuMS+2+2e4QoBUWuBs2P1NhfdM5YWi1kyvlA3zcz/8DUBp8RQ5ylphXiXqTgrtkcwLHk0xcKZx/kDhpUew8fiVoCTXemjejXFEtBFjpiAKDKFDAx9UVYM6aVZtTMkaElm1VrMScugDgxbaJYJDi2zVa0GNGmhZvTQEfjS9Urhu3EtKss+jB+8b4hTH6RRn6jXjylEDo3/oAmGa1xk5lgxhej1CvNMTvTHe7pbGaW3pvCN6fpV+qWnGfQlq6rSeR/wK7cG5fQiZ5/TKQBtHLbqRHbkSilNcpleKMvjU5f4ua/WbuzH7JeTgc0d2bv97SGK1Oc2fhT57CmekJJvogw1Rv4PrVeuLZ92TxnRPFMrUp3K7I47s/o/DaSy0v5TWPf/oCp1Tv47sKZu/hUz96qnJ1xsilY81FbjFu+bv3KUMJy+Kq0MEEGilY43lYQv3AMfCwuPB9y94bfzJZn2IxaO+PzGNRiEFNyRaKQHljOb/3XmM84WHZieKeTv3HO+2jXCct0LrxJCDUPVbPDSW6uEwyoviHkon9UKVDLcYwL3paY+o2YS5HbX/BI/+7P52peNFzwoRR2+3wXwT9yl7eGasInB7et8rs+GUhtxEce0zzjVgLU57AgepJlcavnyZkimdNcQuawoNM+Sa8obV8K2DebDUcDcy8qNjnLku0Yd8D0O+O74B52X1yhjyXsObmUNaoCW4IeS9Nea9CheBRGjHtLBlyWLOVUXozZp546aEPnJSBFlXToluOMB1SxiHzPpOQt4c+WYSsce7cv7C63JnzZ7VXwfW8QJaUbG6gWLNfmsFXaBwRtd3qsvPw5nW+g4VigcrYbRAXaCxN29QRpsJN/PKZ0d74dPC8LUwTqn6yUbjjKeBfYr7zPOM9zAeaOpHg1BbXry72s2GfNb+EHSIKrHwaXwzv/RWzPt65EOz2OFSFWF4KzKNUrKZ77qew60YqOe+5vaHe12rUtvEaVaWs7/Fuvd2OqdtzggIzI/8i8+wim6faxOeuqzz6eurNxrnm89UDNgmKsx+7HvbQhtcr3Y9Lue/wmzRVrFr5QT6tGgE96o+KpzXKBw8IR/5T5NMPfo+MJ0yDcM0T5yTvcxXhSPnXLFixYoVK1as+L/hH18eNwlNDMBOAAAAAElFTkSuQmCC" height="100px" width="100px">
+                                    <div class="col-xs-3" style="font-size: 70px;text-align: center;">
+                                        <?php echo $workflow['services'][$flow->service]['icon']; ?>
                                     </div>
                                     <div class="col-xs-9">
                                         <div style="display: flex;justify-content: space-between;">
-                                            <p class="text-muted"><?php echo $service['type'] ?></p>
+                                            <p class="text-muted"><?php echo _l($service['type']) ?></p>
                                             <div>
                                                 <div class="onoffswitch">
                                                     <input type="checkbox" data-switch-url="<?= admin_url('workflow/updateFlowStatus') ?>" name="onoffswitch" class="onoffswitch-checkbox" id="<?= $flow->id ?>" data-id="<?= $flow->id ?>" <?= ($flow->inactive == 0) ? "checked" : "" ?>>
@@ -75,10 +75,57 @@
                                             </div>
                                         </div>
 
-                                        <h4><?php echo $service['name'] ?></h4>
+                                        <h4><?php echo $service['name'];?>
+                                        <?php if($workflow['services'][$flow->service]['medium']=='approval'): $approvalLevel++; ?>
+                                        <span class="badge badge-success"><?php echo $approvalLevel ?></span>
+                                        <?php endif; ?>
+                                        </h4>
                                         <p class="no-margin"><?php echo $service['description'] ?></p>
                                         <a href="<?php echo admin_url('workflow/configure/' . $flow->id) ?>" class="btn btn-primary" style="float: right;">Configure</a>
                                         <a href="#" data-flow-id="<?php echo $flow->id ?>" class="btn btn-danger delete-flow" style="float: right;margin-right:10px">Delete</a>
+                                        <?php $childer_before_br =true; ?>
+                                        <?php foreach($this->workflow_model->getflows($workflow['action'],$flow->id) as $childflow): ?>
+                                            <?php if($childer_before_br): ?>
+                                            <br><br><br><br>
+                                            <?php $childer_before_br=false; endif; ?>
+                                            <?php if (isset($workflow['services'][$childflow->service])) : $service = $workflow['services'][$childflow->service]; ?>
+                                                <div class="panel_s flow">
+                                                    <div class="panel-body">
+                                                        <div class="row">
+                                                            <div class="col-xs-3" style="font-size: 70px;text-align: center;">
+                                                                <?php echo $workflow['services'][$childflow->service]['icon']; ?>
+                                                            </div>
+                                                            <div class="col-xs-9">
+                                                                <div style="display: flex;justify-content: space-between;">
+                                                                    <p class="text-muted"><?php echo $service['type'] ?></p>
+                                                                    <div>
+                                                                        <div class="onoffswitch">
+                                                                            <input type="checkbox" data-switch-url="<?= admin_url('workflow/updateFlowStatus') ?>" name="onoffswitch" class="onoffswitch-checkbox" id="<?= $childflow->id ?>" data-id="<?= $childflow->id ?>" <?= ($childflow->inactive == 0) ? "checked" : "" ?>>
+                                                                            <label class="onoffswitch-label" for="<?= $childflow->id ?>"></label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <h4><?php echo $service['name'];?>
+                                                                <?php if($workflow['services'][$childflow->service]['medium']=='approval'): $approvalLevel++; ?>
+                                                                <span class="badge badge-success"><?php echo $approvalLevel ?></span>
+                                                                <?php endif; ?>
+                                                                </h4>
+                                                                <p class="no-margin"><?php echo $service['description'] ?></p>
+                                                                <a href="<?php echo admin_url('workflow/configure/' . $childflow->id) ?>" class="btn btn-primary" style="float: right;">Configure</a>
+                                                                <a href="#" data-flow-id="<?php echo $childflow->id ?>" class="btn btn-danger delete-flow" style="float: right;margin-right:10px">Delete</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="lineHorizontal"></div>
+                                            <?php endif; ?>
+                                        <?php endforeach; ?>
+                                        <?php if($workflow['services'][$flow->service]['medium']=='approval'):?>
+                                        <div class="openFlowsWrapper">
+                                            <button class="btn btn-dark openFlows" data-parent-flow ="<?php echo $flow->id ?>"><i class="fa fa-plus" aria-hidden="true"></i></button>
+                                        </div>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>
@@ -86,8 +133,8 @@
                         <div class="lineHorizontal"></div>
                     <?php endif; ?>
                 <?php endforeach; ?>
-                <div id="openFlowsWrapper">
-                    <button class="btn btn-dark" id="openFlows"><i class="fa fa-plus" aria-hidden="true"></i></button>
+                <div class="openFlowsWrapper">
+                    <button class="btn btn-dark openFlows" data-parent-flow ="0"><i class="fa fa-plus" aria-hidden="true"></i></button>
                 </div>
             </div>
         </div>
@@ -103,8 +150,8 @@
                         <div class="col-md-3">
                             <div class="panel_s addflow no-margin" data-flow-name="<?php echo $service_name ?>">
                                 <div class="panel-body" style="padding: 10px;">
-                                    <div class="">
-                                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHcAAAB3CAMAAAAO5y+4AAAAbFBMVEX///8AAAD8/PzIyMi9vb3Nzc3f39/q6uq0tLT5+fnz8/Pt7e3FxcUMDAzn5+fCwsLW1taBgYFVVVUzMzNERESlpaU8PDyLi4taWloTExOVlZV7e3usrKxycnItLS2cnJxoaGglJSVLS0sbGxtvtC+wAAAFDUlEQVRoge1a67KyOgx1IyCgIggIosjF93/HT9lNSaFIguwzc2ZYP7Xpork3sNmsWLFixYoVS8B44T8l9PxtGVbZ+Y2sSJ1g5/45p+uXVfTTR3Nz9n/JaqdDTkCWeH/E6jSjpL8orOVJjXKCtMXltDBtQmFtmZc8czBu1iGqpezspv2t66zIE+ewPTllWjXX3r9HcxFaO1Z2fVT3YI8Thruz8rPKfFvgyI6yY2bqA9VOLnhZ7H9Lm6PdrqH9YeU2w7r+0r1uaK9wN7HYwur+ysgV0vCnswJM5GPOIrTEXYzbAifu9ojpaf/QEc+0cZejbhwxv5Zys7x6K8VznqAnAz6aEce7J0iXXFFD+nXB561m075SmCRmO/UdJFM+7UvVkL2OTBPvIBCzObSvvAlWqnhyhRB7zM3wJ9AXqxMIQCqYSbvZQPG8cJpd8Aslgu5xXUd0c4OJ73RaC7SMn7VgeijoLKIfGCoatg3orSFvAz5CztM2UKDfTJm9yFnXFwIxVQBq/bb7yaslLz0HQV2hOudRGAb9hPrYKzkVgN6IvghehT0Id08JlXcDFwzaavAglDL2iJYRkeAUNEXXQztuMS+2+2e4QoBUWuBs2P1NhfdM5YWi1kyvlA3zcz/8DUBp8RQ5ylphXiXqTgrtkcwLHk0xcKZx/kDhpUew8fiVoCTXemjejXFEtBFjpiAKDKFDAx9UVYM6aVZtTMkaElm1VrMScugDgxbaJYJDi2zVa0GNGmhZvTQEfjS9Urhu3EtKss+jB+8b4hTH6RRn6jXjylEDo3/oAmGa1xk5lgxhej1CvNMTvTHe7pbGaW3pvCN6fpV+qWnGfQlq6rSeR/wK7cG5fQiZ5/TKQBtHLbqRHbkSilNcpleKMvjU5f4ua/WbuzH7JeTgc0d2bv97SGK1Oc2fhT57CmekJJvogw1Rv4PrVeuLZ92TxnRPFMrUp3K7I47s/o/DaSy0v5TWPf/oCp1Tv47sKZu/hUz96qnJ1xsilY81FbjFu+bv3KUMJy+Kq0MEEGilY43lYQv3AMfCwuPB9y94bfzJZn2IxaO+PzGNRiEFNyRaKQHljOb/3XmM84WHZieKeTv3HO+2jXCct0LrxJCDUPVbPDSW6uEwyoviHkon9UKVDLcYwL3paY+o2YS5HbX/BI/+7P52peNFzwoRR2+3wXwT9yl7eGasInB7et8rs+GUhtxEce0zzjVgLU57AgepJlcavnyZkimdNcQuawoNM+Sa8obV8K2DebDUcDcy8qNjnLku0Yd8D0O+O74B52X1yhjyXsObmUNaoCW4IeS9Nea9CheBRGjHtLBlyWLOVUXozZp546aEPnJSBFlXToluOMB1SxiHzPpOQt4c+WYSsce7cv7C63JnzZ7VXwfW8QJaUbG6gWLNfmsFXaBwRtd3qsvPw5nW+g4VigcrYbRAXaCxN29QRpsJN/PKZ0d74dPC8LUwTqn6yUbjjKeBfYr7zPOM9zAeaOpHg1BbXry72s2GfNb+EHSIKrHwaXwzv/RWzPt65EOz2OFSFWF4KzKNUrKZ77qew60YqOe+5vaHe12rUtvEaVaWs7/Fuvd2OqdtzggIzI/8i8+wim6faxOeuqzz6eurNxrnm89UDNgmKsx+7HvbQhtcr3Y9Lue/wmzRVrFr5QT6tGgE96o+KpzXKBw8IR/5T5NMPfo+MJ0yDcM0T5yTvcxXhSPnXLFixYoVK1as+L/hH18eNwlNDMBOAAAAAElFTkSuQmCC" height="80px" width="80px">
+                                    <div class="" style="font-size: 50px;text-align: center;">
+                                        <?php echo $service['icon']; ?>
                                     </div>
                                     <div class="">
                                         <p class="text-muted text-small"><?php echo $service['name'] ?></p>
@@ -122,6 +169,7 @@
 <?php init_tail(); ?>
 
 <script>
+    var currentParentFlowId =0;
     function addService(service) {
         var action = '<?php echo $workflow['action'] ?>';
         $.ajax({
@@ -129,7 +177,8 @@
             type: "post",
             data: {
                 'action': action,
-                'service': service
+                'service': service,
+                'parent_id':currentParentFlowId,
             },
             dataType: "json",
             success: function(response) {
@@ -144,14 +193,14 @@
             },
         })
     }
-    $('#openFlows').click(function() {
+    $('.openFlows').click(function() {
+        currentParentFlowId =$(this).attr('data-parent-flow');
         $('#flowsModal').modal('show');
     });
     $('.addflow').click(function() {
-        var service = $(this).attr('data-flow-name');
+        var service =$(this).attr('data-flow-name');
         addService(service);
     });
-
     $('.delete-flow').click(function(e){
         e.preventDefault();
         if(confirm("Do you want to delete this?")){

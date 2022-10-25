@@ -270,6 +270,24 @@ function app_init_admin_sidebar_menu_items() {
         ]);
     }
 
+    if (has_permission('DealRejectionReasons', '', 'view')) {
+        $CI->app_menu->add_setup_menu_item('DealRejectionReasons', [
+            'name' => _l('als_DealRejectionReasons'),
+            'href' => admin_url('DealRejectionReasons'),
+            //'icon' => 'fa fa-bullhorn',
+            'position' => 56,
+        ]);
+    }
+
+    if (has_permission('workflow', '', 'edit')) {
+        $CI->app_menu->add_setup_menu_item('workflow', [
+            'name' => _l('workflow'),
+            'href' => admin_url('workflow'),
+            //'icon' => 'fa fa-bullhorn',
+            'position' => 56,
+        ]);
+    }
+
     if (has_permission('DealLossReasons', '', 'view')) {
         $CI->app_menu->add_setup_menu_item('DealLossReasons', [
             'name' => _l('als_DealLossReasons'),

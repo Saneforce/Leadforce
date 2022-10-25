@@ -239,6 +239,7 @@ function get_relation_data($type, $rel_id = '')
             $data = $CI->projects_model->get($rel_id);
         } else {
             $where_projects = ' tblprojects.deleted_status = 0 ';
+            $where_projects = ' tblprojects.approved = 1 ';
 			if(in_array('clientid',$need_fields) && in_array('clientid',$mandatory_fields)){
 				if ($CI->input->post('customer_id')) {
 				    $where_projects .= 'AND clientid=' . $CI->input->post('customer_id');

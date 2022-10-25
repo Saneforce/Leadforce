@@ -1,4 +1,21 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
+<?php 
+$can_user_edit =false;
+if(is_admin(get_staff_user_id()) || $project->teamleader == get_staff_user_id() || in_array(get_staff_user_id(),$ownerHierarchy) || (!empty($my_staffids) && in_array($project->teamleader,$my_staffids) && !in_array($project->teamleader,$viewIds))){
+   $can_user_edit =true;
+}
+if($project->approved==0 && count($approval_history)>0){
+   $can_user_edit =false;
+}
+?>
+<style>
+.feed-item{
+   border-left: 2px solid grey !important;
+}
+.activity-feed .feed-item:last-child {
+    border-color: transparent !important;
+}
+</style>
 <div class="row">
    <div class="col-md-6 border-right project-overview-left">
       <div class="row">
@@ -59,7 +76,7 @@
                      <span class="updated_text">
                      <?php echo $project->name; ?>
                      </span>
-                     <?php if(is_admin(get_staff_user_id()) || $project->teamleader == get_staff_user_id() || in_array(get_staff_user_id(),$ownerHierarchy) || (!empty($my_staffids) && in_array($project->teamleader,$my_staffids) && !in_array($project->teamleader,$viewIds))) { ?>
+                     <?php if($can_user_edit ==true){ ?>
                         <button class="btn btn-link pull-right no-padding data_display_btn" data-val="name" ><i class="fa fa-pencil"></i></button>
                      <?php } ?>
                      </div>
@@ -86,7 +103,7 @@
                      <span class="updated_text">
                      <?php echo (isset($teamleader)&&isset($teamleader->firstname))?($teamleader->firstname.' '.$teamleader->lastname):''; ?>
                      </span>
-                     <?php if(is_admin(get_staff_user_id()) || $project->teamleader == get_staff_user_id() || in_array(get_staff_user_id(),$ownerHierarchy) || (!empty($my_staffids) && in_array($project->teamleader,$my_staffids) && !in_array($project->teamleader,$viewIds))) { ?>
+                     <?php if($can_user_edit ==true){ ?>
                         <button class="btn btn-link pull-right no-padding data_display_btn" data-val="teamleader" ><i class="fa fa-pencil"></i></button>
                         <?php } ?>
                       </div>
@@ -125,7 +142,7 @@
                            <?php echo $project->client_data->company; ?>
                         </a>
                         </span>
-                        <?php if(is_admin(get_staff_user_id()) || $project->teamleader == get_staff_user_id() || in_array(get_staff_user_id(),$ownerHierarchy) || (!empty($my_staffids) && in_array($project->teamleader,$my_staffids) && !in_array($project->teamleader,$viewIds))) { ?>
+                        <?php if($can_user_edit ==true){ ?>
                         <button class="btn btn-link pull-right no-padding data_display_btn" data-val="clientid" ><i class="fa fa-pencil"></i></button>
                         <?php } ?>
                       </div>
@@ -163,7 +180,7 @@
                      <span class="updated_text">
                         <?php echo (isset($pipeline)&&isset($pipeline->name))?$pipeline->name:''; ?>
                      </span>
-                     <?php if(is_admin(get_staff_user_id()) || $project->teamleader == get_staff_user_id() || in_array(get_staff_user_id(),$ownerHierarchy) || (!empty($my_staffids) && in_array($project->teamleader,$my_staffids) && !in_array($project->teamleader,$viewIds))) { ?>
+                     <?php if($can_user_edit ==true){ ?>
                         <button class="btn btn-link pull-right no-padding data_display_btn" data-val="pipeline_id" ><i class="fa fa-pencil"></i></button>
                      <?php } ?> 
                     </div>
@@ -228,7 +245,7 @@
                      <span class="updated_text">
                      <?php echo app_format_money($project->project_cost, $currency); ?>
                      </span>
-                     <?php if(is_admin(get_staff_user_id()) || $project->teamleader == get_staff_user_id() || in_array(get_staff_user_id(),$ownerHierarchy) || (!empty($my_staffids) && in_array($project->teamleader,$my_staffids) && !in_array($project->teamleader,$viewIds))) { ?>
+                     <?php if($can_user_edit ==true){ ?>
                         <button class="btn btn-link pull-right no-padding data_display_btn" data-val="project_total_cost" ><i class="fa fa-pencil"></i></button>
                      <?php } ?>  
                     </div>
@@ -259,7 +276,7 @@
                      <span class="updated_text">
                      <?php echo $project_status['name']; ?>
                      </span>
-                     <?php if(is_admin(get_staff_user_id()) || $project->teamleader == get_staff_user_id() || in_array(get_staff_user_id(),$ownerHierarchy) || (!empty($my_staffids) && in_array($project->teamleader,$my_staffids) && !in_array($project->teamleader,$viewIds))) { ?>
+                     <?php if($can_user_edit ==true){ ?>
                         <button class="btn btn-link pull-right no-padding data_display_btn" data-val="status" ><i class="fa fa-pencil"></i></button>
                      <?php }?>
                       </div>
@@ -292,7 +309,7 @@
                      <span class="updated_text">
                      <?php echo _d($project->deadline); ?>
                      </span>
-                     <?php if(is_admin(get_staff_user_id()) || $project->teamleader == get_staff_user_id() || in_array(get_staff_user_id(),$ownerHierarchy) || (!empty($my_staffids) && in_array($project->teamleader,$my_staffids) && !in_array($project->teamleader,$viewIds))) { ?>
+                     <?php if($can_user_edit ==true){ ?>
                      <button class="btn btn-link pull-right no-padding data_display_btn" data-val="deadline" ><i class="fa fa-pencil"></i></button>
                      <?php } ?>
                      </div>
@@ -500,7 +517,7 @@
    }
    ?>
    <?php if(has_permission('projects','','edit') || has_permission('projects','','create')){ ?>
-    <?php if(is_admin(get_staff_user_id()) || $project->teamleader == get_staff_user_id() || in_array(get_staff_user_id(),$ownerHierarchy) || (!empty($my_staffids) && in_array($project->teamleader,$my_staffids) && !in_array($project->teamleader,$viewIds))) { ?>
+    <?php if($can_user_edit ==true){ ?>
    <div class="inline-block pull-right  project-member-settings" data-toggle="tooltip" data-title="<?php echo _l('project_description'); ?>">
       <a href="#" data-toggle="modal" class="pull-right" data-target="#edit_description""><i class="fa fa-pencil"></i></a>
    </div>
@@ -510,7 +527,7 @@
 <div class="team-members project-overview-team-members">
    <hr class="hr-panel-heading project-area-separation" />
    <?php if(has_permission('projects','','edit') || has_permission('projects','','create')){ ?>
-    <?php if(is_admin(get_staff_user_id()) || $project->teamleader == get_staff_user_id() || in_array(get_staff_user_id(),$ownerHierarchy) || (!empty($my_staffids) && in_array($project->teamleader,$my_staffids) && !in_array($project->teamleader,$viewIds))) { ?>
+    <?php if($can_user_edit ==true){ ?>
    <div class="inline-block pull-right mright10 project-member-settings" data-toggle="tooltip" data-title="<?php echo _l('add_edit_members'); ?>">
       <a href="#" data-toggle="modal" class="pull-right" data-target="#add-edit-members"><i class="fa fa-plus"></i></a>
    </div>
@@ -538,7 +555,7 @@
             <?php } ?>
 
             <?php if(has_permission('projects','','edit') || has_permission('projects','','create')){ ?>
-                <?php if(is_admin(get_staff_user_id()) || $project->teamleader == get_staff_user_id() || in_array(get_staff_user_id(),$ownerHierarchy) || (!empty($my_staffids) && in_array($project->teamleader,$my_staffids) && !in_array($project->teamleader,$viewIds))) { ?>
+                <?php if($can_user_edit ==true){ ?>
             <a href="<?php echo admin_url('projects/remove_team_member/'.$project->id.'/'.$member['staff_id']); ?>" class="text-danger _delete"><i class="fa fa fa-times"></i></a>
             <?php } } ?>
 
@@ -552,7 +569,7 @@
 <div class="team-contacts project-overview-team-contacts">
    <hr class="hr-panel-heading project-area-separation" />
    <?php if(has_permission('projects','','edit') || has_permission('projects','','create')){ ?>
-    <?php if(is_admin(get_staff_user_id()) || $project->teamleader == get_staff_user_id() || in_array(get_staff_user_id(),$ownerHierarchy) || (!empty($my_staffids) && in_array($project->teamleader,$my_staffids) && !in_array($project->teamleader,$viewIds))) { ?>
+    <?php if($can_user_edit ==true){ ?>
    <div class="inline-block pull-right mright10 project-contact-settings" data-toggle="tooltip" data-title="<?php echo _l('add_new',_l('contact')); ?>">
    <?php if(!empty($need_fields) && (in_array("project_contacts[]", $need_fields) )){?>
    <a href="#" data-toggle="modal" data-target="#project_contacts_modal"><i class="fa fa-plus"></i></a>
@@ -575,7 +592,7 @@
        ?>
    <div class="media">
       <div class="media-left">
-         <a href="<?php echo admin_url('clients/view_contact/'.$contact["contacts_id"]); ?>">
+         <a href="<?php echo (($can_user_edit))?admin_url('clients/view_contact/'.$contact["contacts_id"]):'#'; ?>">
          <img src="<?php echo contact_profile_image_url($contact['contacts_id'],array('staff-profile-image-small','media-object')); ?>" id="contact-img" class="staff-profile-image-small">
          </a>
       </div>
@@ -584,12 +601,14 @@
          <h5 class="media-heading mtop5" style="width:auto; float:left;"><a href="<?php echo admin_url('clients/view_contact/'.$contact["contacts_id"]); ?>"><?php echo get_contact_full_name($contact['contacts_id']); ?></a>
          
          <?php if((has_permission('projects','','edit') || has_permission('projects','','create')) && $contact['is_primary'] == 0){ ?>
-            <?php if(is_admin(get_staff_user_id()) || $project->teamleader == get_staff_user_id() || in_array(get_staff_user_id(),$ownerHierarchy) || (!empty($my_staffids) && in_array($project->teamleader,$my_staffids) && !in_array($project->teamleader,$viewIds))) { ?>
+            <?php if($can_user_edit ==true){ ?>
          <a href="<?php echo admin_url('projects/remove_team_contact/'.$project->id.'/'.$contact['contacts_id']); ?>" class="text-danger _delete"><i class="fa fa fa-times"></i></a>
          <?php } } ?>
 
          </h5>
+         <?php if($can_user_edit): ?>
          <a href="#" onclick="callfromdeal(<?php echo $contact['contacts_id'].','.$contact['project_id'].','.$contact['phonenumber'].',\'deal\'';?>);" title="Call Now"><img src="<?php echo APP_BASE_URL ?>/assets/images/call.png" style="width:25px;margin-left:10px;"></a>
+         <?php endif; ?>
          <?php
             if($contact['is_primary'] == 1) {
         ?>
@@ -606,6 +625,8 @@
 <?php }?>
 </div>
 <div class="col-md-6 project-overview-right">
+
+<?php if($project->approved ==1): ?>
 <div class="row">
       <!-- <div class="col-md-<?php //echo ($project->deadline ? 6 : 12); ?> project-progress-bars"> -->
       <div class="col-md-12 project-progress-bars">
@@ -751,6 +772,155 @@
 </div>
   -->
 </div>
+<?php else: ?>
+   <?php if($deal_rejected): ?>
+      <p class="project-info bold font-size-14">Approval Status</p>
+      <div class="activity-feed">
+      <?php foreach($approval_history as $history_key => $history): 
+         $currentHistory =$approval_history[$history_key];
+         if($history->status ==1){
+            $approval_status ='approved';
+         }else{
+            $approval_status ='rejected';
+         }
+         $currentLevelStaff =$this->staff_model->get($history->approved_by);
+         ?>
+         
+         <div class="feed-item <?php echo ($approval_status =='approved')?'approved-status':'pending-status'; ?>">
+            <div class="row">
+                  <div class="col-md-8">
+
+                     <?php if($approval_status =='approved'): ?>
+                        <div class="date"><span class="text-has-action text-success" data-toggle="tooltip" data-title="<?php echo _dt($currentHistory->approved_at); ?>" data-original-title="" title="">Approved -  <?php echo time_ago($currentHistory->approved_at); ?></span></div>
+                     <?php elseif($approval_status =='rejected'): ?>
+                        <div class="date"><span class="text-has-action text-danger" data-toggle="tooltip" data-title="<?php echo _dt($currentHistory->approved_at); ?>" data-original-title="" title="">Rejected -  <?php echo time_ago($currentHistory->approved_at); ?></span></div>
+                     <?php else: ?>
+                        <div class="date">Pending</div>
+                     <?php endif; ?>
+                     
+                     <div class="text">
+                        <?php if($currentLevelStaff): ?>
+                        <div style="display: flex;">
+                           <div>
+                              <a href="<?php echo admin_url('profile/'.$currentLevelStaff->staffid) ?>"><?php echo staff_profile_image($currentLevelStaff->staffid,array('staff-profile-image-small','media-object')); ?></a>
+                           </div>
+                           <div>
+                              <p class="mbot10 no-mtop"><?php echo $currentLevelStaff->full_name; ?></p>
+                              <p class="text-muted"><?php echo $currentLevelStaff->designation_name ?></p>
+                              <?php if($approval_status =='approved'): ?>
+                              <p class="mbot10 no-mtop"><?php echo $currentHistory->remarks ?></p>
+                              <?php elseif($approval_status =='rejected'): ?>
+                              <p class="mbot10 no-mtop"><?php echo $currentHistory->remarks ?></p>
+                              <?php endif; ?>
+                           </div>
+                        </div>
+                        
+
+                        <?php else: ?>
+                           <p class="mtop10 no-mbot">Auto approval</b></p>
+                        <?php endif; ?>
+                     </div>
+                     
+                  </div>
+                  <div class="clearfix"></div>
+                  <div class="col-md-12">
+                     <hr class="hr-10">
+                  </div>
+            </div>
+         </div>
+      <?php endforeach; ?>
+   </div>
+   <?php elseif($approval_flow): 
+      $approval_count =$lastApprovalLevel =0;
+      if($approval_history){
+         $lastApprovalLevel =count($approval_history);
+      }
+   ?>
+   <p class="project-info bold font-size-14">Approval Status</p>
+   <div class="activity-feed">
+   <?php foreach($approval_flow as $key => $approval): 
+      if($approval->service !='approval_level')
+      {
+         continue;
+      }
+      $approval_count++;
+      $currentHistory =array();
+      if(isset($approval_history[$approval_count-1])){
+         $currentHistory =$approval_history[$approval_count-1];
+         if($currentHistory->status ==1){
+            $approval_status ='approved';
+         }else{
+            $approval_status ='rejected';
+         }
+         
+         
+      }else{
+         $approval_status ='pending';
+      }
+      $currentLevelStaff =false;
+      if($currentHistory){
+         $currentLevelStaff =$this->staff_model->get($currentHistory->approved_by);
+      }elseif(isset($staff_hierarchy[$approval_count-1])){
+         $currentLevelStaff =$staff_hierarchy[$approval_count-1];
+      }
+      ?>
+      <div class="feed-item <?php echo ($approval_status =='approved')?'approved-status':'pending-status'; ?>">
+        <div class="row">
+            <div class="col-md-8">
+
+               <?php if($approval_status =='approved'): ?>
+                  <div class="date"><span class="text-has-action text-success" data-toggle="tooltip" data-title="<?php echo _dt($currentHistory->approved_at); ?>" data-original-title="" title="">Approved -  <?php echo time_ago($currentHistory->approved_at); ?></span></div>
+               <?php elseif($approval_status =='rejected'): ?>
+                  <div class="date"><span class="text-has-action text-danger" data-toggle="tooltip" data-title="<?php echo _dt($currentHistory->approved_at); ?>" data-original-title="" title="">Rejected -  <?php echo time_ago($currentHistory->approved_at); ?></span></div>
+               <?php else: ?>
+                  <div class="date">Pending</div>
+               <?php endif; ?>
+                
+               <div class="text">
+                  <?php if($currentLevelStaff): ?>
+                  <div style="display: flex;">
+                     <div>
+                        <a href="<?php echo admin_url('profile/'.$currentLevelStaff->staffid) ?>"><?php echo staff_profile_image($currentLevelStaff->staffid,array('staff-profile-image-small','media-object')); ?></a>
+                     </div>
+                     <div>
+                        <p class="mbot10 no-mtop"><?php echo $currentLevelStaff->full_name; ?></p>
+                        <p class="text-muted"><?php echo $currentLevelStaff->designation_name ?></p>
+                        <?php if($approval_status =='approved'): ?>
+                        <p class="mbot10 no-mtop"><?php echo $currentHistory->remarks ?></p>
+                        <?php elseif($approval_status =='rejected'): ?>
+                        <p class="mbot10 no-mtop"><?php echo $currentHistory->remarks ?></p>
+                        <?php endif; ?>
+                     </div>
+                  </div>
+                  
+                  <?php if($approval_status ==' approved'): ?>
+                     
+                  <?php else: ?>
+                     <?php if($lastApprovalLevel ==$approval_count-1 && $currentLevelStaff && $currentLevelStaff->staffid ==get_staff_user_id()): ?>
+                        <br>
+                        <button class="btn btn-success deal-approve" data-deal-id="<?php echo $project->id ?>" >Approve</button>
+                        <button class="btn btn-danger deal-reject" data-deal-id="<?php echo $project->id ?>" >Reject</button>
+                     <?php endif; ?>
+                  <?php endif; ?>
+                  <?php else: ?>
+                     <p class="mtop10 no-mbot">Auto approval</b></p>
+                  <?php endif; ?>
+               </div>
+                
+            </div>
+            <div class="clearfix"></div>
+            <div class="col-md-12">
+                <hr class="hr-10">
+            </div>
+        </div>
+      </div>
+      <?php if($approval_status =='rejected'){break;} ?>
+   <?php endforeach; ?>
+   </div>
+   <?php else: ?>
+      <h3>Approval doesnot provided</h3>
+   <?php endif; ?>
+<?php endif; ?>
 </div>
 <div class="modal fade" id="add-edit-members" tabindex="-1" role="dialog">
    <div class="modal-dialog">
@@ -930,5 +1100,96 @@
         </div>
     </div>
 </div>
+
+<div class="modal" id="approveReasonModel" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                  <div class="form-group">
+                     <label for="approveremark" class="control-label"><?php echo _l('remarks') ?></label>
+                     <textarea id="approveremark" name="approveremark" class="form-control" rows="8"></textarea>
+                  </div>
+                  <button type="button" class="btn btn-success" id="approveReason">Approve</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="rejectReasonModel" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                  <?php
+                  $tm = array("id" => "", "name" => "Nothing Selected");
+                  array_unshift($all_dealrejectionreasons, $tm);
+                  echo render_select('dealrejectionreason_id', $all_dealrejectionreasons, array('id', 'name'), 'DealLossReasons', '', array('required'=>'required'));?>
+
+                  <div class="form-group">
+                     <label for="rejectremark" class="control-label"><small class="req text-danger">* </small><?php echo _l('remarks') ?></label>
+                     <textarea id="rejectremark" name="rejectremark" class="form-control" rows="8"></textarea>
+                  </div>
+                  <button type="button" class="btn btn-danger" id="rejectReason">Reject</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+   document.addEventListener("DOMContentLoaded", function(event) { 
+      $('.deal-approve').click(function(){
+         if(confirm("Do you want to approve this?")){
+            $('#approveReasonModel').modal('show');
+         }
+      });
+
+      $('.deal-reject').click(function(){
+         if(confirm("Do you want to reject this?")){
+            $('#rejectReasonModel').modal('show');
+         }
+      });
+
+      $('#rejectReason').click(function(){
+         var remarks =$('#rejectremark').val();
+         var reason =$('#dealrejectionreason_id').val();
+         $.ajax({
+            url: '<?php echo admin_url('projects/approve/'.$project->id) ?>',
+            type: "post",
+            dataType: "json",
+            data: {remarks:remarks,status:0,reason:reason},
+            success: function(response) {
+               if (response.success == true) {
+                  alert_float('success', response.msg);
+                  setTimeout(function() {
+                        window.location.reload();
+                  }, 1000);
+               }else{
+                  alert_float('danger', response.msg);
+               }
+            },
+         });
+      });
+
+      $('#approveReason').click(function(){
+         var remarks =$('#approveremark').val();
+         $.ajax({
+            url: '<?php echo admin_url('projects/approve/'.$project->id) ?>',
+            type: "post",
+            dataType: "json",
+            data: {remarks:remarks,status:1,reason:0},
+            success: function(response) {
+               if (response.success == true) {
+                  alert_float('success', response.msg);
+                  setTimeout(function() {
+                        window.location.reload();
+                  }, 1000);
+               }else{
+                  alert_float('danger', response.msg);
+               }
+            },
+         });
+      });
+
+   });
+</script>
 <?php //init_tail(); ?>
 <!-- <script type="text/javascript" id="vendor-js" src="<?php echo site_url('assets/builds/vendor-admin.js?v=2.4.0'); ?>"></script> -->

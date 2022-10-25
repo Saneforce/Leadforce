@@ -6,6 +6,7 @@ class Lead_created_workflow extends App_workflow
     private static $action = 'lead_created';
     private static $name = 'Lead created';
     private static $description = 'Trigger when new lead created';
+    private static $icon ='<i class="fa fa-tty"></i>';
     private static $availableServices = [
         'whatsapp_staff_notification' => [
             'type' => 'notification',
@@ -26,7 +27,7 @@ class Lead_created_workflow extends App_workflow
     public function __construct()
     {
         parent::__construct();
-        $this->addWorkflow(self::$action, self::$name, self::$description, self::$availableServices);
+        $this->addWorkflow(self::$action, self::$name, self::$description, self::$availableServices,self::$icon);
     }
 
     public function getService($name)
@@ -42,7 +43,7 @@ class Lead_created_workflow extends App_workflow
 
         $CI = &get_instance();
         $CI->load->model('leads_model');
-        $flows = $CI->workflow_model->getflows('lead_created');
+        $flows = $CI->workflow_model->getflows(self::$action);
         $CI->load->library('merge_fields/leads_merge_fields');
         $leads_merge_fields = $CI->leads_merge_fields->format($lead_id);
         $lead = $CI->leads_model->get($lead_id);

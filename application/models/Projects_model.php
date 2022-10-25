@@ -1148,7 +1148,14 @@ class Projects_model extends App_Model
         return false;
     }
 
-    public function add($data)
+    /**
+     * API RESPONSE
+     * @param  array data
+     * @param  array products
+     * @param  array project_contacts
+     * @param  array primary_contact
+     */
+    public function add($data,$products=false,$project_contacts=false,$primary_contact=false)
     {
         if (isset($data['notify_project_members_status_change'])) {
             unset($data['notify_project_members_status_change']);
@@ -1298,6 +1305,18 @@ class Projects_model extends App_Model
                 $this->send_project_customer_email($insert_id, 'project_marked_as_finished_to_customer');
             }
 
+            if($products) {
+                $this->load->model('currencies_model');
+                $this->products_model->add_deals_products($products, $insert_id, $data['project_currency']);    
+            }
+            if($project_contacts) {
+                $this->projects_model->add_edit_contacts($project_contacts, $insert_id);
+            }
+            if($primary_contact) {
+                $this->projects_model->add_primary_contacts($primary_contact, $insert_id);
+            }
+
+            hooks()->do_action('after_add_project_approval', $insert_id);
             hooks()->do_action('after_add_project', $insert_id);
 
             log_activity('New Project Created [ID: ' . $insert_id . ']');

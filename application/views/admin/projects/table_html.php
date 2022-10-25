@@ -53,6 +53,9 @@ $projects_list_column_order = (array)json_decode(get_option('projects_list_colum
 $table_data = array();
 
 $hasPermissionEdit   = has_permission('projects', '', 'edit');
+if(isset($_GET['approvalList']) && $_GET['approvalList']==1){
+    $hasPermissionEdit =false;
+}
 if ($hasPermissionEdit) {
 	$table_data['checkbox'] = '<input type="checkbox" class="check_email" onclick="check_all(this)" id="select_all" value="all">';
 }

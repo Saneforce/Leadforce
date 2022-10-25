@@ -1,4 +1,11 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
+
+<?php
+$can_user_edit =true;
+if($project->approved==0){
+   $can_user_edit =false;
+}
+?>
 <?php init_head(); ?>
 
 <div id="wrapper">
@@ -40,11 +47,14 @@
                                        } else {
                                         $projectcnt = ' - <a data-toggle="modal" data-target="#dealproduct_Modal">0 item</a>';
                                        }
+                                        if($can_user_edit ==false){
+                                            $projectcnt =' - '.$productscnt.' Items';
+                                        }
                                        ?>
                                           <?php echo $project->name; ?> - <span style="font-size:12px;"><?php echo app_format_money($project->project_cost, $currency).$projectcnt; ?></span> 
 										  <?php if(!empty($project->clientid)){?>
 											  <p style="line-height: 8px; position: relative; top: 0px;"><?php echo $primarycont; ?>
-											  <small><?php echo '<a href="'. admin_url("clients/client/".$project->clientid).'" style="" >'.$project->client_data->company.'</a>'; ?></small>
+											  <small><?php echo '<a href="'.(($project->approved ==1)?admin_url("clients/client/".$project->clientid):"#").'" style="" >'.$project->client_data->company.'</a>'; ?></small>
 											  </p>
 										  <?php }?>
                                         </div>
@@ -67,17 +77,17 @@
                      <?php
                      if(is_admin(get_staff_user_id()) || $project->teamleader == get_staff_user_id() || in_array(get_staff_user_id(),$ownerHierarchy) || (!empty($my_staffids) && in_array($project->teamleader,$my_staffids) && !in_array($project->teamleader,$viewIds))) { ?>
                         <div class="btn-group">
-                            <?php if($project->deleted_status == 1) { ?>
+                            <?php if($project->deleted_status == 1 && $project->approved ==1) { ?>
                                 <a href="<?php echo admin_url('projects/restore_project/'.$project->id); ?>" style="" class="btn btn-info"><?php echo _l('restore'); ?></a>
                             <?php } else { ?>
-							<?php if($project->stage_of == 0){ ?>
+							<?php if($project->stage_of == 0 && $project->approved ==1){ ?>
 							<button type="button" class="btn btn-success" onclick="ch_deal_s_to('1')">
 								<?php echo _l('project-status-won'); ?>
 							</button>
 							<button type="button" class="btn btn-danger" onclick="ch_deal_s_to('2')">
 								<?php echo _l('project-status-loss'); ?>
 							</button>
-							<?php }else{ ?>
+							<?php }elseif($project->approved ==1){ ?>
 							<span class="btn ">
 							<span style="margin: 5px ; font-weight:bold;" class="label label-<?php echo ($project->stage_of == 1)?'success':'danger'; ?>"><?php echo _l('project-status-'.$project->stage_of); ?></span>
 							</span>
@@ -92,7 +102,7 @@
                         <a href="#" onclick="new_task_from_relation(undefined,'project',<?php echo $project->id; ?>); return false;" class="btn btn-info"><?php echo _l('new_task'); ?></a>
                         <?php } */?>
                         <?php
-                        if($project->deleted_status == 0) {
+                        if($project->deleted_status == 0 && $project->approved ==1) {
                            $invoice_func = 'pre_invoice_project';
                            ?>
                         <?php if(has_permission('invoices','','create')){ ?>
@@ -164,12 +174,14 @@
                   </div>
                </div>
             </div>
+            <?php if($project->approved ==1): ?>
             <div class="panel_s project-menu-panel">
                <div class="panel-body">
                   <?php hooks()->do_action('before_render_project_view', $project->id); ?>
                   <?php $this->load->view('admin/projects/project_tabs'); ?>
                </div>
             </div>
+            <?php endif; ?>
             <?php
                if((has_permission('projects','','create') || has_permission('projects','','edit'))
                  && $project->status == 1
@@ -199,7 +211,7 @@
             <?php } */?>
             <div class="panel_s">
                <div class="panel-body">
-                  <?php echo $this->load->view(($tab ? $tab['view'] : 'admin/projects/project_overview')); ?>
+                  <?php echo $this->load->view(($project->approved ==1 && $tab ? $tab['view'] : 'admin/projects/project_overview')); ?>
                </div>
             </div>
          </div>

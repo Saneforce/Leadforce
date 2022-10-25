@@ -21,17 +21,21 @@
               $kanban_onscroll_url = admin_url('projects/kanban_noscroll?pipelines='.$pipelines[0]['id'].'&member=&gsearch=');
               $kanban_url = admin_url('projects/kanbans?pipelines='.$pipelines[0]['id'].'&member=&gsearch=');
               $forecast_url = admin_url('projects/kanbans_forecast?pipelines='.$pipelines[0]['id'].'&member='.$mem.'&gsearch='.$gsearch);
+			  $approval_url = admin_url('projects/index_list?approvalList=1&pipelines=&member=&gsearch=');
               if(!is_admin(get_staff_user_id())) {
                   $list_url = admin_url('projects/index_list?pipelines='.$pipelines[0]['id'].'&member='.get_staff_user_id().'&gsearch=');
                   $kanban_onscroll_url = admin_url('projects/kanban_noscroll?pipelines='.$pipelines[0]['id'].'&member='.get_staff_user_id().'&gsearch=');
                   $kanban_url = admin_url('projects/kanbans?pipelines='.$pipelines[0]['id'].'&member='.get_staff_user_id().'&gsearch=');
                   $forecast_url = admin_url('projects/kanbans_forecast?pipelines='.$pipelines[0]['id'].'&member='.$mem.'&gsearch='.$gsearch);
+                //   $approval_url = admin_url('projects/index_list?approvalList=1&pipelines='.$pipelines[0]['id'].'&member='.get_staff_user_id().'&gsearch=');
               }
               ?>
-              <a href="<?php echo $list_url; ?>" data-toggle="tooltip" title="<?php echo _l('projects'); ?>" class="btn btn-primary"><i class="fa fa-list" aria-hidden="true"></i></a>
+              <a href="<?php echo $list_url; ?>" data-toggle="tooltip" title="<?php echo _l('projects'); ?>" class="btn <?php echo !isset($_GET['approvalList'])?'btn-primary':'btn-default' ?>"><i class="fa fa-list" aria-hidden="true"></i></a>
               <a href="<?php echo $kanban_onscroll_url; ?>" data-toggle="tooltip" title="<?php echo _l('leads_switch_to_kanban_noscroll'); ?>" class="btn btn-default"><i class="fa fa-th" aria-hidden="true"></i></a>
               <a href="<?php echo $kanban_url; ?>" data-toggle="tooltip" title="<?php echo _l('leads_switch_to_kanban'); ?>" class="btn btn-default"><i class="fa fa-th-large" aria-hidden="true"></i></a>
               <a href="<?php echo $forecast_url; ?>" data-toggle="tooltip" title="<?php echo _l('leads_switch_to_forecast'); ?>" class="btn btn-default"><i class="fa fa-line-chart" aria-hidden="true"></i></a>
+			  <a href="<?php echo $approval_url; ?>" data-toggle="tooltip" title="<?php echo _l('deal_approval_list'); ?>" class="btn <?php echo isset($_GET['approvalList'])?'btn-primary':'btn-default' ?> "><i class="fa fa-check-square-o" aria-hidden="true"></i></a>
+
               
            
 <div class="btn-group pull-right mleft4 mbot25 btn-with-tooltip-group _filter_data" data-toggle="tooltip" data-title="<?php echo _l('projects_list_column'); ?>">

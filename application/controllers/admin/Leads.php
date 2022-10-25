@@ -522,6 +522,7 @@ class Leads extends AdminController
                 'progress'      => $data['progress'],
                 'start_date'      => date('Y-m-d'),
                 'project_created'    => date('Y-m-d'),
+                'created_by'    => get_staff_user_id(),
             ]);
             $deal_id = $this->db->insert_id();
             if($deal_id) {
@@ -616,7 +617,9 @@ class Leads extends AdminController
 
             $this->db->where('id', $data['leadid']);
             $this->db->update(db_prefix() . 'leads', ['project_id' => $deal_id, 'deleted_status' => 1]);
-                    
+            
+            hooks()->do_action('after_add_project_approval', $deal_id);
+        
             set_alert('success', _l('lead_to_client_base_converted_success'));
 
             redirect(admin_url('projects/view/'.$deal_id.'?group=project_overview'));
