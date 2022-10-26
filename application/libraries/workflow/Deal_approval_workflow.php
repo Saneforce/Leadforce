@@ -61,7 +61,6 @@ class Deal_approval_workflow extends App_workflow
 
     public function trigger($deal_id)
     {
-
         $CI = &get_instance();
         $CI->load->model('projects_model');
         $flows = $CI->workflow_model->getflows(self::$action);
@@ -70,7 +69,7 @@ class Deal_approval_workflow extends App_workflow
             $approvalLevel =0;
             $CI->db->select('count(id) as level');
             $CI->db->where('rel_type','project');
-            $CI->db->where('reopned',0);
+            $CI->db->where('reopened',0);
             $CI->db->where('rel_id',$deal_id);
             $approvedRow =$CI->db->get(db_prefix().'approval_history')->row();
             $approvedLevel =0;
@@ -135,11 +134,11 @@ class Deal_approval_workflow extends App_workflow
                                             $this->approveDeal($deal_id);
                                             continue ;
                                         }
-                                        $childflows = (array) $CI->workflow_model->getflows(self::$action,$flows[$approval_key]->id);
-                                        if($childflows){
-                                            foreach($childflows as $childflow){
-                                                if($childflow->service =='approval_request_email_notification' && $childflow->configure){
-                                                    $this->emailNotification($childflow,$deal_id,$approvals[$approval_key+1]->staffid);
+                                        $approval_request_email_notification_flows =$CI->workflow_model->getflows(self::$action,0,array('service'=>'approval_request_email_notification','inactive'=>0));
+                                        if($approval_request_email_notification_flows){
+                                            foreach($approval_request_email_notification_flows as $approval_request_email_notification_flow){
+                                                if($approval_request_email_notification_flow->configure){
+                                                    $this->emailNotification($approval_request_email_notification_flow,$deal_id,$approvals[$approval_key+1]->staffid);
                                                 }
                                             }
                                         }

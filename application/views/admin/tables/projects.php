@@ -15,6 +15,22 @@ if(isset($_SESSION['approvalList']) && $_SESSION['approvalList'] ==1){
     $approvalList =0;
     $approval_where =' AND ' . db_prefix() . 'projects.approved = 1';
 }
+if($approvalList){
+    $userAccessApproval =false;
+    $approval_flows =$this->ci->workflow_model->getflows('deal_approval',0,['service'=>'approval_level','inactive'=>0]);
+    if($approval_flows){
+        foreach ($approval_flows as $key => $flow) {
+            if($flow->configure){
+                $configure =json_decode($flow->configure,true);
+                if($configure['approver'] ==get_staff_user_id()){
+                    $userAccessApproval =true;
+                    break;
+                }
+            }
+        }
+    }
+}
+
 
 $aColumns_temp = [
     'id'=>db_prefix() . 'projects.id as id',
@@ -222,17 +238,21 @@ $gsearch = $_SESSION['gsearch'];
 if(!empty($gsearch)){
     array_push($where, ' AND ' . db_prefix() . 'projects.id IN (SELECT id FROM ' . db_prefix() . 'projects WHERE name like "%' . $gsearch . '%")');
 }
-$my_staffids = $this->ci->staff_model->get_my_staffids();
-if ($_SESSION['member']) {
-    $memb = $_SESSION['member'];
-    array_push($where, ' AND (' . db_prefix() . 'projects.id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . $memb . ')'.$approval_where.') OR  ' . db_prefix() . 'projects.teamleader in (' . $memb . ') )');
-    //array_push($where, ' AND ' . db_prefix() . 'projects.id IN (SELECT project_id FROM ' . db_prefix() . 'project_members WHERE staff_id=' . $memb . ')');
-    //array_push($where, ' AND ' . db_prefix() . 'projects.teamleader = ' . $memb);
-} else {
-    if($my_staffids){
-        array_push($where, ' AND (' . db_prefix() . 'projects.id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')'.$approval_where.') OR  ' . db_prefix() . 'projects.teamleader in (' . implode(',',$my_staffids) . ') )');
+
+if($userAccessApproval ==false){
+    $my_staffids = $this->ci->staff_model->get_my_staffids();
+    if ($_SESSION['member']) {
+        $memb = $_SESSION['member'];
+        array_push($where, ' AND (' . db_prefix() . 'projects.id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . $memb . ')'.$approval_where.') OR  ' . db_prefix() . 'projects.teamleader in (' . $memb . ') )');
+        //array_push($where, ' AND ' . db_prefix() . 'projects.id IN (SELECT project_id FROM ' . db_prefix() . 'project_members WHERE staff_id=' . $memb . ')');
+        //array_push($where, ' AND ' . db_prefix() . 'projects.teamleader = ' . $memb);
+    } else {
+        if($my_staffids){
+            array_push($where, ' AND (' . db_prefix() . 'projects.id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')'.$approval_where.') OR  ' . db_prefix() . 'projects.teamleader in (' . implode(',',$my_staffids) . ') )');
+        }
     }
 }
+
 array_push($where, ' AND ' . db_prefix() . 'projects.deleted_status = 0');
 
 // $custom_fields = get_table_custom_fields('projects');

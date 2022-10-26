@@ -121,7 +121,7 @@
                                                 <div class="lineHorizontal"></div>
                                             <?php endif; ?>
                                         <?php endforeach; ?>
-                                        <?php if($workflow['services'][$flow->service]['medium']=='approval'):?>
+                                        <?php if(false && $workflow['services'][$flow->service]['medium']=='approval'):?>
                                         <div class="openFlowsWrapper">
                                             <button class="btn btn-dark openFlows" data-parent-flow ="<?php echo $flow->id ?>"><i class="fa fa-plus" aria-hidden="true"></i></button>
                                         </div>

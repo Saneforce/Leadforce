@@ -46,9 +46,15 @@ function approvalFlowTree($approval_history ,$title ='Approval Status')
                                         <p class="mbot10 no-mtop"><?php echo $currentLevelStaff->full_name; ?></p>
                                         <p class="text-muted"><?php echo $currentLevelStaff->designation_name ?></p>
                                         <?php if ($approval_status == 'approved') : ?>
-                                            <p class="mbot10 no-mtop"><?php echo $currentHistory->remarks ?></p>
+                                            <?php if($currentHistory->remarks):?>
+                                            <p class="mbot10 no-mtop"><?php echo _l('remarks') ?> : <?php echo $currentHistory->remarks ?></p>
+                                            <?php endif; ?>
                                         <?php elseif ($approval_status == 'rejected') : ?>
-                                            <p class="mbot10 no-mtop"><?php echo $currentHistory->remarks ?></p>
+                                            <?php $reason =$CI->DealRejectionReasons_model->getDealRejectionReasonsbyId($currentHistory->reason);
+                                            if($reason):?>
+                                            <p class="mbot10 no-mtop text-danger"><?php echo _l('reason') ?> : <?php echo $reason->name ?></p>
+                                            <?php endif; ?>
+                                            <p class="mbot10 no-mtop"><?php echo _l('remarks') ?> : <?php echo $currentHistory->remarks ?></p>
                                         <?php endif; ?>
                                     </div>
                                 </div>

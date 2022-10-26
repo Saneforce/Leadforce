@@ -49,7 +49,7 @@
                 if(response.success ==true){
                     alert_float('success', response.msg);
                     setTimeout(function(){
-                        window.location.reload();
+                        window.location ='<?php echo admin_url('workflow/flow/' . $workflow['action']) ?>';
                     },1000);
                 }else{
                     alert_float('warning', response.msg);

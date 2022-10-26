@@ -24,7 +24,7 @@
 							<hr class="hr-panel-heading" />
 							<div class="clearfix"></div>
 							<?php $value = (isset($DealRejectionReasons) ? $DealRejectionReasons->name : ''); ?>
-							<?php $attrs = array('required' => true); ?>
+							<?php $attrs = array('required' => true,'maxlength'=>191); ?>
 							<?php echo render_input('name','dealrejectionreasons_name',$value,'text',$attrs); ?>
 							<!-- Publish Status -->
 							<div class="form-group select-placeholder">
@@ -50,7 +50,16 @@
 <?php init_tail(); ?>
 <script>
 $(function(){
-	appValidateForm($('#dealrejectionreasons-form'),{name:'required',publishstatus:'required'});
+	appValidateForm($('#dealrejectionreasons-form'),{name:{
+		required:true,
+		onkeyup: false,
+		normalizer: function(value) {
+			// Update the value of the element
+			this.value = $.trim(value);
+			// Use the trimmed value for validation
+			return this.value;
+		}
+	},publishstatus:'required'});
 });
 </script>
 </body>

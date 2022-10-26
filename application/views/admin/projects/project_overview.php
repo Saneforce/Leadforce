@@ -839,10 +839,16 @@ if($project->approved==0 && $deal_rejected && get_staff_user_id() != $project->c
                      <div>
                         <p class="mbot10 no-mtop"><?php echo $currentLevelStaff->full_name; ?></p>
                         <p class="text-muted"><?php echo $currentLevelStaff->designation_name ?></p>
-                        <?php if($approval_status =='approved'): ?>
-                        <p class="mbot10 no-mtop"><?php echo $currentHistory->remarks ?></p>
-                        <?php elseif($approval_status =='rejected'): ?>
-                        <p class="mbot10 no-mtop"><?php echo $currentHistory->remarks ?></p>
+                        <?php if ($approval_status == 'approved') : ?>
+                           <?php if($currentHistory->remarks):?>
+                           <p class="mbot10 no-mtop"><?php echo _l('remarks') ?> : <?php echo $currentHistory->remarks ?></p>
+                           <?php endif; ?>
+                        <?php elseif ($approval_status == 'rejected') : ?>
+                           <?php $reason =$this->DealRejectionReasons_model->getDealRejectionReasonsbyId($currentHistory->reason);
+                           if($reason):?>
+                           <p class="mbot10 no-mtop text-danger"><?php echo _l('reason') ?> : <?php echo $reason->name ?></p>
+                           <?php endif; ?>
+                           <p class="mbot10 no-mtop"><?php echo _l('remarks') ?> : <?php echo $currentHistory->remarks ?></p>
                         <?php endif; ?>
                      </div>
                   </div>
@@ -1080,7 +1086,7 @@ if($project->approved==0 && $deal_rejected && get_staff_user_id() != $project->c
                   <?php
                   $tm = array("id" => "", "name" => "Nothing Selected");
                   array_unshift($all_dealrejectionreasons, $tm);
-                  echo render_select('dealrejectionreason_id', $all_dealrejectionreasons, array('id', 'name'), 'DealLossReasons', '', array('required'=>'required'));?>
+                  echo render_select('dealrejectionreason_id', $all_dealrejectionreasons, array('id', 'name'), 'deal_reject_reason', '', array('required'=>'required'));?>
 
                   <div class="form-group">
                      <label for="rejectremark" class="control-label"><small class="req text-danger">* </small><?php echo _l('remarks') ?></label>

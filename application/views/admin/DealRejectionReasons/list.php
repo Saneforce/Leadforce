@@ -8,7 +8,7 @@
 					<div class="panel-body">
 						<div class="_buttons">
 							<?php if(has_permission('DealRejectionReasons','','create')) { ?>
-								<a href="<?php echo admin_url('DealRejectionReasons/save'); ?>" class="btn btn-info pull-left display-block"><?php echo _l('new_dealrejectionreasons'); ?></a>
+								<a href="<?php echo admin_url('DealRejectionReasons/save'); ?>" class="btn btn-info pull-left display-block"><?php echo _l('new_DealRejectionReasons'); ?></a>
 							<?php } else { ?>
 								<p class="btn btn-info pull-left display-block"><?php echo _l('DealRejectionReasons'); ?></p>
 							<?php } ?>
