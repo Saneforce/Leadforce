@@ -4143,3 +4143,33 @@ $lang['chart_view']		        =	'Chart View';
 $lang['sync_mail_help_text']    =	"Help text : Once Synced all the Deal's mail will be Fetched";
 $lang['compose_email']			=	"COMPOSE EMAIL";
 $lang['sync_mail']				=	"SYNC MAIL";
+
+// approval
+$lang['approval']				=	"Approval";
+$lang['approval_projects']      =   "Approval Pending Deals";
+$lang['rejected_projects']      =   "Rejected Deals";
+$lang['approval_reopen']      =     "Reopen";
+$lang['deal_approval_list']      =  "Deal approval list";
+$lang['deal_created_sent_for_approval']      =  "Deal created and sent for approval";
+# Deal Rejection Reasons
+$lang['new_DealRejectionReasons']				= 'New Deal Rejection Reasons';
+$lang['all_DealRejectionReasons']				= 'All Deal Rejection Reasons';
+$lang['DealRejectionReasons']           		    = 'Deal Rejection Reasons';
+$lang['als_DealRejectionReasons']           		= $lang['DealRejectionReasons'] ;
+$lang['DealRejectionReasons_lowercase'] 		    = 'deal rejection reasons';
+$lang['total_dealrejectionreasons']    		    = 'Total Deal Rejection Reasons: ';
+$lang['dealrejectionreasons_name']      		    = 'Deal Rejection Reasons Name';
+$lang['dealrejectionreasonspublishstatus']		= 'Publish';
+$lang['dealrejectionreasons_option_select']		= 'Select';
+$lang['dealrejectionreasons_option_no']			= 'No';
+$lang['dealrejectionreasons_option_yes']		    = 'Yes';
+$lang['deal_reject_reason']		    = 'Deal reject reason';
+//workflow
+$lang['workflow']				=	"Workflow";
+$lang['workflow_automation']	=	"Workflow automation";
+$lang['permission_configure']   =	"Configuration";
+$lang['action']				    =	"Action";
+$lang['notification']			=	"Notification";
+$lang['system']			        =	"System";
+$lang['remarks']			    =	"Remarks";
+$lang['reason']			        =	"Reason";
