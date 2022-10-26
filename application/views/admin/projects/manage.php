@@ -161,10 +161,9 @@ foreach($custom_fields as $cfkey=>$cfval){
                 <div class="col-md-1 padding0">
 							<h4><?php echo _l('filter_by'); ?></h4>
 						</div>
-						<?php if(isset($_GET['approvalList']) && $_GET['approvalList']==1): ?>
-						<?php echo form_open(admin_url('projects/index_list?approvalList=1'), array('method'=>'get','id'=>'ganttFiltersForm')); ?>
-						<?php else: ?>
 						<?php echo form_open(admin_url('projects/index_list'), array('method'=>'get','id'=>'ganttFiltersForm')); ?>
+						<?php if(isset($_GET['approvalList']) && $_GET['approvalList']==1): ?>
+						<?php echo form_hidden('approvalList', $_GET['approvalList']); ?>
 						<?php endif; ?>
 						<?php
 			            /**

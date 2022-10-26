@@ -143,7 +143,7 @@ if($project->approved==0 && $deal_rejected && get_staff_user_id() != $project->c
                      <div class="data_display">
                      <span class="updated_text">
                          <input type="hidden" id="clid" value="<?php echo $project->clientid; ?>">
-                        <a href="<?php echo admin_url(); ?>clients/client/<?php echo $project->clientid; ?>">
+                        <a href="<?php echo ($can_user_edit)? admin_url('clients/client/'.$project->clientid):'#'; ?>">
                            <?php echo $project->client_data->company; ?>
                         </a>
                         </span>
@@ -548,13 +548,13 @@ if($project->approved==0 && $deal_rejected && get_staff_user_id() != $project->c
    foreach($members as $member){ ?>
    <div class="media">
       <div class="media-left">
-         <a href="<?php echo admin_url('staff/member/'.$member["staff_id"]); ?>">
+         <a href="<?php echo $can_user_edit?admin_url('staff/member/'.$member["staff_id"]):'#'; ?>">
             <?php echo staff_profile_image($member['staff_id'],array('staff-profile-image-small','media-object')); ?>
          </a>
       </div>
       <div class="media-body">
         
-         <h5 class="media-heading mtop5"><a href="<?php echo admin_url('staff/member/'.$member["staff_id"]); ?>"><?php echo get_staff_full_name($member['staff_id']); ?></a>
+         <h5 class="media-heading mtop5"><a href="<?php echo $can_user_edit?admin_url('staff/member/'.$member["staff_id"]):'#'; ?>"><?php echo get_staff_full_name($member['staff_id']); ?></a>
             <?php if(has_permission('projects','','create') || $member['staff_id'] == get_staff_user_id()){ ?>
             <br /><small class="text-muted"><?php echo _l('total_logged_hours_by_staff') .': '.seconds_to_time_format($member['total_logged_time']); ?></small>
             <?php } ?>
@@ -597,13 +597,13 @@ if($project->approved==0 && $deal_rejected && get_staff_user_id() != $project->c
        ?>
    <div class="media">
       <div class="media-left">
-         <a href="<?php echo (($can_user_edit))?admin_url('clients/view_contact/'.$contact["contacts_id"]):'#'; ?>">
+         <a href="<?php echo $can_user_edit?admin_url('clients/view_contact/'.$contact["contacts_id"]):'#'; ?>">
          <img src="<?php echo contact_profile_image_url($contact['contacts_id'],array('staff-profile-image-small','media-object')); ?>" id="contact-img" class="staff-profile-image-small">
          </a>
       </div>
       <div class="media-body">
          
-         <h5 class="media-heading mtop5" style="width:auto; float:left;"><a href="<?php echo admin_url('clients/view_contact/'.$contact["contacts_id"]); ?>"><?php echo get_contact_full_name($contact['contacts_id']); ?></a>
+         <h5 class="media-heading mtop5" style="width:auto; float:left;"><a href="<?php echo $can_user_edit?admin_url('clients/view_contact/'.$contact["contacts_id"]):'#'; ?>"><?php echo get_contact_full_name($contact['contacts_id']); ?></a>
          
          <?php if((has_permission('projects','','edit') || has_permission('projects','','create')) && $contact['is_primary'] == 0){ ?>
             <?php if($can_user_edit ==true){ ?>

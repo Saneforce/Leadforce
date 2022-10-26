@@ -215,7 +215,10 @@ class Deal_approval_workflow extends App_workflow
             $deals_merge_fields = $CI->deals_merge_fields->format($deal_id);
             $CI->load->library('merge_fields/staff_merge_fields');
             $staff_merge_fields = $CI->staff_merge_fields->format($staffid);
-            $merge_fields = array_merge($deals_merge_fields, $staff_merge_fields);
+            $CI->load->library('merge_fields/other_merge_fields');
+
+            $others_merge_fields = $CI->other_merge_fields->format();
+            $merge_fields = array_merge($deals_merge_fields, $staff_merge_fields,$others_merge_fields);
             foreach($merge_fields as $field_key => $field_value){
                 $subject =str_replace($field_key,$field_value,$subject);
                 $fromname =str_replace($field_key,$field_value,$fromname);

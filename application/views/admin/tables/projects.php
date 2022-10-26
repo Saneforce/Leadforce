@@ -251,6 +251,15 @@ if($userAccessApproval ==false){
         //array_push($where, ' AND ' . db_prefix() . 'projects.teamleader = ' . $memb);
     } else {
         if($my_staffids){
+            $lowlevel = $this->ci->staff_model->printHierarchyTree(get_staff_user_id());
+
+            if($lowlevel){
+                foreach($lowlevel as $lowstaff){
+                    if(!in_array($lowstaff,$my_staffids)){
+                        $my_staffids[] =$lowstaff;
+                    }
+                }
+            }
             array_push($where, ' AND (' . db_prefix() . 'projects.id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')'.$approval_where.') OR  ' . db_prefix() . 'projects.teamleader in (' . implode(',',$my_staffids) . ') )');
         }
     }
@@ -304,7 +313,7 @@ foreach ($rResult as $aRow) {
     }
     $row_temp['project_status'] = $stage_of;
     $link = admin_url('projects/view/' . $aRow['id']);
-	if ($hasPermissionEdit ) {
+	if ($hasPermissionEdit && $approvalList ==0) {
 		$checkbox = "<input type='checkbox' id='check_".$aRow['id']."' class='check_mail' onclick='check_header()' value='".$aRow['id']."'>";
 	}
 
@@ -458,7 +467,7 @@ foreach ($rResult as $aRow) {
     }
 	$i2 = 0;
     foreach($projects_list_column_order as $ckey=>$cval){
-		if ($hasPermissionEdit) {
+		if ($hasPermissionEdit  && $approvalList ==0) {
 			if($i2==0){
 				 $row[] = $checkbox;
 			}

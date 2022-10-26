@@ -29,9 +29,11 @@
                         <div class="form-group">
                             <div class="row available_merge_fields_container">
                                 <?php foreach ($service['mergeFields'] as $mergeFieldsKey => $mergeFields) : ?>
+                                    <div class="col-md-12"><h4><?php echo _l('workflow_'.$mergeFieldsKey) ?></h4></div>
                                     <?php foreach ($mergeFields as $field) : ?>
                                         <div class="col-md-4 col-xs-6"><?php echo $field; ?></div>
                                     <?php endforeach; ?>
+                                    <br>
                                 <?php endforeach; ?>
                             </div>
                         </div>
