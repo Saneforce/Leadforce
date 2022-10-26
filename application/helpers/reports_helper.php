@@ -241,6 +241,7 @@ function get_req_val($req_val,$sel_val,$s_val,$d_val,$key,$all_val,$out_type){
 function get_activity_filters($req_filters,$check_data=''){
 	$CI			= 	& get_instance();
 	$needed = get_tasks_need_fields();
+	$needed['need_fields'][] = 'rel_type';
 	$where 		= 	array();
 	$req_cond	=	'';
 	$filters	=	$req_filters['filters'];
@@ -255,7 +256,6 @@ function get_activity_filters($req_filters,$check_data=''){
 		$table = db_prefix().'filter';
 		$custom_fields = get_table_custom_fields('tasks');
 		$customs = array_column($custom_fields, 'slug');
-		
 		foreach($filters as $filter12){
 			if ((!empty($needed['need_fields']) && in_array($filter12, $needed['need_fields'])) || in_array($filter12, $customs)){
 				$check_cond = filter_cond($filters2[$i1]);
@@ -373,18 +373,24 @@ function get_task_vals($fields,$fields1,$table,$qry_cond,$filters = array()){
 	 if(!empty($qry_cond)){
 		 if(!empty($type_cond)){
 			 
-			 $type_cond .= 'AND '.$type_cond." AND " ;
+			 $type_cond = 'AND '.$type_cond." AND " ;
 		 }
 		 else{
 			$type_cond = " " ;
-			if(!empty($qry_cond)){
+			if(!empty($filters)){
 				$type_cond = " AND " ;
 			}
 			$qry_cond = ltrim($qry_cond,"and ");
 			$qry_cond = ltrim($qry_cond,"AND ");
 		 }
+			if(empty($type_cond) && !empty($filters)){
+				$conds = " AND " ;
+			}
 			$qry_cond = " where ".db_prefix()."tasks.id !='' ".$conds.$type_cond.$qry_cond;
 	 }else{
+			if(empty($type_cond) && !empty($filters)){
+				$conds = " AND " ;
+			}
 		  $qry_cond = " where ".db_prefix()."tasks.id !='' ".$conds.$type_cond;
 	 }
 	 if(!empty($fields)){
@@ -399,6 +405,7 @@ function get_task_vals($fields,$fields1,$table,$qry_cond,$filters = array()){
 		 $qry_cond .= " and ((ta1.taskid = ".db_prefix()."tasks.id and ta1.staffid in(" . implode(',',$my_staffids) . ") ) or ( OR ".db_prefix()."tasks.rel_id IN(SELECT ".db_prefix()."projects.id FROM ". db_prefix()."projects join ".db_prefix()."project_members  on ".db_prefix()."project_members.project_id = " .db_prefix()."projects.id WHERE ".db_prefix()."project_members.staff_id in (". implode(',',$my_staffids)."))))";
 	 }
 	 $CI			= & get_instance();
+	
 	 $task_vals 	= $CI->db->query("SELECT ".$fields."COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '1',".db_prefix(). "tasks.id,NULL)) AS upcoming,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '2',".db_prefix(). "tasks.id,NULL)) AS overdue,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '3',".db_prefix(). "tasks.id,NULL)) AS today,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '4',".db_prefix(). "tasks.id,NULL)) AS in_progress,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '5',".db_prefix(). "tasks.id,NULL)) AS completed ".$fields1." FROM ".$table.$qry_cond)->result_array();
 	return $task_vals;
  }
@@ -948,18 +955,18 @@ function set_activity_summary($type){
 		}
 		else{
 			if(!empty($colarrs)){
-			 foreach($colarrs as $ckey=>$cval){
-				 if((!empty($needed['need_fields']) && in_array($ckey, $needed['need_fields']))  ){
-					 $filter_data['view_by'] = $ckey;
-				 }
+				foreach($colarrs as $ckey=>$cval){
+					if((!empty($needed['need_fields']) && in_array($ckey, $needed['need_fields']))){
+						$filter_data['view_by'] = $ckey;
+					}
+				}
 			}
-		}
-		 $filter_data['view_type']	= '';
-		 if($filter_data['view_by'] == 'date' && (check_activity_date($filter_data['view_by']))){
+			$filter_data['view_type']	= '';
+			if($filter_data['view_by'] == 'date' && (check_activity_date($filter_data['view_by']))){
 			$filter_data['view_type']	=	'date';
 			$filter_data['date_range1']	=	_l('weekly');
-		 }
-		 $filter_data['sel_measure']	=_l('deal_val');
+			}
+			$filter_data['sel_measure']	=_l('deal_val');
 		}
 	}
 	else{
@@ -1173,7 +1180,7 @@ function get_edit_data($type,$id){
 	$data['need_fields_label']	=	$needed['need_fields_label'];
 	$data['need_fields_edit']	=	$needed['need_fields_edit'];
 	$data['mandatory_fields1']	=	$needed['mandatory_fields1'];
-	$data['report_page'] = 'deal';
+	$data['report_page'] = $type;
 	$data['report_filter'] =  $CI->load->view('admin/reports/filter', $data,true);
 	$data['report_footer'] =  $CI->load->view('admin/reports/report_footer', $data,true);
 	$shares = $CI->db->query("SELECT share_type,id FROM " . db_prefix() ."shared where  report_id = '".$id."'")->result_array();
@@ -1206,4 +1213,7 @@ function get_th_column($view_by,$type){
 		$view_by = $custom_fields[$req_key]['name'];
 	}
 	return $view_by;
+}
+function random_color() {
+	return $rand = '#'.str_pad(dechex(rand(0x000000, 0xFFFFFF)), 6, 0, STR_PAD_LEFT);
 }

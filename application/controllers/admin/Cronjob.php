@@ -792,7 +792,7 @@ exit;
 	}
 
 	public function webhook_call_history() {
-
+		file_put_contents("test.txt",'telecmi');
 		if($json = json_decode(file_get_contents("php://input"), true)) {
 			$post = $json;
 		} else {
@@ -827,7 +827,7 @@ exit;
 		// 	'char_set' => 'utf8',
 		// 	'dbcollat' => 'utf8_general_ci'
 		// );
-		file_put_contents("test1.txt",'fsd');
+		file_put_contents("test.txt",'fsd');
 		$this->db2 = $this->load->database($this->dynamicDB, TRUE); 
 		if($post) {
 			
@@ -1042,11 +1042,15 @@ exit;
 		exit;
 	}
 	public function webhook_daffy_history() {
-  		
-		$post = $_GET;
+		
+  		file_put_contents("test1.txt",file_get_contents('php://input'));
+		//$post = $_GET;
+		$post_val = file_get_contents('php://input');
+		$post = json_decode($post_val,true);
+		$post = $post['payload'];
 		$dbname = explode('.leadforce.mobi',$_SERVER['HTTP_HOST']);
-		 file_put_contents("test.txt",json_encode($post));
-		/*$this->dynamicDB = array(
+		// file_put_contents("test.txt",json_encode($post));
+		/* $this->dynamicDB = array(
 			'hostname' => 'localhost',
 			'username' => 'root',
 			'password' => '',
@@ -1057,7 +1061,7 @@ exit;
 			'db_debug' => TRUE,
 			'char_set' => 'utf8',
 			'dbcollat' => 'utf8_general_ci'
-		);*/
+		); */
 		$this->dynamicDB = array(	
 			'hostname' => APP_DB_HOSTNAME,	
 			'username' => APP_DB_USERNAME,	
@@ -1071,34 +1075,17 @@ exit;
 			'dbcollat' => 'utf8_general_ci'	
 		);
 		$this->db2 = $this->load->database($this->dynamicDB, TRUE); 
-		
-
 		if($post) {
 			
 			$from = $post['from'];
 			$to = $post['to'];
-			$start_at = $post['start_at'];
+			$start_at = $post['call_start_at'];
 			$duration = $post['duration'];
 			$status = $post['status'];
 			$recording_url = $post['recording_url'];
 			$time = $start_at;
 
 			$totData = array();
-			/*$totData['duration'] = $duration; //duration
-			$totData['agent'] = $from;
-			$totData['billedsec'] = $duration; //duration
-			$totData['filename'] = $recording_url;
-			$totData['record'] = 1;
-			$totData['status'] = $status; //status
-			$totData['call_to'] = $to; //to
-			$totData['call_from'] = $from; //from
-			$totData['time'] = $time;
-			//pre($totData);
-			$this->db2->where('id',127);
-			$this->db2->update('tblcall_history', $totData);
-			echo "done";
-			exit;*/
-
 
 			//APP Credentials
 			$this->db2->select('*');
@@ -1107,12 +1094,8 @@ exit;
 			$row = $query->row_array();
 			
 			$to = substr($post['to'],2);
-			$cmiuid = $post['webhook_id'];
-			// if($post['hangup_cause'] == 'disconnected_by_callee' || $post['hangup_cause'] == 'disconnected_by_caller') {
-			// 	$status = 'answered';
-			// } else {
-			// 	$status = $post['hangup_cause'];
-			// }
+			//$cmiuid = $post['webhook_id'];
+			$cmiuid = 0;
 			$from = $post['from'];
 			$time = strtotime($post['start_at']);
 			$duration = $post['duration'];
@@ -1154,7 +1137,12 @@ exit;
 
 						}
 //echo '<br>'.FCPATH."uploads/recordings/".$filename;						//file_put_contents($_SERVER['DOCUMENT_ROOT']."/perfex_crm/uploads/recordings/".$filename, fopen($mp3, 'r'));
-						file_put_contents(FCPATH."uploads/recordings/".$filename, fopen($mp3, 'r'));
+						//file_put_contents(FCPATH."uploads/recordings/".$filename, fopen($post['recording_url'], 'r'));
+						
+						sleep(40);
+
+						file_put_contents(FCPATH."uploads/recordings/".$filename, fopen($post['recording_url'], 'r'));
+						
 
 						//file_put_contents($_SERVER['DOCUMENT_ROOT']."/uploads/recordings/".$filename, fopen($mp3, 'r'));
 					} else {

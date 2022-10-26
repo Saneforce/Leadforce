@@ -294,6 +294,9 @@ $('#kan-ban-tab').scroll(function() {
 .kan-ban-col {
     width: calc(100%/<?php echo count($statuses); ?>);
 }
+ul.dropdown-menu li:first-child {
+	display: block !important;
+}
 </style>
 <style>
 .panel-heading-bg .heading.pointer{

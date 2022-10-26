@@ -678,7 +678,7 @@ function app_init_admin_sidebar_menu_items() {
     ]);
     if (has_permission('settings', '', 'view')) {
         $CI->app_menu->add_setup_menu_item('settings', [
-            'href' => admin_url('settings'),
+            'href' => admin_url('settings?group=company'),
             'name' => _l('acs_settings'),
             'position' => 200,
         ]);

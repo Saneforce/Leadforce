@@ -40,7 +40,7 @@ class Activity_reports extends AdminController
 		$activity_val = task_values();
 		$data =  json_decode($activity_val, true);
 		$needed = get_tasks_need_fields();
-
+		$needed['need_fields'][] = 'rel_type';
 		$data['filters']	=	$filters = $this->session->userdata('activity_filters');
 		$data['filters1']	=	$this->session->userdata('activity_filters1');
 		$data['filters2']	=	$this->session->userdata('activity_filters2');
@@ -52,11 +52,11 @@ class Activity_reports extends AdminController
 			$i = 0;
 			foreach($filters as $filter1){
 				if ((!empty($needed['need_fields']) && !in_array($filter1, $needed['need_fields'])) && (!in_array($filter1, $customs)) ){
-					unset($data['filters'][$i]);
-					unset($data['filters1'][$i]);
-					unset($data['filters2'][$i]);
-					unset($data['filters3'][$i]);
-					unset($data['filters4'][$i]);
+					unset($data['activity_filters'][$i]);
+					unset($data['activity_filters1'][$i]);
+					unset($data['activity_filters2'][$i]);
+					unset($data['activity_filters3'][$i]);
+					unset($data['activity_filters4'][$i]);
 				}
 				$i++;
 			}
@@ -457,6 +457,16 @@ class Activity_reports extends AdminController
 			case 'tags':
 				$filter_data['activity_filters1'.$cur_id12][$cur_num1]	=	'is'; 
 				break;
+			case 'tasktype':
+				$this->db->where('status', 'Active');
+				$task_types = $this->db->get(db_prefix() . 'tasktype')->result_array();
+				$filter_data['activity_filters1'.$cur_id12][$cur_num1]	=	'is'; 
+				$filter_data['activity_filters2'.$cur_id12][$cur_num1] = $task_types[0]['name'];
+				break;
+			case 'rel_type':
+				$filter_data['activity_filters1'.$cur_id12][$cur_num1]	=	'is'; 
+				$filter_data['activity_filters2'.$cur_id12][$cur_num1]  = 'contact';
+				break;
 			case 'product_qty':
 			case 'product_amt':
 			case 'project_cost':
@@ -518,6 +528,7 @@ class Activity_reports extends AdminController
 		$req_out = '';
 		$needed = get_tasks_need_fields();
 		$need_fields		=	$needed['need_fields'];
+		$needed['need_fields'][] = 'rel_type';
 		if (($key = array_search('id', $needed['need_fields'])) !== false ) {
 			unset($needed['need_fields'][$key]);
 		}
@@ -571,8 +582,8 @@ class Activity_reports extends AdminController
 		}
 		$filters	=	$this->session->userdata('activity_filters'.$cur_id12);
 		$filters2	=	$this->session->userdata('activity_filters2'.$cur_id12);
-		$check_val1 = $cur_val;
-		$check_val2 = $req_val;
+		$check_val1 =	$cur_val;
+		$check_val2	=	$req_val;
 		if(empty($cur_val)){
 			$cur_val = $_REQUEST['cur_val'];
 		}
@@ -641,6 +652,15 @@ class Activity_reports extends AdminController
 						$req_out = get_req_val($req_val,'select','id','name','',$req_data,'task');
 					}
 				break;
+			case 'tasktype':
+				$this->db->where('status', 'Active');
+				$task_types = $this->db->get(db_prefix() . 'tasktype')->result_array();
+				$req_out	= get_req_val($req_val,'select','id','name','',$task_types,'task');
+				break;
+			case 'rel_type':
+				$all_status = array('contact'=>_l('contact'),'customer'=>_l('clients'),'project'=>_l('project'),'lead'=>_l('lead'),'proposal'=>_l('proposal'));
+				$req_out = get_req_val($req_val,'select','','','key',$all_status,'task');
+				break;
 			case 'project_contacts':
 				$selected = '';
 				$rel_data = get_relation_data('contacts',$selected);
@@ -701,145 +721,145 @@ class Activity_reports extends AdminController
 					$req_out = get_req_val($req_val,'select','userid','company','',$req_data,'task');
 				}
 				break;
-				case 'dateadded':
-				case 'startdate':
-				case 'datemodified':
-				case 'datefinished':
-					$req_out = get_req_val($req_val,'date','','','','','task');
-					break;
-				case 'assignees':
-					$selected = '';
-					$rel_data = get_relation_data('staff',$selected);
-					$rel_val = get_relation_values($rel_data,'staff');
-					if(empty($filters2[$req_val-1])){
-						$req_out = get_req_val($req_val,'select','id','name','',$rel_val,'task');
-					}else{
+			case 'dateadded':
+			case 'startdate':
+			case 'datemodified':
+			case 'datefinished':
+				$req_out = get_req_val($req_val,'date','','','','','task');
+				break;
+			case 'assignees':
+				$selected = '';
+				$rel_data = get_relation_data('staff',$selected);
+				$rel_val = get_relation_values($rel_data,'staff');
+				if(empty($filters2[$req_val-1])){
+					$req_out = get_req_val($req_val,'select','id','name','',$rel_val,'task');
+				}else{
+					if (str_contains($filters2[$req_val-1], ',')) {
+						$req_vals1 = explode(',',$filters2[$req_val-1]);
+						$i2 =0;
+					}
+					foreach($rel_data as $rel_li1){
 						if (str_contains($filters2[$req_val-1], ',')) {
-							$req_vals1 = explode(',',$filters2[$req_val-1]);
-							$i2 =0;
-						}
-						foreach($rel_data as $rel_li1){
-							if (str_contains($filters2[$req_val-1], ',')) {
-								if(in_array($rel_li1['staffid'],$req_vals1)){
-									$req_data[$i2] = $rel_li1;
-									$i2++;
-								}
-							}
-							else{
-								if($rel_li1['staffid']==$filters2[$req_val-1]){
-									$req_data[0] = $rel_li1;
-									break;
-								}
-							}
-						}
-						$req_out = get_req_val($req_val,'select','staffid','firstname,lastname','',$req_data,'task');
-					}
-					break;
-				case 'status':
-					$all_status = array('1'=>_l('task_status_1'),'2'=>_l('task_status_2'),'3'=>_l('task_status_3'),'5'=>_l('task_status_5'));
-					$req_out = get_req_val($req_val,'select','','','key',$all_status,'task');
-					break;
-				case 'project_status':
-					$all_status = get_stage_report();
-					$req_out	= get_req_val($req_val,'select','id','name','',$all_status,'task');
-					break;
-				case 'priority':
-					$all_status = array('1'=>_l('task_priority_low'),'2'=>_l('task_priority_medium'),'3'=>_l('task_priority_high'),'4'=>_l('task_priority_urgent'));
-					$req_out = get_req_val($req_val,'select','','','key',$all_status,'task');
-					break;
-				case 'project_pipeline':
-					$pipelines  = get_pipeline_report();
-					$req_out	= get_req_val($req_val,'select','id','name','',$pipelines,'task');
-					break;
-				case 'project_status':
-					$all_status = get_stage_report();
-					$req_out = get_req_val($req_val,'select','id','name','',$all_status,'task');
-					break;
-				case 'project_name':
-					$selected = '';
-					$cond	  = array();
-					$rel_data = get_relation_data('project',$selected);
-					$req_data = array();
-					$rel_val  = get_relation_values($rel_data,'project');
-					if(empty($filters2[$req_val-1])){
-						$req_out = get_req_val($req_val,'select','id','name','',$rel_val,'task');
-					}else{
-						if (str_contains($filters2[$req_val-1], ',')) {
-							$req_vals1 = explode(',',$filters2[$req_val-1]);
-							$i2 =0;
-						}
-						foreach($rel_data as $rel_li1){
-							if (str_contains($filters2[$req_val-1], ',')) {
-								if(in_array($rel_li1['id'],$req_vals1)){
-									$req_data[$i2] = $rel_li1;
-									$i2++;
-								}
-							}
-							else{
-								if($rel_li1['id']==$filters2[$req_val-1]){
-									$req_data[0] = $rel_li1;
-									break;
-								}
-							}
-						}
-						$req_out = get_req_val($req_val,'select','id','name','',$req_data,'task');
-					}
-					break;
-				case 'tags':
-					$selected = '';
-					$rel_val = get_relation_values($rel_data,'tags');
-					$rel_data = get_relation_data('tags',$selected);
-					if(empty($filters2[$req_val-1])){
-						$rel_data = array();
-						$req_out = get_req_val($req_val,'select','id','name','',$rel_data,'task');
-					}else{
-						if (str_contains($filters2[$req_val-1], ',')) {
-							$req_vals1 = explode(',',$filters2[$req_val-1]);
-							$i2 =0;
-						}
-						foreach($rel_data as $rel_li1){
-							if (str_contains($filters2[$req_val-1], ',')) {
-								if(in_array($rel_li1['id'],$req_vals1)){
-									$req_data[$i2] = $rel_li1;
-									$i2++;
-								}
-							}
-							else{
-								if($rel_li1['id']==$filters2[$req_val-1]){
-									$req_data[0] = $rel_li1;
-									break;
-								}
-							}
-						}
-						$req_out = get_req_val($req_val,'select','id','name','',$req_data,'task');
-					}
-					break;
-				default:
-					$fields =  $this->db->query("SELECT type,options FROM " . db_prefix() . "customfields where slug = '".$cur_val."' ")->row();
-					if($fields->type == 'date_picker' || $fields->type == 'date_picker_time' || $fields->type == 'date_range'){
-						$req_out = get_req_val($req_val,'date','','','','','task');
-					}
-					else if($fields->type == 'select' || $fields->type=='multiselect'){
-						$req_array = array();
-						if (str_contains($fields->options, ',')) { 
-							$options = explode(',',$fields->options);
-							foreach($options as $option1){
-								$req_array[$option1] = $option1;
+							if(in_array($rel_li1['staffid'],$req_vals1)){
+								$req_data[$i2] = $rel_li1;
+								$i2++;
 							}
 						}
 						else{
-							$req_array[$fields->options] = $fields->options;
+							if($rel_li1['staffid']==$filters2[$req_val-1]){
+								$req_data[0] = $rel_li1;
+								break;
+							}
 						}
-						$req_out = get_req_val($req_val,'select','','','key',$req_array,'task');
 					}
-					else if($fields->type == 'number'){
-						$req_out = get_req_val($req_val,'number','','','','','task');
+					$req_out = get_req_val($req_val,'select','staffid','firstname,lastname','',$req_data,'task');
+				}
+				break;
+			case 'status':
+				$all_status = array('1'=>_l('task_status_1'),'2'=>_l('task_status_2'),'3'=>_l('task_status_3'),'5'=>_l('task_status_5'));
+				$req_out = get_req_val($req_val,'select','','','key',$all_status,'task');
+				break;
+			case 'project_status':
+				$all_status = get_stage_report();
+				$req_out	= get_req_val($req_val,'select','id','name','',$all_status,'task');
+				break;
+			case 'priority':
+				$all_status = array('1'=>_l('task_priority_low'),'2'=>_l('task_priority_medium'),'3'=>_l('task_priority_high'),'4'=>_l('task_priority_urgent'));
+				$req_out = get_req_val($req_val,'select','','','key',$all_status,'task');
+				break;
+			case 'project_pipeline':
+				$pipelines  = get_pipeline_report();
+				$req_out	= get_req_val($req_val,'select','id','name','',$pipelines,'task');
+				break;
+			case 'project_status':
+				$all_status = get_stage_report();
+				$req_out = get_req_val($req_val,'select','id','name','',$all_status,'task');
+				break;
+			case 'project_name':
+				$selected = '';
+				$cond	  = array();
+				$rel_data = get_relation_data('project',$selected);
+				$req_data = array();
+				$rel_val  = get_relation_values($rel_data,'project');
+				if(empty($filters2[$req_val-1])){
+					$req_out = get_req_val($req_val,'select','id','name','',$rel_val,'task');
+				}else{
+					if (str_contains($filters2[$req_val-1], ',')) {
+						$req_vals1 = explode(',',$filters2[$req_val-1]);
+						$i2 =0;
+					}
+					foreach($rel_data as $rel_li1){
+						if (str_contains($filters2[$req_val-1], ',')) {
+							if(in_array($rel_li1['id'],$req_vals1)){
+								$req_data[$i2] = $rel_li1;
+								$i2++;
+							}
+						}
+						else{
+							if($rel_li1['id']==$filters2[$req_val-1]){
+								$req_data[0] = $rel_li1;
+								break;
+							}
+						}
+					}
+					$req_out = get_req_val($req_val,'select','id','name','',$req_data,'task');
+				}
+				break;
+			case 'tags':
+				$selected = '';
+				$rel_val = get_relation_values($rel_data,'tags');
+				$rel_data = get_relation_data('tags',$selected);
+				if(empty($filters2[$req_val-1])){
+					$rel_data = array();
+					$req_out = get_req_val($req_val,'select','id','name','',$rel_data,'task');
+				}else{
+					if (str_contains($filters2[$req_val-1], ',')) {
+						$req_vals1 = explode(',',$filters2[$req_val-1]);
+						$i2 =0;
+					}
+					foreach($rel_data as $rel_li1){
+						if (str_contains($filters2[$req_val-1], ',')) {
+							if(in_array($rel_li1['id'],$req_vals1)){
+								$req_data[$i2] = $rel_li1;
+								$i2++;
+							}
+						}
+						else{
+							if($rel_li1['id']==$filters2[$req_val-1]){
+								$req_data[0] = $rel_li1;
+								break;
+							}
+						}
+					}
+					$req_out = get_req_val($req_val,'select','id','name','',$req_data,'task');
+				}
+				break;
+			default:
+				$fields =  $this->db->query("SELECT type,options FROM " . db_prefix() . "customfields where slug = '".$cur_val."' ")->row();
+				if($fields->type == 'date_picker' || $fields->type == 'date_picker_time' || $fields->type == 'date_range'){
+					$req_out = get_req_val($req_val,'date','','','','','task');
+				}
+				else if($fields->type == 'select' || $fields->type=='multiselect'){
+					$req_array = array();
+					if (str_contains($fields->options, ',')) { 
+						$options = explode(',',$fields->options);
+						foreach($options as $option1){
+							$req_array[$option1] = $option1;
+						}
 					}
 					else{
-						$req_out = get_req_val($req_val,'text','','','','','task');
-					} 
-					//$req_out = get_default_val($cur_val,$req_val,'task');
-					break;
+						$req_array[$fields->options] = $fields->options;
+					}
+					$req_out = get_req_val($req_val,'select','','','key',$req_array,'task');
+				}
+				else if($fields->type == 'number'){
+					$req_out = get_req_val($req_val,'number','','','','','task');
+				}
+				else{
+					$req_out = get_req_val($req_val,'text','','','','','task');
+				} 
+				//$req_out = get_default_val($cur_val,$req_val,'task');
+				break;
 		}
 		if(!empty($check_val1) && !empty($check_val2)){
 			return $req_out;

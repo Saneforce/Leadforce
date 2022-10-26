@@ -158,7 +158,6 @@ function summary_val($tables,$fields,$qry_cond,$measure,$view_by,$cur_rows,$filt
 			$qry_cond = " p.deleted_status = '0' ".$qry_cond;
 			$deal_vals = get_deal_vals($req_fields,$fields,$tables,$qry_cond,$filters);
 			$data = get_sumary_product_vals($deal_vals,$view_by,$cur_rows);
-			
 		}
 		else if($measure == 'Deal weighted value'){
 			$req_fields = "*,sum(p.project_cost) as tot_val,sum( IF(p.stage_of = '1',(p.project_cost*(p.progress/100)),NULL)) AS own_price,sum(IF(p.stage_of = '0',(p.project_cost*(p.progress/100)),NULL)) AS open_price,sum(IF(p.stage_of = '0',(p.project_cost*(p.progress/100)),NULL)) AS lost_price";
@@ -624,7 +623,7 @@ function check_year_week($view_by){
 						if($num_month >= $start_days){
 							$start_date  = date('Y-m-d',strtotime($w_start_date.'-'.$key.'-'.$cur_year));
 							$end_date	 = date('Y-m-d',strtotime($w_end_date.'-'.$key.'-'.$cur_year));
-						if(check_activity_date($view_by)){
+							if(check_activity_date($view_by)){
 								$qry_cond 	 .= " and ".$view_by." >= '".$start_date."' and ".$view_by." <= '".$end_date."'";
 							}
 							else{
@@ -1263,10 +1262,10 @@ function get_stage_report(){
 	return $all_status;
 }
 function check_activity_date($cur_filter){
-	if($cur_filter == 'startdate' || $cur_filter == 'dateadded' || $cur_filter == 'datemodified' || $cur_filter == 'datefinished'){
+	if($cur_filter == 'startdate' || $cur_filter == 'dateadded' || $cur_filter == 'datemodified' || $cur_filter == 'datefinished' ){
 		return true;
 	}
-	else if($cur_filter == 'project_start_date' || $cur_filter == 'project_deadline' || $cur_filter == 'won_date' || $cur_filter == 'lost_date' || $cur_filter == 'project_created' || $cur_filter == 'project_modified'){
+	else if($cur_filter == 'project_start_date' || $cur_filter == 'project_deadline' || $cur_filter == 'won_date' || $cur_filter == 'lost_date' || $cur_filter == 'project_created' || $cur_filter == 'project_modified'  || $cur_filter == 'deadline' || $cur_filter == 'start_date'  || $cur_filter == 'stage_on'){
 		return true;
 	}
 	else if($cur_filter == 'date_picker' || $cur_filter == 'date_picker_time' || $cur_filter == 'date_range'){
