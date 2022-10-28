@@ -96,11 +96,12 @@ class Deal_approval_workflow extends App_workflow
                                 $this->emailNotification($approval_request_email_notification,$deal_id,$approvals[$approvalLevel-1]->staffid);
                             }
                         }
+                        
+                        $CI->db->where('id',$deal_id);
+                        $CI->db->update(db_prefix().'projects',['approved'=>0]);
                         if(!$approvals[$approvalLevel-1]){
                             $this->approveDeal($deal_id);
                         }
-                        $CI->db->where('id',$deal_id);
-                        $CI->db->update(db_prefix().'projects',['approved'=>0]);
                         return true;
                     }
                 }
