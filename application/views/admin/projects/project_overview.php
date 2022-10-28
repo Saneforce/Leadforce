@@ -14,6 +14,9 @@ if($project->approved==0 && $deal_rejected && get_staff_user_id() != $project->c
 
 ?>
 <style>
+.project-overview-left a[href="#"]{
+   color: inherit !important;
+}
 .feed-item{
    border-left: 2px solid grey !important;
 }

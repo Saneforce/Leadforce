@@ -35,6 +35,19 @@ class Workflow_model extends App_Model
                     ];
                 }
             }
+            if($this->input->post('action') =='deal_approval'){
+                if($this->input->post('service') =='approval_request_email_notification' || $this->input->post('service') =='approved_email_notification' || $this->input->post('service') =='rejected_email_notification'){
+                    $this->db->where('action',$this->input->post('action'));
+                    $this->db->where('service',$this->input->post('service'));
+                    $flow_exists =$this->db->get(db_prefix().'workflow')->row();
+                    if($flow_exists){
+                        return [
+                            'success'=>false,
+                            'msg'=>'Selected service already exists'
+                        ];
+                    }
+                }
+            }
             $data =array(
                 'action'=>$this->input->post('action'),
                 'service'=>$this->input->post('service'),

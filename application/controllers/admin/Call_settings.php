@@ -88,9 +88,9 @@ class Call_settings extends AdminController
                     if(isset($_POST['id']) && $_POST['id']>0 && $this->callsettings_model->check_ivr_name_same($_POST['id'],$_POST['daffytel_ivr_name']) == false){
                         $ivr_name_rule .='|is_unique['.db_prefix().'call_settings.ivr_name]';
                     }
-                    if(isset($_POST['id']) && $_POST['id']>0 && $this->callsettings_model->check_app_id_same($_POST['id'],$_POST['daffytel_app_key']) == false){
-                        $app_id_rule .='|is_unique['.db_prefix().'call_settings.app_id]';
-                    }
+                    // if(isset($_POST['id']) && $_POST['id']>0 && $this->callsettings_model->check_app_id_same($_POST['id'],$_POST['daffytel_app_key']) == false){
+                    //     $app_id_rule .='|is_unique['.db_prefix().'call_settings.app_id]';
+                    // }
                     if(isset($_POST['id']) && $_POST['id']>0 && $this->callsettings_model->check_app_id_secret($_POST['id'],$_POST['daffytel_app_secret']) == false){
                         $app_secret_rule .='|is_unique['.db_prefix().'call_settings.app_secret]';
                     }

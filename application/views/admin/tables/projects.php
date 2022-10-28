@@ -346,11 +346,16 @@ foreach ($rResult as $aRow) {
         //$name .= ' | <a href="#" onclick="copy_project(' . $aRow['id'] . ');return false;">' . _l('copy_project') . '</a>';
     }
 
-    if ($hasPermissionEdit && ($approvalList==0 || $rejectedDeal)) {
+    $this->ci->db->where('id',$aRow['id']);
+    $project_row =$this->ci->db->get(db_prefix().'projects')->row();
+    $created_by = $project_row->created_by;
+
+    if ($hasPermissionEdit && ($approvalList==0 || ($rejectedDeal && $created_by ==get_staff_user_id()))) {
         $name .= ' | <a href="' . $link . '?group=project_overview">' . _l('edit') . '</a>';
     }
     
-    if (($approvalList==0 || $rejectedDeal)&& (($hasPermissionDelete && (!empty($my_staffids) && in_array($aRow['teamleader'],$my_staffids) && !in_array($aRow['teamleader'],$view_ids))) || is_admin(get_staff_user_id()) || $aRow['teamleader'] == get_staff_user_id())) {
+    
+    if (($approvalList==0 || ($rejectedDeal && $created_by ==get_staff_user_id()))&& (($hasPermissionDelete && (!empty($my_staffids) && in_array($aRow['teamleader'],$my_staffids) && !in_array($aRow['teamleader'],$view_ids))) || is_admin(get_staff_user_id()) || $aRow['teamleader'] == get_staff_user_id())) {
         $name .= ' | <a href="' . admin_url('projects/delete/' . $aRow['id']) . '" class="text-danger _delete">' . _l('delete') . '</a>';
     }
 

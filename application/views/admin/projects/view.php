@@ -5,6 +5,10 @@ $can_user_edit =true;
 if($project->approved==0){
    $can_user_edit =false;
 }
+
+if($deal_rejected && get_staff_user_id() == $project->created_by){
+   $can_user_edit =true;
+}
 ?>
 <?php init_head(); ?>
 

@@ -1,6 +1,5 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
-
 <?php $workflows = $this->app_workflow->getWorkflows(); ?>
 <div id="wrapper">
     <div class="content">

@@ -79,7 +79,6 @@ class Deal_approval_workflow extends App_workflow
             $CI->load->model('approval_model');
             $approvals =$CI->approval_model->getDealReportingLevels($deal->teamleader);
             $approval_request_email_notification =array();
-            
             foreach ($flows as $flow) {
                 if($flow->service =='approval_level'){
                     $approvalLevel++;
@@ -93,7 +92,12 @@ class Deal_approval_workflow extends App_workflow
                 if ($flow->inactive == 0 && $flow->configure) {
                     if($flow->service =='approval_level' && $approvalLevel >$approvedLevel ){
                         if($approval_request_email_notification){
-                            $this->emailNotification($approval_request_email_notification,$deal_id,$approvals[$approvalLevel-1]->staffid);
+                            if($approvals[$approvalLevel-1]){
+                                $this->emailNotification($approval_request_email_notification,$deal_id,$approvals[$approvalLevel-1]->staffid);
+                            }
+                        }
+                        if(!$approvals[$approvalLevel-1]){
+                            $this->approveDeal($deal_id);
                         }
                         $CI->db->where('id',$deal_id);
                         $CI->db->update(db_prefix().'projects',['approved'=>0]);
@@ -125,7 +129,8 @@ class Deal_approval_workflow extends App_workflow
                             if($approval){
                                 $CI->approval_model->addApprovalHistory('projects',$deal_id,get_staff_user_id(),$CI->input->post('reason'),$CI->input->post('remarks'),$CI->input->post('status'));
                             }else{
-                                $CI->approval_model->addApprovalHistory('projects',$deal_id,0,$CI->input->post('reason'),'Auto Approved by system',$CI->input->post('status'));
+                                $_POST['status']=1;
+                                $CI->approval_model->addApprovalHistory('projects',$deal_id,0,0,'Auto Approved by system',1);
                             }
                             if($CI->input->post('status')==1){ //for approval
                                 if($finalApproval-1 !=$approval_key && isset($flows[$approval_key+1])){
