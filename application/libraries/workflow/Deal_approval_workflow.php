@@ -160,6 +160,7 @@ class Deal_approval_workflow extends App_workflow
                                     }
                                     $CI->db->where('id',$deal_id);
                                     $CI->db->update(db_prefix().'projects',['approved'=>1]);
+                                    return 'redirect_projects';
                                 }
                                 return true;
                             }else{ // for rejection

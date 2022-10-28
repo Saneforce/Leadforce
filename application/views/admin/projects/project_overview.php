@@ -1147,7 +1147,12 @@ if($project->approved==0 && $deal_rejected && get_staff_user_id() != $project->c
                if (response.success == true) {
                   alert_float('success', response.msg);
                   setTimeout(function() {
+                     if(typeof response.redirect !='undefined'){
+                        window.location = response.redirect;
+                     }else{
                         window.location.reload();
+                     }
+                        
                   }, 1000);
                }else{
                   alert_float('danger', response.msg);

@@ -3905,12 +3905,24 @@ class Projects extends AdminController
             }else{
                 $msg ='Deal rejected successfully';
             }
-            echo json_encode(
-                array(
-                    'success'=>true,
-                    'msg'=>$msg
-                )
-            );
+
+            if($success =='redirect_projects'){
+                echo json_encode(
+                    array(
+                        'success'=>true,
+                        'msg'=>$msg,
+                        'redirect'=>admin_url('projects/index_list'),
+                    )
+                );
+            }else{
+                echo json_encode(
+                    array(
+                        'success'=>true,
+                        'msg'=>$msg
+                    )
+                );
+            }
+            
             die;
         }else{
             echo json_encode(
