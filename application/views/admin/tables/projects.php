@@ -302,6 +302,9 @@ $output  = $result['output'];
 $rResult = $result['rResult'];
 $view_ids = $this->ci->staff_model->getFollowersViewList();
 $allow_to_call = $this->ci->callsettings_model->accessToCall();
+if($approvalList){
+    $allow_to_call = false;
+}
 // pre($where);
 foreach ($rResult as $aRow) {
     
@@ -423,7 +426,11 @@ foreach ($rResult as $aRow) {
         if($lable == '') {
             $lable = _l('contact_name');
         }
-        $contact .= '<a class="task-table-related" data-toggle="tooltip" data-html="true" title="' . $lable . '" href="' . admin_url("clients/view_contact/".$aRow['primary_id']) . '">' .$aRow['contact_name']. '</a><input type="hidden" id="input_phone_'.$aRow['primary_id'].'" value="'.$aRow['contact_phone'].'">';
+        $contact_view_link ='#';
+        if($approvalList==0){
+            $contact_view_link =admin_url("clients/view_contact/".$aRow['primary_id']);
+        }
+        $contact .= '<a class="task-table-related" data-toggle="tooltip" data-html="true" title="' . $lable . '" href="' . $contact_view_link . '">' .$aRow['contact_name']. '</a><input type="hidden" id="input_phone_'.$aRow['primary_id'].'" value="'.$aRow['contact_phone'].'">';
         if(isset($aRow['contact_phone']) && !empty($aRow['contact_phone']) && $allow_to_call == 1) {
             $calling_code =$this->ci->callsettings_model->getCallingCode($aRow['contact_phone_country_code']);
             $contact .= '<div><a href="#" onclick="callfromdeal('.$aRow['primary_id'].','.$aRow['id'].','.$aRow['contact_phone'].',\'deal\',\''.$calling_code.'\');" title="Call Now"><img src="'.APP_BASE_URL.'/assets/images/call.png" style="width:25px;"></a></div>';

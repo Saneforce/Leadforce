@@ -21,23 +21,23 @@ function app_init_workflow_actions()
 
 }
 
-hooks()->add_action('lead_created','workflow_lead_created');
+// hooks()->add_action('lead_created','workflow_lead_created');
 
-function workflow_lead_created($lead_id)
-{
-    $CI = &get_instance();
-    $CI->load->model('workflow_model');
-    $CI->lead_created_workflow->trigger($lead_id);
-}
+// function workflow_lead_created($lead_id)
+// {
+//     $CI = &get_instance();
+//     $CI->load->model('workflow_model');
+//     $CI->lead_created_workflow->trigger($lead_id);
+// }
 
-hooks()->add_action('after_add_project','workflow_deal_created');
+// hooks()->add_action('after_add_project','workflow_deal_created');
 
-function workflow_deal_created($deal_id)
-{
-    $CI = &get_instance();
-    $CI->load->model('workflow_model');
-    $CI->deal_created_workflow->trigger($deal_id);
-}
+// function workflow_deal_created($deal_id)
+// {
+//     $CI = &get_instance();
+//     $CI->load->model('workflow_model');
+//     $CI->deal_created_workflow->trigger($deal_id);
+// }
 
 hooks()->add_action('after_add_project_approval','workflow_deal_created_approval');
 

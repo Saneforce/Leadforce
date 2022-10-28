@@ -3943,6 +3943,17 @@ class Projects extends AdminController
         $this->db->where('rel_type','projects');
         $this->db->where('rel_id',$deal_id);
         $this->db->update(db_prefix().'approval_history',['reopened'=>1]);
+
+        //for auto approval
+        $this->load->model('approval_model');
+        $this->db->where('id',$deal_id);
+        $project =$this->db->get(db_prefix().'projects')->row();
+        if($project){
+            $approvals =$this->approval_model->getDealReportingLevels($project->teamleader);
+            if($approvals && !$approvals[0]){
+                approve_deal($deal_id);
+            }
+        }
         set_alert('success', 'Reopened Successfully');
         redirect(admin_url('projects/view/'.$deal_id));
     }
