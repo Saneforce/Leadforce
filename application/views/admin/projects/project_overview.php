@@ -614,7 +614,7 @@ if($project->approved==0 && $deal_rejected && get_staff_user_id() != $project->c
          <?php } } ?>
 
          </h5>
-         <?php if($can_user_edit): ?>
+         <?php if($can_user_edit && $project->approved==1): ?>
          <a href="#" onclick="callfromdeal(<?php echo $contact['contacts_id'].','.$contact['project_id'].','.$contact['phonenumber'].',\'deal\'';?>);" title="Call Now"><img src="<?php echo APP_BASE_URL ?>/assets/images/call.png" style="width:25px;margin-left:10px;"></a>
          <?php endif; ?>
          <?php
