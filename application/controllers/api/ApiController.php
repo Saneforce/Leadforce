@@ -15,6 +15,7 @@ class ApiController extends BaseController
         $this->load->model('staff_model');
         $this->load->model('pipeline_model');
         $this->load->model('gdpr_model');
+        $this->load->model('api_model');
 
         $this->load->library([
             'app_object_cache'
@@ -3110,6 +3111,9 @@ class ApiController extends BaseController
     public function global_search()
     {
         $gsearch   = $_POST['q'];
+        if(strlen(trim($gsearch)) ==0){
+            $this->api_model->response_ok(true,[],'No data found');
+        }
         $my_staffids = $this->staff_model->get_my_staffids();
         $data = array();
 		$fields = "id,name,description,status,pipeline_id,clientid,teamleader,billing_type,start_date,deadline,project_created,created_by,project_modified,modified_by,date_finished,progress,progress_from_tasks,project_cost,project_rate_per_hour,estimated_hours,addedfrom,stage_of,stage_on,loss_reason,loss_remark,deleted_status,project_currency,imported_id,lead_id";
@@ -3140,7 +3144,7 @@ class ApiController extends BaseController
                 db_prefix() ."clients.phonenumber like '%".$gsearch."%'" .") and ".db_prefix()."clients.company != " => "",
             ]);
         }
-
+        $likeqry ='';
         if(!is_admin(get_staff_user_id())) {
             if($my_staffids) {
                 $where = ' WHERE ('.db_prefix().'contacts.addedfrom IN (' . implode(',',$my_staffids) . ') OR (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')  AND tblprojects.clientid != "")) OR  (' . db_prefix() . 'contacts.userid IN (SELECT ' . db_prefix() . 'projects.clientid FROM ' . db_prefix() . 'projects where ' . db_prefix() . 'projects.teamleader in (' . implode(',',$my_staffids) . ') AND tblprojects.clientid != "" )))   AND (tblcontacts.firstname like "%'.$gsearch.'%" OR tblcontacts.email like "%'.$gsearch.'%" OR tblcontacts.phonenumber like "%'.$gsearch.'%")  AND tblcontacts.deleted_status=0 AND tblclients.deleted_status=0 '.$likeqry;
@@ -3172,13 +3176,7 @@ class ApiController extends BaseController
                 db_prefix() ."contacts.phonenumber like '%".$gsearch."%'".") and ".db_prefix()."contacts.firstname != " => "",
             ]);
         }
-
-        $outputArr =array(
-            'status_code' =>200,
-            'status' =>true,
-            'response' =>$data
-        );
-        echo $out =json_encode($outputArr);
+        $this->api_model->response_ok(true,$data,'');
     }
 
 }

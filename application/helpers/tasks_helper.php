@@ -2892,3 +2892,59 @@ function task_count_cond(){
 	}
 	return $where_cond;
 }
+
+
+function api_tasks_summary_data($rel_id = null, $rel_type = null)
+{
+    $CI            = &get_instance();
+    $tasks_summary = [];
+    $statuses      = ['overdue','today','tomorrow','dayaftertomorrow'];
+    //pr($statuses); exit;
+    foreach ($statuses as $status) {
+        $tasks_where = 'rel_type != "" AND ';
+        if($status == 'overdue') {
+			$tasks_where = ' date(startdate) < CURDATE() AND status != 5 ';
+        } elseif($status == 'today') {
+            $tasks_where = ' date(startdate) = CURDATE()';
+        } elseif($status == 'tomorrow') {
+            $tasks_where = ' date(startdate) = (CURDATE()+1)';
+        }  elseif($status== 'dayaftertomorrow') {
+            $tasks_where = ' date(startdate) = (CURDATE()+2)';
+        }
+        $my_staffids = $CI->staff_model->get_my_staffids();
+        
+        $tasks_my_where = 'id IN(SELECT taskid FROM ' . db_prefix() . 'task_assigned WHERE staffid=' . get_staff_user_id() . ') AND ' . $tasks_where;
+        if ($rel_id && $rel_type) {
+            if($my_staffids){
+                
+                $tasks_where .= ' AND rel_id=' . $rel_id . ' AND tbltasks.id IN (select taskid from tbltask_assigned where staffid IN (' . implode(',',$my_staffids) . '))';
+                $tasks_my_where .= ' AND rel_id=' . $rel_id . ' AND tbltasks.id IN (select taskid from tbltask_assigned where staffid IN (' . implode(',',$my_staffids) . '))';
+                //array_push($where, ' AND ' . db_prefix() . 'tasks.rel_id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ') OR  ' . db_prefix() . 'projects.teamleader in (' . implode(',',$my_staffids) . ') )');
+            } else {
+                $tasks_where .= ' AND rel_id=' . $rel_id . ' AND rel_type="' . $rel_type . '"';
+                $tasks_my_where .= ' AND rel_id=' . $rel_id . ' AND rel_type="' . $rel_type . '"';
+            }
+        } else {
+            if($my_staffids){
+				$tasks_where .= ' AND (' . db_prefix() . 'tasks.id in (select taskid from tbltask_assigned where staffid in (' . implode(',',$my_staffids) . ')) OR ' . db_prefix() . 'tasks.rel_id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')) )';
+            	$tasks_my_where .= ' AND (' . db_prefix() . 'tasks.id in (select taskid from tbltask_assigned where staffid in (' . implode(',',$my_staffids) . ')) OR ' . db_prefix() . 'tasks.rel_id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')))';
+			}else{
+				$sqlProjectTasksWhere = ' AND CASE
+				WHEN rel_type="project" AND rel_id IN (SELECT project_id FROM ' . db_prefix() . 'project_settings WHERE project_id=rel_id AND name="hide_tasks_on_main_tasks_table" AND value=1)
+				THEN rel_type != "project"
+				ELSE 1=1
+				END';
+				$tasks_where .= $sqlProjectTasksWhere;
+				$tasks_my_where .= $sqlProjectTasksWhere;
+			}
+        }
+        
+		$tasks_where =$tasks_where;
+        $tasks_my_where = $tasks_my_where;
+        $summary                   = [];
+        $summary['total_tasks']    = total_rows(db_prefix() . 'tasks', $tasks_where);
+        $summary['total_my_tasks'] = total_rows(db_prefix() . 'tasks', $tasks_my_where);
+        $tasks_summary[$status]           = $summary;
+    }
+    return $tasks_summary;
+}

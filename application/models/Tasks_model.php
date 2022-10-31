@@ -3197,6 +3197,18 @@ class Tasks_model extends App_Model
         if(isset($_POST['search']['value']) && ($_POST['search']['value'] == 'deal' || $_POST['search']['value'] == 'Deal')) {
             array_push($where, ' AND ' . db_prefix() . 'tasks.rel_type like "%project%"');
         }
+
+        
+        if(isset($_POST['overdue_only']) && $_POST['overdue_only'] ===true){
+            array_push($where, ' AND '.db_prefix() . 'tasks.startdate < "'.date('Y-m-d').'" AND '.db_prefix() . 'tasks.status != 5 ');
+        }
+        
+        if(isset($_POST['search_by_date']) && $_POST['search_by_date']){
+            $previous_date =date('Y-m-d', strtotime('-1 day', strtotime($_POST['search_by_date'])));
+            $next_date =date('Y-m-d', strtotime('+1 day', strtotime($_POST['search_by_date'])));
+            array_push($where, ' AND ' . db_prefix() . 'tasks.startdate >="'.$previous_date.'"');
+            array_push($where, ' AND ' . db_prefix() . 'tasks.startdate <="'.$next_date.'"');
+        }
         $idkey = 0;
         $view_ids = $this->staff_model->getFollowersViewList();
         $custom_fields = get_table_custom_fields('tasks');

@@ -109,7 +109,7 @@ $route['api/getorgactivity'] = "api/ApiController/getorgactivity";
 $route['api/organisationlist'] = "api/ApiController/organisationlist";
 $route['api/addclient_byapi'] = "api/ApiController/addclient_byapi";
 $route['api/get_organizations_by_person'] = "api/ApiController/get_organizations_by_person";
-$route['api/global_search'] = "api/ApiController/global_search";
+// $route['api/global_search'] = "api/ApiController/global_search";
 
 
 $route['api/getcustomfields'] = "api/ApiController/getcustomfields";

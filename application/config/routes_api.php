@@ -12,6 +12,7 @@ $route['api/activities/undone/(:num)']['put'] = 'api/activities/unmarkasdone/$1'
 $route['api/activities/types']['get'] = 'api/activities/gettypes';
 $route['api/activities/priorities']['get'] = 'api/activities/getpriorities';
 $route['api/activities/relatedto']['get'] = 'api/activities/getrelatedto';
+$route['api/activities/summary']['get'] = 'api/activities/getsummary';
 
 
 // for staffs
@@ -31,3 +32,6 @@ $route['api/persons/deal/(:num)']['get'] = 'api/persons/getbydeal/$1';
 // for authentication
 $route['api/authentication/login/']['post'] = 'api/authentication/login';
 $route['api/authentication/forgotpassword/']['post'] = 'api/authentication/forgotpassword';
+
+// for global serach
+$route['api/global_search']['get'] = "api/ApiController/global_search";

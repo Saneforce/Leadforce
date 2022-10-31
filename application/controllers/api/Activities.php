@@ -36,6 +36,15 @@ class Activities extends BaseController
         if(isset($_POST['search'])){
             $_POST['search'] =array('value'=>$_POST['search']);
         }
+
+        if(isset($_POST['date'])){
+            $_POST['search_by_date'] =$_POST['date'];
+        }
+
+        if(isset($_POST['overdue'])){
+            $_POST['overdue_only'] =$_POST['overdue'];
+        }
+
         $length =25;
         if(isset($_POST['page'])){
             if($_POST['page'] ==0){
@@ -117,7 +126,7 @@ class Activities extends BaseController
         $this->db->where('id', $id);
         $task = $this->db->get(db_prefix() . 'tasks')->row();
         if(!$task){
-            $this->api_model->response_bad_request(false,$valid,'Could not update activity');
+            $this->api_model->response_bad_request(false,array(),'Could not update activity');
         }
         $data                = $this->input->post();
         $data['description'] = $this->input->post('description', false);
@@ -243,5 +252,19 @@ class Activities extends BaseController
             // 'lead' => _l('lead'),
         ];
         $this->api_model->response_ok(true,$relatedto,'');
+    }
+
+    public function getsummary()
+    {
+        $summary =api_tasks_summary_data();
+        if($summary){
+            if($summary){
+                $this->api_model->response_ok(true,$summary,'');
+            }else{
+                $this->api_model->response_ok(true,[],'No records found');
+            } 
+        }else{
+            $this->api_model->response_bad_request(true,[],'No records found');
+        }
     }
 }
