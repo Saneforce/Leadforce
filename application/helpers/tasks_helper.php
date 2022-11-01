@@ -2878,6 +2878,9 @@ function task_count_cond(){
 			}
 		}
 	}
+	if(!empty($_REQUEST['my_tasks'])){
+		$all_staff[] = get_staff_user_id();
+	}
 	if(!empty($all_staff)){
 		if(!empty($where_cond))
 			$where_cond .= " and ".db_prefix()."tasks.id in(select taskid from ".db_prefix()."task_assigned where staffid IN(".implode(',',$all_staff).")) ";
