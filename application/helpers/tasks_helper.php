@@ -2787,49 +2787,49 @@ function task_count_cond(){
 	$CI   = &get_instance();
 	$where_cond = '';
 	if(!empty($_REQUEST['today_tasks'])){
-		$where_cond = " where ".db_prefix()."tasks.dateadded like '%".date('Y-m-d')."%' ";
+		$where_cond = " where ".db_prefix()."tasks.startdate like '%".date('Y-m-d')."%' ";
 	}
 	if(!empty($_REQUEST['tomorrow_tasks'])){
 		$tomorrow = date("Y-m-d", strtotime("+1 day"));
-		$where_cond = " where ".db_prefix()."tasks.dateadded like '%".$tomorrow."%' ";
+		$where_cond = " where ".db_prefix()."tasks.startdate like '%".$tomorrow."%' ";
 	}
 	if(!empty($_REQUEST['yesterday_tasks'])){
 		$yesterday = date("Y-m-d", strtotime("-1 day"));
-		$where_cond = " where ".db_prefix()."tasks.dateadded like '%".$yesterday."%' ";
+		$where_cond = " where ".db_prefix()."tasks.startdate like '%".$yesterday."%' ";
 	}
 	if(!empty($_REQUEST['thisweek_tasks'])){
 		$week_start = date('Y-m-d',strtotime('sunday this week')).' 00:00:00';
 		$week_end = date('Y-m-d',strtotime('saturday this week')).' 23:59:59';
-		$where_cond = " where ".db_prefix()."tasks.dateadded >= '".$week_start."' and ".db_prefix()."tasks.dateadded >= '".$week_end."' ";
+		$where_cond = " where ".db_prefix()."tasks.startdate >= '".$week_start."' and ".db_prefix()."tasks.startdate >= '".$week_end."' ";
 	}
 	if(!empty($_REQUEST['lastweek_tasks'])){
 		$week_start = date('Y-m-d',strtotime('sunday this week',strtotime("-1 week +1 day"))).' 00:00:00';
 		$week_end = date('Y-m-d',strtotime('saturday this week',strtotime("-1 week +1 day"))).' 23:59:59';
-		$where_cond = " where ".db_prefix()."tasks.dateadded >= '".$week_start."' and ".db_prefix()."tasks.dateadded >= '".$week_end."' ";
+		$where_cond = " where ".db_prefix()."tasks.startdate >= '".$week_start."' and ".db_prefix()."tasks.startdate >= '".$week_end."' ";
 	} 
 	if(!empty($_REQUEST['nextweek_tasks'])){
 		$week_start = date('Y-m-d',strtotime('sunday this week',strtotime("+1 week +1 day"))).' 00:00:00';
 		$week_end = date('Y-m-d',strtotime('saturday this week',strtotime("+1 week +1 day"))).' 23:59:59';
-		$where_cond = " where ".db_prefix()."tasks.dateadded >= '".$week_start."' and ".db_prefix()."tasks.dateadded >= '".$week_end."' ";
+		$where_cond = " where ".db_prefix()."tasks.startdate >= '".$week_start."' and ".db_prefix()."tasks.startdate >= '".$week_end."' ";
 	}
 	if(!empty($_REQUEST['thismonth_tasks'])){
-		$where_cond = " where month(".db_prefix()."tasks.dateadded) = '".date('m')."' and year(".db_prefix()."tasks.dateadded) = '".date('Y')."' ";
+		$where_cond = " where month(".db_prefix()."tasks.startdate) = '".date('m')."' and year(".db_prefix()."tasks.startdate) = '".date('Y')."' ";
 	}
 	if(!empty($_REQUEST['lastmonth_tasks'])){
 		$month = date('m',strtotime('last month'));
 		$year  = date('Y',strtotime('last month'));
-		$where_cond = " where month(".db_prefix()."tasks.dateadded) = '".$month."' and year(".db_prefix()."tasks.dateadded) = '".$year."' ";
+		$where_cond = " where month(".db_prefix()."tasks.startdate) = '".$month."' and year(".db_prefix()."tasks.startdate) = '".$year."' ";
 	}
 	if(!empty($_REQUEST['nextmonth_tasks'])){
 		$date = date('01-m-Y');
 		$month = date("m", strtotime ('+1 month',strtotime($date)));
 		$year = date("Y", strtotime ('+1 month',strtotime($date)));
-		$where_cond = " where  month(".db_prefix()."tasks.dateadded) = '".$month."' and year(".db_prefix()."tasks.dateadded) = '".$year."' ";
+		$where_cond = " where  month(".db_prefix()."tasks.startdate) = '".$month."' and year(".db_prefix()."tasks.startdate) = '".$year."' ";
 	}  
 	if(!empty($_REQUEST['custom_tasks'])){
 		$month_start = date('Y-m-d',strtotime($_REQUEST['custom_date_start_tasks'])).' 00:00:00';
 		$month_end   = date('Y-m-d',strtotime($_REQUEST['custom_date_end_tasks'])).' 23:59:59';
-		$where_cond  = " where ".db_prefix()."tasks.dateadded >= '".$month_start."' and ".db_prefix()."tasks.dateadded <= '".$month_end."' ";
+		$where_cond  = " where ".db_prefix()."tasks.startdate >= '".$month_start."' and ".db_prefix()."tasks.startdate <= '".$month_end."' ";
 	}
 	$in_cond = '';
 	if(!empty($_REQUEST['upcoming_tasks'])){
@@ -2857,6 +2857,34 @@ function task_count_cond(){
 		else
 			$where_cond  = " where ".db_prefix()."tasks.status in(".$in_cond.") ";
 	}
+	if(!empty($_REQUEST['my_tasks'])){
+		if(!empty($where_cond))
+			$where_cond .= " and ".db_prefix()."tasks.id in(SELECT taskid FROM ".db_prefix(). "task_assigned WHERE staffid=".get_staff_user_id().") ";
+		else
+			$where_cond  = " where ".db_prefix()."tasks.id in(SELECT taskid FROM ".db_prefix(). "task_assigned WHERE staffid=".get_staff_user_id().") ";
+	}
+	$cond	= array('taskid!='=>'0');
+	$CI->db->select('staffid');
+	$CI->db->from(db_prefix()."task_assigned");
+	$CI->db->where($cond); 
+	$CI->db->group_by('staffid'); 
+	$query = $CI->db->get();
+	$assigns = $query->result_array();
+	$all_staff = array();
+	if(!empty($assigns)){
+		foreach($assigns as $assign1){
+			if(!empty($_REQUEST['task_assigned_'.$assign1['staffid']]) ){
+				$all_staff[] = $assign1['staffid'];
+			}
+		}
+	}
+	if(!empty($all_staff)){
+		if(!empty($where_cond))
+			$where_cond .= " and ".db_prefix()."tasks.id in(select taskid from ".db_prefix()."task_assigned where staffid IN(".implode(',',$all_staff).")) ";
+		else
+			$where_cond  = " where ".db_prefix()."tasks.id in(select taskid from ".db_prefix()."task_assigned where staffid IN(".implode(',',$all_staff).")) ";
+	}
+	
 	$fields = "id,name";
 	$cond	= array('status'=>'Active');
 	$CI->db->select($fields);
