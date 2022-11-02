@@ -83,12 +83,9 @@ class Deal_approval_workflow extends App_workflow
                 if($flow->service =='approval_level'){
                     $approvalLevel++;
                 }
-                
-                
                 if($approvedLevel==0 && $flow->service =='approval_request_email_notification' && $flow->configure){
                     $approval_request_email_notification =$flow;
                 }
-                
                 if ($flow->inactive == 0 && $flow->configure) {
                     if($flow->service =='approval_level' && $approvalLevel >$approvedLevel ){
                         if($approval_request_email_notification){
@@ -107,6 +104,7 @@ class Deal_approval_workflow extends App_workflow
                 }
             }
         }
+        return false;
     }
 
     public function approveDeal($deal_id)

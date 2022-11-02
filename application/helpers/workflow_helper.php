@@ -46,8 +46,10 @@ function workflow_deal_created_approval($deal_id)
 
     $CI = &get_instance();
     $CI->load->model('workflow_model');
-    $CI->deal_approval_workflow->trigger($deal_id);
-
-    set_alert('success', _l('deal_created_sent_for_approval'));
-    redirect(admin_url('projects/index_list?approvalList=1'));
+    $approval_success =$CI->deal_approval_workflow->trigger($deal_id);
+    if($approval_success ===true){
+        set_alert('success', _l('deal_created_sent_for_approval'));
+        redirect(admin_url('projects/index_list?approvalList=1'));
+    }
+    
 }
