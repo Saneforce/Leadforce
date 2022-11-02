@@ -73,6 +73,7 @@ class Dbcreations extends CI_Model
 		$adminData['phonenumber'] = $data['phone'];
 		$adminData['admin'] = 1;
 		$adminData['role'] = 1;
+		$adminData['designation'] = 5;
 		$adminData['action_for'] = 'Active';
 		$adminData['active'] = 1;
 		$adminData['default_language'] = 'english';
