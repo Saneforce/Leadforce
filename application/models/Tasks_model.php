@@ -3065,13 +3065,16 @@ class Tasks_model extends App_Model
 				} else {
 					$where = substr($where, 3);
 				}
-				
 				$sWhere = 'WHERE ' . $where;
 					
 			}
 		}
 		$where_cond = '';
-		if(!empty($_REQUEST['cur_val']) && $_REQUEST['cur_val']=='today_tasks'){
+		$where_cond = task_count_cond();
+		if(!empty($sWhere))
+			$where_cond = ltrim($where_cond," where");
+		$sWhere .= $where_cond;
+		/* if(!empty($_REQUEST['cur_val']) && $_REQUEST['cur_val']=='today_tasks'){
 			$req_cond = (!empty($sWhere))?" and ":" where ";
 			$sWhere .= $req_cond.db_prefix()."tasks.startdate like '%".date('Y-m-d')."%' ";
 		}
@@ -3148,7 +3151,7 @@ class Tasks_model extends App_Model
 		if(!empty($_REQUEST['task_project']) ){
 			$req_cond = (!empty($sWhere))?" and ":" where ";
 			$sWhere  .= $req_cond.db_prefix()."tasks.rel_id = '".$_REQUEST['task_project']."' and rel_type = 'project' ";
-		}
+		} */
 		$cur_staff_id = get_staff_user_id();
 		$fields = "COUNT(DISTINCT IF(".db_prefix()."tasks.status = '1',".db_prefix(). "tasks.id,NULL)) AS upcoming,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '2',".db_prefix(). "tasks.id,NULL)) AS overdue,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '3',".db_prefix(). "tasks.id,NULL)) AS today,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '4',".db_prefix(). "tasks.id,NULL)) AS in_progress,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '5',".db_prefix(). "tasks.id,NULL)) AS completed,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '2' and ".db_prefix(). "tasks.id in(select taskid from ".db_prefix()."task_assigned where staffid = '".$cur_staff_id."'),".db_prefix(). "tasks.id,NULL)) AS overdue_me,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '1' and ".db_prefix(). "tasks.id in(select taskid from ".db_prefix()."task_assigned where staffid = '".$cur_staff_id."'),".db_prefix(). "tasks.id,NULL)) AS upcoming_me,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '3' and ".db_prefix(). "tasks.id in(select taskid from ".db_prefix()."task_assigned where staffid = '".$cur_staff_id."'),".db_prefix(). "tasks.id,NULL)) AS today_me,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '4' and ".db_prefix(). "tasks.id in(select taskid from ".db_prefix()."task_assigned where staffid = '".$cur_staff_id."'),".db_prefix(). "tasks.id,NULL)) AS in_progress_me,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '5' and ".db_prefix(). "tasks.id in(select taskid from ".db_prefix()."task_assigned where staffid = '".$cur_staff_id."'),".db_prefix(). "tasks.id,NULL)) AS completed_me";
 		
