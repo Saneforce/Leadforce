@@ -436,9 +436,9 @@
                   $("#salesintax").prop("checked", false);
                   $("#salesextax").prop("checked", false);
                   if(msg.discount_value == 1 || msg.discount_option == 1) {
-                      $('#topheading').html('<div class="col-md-3">Item</div><div class="col-md-2">Price</div><div class="col-md-2">Quantity</div><div class="col-md-2">Discount %</div><div class="col-md-2">Total</div>');
+                      $('#topheading').html('<div class="">Item</div><?php echo get_particulars_item_ordered_headers() ?><div class="">Price</div><div class="">Quantity</div><div class="">Discount %</div><div class="">Total</div>');
                   } else {
-                      $('#topheading').html('<div class="col-md-3">Item</div><div class="col-md-2">Price</div><div class="col-md-2">Quantity</div><div class="col-md-2">Total</div>');
+                      $('#topheading').html('<div class="">Item</div><?php echo get_particulars_item_ordered_headers() ?><div class="">Price</div><div class="">Quantity</div><div class="">Total</div>');
                   }
                   
                   $('#product_index').val(1);

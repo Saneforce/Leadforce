@@ -413,4 +413,63 @@ class Invoice_items_model extends App_Model
 		$cur_val = $_REQUEST['value'];
         return $this->db->query('SELECT a.id as id, a.name as name,b.price as price   FROM ' . db_prefix() . 'items as a JOIN ' . db_prefix() . 'item_price as b ON b.item_id=a.id  where  a.id = b.item_id and b.currency = "'.$name.'" and a.id = "'.$cur_val.'"')->result_array();
     }
+
+
+    public function get_all_table_fields()
+    {
+        $colarr = array(
+            "name" => array("ins" => "name", "ll" => "name"),
+            "code" => array("ins" => "code", "ll" => "code"),
+            "cat_name" => array("ins" => "cat_name", "ll" => "category"),
+            "unit" => array("ins" => "unit", "ll" => "unit"),
+            "description" => array("ins" => "description", "ll" => "description"),
+        );
+
+        $custom_fields = get_table_custom_fields('items');
+        foreach ($custom_fields as $cfkey => $cfval) {
+            $colarr[$cfval['slug']] = array("ins" => $cfval['name'], "ll" => $cfval['name']);
+        }
+
+        return $colarr;
+    }
+
+    public function get_particulars_ordered_details($id)
+    {
+        $aColumns_temp =array(
+            'name'=>db_prefix() . 'items.name',
+            'code'=>db_prefix() . 'items.code',
+            'cat_name'=> db_prefix() . 'item_category.cat_name',
+            'unit'=>db_prefix(). 'items.unit',
+            'description'=>db_prefix(). 'items.description',
+        );
+        $selects =array();
+        $joins =array();
+        $particulars_items_list_column_order = (array)json_decode(get_option('particulars_items_list_column'));
+        if($particulars_items_list_column_order){
+            foreach($particulars_items_list_column_order as $orderkey => $ordervalue){
+                 $selects [] =$aColumns_temp[$orderkey];
+            }
+            $joins [] =array(db_prefix() . 'taxes as t1','t1.id = ' . db_prefix() . 'items.tax','left');
+            $joins [] =array(db_prefix() . 'item_category',db_prefix() . 'item_category.id = ' . db_prefix() . 'items.categoryid','left');
+            
+            $custom_fields = get_custom_fields('items');
+            
+            foreach ($custom_fields as $key => $field) {
+                $selectAs = (is_cf_date($field) ? 'date_picker_cvalue_' . $key : 'cvalue_' . $key);
+                $this->db->select('ctable_' . $key . '.value as ' . $selectAs);
+                $this->db->join(db_prefix() . 'customfieldsvalues as ctable_' . $key,db_prefix() . 'items.id = ctable_' . $key . '.relid AND ctable_' . $key . '.fieldto="items_pr" AND ctable_' . $key . '.fieldid=' . $field['id'],'left');
+            }
+            if($selects){
+                $this->db->select($selects);
+            }
+            if($joins){
+                foreach($joins as $join){
+                    $this->db->join($join[0],$join[1],$join[2]);
+                }
+            }    
+            $this->db->where(db_prefix() . 'items.id',$id);
+            $details =$this->db->get(db_prefix() . 'items')->row();
+            return $details;
+        }
+    }
 }

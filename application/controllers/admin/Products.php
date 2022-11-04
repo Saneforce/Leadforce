@@ -403,20 +403,21 @@ class Products extends AdminController
       //  $data = $this->products_model->getprod_price($cur);
 		$data = $this->invoice_items_model->get_items($cur);
         $html = '';
-            $html .= '<div style="height:40px; clear:both;" class="productdiv" id="'.$_POST['length'].'"><div class="col-md-4">
+            $html .= '<div style="height:40px; clear:both;" class="productdiv css-table-row" id="'.$_POST['length'].'"><div class="">
             <select name="product[]" class="form-control" onchange="getprice1(this,'.$_POST['length'].')"><option value="">--Select Item--</option>';
             foreach($data as $val) {
                     $html .= '<option value="'.$val["id"].'">'.$val["name"].'</option>';
             } 
             $html .= '</select>';
-            $html .= '</div>
-            <div class="col-md-2">
+            $html .= '</div>';
+            $html .=get_particulars_item_ordered_inputs($_POST['length']);
+            $html .='<div class="">
             <input type="text" name="price[]" placeholder="Price" value="" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="price_update(this,'.$_POST['length'].')" class="form-control" />';
                 $html .= '</div>';
-                $html .= '<div class="col-md-2">
+                $html .= '<div class="">
                 <input type="number" name="qty[]" placeholder="Qty" min="1" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="qty_total(this,'.$_POST['length'].')" value=""  class="form-control" />';
                 $html .= '</div>';
-                $html .= '<div class="col-md-3">
+                $html .= '<div class="">
                 <input type="text" name="total[]" placeholder="Total" value="" readonly class="form-control" />';
                 $html .= '</div>';
                 $html .= '<a href="javascript:void(0);" class="removeproduct_button" title="Remove field" style="position:relative; top:8px; left:15px"><i class="fa fa-trash"></i></a>
@@ -459,27 +460,28 @@ class Products extends AdminController
         //pre($data);
         $html = '';
         $length = 0;
-        $html .= '<div style="height:40px; clear:both;" class="productdiv" id="'.$length.'"><div class="col-md-3 wcb">
+        $html .= '<div style="height:40px; clear:both;" class="productdiv css-table-row" id="'.$length.'"><div class=" wcb">
         <input type="hidden" name="no[]" value="'.$length.'">
-                        <input type="checkbox" name="status_'.$length.'" value="1" class="form-control cbox">
+                        <input type="hidden" name="status_'.$length.'" value="1" class="form-control cbox">
         <select name="product[]" class="form-control" onchange="getdealprodprice(this,'.$length.')"><option value="">--Select Item--</option>';
         foreach($data as $val) {
                 $html .= '<option value="'.$val["id"].'"  >'.$val["name"].'</option>';
         } 
         $html .= '</select>';
-        $html .= '</div>
-        <div class="col-md-2">
+        $html .= '</div>';
+        $html .=get_particulars_item_ordered_inputs($length);
+        $html .='<div class="">
         <input type="text" name="price[]" placeholder="Price" value="" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="price_update(this,'.$length.')" class="form-control" />';
         $html .= '</div>';
-        $html .= '<div class="col-md-2">
+        $html .= '<div class="">
         <input type="number" name="qty[]" placeholder="Qty" min="1" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="qty_total(this,'.$length.')" value=""  class="form-control" />';
         $html .= '</div>';
         if($discount_value == 1 || $discount_option == 1) {
-            $html .= '<div class="col-md-2">
+            $html .= '<div class="">
                 <input type="number" name="discount[]" placeholder="Discount" min="0" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="discount_total(this,'.$length.')" value=""  class="form-control" />';
                 $html .= '</div>';
         }
-        $html .= '<div class="col-md-2">
+        $html .= '<div class="">
         <input type="text" name="total[]" placeholder="Total" value="" readonly class="form-control" />';
         $html .= '</div>';
         
@@ -555,9 +557,9 @@ class Products extends AdminController
                     if($prod['status'] == 1) {
                         $checked = 'checked';
                     }
-                    $html .= '<div style="height:40px; clear:both" class="productdiv" id="'.$i.'"><div class="col-md-3 wcb">
+                    $html .= '<div style="height:40px; clear:both" class="productdiv css-table-row" id="'.$i.'"><div class="wcb">
                     <input type="hidden" name="no[]" value="'.$i.'">
-                                <input type="checkbox" name="status_'.$i.'" value="1" class="form-control cbox" '.$checked.' >
+                                <input type="hidden" name="status_'.$i.'" value="1" class="form-control cbox" '.$checked.' >
                     <select name="product[]" class="form-control" onchange="getdealprodprice(this,'.$i.')"><option value="">--Select Item--</option>';
                     foreach($data as $val) {
                         $selected = '';
@@ -567,19 +569,20 @@ class Products extends AdminController
                             $html .= '<option value="'.$val["id"].'"  '.$selected.'>'.$val["name"].'</option>';
                     } 
                     $html .= '</select>';
-                    $html .= '</div>
-                    <div class="col-md-2">
+                    $html .= '</div>';
+                    $html .=get_particulars_item_ordered_inputs($i,$prod['productid']);
+                    $html .='<div class="">
                     <input type="text" name="price[]" placeholder="Price" value="'.$prod['price'].'" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="price_update(this,'.$i.')" class="form-control" />';
                         $html .= '</div>';
-                        $html .= '<div class="col-md-2">
+                        $html .= '<div class="">
                         <input type="number" name="qty[]" placeholder="Qty" min="1" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="qty_total(this,'.$i.')" value="'.$prod['quantity'].'"  class="form-control" />';
                         $html .= '</div>';
                         if($discount_value == 1 || $discount_option == 1) {
-                            $html .= '<div class="col-md-2">
+                            $html .= '<div class="">
                             <input type="number" name="discount[]" placeholder="Discount" min="0" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="discount_total(this,'.$i.')" value="'.$prod['discount'].'"  class="form-control" />';
                             $html .= '</div>';
                         }
-                        $html .= '<div class="col-md-2">
+                        $html .= '<div class="">
                         <input type="text" name="total[]" placeholder="Total" value="'.$prod['total_price'].'" readonly class="form-control" />';
                         $html .= '</div>';
                         
@@ -599,7 +602,7 @@ class Products extends AdminController
                         </ul>
                     </span>';
                     if($prod['variation']) {
-                            $html .= '<div class="col-md-2" id="variation_'.$i.'" style="width: 23.3%;margin: 4px 19px 15px;">
+                            $html .= '<div class="" id="variation_'.$i.'" style="width: 23.3%;margin: 4px 19px 15px;">
                             <label>VARIATION</label>
                             <select name="variation_'.$i.'" class="form-control" onchange="getvariationprodprice(this,'.$i.')">
                             <option value="">--Select Variation--</option>';
@@ -626,9 +629,9 @@ class Products extends AdminController
                     //$unitprice = $this->db->get(db_prefix() . 'unit_price')->result_array();
                       $this->db->join(db_prefix() . 'taxes', db_prefix() . 'taxes.id=' . db_prefix() . 'item_price.tax');
                     $unitprice = $this->db->get(db_prefix() . 'item_price')->result_array();
-                    $html .= '<div style="height:40px; clear:both" class="productdiv" id="'.$i.'"><div class="col-md-2 wcb" style="width:20%;">
+                    $html .= '<div style="height:40px; clear:both" class="productdiv css-table-row" id="'.$i.'"><div class="wcb" style="width:20%;">
                     <input type="hidden" name="no[]" value="'.$i.'">
-                                <input type="checkbox" name="status_'.$i.'" value="1" class="form-control cbox" '.$checked.' >
+                                <input type="hidden" name="status_'.$i.'" value="1" class="form-control cbox" '.$checked.' >
                     <select name="product[]" class="form-control" onchange="getdealprodprice(this,'.$i.')"><option value="">--Select Item--</option>';
                     foreach($data as $val) {
                         $selected = '';
@@ -638,26 +641,27 @@ class Products extends AdminController
                             $html .= '<option value="'.$val["id"].'"  '.$selected.'>'.$val["name"].'</option>';
                     } 
                     $html .= '</select>';
-                    $html .= '</div>
-                    <div class="col-md-2">
+                    $html .= '</div>';
+                    $html .=get_particulars_item_ordered_inputs($i,$prod['productid']);
+                    $html .='<div class="">
                     <input type="text" name="price[]" placeholder="Price" value="'.$prod['price'].'" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="price_update(this,'.$i.')" class="form-control" />';
                         $html .= '</div>';
-                        $html .= '<div class="col-md-1">
+                        $html .= '<div class="">
                         <input type="number" name="qty[]" placeholder="Qty" min="1" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="qty_total(this,'.$i.')" value="'.$prod['quantity'].'"  class="form-control" />';
                         $html .= '</div>';
                         $tax = (isset($prod['tax']) && $prod['tax'] > 0) ? $prod['tax'] : 0;
                         if($tax < 1)
                             $tax = (isset($unitprice[0]['taxrate']) && $unitprice[0]['taxrate'] > 0) ? $unitprice[0]['taxrate'] : 0;
                         
-                        $html .= '<div class="col-md-2">
+                        $html .= '<div class="">
                         <input type="number" name="tax[]" placeholder="Tax" min="0" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="tax_total(this,'.$i.')" value="'.$tax.'"  class="form-control" />';
                         $html .= '</div>';
                         if($discount_value == 1 || $discount_option == 1) {
-                            $html .= '<div class="col-md-2">
+                            $html .= '<div class="">
                             <input type="number" name="discount[]" placeholder="Discount" min="0" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="discount_total(this,'.$i.')" value="'.$prod['discount'].'"  class="form-control" />';
                             $html .= '</div>';
                         }
-                        $html .= '<div class="col-md-2">
+                        $html .= '<div class="">
                         <input type="text" name="total[]" placeholder="Total" value="'.$prod['total_price'].'" readonly class="form-control" />';
                         $html .= '</div>';
                         
@@ -677,7 +681,7 @@ class Products extends AdminController
                         </ul>
                       </span>';
                       if($prod['variation']) {
-                      $html .= '<div class="col-md-2" id="variation_'.$i.'" style="width: 18.7%;margin: 4px 15px 15px;clear:both;">
+                      $html .= '<div class="" id="variation_'.$i.'" style="width: 18.7%;margin: 4px 15px 15px;clear:both;">
                       <label>VARIATION</label>
                       <select name="variation_'.$i.'" class="form-control" onchange="getvariationprodprice(this,'.$i.')">
                       <option value="">--Select Variation--</option>';
@@ -699,27 +703,28 @@ class Products extends AdminController
         } else {
             $length = 0;
             $discount_option = get_option('product_discount_option');
-            $html .= '<div style="height:40px; clear:both;" class="productdiv" id="'.$length.'"><div class="col-md-3 wcb">
+            $html .= '<div style="height:40px; clear:both;" class="productdiv css-table-row" id="'.$length.'"><div class="wcb">
             <input type="hidden" name="no[]" value="'.$length.'">
-                            <input type="checkbox" name="status_'.$length.'" value="1" class="form-control cbox">
+                            <input type="hidden" name="status_'.$length.'" value="1" class="form-control cbox">
             <select name="product[]" class="form-control" onchange="getdealprodprice(this,'.$length.')"><option value="">--Select Item--</option>';
             foreach($data as $val) {
                     $html .= '<option value="'.$val["id"].'"  >'.$val["name"].'</option>';
             } 
             $html .= '</select>';
-            $html .= '</div>
-            <div class="col-md-2">
+            $html .= '</div>';
+            $html .=get_particulars_item_ordered_inputs($length);
+            $html .='<div class="">
             <input type="text" name="price[]" placeholder="Price" value="" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="price_update(this,'.$length.')" class="form-control" />';
                 $html .= '</div>';
-                $html .= '<div class="col-md-2">
+                $html .= '<div class="">
                 <input type="number" name="qty[]" placeholder="Qty" min="1" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="qty_total(this,'.$length.')" value=""  class="form-control" />';
                 $html .= '</div>';
                 if($discount_value == 1 || $discount_option == 1) {
-                    $html .= '<div class="col-md-2">
+                    $html .= '<div class="">
                         <input type="number" name="discount[]" placeholder="Discount" min="0" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="discount_total(this,'.$length.')" value=""  class="form-control" />';
                         $html .= '</div>';
                 }
-                $html .= '<div class="col-md-2">
+                $html .= '<div class="">
                 <input type="text" name="total[]" placeholder="Total" value="" readonly class="form-control" />';
                 $html .= '</div>';
                 
@@ -798,9 +803,9 @@ class Products extends AdminController
                     if($prod['status'] == 1) {
                         $checked = 'checked';
                     }
-                    $html .= '<div style="height:40px; clear:both" class="productdiv" id="'.$i.'"><div class="col-md-3 wcb">
+                    $html .= '<div style="height:40px; clear:both" class="productdiv css-table-row" id="'.$i.'"><div class="wcb">
                     <input type="hidden" name="no[]" value="'.$i.'">
-                                <input type="checkbox" name="status_'.$i.'" value="1" class="form-control cbox" '.$checked.' >
+                                <input type="hidden" name="status_'.$i.'" value="1" class="form-control cbox" '.$checked.' >
                     <select name="product[]" class="form-control" onchange="getdealprodprice(this,'.$i.')"><option value="">--Select Item--</option>';
                     foreach($data as $val) {
                         $selected = '';
@@ -810,19 +815,20 @@ class Products extends AdminController
                             $html .= '<option value="'.$val["id"].'"  '.$selected.'>'.$val["name"].'</option>';
                     } 
                     $html .= '</select>';
-                    $html .= '</div>
-                    <div class="col-md-2">
+                    $html .= '</div>';
+                    $html .=get_particulars_item_ordered_inputs($i,$prod['productid']);
+                    $html .='<div class="">
                     <input type="text" name="price[]" placeholder="Price" value="'.$prod['price'].'" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="price_update(this,'.$i.')" class="form-control" />';
                         $html .= '</div>';
-                        $html .= '<div class="col-md-2">
+                        $html .= '<div class="">
                         <input type="number" name="qty[]" placeholder="Qty" min="1" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="qty_total(this,'.$i.')" value="'.$prod['quantity'].'"  class="form-control" />';
                         $html .= '</div>';
                         if($discount_value == 1 || $discount_option == 1) {
-                            $html .= '<div class="col-md-2">
+                            $html .= '<div class="">
                             <input type="number" name="discount[]" placeholder="Discount" min="0" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="discount_total(this,'.$i.')" value="'.$prod['discount'].'"  class="form-control" />';
                             $html .= '</div>';
                         }
-                        $html .= '<div class="col-md-2">
+                        $html .= '<div class="">
                         <input type="text" name="total[]" placeholder="Total" value="'.$prod['total_price'].'" readonly class="form-control" />';
                         $html .= '</div>';
                         
@@ -842,7 +848,7 @@ class Products extends AdminController
                         </ul>
                     </span>';
                     if($prod['variation']) {
-                            $html .= '<div class="col-md-2" id="variation_'.$i.'" style="width: 23.3%;margin: 4px 19px 15px;">
+                            $html .= '<div class="" id="variation_'.$i.'" style="width: 23.3%;margin: 4px 19px 15px;">
                             <label>VARIATION</label>
                             <select name="variation_'.$i.'" class="form-control" onchange="getvariationprodprice(this,'.$i.')">
                             <option value="">--Select Variation--</option>';
@@ -869,9 +875,9 @@ class Products extends AdminController
                     //$unitprice = $this->db->get(db_prefix() . 'unit_price')->result_array();
                       $this->db->join(db_prefix() . 'taxes', db_prefix() . 'taxes.id=' . db_prefix() . 'item_price.tax');
                     $unitprice = $this->db->get(db_prefix() . 'item_price')->result_array();
-                    $html .= '<div style="height:40px; clear:both" class="productdiv" id="'.$i.'"><div class="col-md-2 wcb" style="width:20%;">
+                    $html .= '<div style="height:40px; clear:both" class="productdiv css-table-row" id="'.$i.'"><div class="wcb">
                     <input type="hidden" name="no[]" value="'.$i.'">
-                                <input type="checkbox" name="status_'.$i.'" value="1" class="form-control cbox" '.$checked.' >
+                                <input type="hidden" name="status_'.$i.'" value="1" class="form-control cbox" '.$checked.' >
                     <select name="product[]" class="form-control" onchange="getdealprodprice(this,'.$i.')"><option value="">--Select Item--</option>';
                     foreach($data as $val) {
                         $selected = '';
@@ -881,26 +887,27 @@ class Products extends AdminController
                             $html .= '<option value="'.$val["id"].'"  '.$selected.'>'.$val["name"].'</option>';
                     } 
                     $html .= '</select>';
-                    $html .= '</div>
-                    <div class="col-md-2">
+                    $html .= '</div>';
+                    $html .=get_particulars_item_ordered_inputs($i,$prod['productid']);
+                    $html .='<div class="">
                     <input type="text" name="price[]" placeholder="Price" value="'.$prod['price'].'" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="price_update(this,'.$i.')" class="form-control" />';
                         $html .= '</div>';
-                        $html .= '<div class="col-md-1">
+                        $html .= '<div class="">
                         <input type="number" name="qty[]" placeholder="Qty" min="1" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="qty_total(this,'.$i.')" value="'.$prod['quantity'].'"  class="form-control" />';
                         $html .= '</div>';
                         $tax = (isset($prod['tax']) && $prod['tax'] > 0) ? $prod['tax'] : 0;
                         if($tax < 1)
                             $tax = (isset($unitprice[0]['taxrate']) && $unitprice[0]['taxrate'] > 0) ? $unitprice[0]['taxrate'] : 0;
                         
-                        $html .= '<div class="col-md-2">
+                        $html .= '<div class="">
                         <input type="number" name="tax[]" placeholder="Tax" min="0" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="tax_total(this,'.$i.')" value="'.$tax.'"  class="form-control" />';
                         $html .= '</div>';
                         if($discount_value == 1 || $discount_option == 1) {
-                            $html .= '<div class="col-md-2">
+                            $html .= '<div class="">
                             <input type="number" name="discount[]" placeholder="Discount" min="0" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="discount_total(this,'.$i.')" value="'.$prod['discount'].'"  class="form-control" />';
                             $html .= '</div>';
                         }
-                        $html .= '<div class="col-md-2">
+                        $html .= '<div class="">
                         <input type="text" name="total[]" placeholder="Total" value="'.$prod['total_price'].'" readonly class="form-control" />';
                         $html .= '</div>';
                         
@@ -920,7 +927,7 @@ class Products extends AdminController
                         </ul>
                       </span>';
                       if($prod['variation']) {
-                      $html .= '<div class="col-md-2" id="variation_'.$i.'" style="width: 18.7%;margin: 4px 15px 15px;clear:both;">
+                      $html .= '<div class="" id="variation_'.$i.'" style="width: 18.7%;margin: 4px 15px 15px;clear:both;">
                       <label>VARIATION</label>
                       <select name="variation_'.$i.'" class="form-control" onchange="getvariationprodprice(this,'.$i.')">
                       <option value="">--Select Variation--</option>';
@@ -942,27 +949,28 @@ class Products extends AdminController
         } else {
             $length = 0;
             $discount_option = get_option('product_discount_option');
-            $html .= '<div style="height:40px; clear:both;" class="productdiv" id="'.$length.'"><div class="col-md-3 wcb">
+            $html .= '<div style="height:40px; clear:both;" class="productdiv css-table-row" id="'.$length.'"><div class="wcb">
             <input type="hidden" name="no[]" value="'.$length.'">
-                            <input type="checkbox" name="status_'.$length.'" value="1" class="form-control cbox">
+                            <input type="hidden" name="status_'.$length.'" value="1" class="form-control cbox">
             <select name="product[]" class="form-control" onchange="getdealprodprice(this,'.$length.')"><option value="">--Select Item--</option>';
             foreach($data as $val) {
                     $html .= '<option value="'.$val["id"].'"  >'.$val["name"].'</option>';
             } 
             $html .= '</select>';
-            $html .= '</div>
-            <div class="col-md-2">
+            $html .= '</div>';
+            $html .=get_particulars_item_ordered_inputs($length);
+            $html .='<div class="">
             <input type="text" name="price[]" placeholder="Price" value="" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="price_update(this,'.$length.')" class="form-control" />';
                 $html .= '</div>';
-                $html .= '<div class="col-md-2">
+                $html .= '<div class="">
                 <input type="number" name="qty[]" placeholder="Qty" min="1" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="qty_total(this,'.$length.')" value=""  class="form-control" />';
                 $html .= '</div>';
                 if($discount_value == 1 || $discount_option == 1) {
-                    $html .= '<div class="col-md-2">
+                    $html .= '<div class="">
                         <input type="number" name="discount[]" placeholder="Discount" min="0" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="discount_total(this,'.$length.')" value=""  class="form-control" />';
                         $html .= '</div>';
                 }
-                $html .= '<div class="col-md-2">
+                $html .= '<div class="">
                 <input type="text" name="total[]" placeholder="Total" value="" readonly class="form-control" />';
                 $html .= '</div>';
                 
@@ -1041,9 +1049,9 @@ class Products extends AdminController
                     if($prod['status'] == 1) {
                         $checked = 'checked';
                     }
-                    $html .= '<div style="height:40px; clear:both" class="productdiv" id="'.$i.'"><div class="col-md-3 wcb">
+                    $html .= '<div style="height:40px; clear:both" class="productdiv css-table-row" id="'.$i.'"><div class="wcb">
                     <input type="hidden" name="no[]" value="'.$i.'">
-                                <input type="checkbox" name="status_'.$i.'" value="1" class="form-control cbox" '.$checked.' >
+                                <input type="hidden" name="status_'.$i.'" value="1" class="form-control cbox" '.$checked.' >
                     <select name="product[]" class="form-control" onchange="getdealprodprice(this,'.$i.')"><option value="">--Select Item--</option>';
                     foreach($data as $val) {
                         $selected = '';
@@ -1053,19 +1061,20 @@ class Products extends AdminController
                             $html .= '<option value="'.$val["id"].'"  '.$selected.'>'.$val["name"].'</option>';
                     } 
                     $html .= '</select>';
-                    $html .= '</div>
-                    <div class="col-md-2">
+                    $html .= '</div>';
+                    $html .=get_particulars_item_ordered_inputs($i,$prod['productid']);
+                    $html .='<div class="">
                     <input type="text" name="price[]" placeholder="Price" value="'.$prod['price'].'" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="price_update(this,'.$i.')" class="form-control" />';
                         $html .= '</div>';
-                        $html .= '<div class="col-md-2">
+                        $html .= '<div class="">
                         <input type="number" name="qty[]" placeholder="Qty" min="1" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="qty_total(this,'.$i.')" value="'.$prod['quantity'].'"  class="form-control" />';
                         $html .= '</div>';
                         if($discount_value == 1 || $discount_option == 1) {
-                            $html .= '<div class="col-md-2">
+                            $html .= '<div class="">
                             <input type="number" name="discount[]" placeholder="Discount" min="0" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="discount_total(this,'.$i.')" value="'.$prod['discount'].'"  class="form-control" />';
                             $html .= '</div>';
                         }
-                        $html .= '<div class="col-md-2">
+                        $html .= '<div class="">
                         <input type="text" name="total[]" placeholder="Total" value="'.$prod['total_price'].'" readonly class="form-control" />';
                         $html .= '</div>';
                         
@@ -1085,7 +1094,7 @@ class Products extends AdminController
                         </ul>
                     </span>';
                     if($prod['variation']) {
-                            $html .= '<div class="col-md-2" id="variation_'.$i.'" style="width: 23.3%;margin: 4px 19px 15px;">
+                            $html .= '<div class="" id="variation_'.$i.'" style="width: 23.3%;margin: 4px 19px 15px;">
                             <label>VARIATION</label>
                             <select name="variation_'.$i.'" class="form-control" onchange="getvariationprodprice(this,'.$i.')">
                             <option value="">--Select Variation--</option>';
@@ -1112,9 +1121,9 @@ class Products extends AdminController
                     //$unitprice = $this->db->get(db_prefix() . 'unit_price')->result_array();
                       $this->db->join(db_prefix() . 'taxes', db_prefix() . 'taxes.id=' . db_prefix() . 'item_price.tax');
                     $unitprice = $this->db->get(db_prefix() . 'item_price')->result_array();
-                    $html .= '<div style="height:40px; clear:both" class="productdiv" id="'.$i.'"><div class="col-md-2 wcb" style="width:20%;">
+                    $html .= '<div style="height:40px; clear:both" class="productdiv css-table-row" id="'.$i.'"><div class="wcb">
                     <input type="hidden" name="no[]" value="'.$i.'">
-                                <input type="checkbox" name="status_'.$i.'" value="1" class="form-control cbox" '.$checked.' >
+                                <input type="hidden" name="status_'.$i.'" value="1" class="form-control cbox" '.$checked.' >
                     <select name="product[]" class="form-control" onchange="getdealprodprice(this,'.$i.')"><option value="">--Select Item--</option>';
                     foreach($data as $val) {
                         $selected = '';
@@ -1124,26 +1133,27 @@ class Products extends AdminController
                             $html .= '<option value="'.$val["id"].'"  '.$selected.'>'.$val["name"].'</option>';
                     } 
                     $html .= '</select>';
-                    $html .= '</div>
-                    <div class="col-md-2">
+                    $html .= '</div>';
+                    $html .=get_particulars_item_ordered_inputs($i,$prod['productid']);
+                    $html .='<div class="">
                     <input type="text" name="price[]" placeholder="Price" value="'.$prod['price'].'" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="price_update(this,'.$i.')" class="form-control" />';
                         $html .= '</div>';
-                        $html .= '<div class="col-md-1">
+                        $html .= '<div class="">
                         <input type="number" name="qty[]" placeholder="Qty" min="1" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="qty_total(this,'.$i.')" value="'.$prod['quantity'].'"  class="form-control" />';
                         $html .= '</div>';
                         $tax = (isset($prod['tax']) && $prod['tax'] > 0) ? $prod['tax'] : 0;
                         if($tax < 1)
                             $tax = (isset($unitprice[0]['taxrate']) && $unitprice[0]['taxrate'] > 0) ? $unitprice[0]['taxrate'] : 0;
                         
-                        $html .= '<div class="col-md-2">
+                        $html .= '<div class="">
                         <input type="number" name="tax[]" placeholder="Tax" min="0" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="tax_total(this,'.$i.')" value="'.$tax.'"  class="form-control" />';
                         $html .= '</div>';
                         if($discount_value == 1 || $discount_option == 1) {
-                            $html .= '<div class="col-md-2">
+                            $html .= '<div class="">
                             <input type="number" name="discount[]" placeholder="Discount" min="0" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="discount_total(this,'.$i.')" value="'.$prod['discount'].'"  class="form-control" />';
                             $html .= '</div>';
                         }
-                        $html .= '<div class="col-md-2">
+                        $html .= '<div class="">
                         <input type="text" name="total[]" placeholder="Total" value="'.$prod['total_price'].'" readonly class="form-control" />';
                         $html .= '</div>';
                         
@@ -1163,7 +1173,7 @@ class Products extends AdminController
                         </ul>
                       </span>';
                       if($prod['variation']) {
-                      $html .= '<div class="col-md-2" id="variation_'.$i.'" style="width: 18.7%;margin: 4px 15px 15px;clear:both;">
+                      $html .= '<div class="" id="variation_'.$i.'" style="width: 18.7%;margin: 4px 15px 15px;clear:both;">
                       <label>VARIATION</label>
                       <select name="variation_'.$i.'" class="form-control" onchange="getvariationprodprice(this,'.$i.')">
                       <option value="">--Select Variation--</option>';
@@ -1185,27 +1195,28 @@ class Products extends AdminController
         } else {
             $length = 0;
             $discount_option = get_option('product_discount_option');
-            $html .= '<div style="height:40px; clear:both;" class="productdiv" id="'.$length.'"><div class="col-md-3 wcb">
+            $html .= '<div style="height:40px; clear:both;" class="productdiv css-table-row" id="'.$length.'"><div class="wcb">
             <input type="hidden" name="no[]" value="'.$length.'">
-                            <input type="checkbox" name="status_'.$length.'" value="1" class="form-control cbox">
+                            <input type="hidden" name="status_'.$length.'" value="1" class="form-control cbox">
             <select name="product[]" class="form-control" onchange="getdealprodprice(this,'.$length.')"><option value="">--Select Item--</option>';
             foreach($data as $val) {
                     $html .= '<option value="'.$val["id"].'"  >'.$val["name"].'</option>';
             } 
             $html .= '</select>';
-            $html .= '</div>
-            <div class="col-md-2">
+            $html .= '</div>';
+            $html .=get_particulars_item_ordered_inputs($length);
+            $html .='<div class="">
             <input type="text" name="price[]" placeholder="Price" value="" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="price_update(this,'.$length.')" class="form-control" />';
                 $html .= '</div>';
-                $html .= '<div class="col-md-2">
+                $html .= '<div class="">
                 <input type="number" name="qty[]" placeholder="Qty" min="1" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="qty_total(this,'.$length.')" value=""  class="form-control" />';
                 $html .= '</div>';
                 if($discount_value == 1 || $discount_option == 1) {
-                    $html .= '<div class="col-md-2">
+                    $html .= '<div class="">
                         <input type="number" name="discount[]" placeholder="Discount" min="0" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="discount_total(this,'.$length.')" value=""  class="form-control" />';
                         $html .= '</div>';
                 }
-                $html .= '<div class="col-md-2">
+                $html .= '<div class="">
                 <input type="text" name="total[]" placeholder="Total" value="" readonly class="form-control" />';
                 $html .= '</div>';
                 
@@ -1267,7 +1278,7 @@ class Products extends AdminController
                 if($prod['status'] == 1) {
                     $checked = 'checked';
                 }
-                $html .= '<div style="height:40px; clear:both" class="productdiv" id="'.$i.'"><div class="col-md-3 wcb">
+                $html .= '<div style="height:40px; clear:both" class=" css-table-row" id="'.$i.'"><div class="wcb">
                 <input type="hidden" name="no[]" value="'.$i.'">
                             <input type="checkbox" name="status_'.$i.'" value="1" class="form-control cbox" '.$checked.' >
                 <select name="product[]" class="form-control" onchange="getdealprodprice(this,'.$i.')"><option value="">--Select Item--</option>';
@@ -1279,19 +1290,21 @@ class Products extends AdminController
                         $html .= '<option value="'.$val["id"].'"  '.$selected.'>'.$val["name"].'</option>';
                 } 
                 $html .= '</select>';
-                $html .= '</div>
-                <div class="col-md-2">
+                $html .= '</div>';
+                $html .=get_particulars_item_ordered_inputs($i,$prod['productid']);
+                $html .='
+                <div class="">
                 <input type="text" name="price[]" placeholder="Price" value="'.$prod['price'].'" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="price_update(this,'.$i.')" class="form-control" />';
                     $html .= '</div>';
-                    $html .= '<div class="col-md-2">
+                    $html .= '<div class="">
                     <input type="number" name="qty[]" placeholder="Qty" min="1" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="qty_total(this,'.$i.')" value="'.$prod['quantity'].'"  class="form-control" />';
                     $html .= '</div>';
                     if($discount_value == 1 || $discount_option == 1) {
-                        $html .= '<div class="col-md-2">
+                        $html .= '<div class="">
                         <input type="number" name="discount[]" placeholder="Discount" min="0" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="discount_total(this,'.$i.')" value="'.$prod['discount'].'"  class="form-control" />';
                         $html .= '</div>';
                     }
-                    $html .= '<div class="col-md-2">
+                    $html .= '<div class="">
                     <input type="text" name="total[]" placeholder="Total" value="'.$prod['total_price'].'" readonly class="form-control" />';
                     $html .= '</div>';
                     
@@ -1311,7 +1324,7 @@ class Products extends AdminController
                     </ul>
                   </span>';
                   if($prod['variation']) {
-                        $html .= '<div class="col-md-2" id="variation_'.$i.'" style="width: 23.3%;margin: 4px 19px 15px;">
+                        $html .= '<div class="" id="variation_'.$i.'" style="width: 23.3%;margin: 4px 19px 15px;">
                         <label>VARIATION</label>
                         <select name="variation_'.$i.'" class="form-control" onchange="getvariationprodprice(this,'.$i.')">
                         <option value="">--Select Variation--</option>';
@@ -1339,27 +1352,30 @@ class Products extends AdminController
                 }
             }
             $discount_option = get_option('product_discount_option');
-            $html .= '<div style="height:40px; clear:both;" class="productdiv" id="'.$_POST['length'].'"><div class="col-md-3 wcb">
+            $html .= '<div style="height:40px; clear:both;" class="productdiv css-table-row" id="'.$_POST['length'].'"><div class="wcb">
             <input type="hidden" name="no[]" value="'.$_POST['length'].'">
-                            <input type="checkbox" name="status_'.$_POST['length'].'" value="1" class="form-control cbox">
+                            <input type="hidden" name="status_'.$_POST['length'].'" value="1" class="form-control cbox">
             <select name="product[]" class="form-control" onchange="getdealprodprice(this,'.$_POST['length'].')"><option value="">--Select Item--</option>';
             foreach($data as $val) {
                     $html .= '<option value="'.$val["id"].'">'.$val["name"].'</option>';
             } 
             $html .= '</select>';
-            $html .= '</div>
-            <div class="col-md-2">
+            $html .= '</div>';
+
+            $html .=get_particulars_item_ordered_inputs($_POST['length']);
+
+            $html .='<div class="">
             <input type="text" name="price[]" placeholder="Price" value="" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="price_update(this,'.$_POST['length'].')" class="form-control" />';
                 $html .= '</div>';
-                $html .= '<div class="col-md-2">
+                $html .= '<div class="">
                 <input type="number" name="qty[]" placeholder="Qty" min="1" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="qty_total(this,'.$_POST['length'].')" value=""  class="form-control" />';
                 $html .= '</div>';
                 if($discount_value == 1 || $discount_option == 1) {
-                    $html .= '<div class="col-md-2">
+                    $html .= '<div class="">
                         <input type="number" name="discount[]" placeholder="Discount" min="0" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="discount_total(this,'.$_POST['length'].')" value=""  class="form-control" />';
                         $html .= '</div>';
                 }
-                $html .= '<div class="col-md-2">
+                $html .= '<div class="">
                 <input type="text" name="total[]" placeholder="Total" value="" readonly class="form-control" />';
                 $html .= '</div>';
                 
@@ -1448,30 +1464,31 @@ class Products extends AdminController
         //     }
 
         // } else {
-            $html .= '<div style="height:40px; clear:both" class="productdiv" id="'.$_POST['length'].'"><div class="col-md-2 wcb" style="width:20%;">
+            $html .= '<div style="height:40px; clear:both" class="productdiv css-table-row" id="'.$_POST['length'].'"><div class="wcb">
             <input type="hidden" name="no[]" value="'.$_POST['length'].'">
-                            <input type="checkbox" name="status_'.$_POST['length'].'" value="1" class="form-control cbox">
+                            <input type="hidden" name="status_'.$_POST['length'].'" value="1" class="form-control cbox">
             <select name="product[]" class="form-control" onchange="getdealprodprice(this,'.$_POST['length'].')"><option value="">--Select Item--</option>';
             foreach($data as $val) {
                     $html .= '<option value="'.$val["id"].'">'.$val["name"].'</option>';
             } 
             $html .= '</select>';
-            $html .= '</div>
-            <div class="col-md-2">
+            $html .= '</div>';
+            $html .=get_particulars_item_ordered_inputs($_POST['length']);
+            $html .='<div class="">
             <input type="text" name="price[]" placeholder="Price" value="" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="price_update(this,'.$_POST['length'].')" class="form-control" />';
                 $html .= '</div>';
-                $html .= '<div class="col-md-1">
+                $html .= '<div class="">
                 <input type="number" name="qty[]" placeholder="Qty" min="1" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="qty_total(this,'.$_POST['length'].')" value=""  class="form-control" />';
                 $html .= '</div>';
-                $html .= '<div class="col-md-2">
+                $html .= '<div class="">
                 <input type="number" name="tax[]" placeholder="Tax" min="0" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="tax_total(this,'.$_POST['length'].')" value=""  class="form-control" />';
                 $html .= '</div>';
                 if($discount_value == 1 || $discount_option == 1) {
-                    $html .= '<div class="col-md-2">
+                    $html .= '<div class="">
                     <input type="number" name="discount[]" placeholder="Discount" min="0" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="discount_total(this,'.$_POST['length'].')" value=""  class="form-control" />';
                     $html .= '</div>';
                 }
-                $html .= '<div class="col-md-2">
+                $html .= '<div class="">
                 <input type="text" name="total[]" placeholder="Total" value="" readonly class="form-control" />';
                 $html .= '</div>';
                 
@@ -1552,9 +1569,9 @@ class Products extends AdminController
 				//$unitprice = $this->db->get(db_prefix() . 'unit_price')->result_array();
 				  $this->db->join(db_prefix() . 'taxes', db_prefix() . 'taxes.id=' . db_prefix() . 'item_price.tax');
 				$unitprice = $this->db->get(db_prefix() . 'item_price')->result_array();
-                $html .= '<div style="height:40px; clear:both" class="productdiv" id="'.$i.'"><div class="col-md-2 wcb" style="width:20%;">
+                $html .= '<div style="height:40px; clear:both" class="productdiv css-table-row" id="'.$i.'"><div class="wcb">
                 <input type="hidden" name="no[]" value="'.$i.'">
-                            <input type="checkbox" name="status_'.$i.'" value="1" class="form-control cbox" '.$checked.' >
+                            <input type="hidden" name="status_'.$i.'" value="1" class="form-control cbox" '.$checked.' >
                 <select name="product[]" class="form-control" onchange="getdealprodprice(this,'.$i.')"><option value="">--Select Item--</option>';
                 foreach($data as $val) {
                     $selected = '';
@@ -1564,26 +1581,27 @@ class Products extends AdminController
                         $html .= '<option value="'.$val["id"].'"  '.$selected.'>'.$val["name"].'</option>';
                 } 
                 $html .= '</select>';
-                $html .= '</div>
-                <div class="col-md-2">
+                $html .= '</div>';
+                $html .=get_particulars_item_ordered_inputs($i,$prod['productid']);
+                $html .='<div class="">
                 <input type="text" name="price[]" placeholder="Price" value="'.$prod['price'].'" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="price_update(this,'.$i.')" class="form-control" />';
                     $html .= '</div>';
-                    $html .= '<div class="col-md-1">
+                    $html .= '<div class="">
                     <input type="number" name="qty[]" placeholder="Qty" min="1" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="qty_total(this,'.$i.')" value="'.$prod['quantity'].'"  class="form-control" />';
                     $html .= '</div>';
                     $tax = (isset($prod['tax']) && $prod['tax'] > 0) ? $prod['tax'] : 0;
                     if($tax < 1)
                         $tax = (isset($unitprice[0]['taxrate']) && $unitprice[0]['taxrate'] > 0) ? $unitprice[0]['taxrate'] : 0;
                     
-                    $html .= '<div class="col-md-2">
+                    $html .= '<div class="">
                     <input type="number" name="tax[]" placeholder="Tax" min="0" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="tax_total(this,'.$i.')" value="'.$tax.'"  class="form-control" />';
                     $html .= '</div>';
                     if($discount_value == 1 || $discount_option == 1) {
-                        $html .= '<div class="col-md-2">
+                        $html .= '<div class="">
                         <input type="number" name="discount[]" placeholder="Discount" min="0" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="discount_total(this,'.$i.')" value="'.$prod['discount'].'"  class="form-control" />';
                         $html .= '</div>';
                     }
-                    $html .= '<div class="col-md-2">
+                    $html .= '<div class="">
                     <input type="text" name="total[]" placeholder="Total" value="'.$prod['total_price'].'" readonly class="form-control" />';
                     $html .= '</div>';
                     
@@ -1603,7 +1621,7 @@ class Products extends AdminController
                     </ul>
                   </span>';
                   if($prod['variation']) {
-                  $html .= '<div class="col-md-2" id="variation_'.$i.'" style="width: 18.7%;margin: 4px 15px 15px;clear:both;">
+                  $html .= '<div class="" id="variation_'.$i.'" style="width: 18.7%;margin: 4px 15px 15px;clear:both;">
                   <label>VARIATION</label>
                   <select name="variation_'.$i.'" class="form-control" onchange="getvariationprodprice(this,'.$i.')">
                   <option value="">--Select Variation--</option>';
@@ -1623,30 +1641,31 @@ class Products extends AdminController
             }
 
         } else {
-            $html .= '<div style="height:40px; clear:both" class="productdiv" id="'.$_POST['length'].'"><div class="col-md-2 wcb" style="width:20%;">
+            $html .= '<div style="height:40px; clear:both" class="productdiv css-table-row" id="'.$_POST['length'].'"><div class="wcb">
             <input type="hidden" name="no[]" value="'.$_POST['length'].'">
-                            <input type="checkbox" name="status_'.$_POST['length'].'" value="1" class="form-control cbox">
+                            <input type="hidden" name="status_'.$_POST['length'].'" value="1" class="form-control cbox">
             <select name="product[]" class="form-control" onchange="getdealprodprice(this,'.$_POST['length'].')"><option value="">--Select Item--</option>';
             foreach($data as $val) {
                     $html .= '<option value="'.$val["id"].'">'.$val["name"].'</option>';
             } 
             $html .= '</select>';
-            $html .= '</div>
-            <div class="col-md-2">
+            $html .= '</div>';
+            $html .=get_particulars_item_ordered_inputs($_POST['length']);
+            $html .='<div class="">
             <input type="text" name="price[]" placeholder="Price" value="" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="price_update(this,'.$_POST['length'].')" class="form-control" />';
                 $html .= '</div>';
                 $html .= '<div class="col-md-1">
                 <input type="number" name="qty[]" placeholder="Qty" min="1" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="qty_total(this,'.$_POST['length'].')" value=""  class="form-control" />';
                 $html .= '</div>';
-                $html .= '<div class="col-md-2">
+                $html .= '<div class="">
                 <input type="number" name="tax[]" placeholder="Tax" min="0" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="tax_total(this,'.$_POST['length'].')" value=""  class="form-control" />';
                 $html .= '</div>';
                 if($discount_value == 1 || $discount_option == 1) {
-                    $html .= '<div class="col-md-2">
+                    $html .= '<div class="">
                     <input type="number" name="discount[]" placeholder="Discount" min="0" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="discount_total(this,'.$_POST['length'].')" value=""  class="form-control" />';
                     $html .= '</div>';
                 }
-                $html .= '<div class="col-md-2">
+                $html .= '<div class="">
                 <input type="text" name="total[]" placeholder="Total" value="" readonly class="form-control" />';
                 $html .= '</div>';
                 
@@ -1726,9 +1745,9 @@ class Products extends AdminController
 				//$unitprice = $this->db->get(db_prefix() . 'unit_price')->result_array();
 				  $this->db->join(db_prefix() . 'taxes', db_prefix() . 'taxes.id=' . db_prefix() . 'item_price.tax');
 				$unitprice = $this->db->get(db_prefix() . 'item_price')->result_array();
-                $html .= '<div style="height:40px; clear:both" class="productdiv" id="'.$i.'"><div class="col-md-2 wcb" style="width:20%;">
+                $html .= '<div style="height:40px; clear:both" class="productdiv css-table-row" id="'.$i.'"><div class="wcb" >
                 <input type="hidden" name="no[]" value="'.$i.'">
-                            <input type="checkbox" name="status_'.$i.'" value="1" class="form-control cbox" '.$checked.' >
+                            <input type="hidden" name="status_'.$i.'" value="1" class="form-control cbox" '.$checked.' >
                 <select name="product[]" class="form-control" onchange="getdealprodprice(this,'.$i.')"><option value="">--Select Item--</option>';
                 foreach($data as $val) {
                     $selected = '';
@@ -1738,26 +1757,27 @@ class Products extends AdminController
                         $html .= '<option value="'.$val["id"].'"  '.$selected.'>'.$val["name"].'</option>';
                 } 
                 $html .= '</select>';
-                $html .= '</div>
-                <div class="col-md-2">
+                $html .= '</div>';
+                $html .=get_particulars_item_ordered_inputs($i,$prod['productid']);
+                $html .='<div class="">
                 <input type="text" name="price[]" placeholder="Price" value="'.$prod['price'].'" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="price_update(this,'.$i.')" class="form-control" />';
                     $html .= '</div>';
-                    $html .= '<div class="col-md-1">
+                    $html .= '<div class="">
                     <input type="number" name="qty[]" placeholder="Qty" min="1" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="qty_total(this,'.$i.')" value="'.$prod['quantity'].'"  class="form-control" />';
                     $html .= '</div>';
                     $tax = (isset($prod['tax']) && $prod['tax'] > 0) ? $prod['tax'] : 0;
                     if($tax < 1)
                         $tax = (isset($unitprice[0]['taxrate']) && $unitprice[0]['taxrate'] > 0) ? $unitprice[0]['taxrate'] : 0;
                                         
-                    $html .= '<div class="col-md-2">
+                    $html .= '<div class="">
                     <input type="number" name="tax[]" placeholder="Tax" min="0" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="tax_total(this,'.$i.')" value="'.$tax.'"  class="form-control" />';
                     $html .= '</div>';
                     if($discount_value == 1 || $discount_option == 1) {
-                        $html .= '<div class="col-md-2">
+                        $html .= '<div class="">
                         <input type="number" name="discount[]" placeholder="Discount" min="0" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="discount_total(this,'.$i.')" value="'.$prod['discount'].'"  class="form-control" />';
                         $html .= '</div>';
                     }
-                    $html .= '<div class="col-md-2">
+                    $html .= '<div class="">
                     <input type="text" name="total[]" placeholder="Total" value="'.$prod['total_price'].'" readonly class="form-control" />';
                     $html .= '</div>';
                     
@@ -1777,7 +1797,7 @@ class Products extends AdminController
                 </ul>
               </span>';
                   if($prod['variation']) {
-                  $html .= '<div class="col-md-2" id="variation_'.$i.'" style="width: 18.7%;margin: 4px 15px 15px;clear:both;">
+                  $html .= '<div class="" id="variation_'.$i.'" style="width: 18.7%;margin: 4px 15px 15px;clear:both;">
                   <label>VARIATION</label>
                   <select name="variation_'.$i.'" class="form-control" onchange="getvariationprodprice(this,'.$i.')">
                   <option value="">--Select Variation--</option>';
@@ -1797,30 +1817,32 @@ class Products extends AdminController
             }
 
         } else {
-            $html .= '<div style="height:40px; clear:both" class="productdiv" id="'.$_POST['length'].'"><div class="col-md-2 wcb" style="width:20%;">
+            $html .= '<div style="height:40px; clear:both" class="productdiv css-table-row" id="'.$_POST['length'].'"><div class="wcb">
             <input type="hidden" name="no[]" value="'.$_POST['length'].'">
-                            <input type="checkbox" name="status_'.$_POST['length'].'" value="1" class="form-control cbox">
+                            <input type="hidden" name="status_'.$_POST['length'].'" value="1" class="form-control cbox">
             <select name="product[]" class="form-control" onchange="getdealprodprice(this,'.$_POST['length'].')"><option value="">--Select Item--</option>';
             foreach($data as $val) {
                     $html .= '<option value="'.$val["id"].'">'.$val["name"].'</option>';
             } 
             $html .= '</select>';
-            $html .= '</div>
-            <div class="col-md-2">
+            $html .= '</div>';
+            $html .=get_particulars_item_ordered_inputs($_POST['length']);
+
+            $html .='<div class="">
             <input type="text" name="price[]" placeholder="Price" value="" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="price_update(this,'.$_POST['length'].')" class="form-control" />';
                 $html .= '</div>';
-                $html .= '<div class="col-md-1">
+                $html .= '<div class="">
                 <input type="number" name="qty[]" placeholder="Qty" min="1" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="qty_total(this,'.$_POST['length'].')" value=""  class="form-control" />';
                 $html .= '</div>';
-                $html .= '<div class="col-md-2">
+                $html .= '<div class="">
                 <input type="number" name="tax[]" placeholder="Tax" min="0" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="tax_total(this,'.$_POST['length'].')" value=""  class="form-control" />';
                 $html .= '</div>';
                 if($discount_value == 1 || $discount_option == 1) {
-                    $html .= '<div class="col-md-2">
+                    $html .= '<div class="">
                     <input type="number" name="discount[]" placeholder="Discount" min="0" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="discount_total(this,'.$_POST['length'].')" value=""  class="form-control" />';
                     $html .= '</div>';
                 }
-                $html .= '<div class="col-md-2">
+                $html .= '<div class="">
                 <input type="text" name="total[]" placeholder="Total" value="" readonly class="form-control" />';
                 $html .= '</div>';
                 
@@ -1895,9 +1917,9 @@ class Products extends AdminController
                 if($prod['status'] == 1) {
                     $checked = 'checked';
                 }
-                $html .= '<div style="height:40px; clear:both" class="productdiv" id="'.$i.'"><div class="col-md-3 wcb">
+                $html .= '<div style="height:40px; clear:both" class="productdiv css-table-row" id="'.$i.'"><div class=" wcb">
                 <input type="hidden" name="no[]" value="'.$i.'">
-                            <input type="checkbox" name="status_'.$i.'" value="1" class="form-control cbox" '.$checked.' >
+                            <input type="hidden" name="status_'.$i.'" value="1" class="form-control cbox" '.$checked.' >
                 <select name="product[]" class="form-control" onchange="getdealprodprice(this,'.$i.')"><option value="">--Select Item--</option>';
                 foreach($data as $val) {
                     $selected = '';
@@ -1907,19 +1929,20 @@ class Products extends AdminController
                         $html .= '<option value="'.$val["id"].'"  '.$selected.'>'.$val["name"].'</option>';
                 } 
                 $html .= '</select>';
-                $html .= '</div>
-                <div class="col-md-2">
+                $html .= '</div>';
+                $html .=get_particulars_item_ordered_inputs($i,$prod['productid']);
+                $html .= '<div class="">
                 <input type="text" name="price[]" placeholder="Price" value="'.$prod['price'].'" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="price_update(this,'.$i.')" class="form-control" />';
                     $html .= '</div>';
-                    $html .= '<div class="col-md-2">
+                    $html .= '<div class="">
                     <input type="number" name="qty[]" placeholder="Qty" min="1" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="qty_total(this,'.$i.')" value="'.$prod['quantity'].'"  class="form-control" />';
                     $html .= '</div>';
                     if($discount_value == 1 || $discount_option == 1) {
-                        $html .= '<div class="col-md-2">
+                        $html .= '<div class="">
                         <input type="number" name="discount[]" placeholder="Discount" min="0" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="discount_total(this,'.$i.')" value="'.$prod['discount'].'"  class="form-control" />';
                         $html .= '</div>';
                     }
-                    $html .= '<div class="col-md-2">
+                    $html .= '<div class="">
                     <input type="text" name="total[]" placeholder="Total" value="'.$prod['total_price'].'" readonly class="form-control" />';
                     $html .= '</div>';
                     
@@ -1939,7 +1962,7 @@ class Products extends AdminController
                     </ul>
                   </span>';
                   if($prod['variation']) {
-                        $html .= '<div class="col-md-2" id="variation_'.$i.'" style="width: 23.3%;margin: 4px 19px 15px;">
+                        $html .= '<div class="" id="variation_'.$i.'" style="width: 23.3%;margin: 4px 19px 15px;">
                         <label>VARIATION</label>
                         <select name="variation_'.$i.'" class="form-control" onchange="getvariationprodprice(this,'.$i.')">
                         <option value="">--Select Variation--</option>';
@@ -1967,27 +1990,28 @@ class Products extends AdminController
                 }
             }
             $discount_option = get_option('product_discount_option');
-            $html .= '<div style="height:40px; clear:both;" class="productdiv" id="'.$_POST['length'].'"><div class="col-md-3 wcb">
+            $html .= '<div style="height:40px; clear:both;" class="productdiv css-table-row" id="'.$_POST['length'].'"><div class="wcb">
             <input type="hidden" name="no[]" value="'.$_POST['length'].'">
-                            <input type="checkbox" name="status_'.$_POST['length'].'" value="1" class="form-control cbox">
+                            <input type="hidden" name="status_'.$_POST['length'].'" value="1" class="form-control cbox">
             <select name="product[]" class="form-control" onchange="getdealprodprice(this,'.$_POST['length'].')"><option value="">--Select Item--</option>';
             foreach($data as $val) {
                     $html .= '<option value="'.$val["id"].'">'.$val["name"].'</option>';
             } 
             $html .= '</select>';
-            $html .= '</div>
-            <div class="col-md-2">
+            $html .= '</div>';
+            $html .=get_particulars_item_ordered_inputs($_POST['length']);
+            $html .= '<div class="">
             <input type="text" name="price[]" placeholder="Price" value="" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="price_update(this,'.$_POST['length'].')" class="form-control" />';
                 $html .= '</div>';
-                $html .= '<div class="col-md-2">
+                $html .= '<div class="">
                 <input type="number" name="qty[]" placeholder="Qty" min="1" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="qty_total(this,'.$_POST['length'].')" value=""  class="form-control" />';
                 $html .= '</div>';
                 if($discount_value == 1 || $discount_option == 1) {
-                    $html .= '<div class="col-md-2">
+                    $html .= '<div class="">
                         <input type="number" name="discount[]" placeholder="Discount" min="0" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="discount_total(this,'.$_POST['length'].')" value=""  class="form-control" />';
                         $html .= '</div>';
                 }
-                $html .= '<div class="col-md-2">
+                $html .= '<div class="">
                 <input type="text" name="total[]" placeholder="Total" value="" readonly class="form-control" />';
                 $html .= '</div>';
                 
@@ -2017,6 +2041,8 @@ class Products extends AdminController
 
     public function getpricebyid() {
         $this->load->model('currencies_model');
+        // $this->load->model('products_model');
+        
         if(isset($_POST['currency'])) {
             if(is_numeric($_POST['currency'])) {
                 $currency = $this->currencies_model->get($_POST['currency']);
@@ -2028,9 +2054,7 @@ class Products extends AdminController
             $currency = $this->currencies_model->get_base_currency();
             $cur = $currency->name;
         }
-        //pre($cur);
         $data = $this->products_model->getpricebyid($cur);
-		
         echo json_encode($data);
         exit();
     }
@@ -3263,6 +3287,16 @@ class Products extends AdminController
         $viewData['html'] = $this->load->view('admin/products/groups/_statement', $data, true);
 
         echo json_encode($viewData);
+    }
+
+    public function get_particulars_ordered_details($id)
+    {
+        $this->load->model('invoice_items_model');
+        $details =$this->invoice_items_model->get_particulars_ordered_details($id);
+        echo json_encode(array(
+            'success'=>true,
+            'data'=>$details
+        ));
     }
     
 }
