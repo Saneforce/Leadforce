@@ -434,6 +434,52 @@ class Settings extends AdminController
 		redirect($this->agent->referrer());
     }
 
+    public function item_list_column()
+    {
+		if (!has_permission('settings', '', 'view')) {
+            access_denied('settings');
+        }
+		if ($this->input->post()) {
+            if (!has_permission('settings', '', 'edit')) {
+                access_denied('settings');
+            }
+           
+
+            $post_data = $this->input->post();
+			if (isset($post_data['settings']['items_list_column'])) {
+                $post_data['settings']['items_list_column'] = json_encode($post_data['settings']['items_list_column']);
+            }
+			$success = $this->settings_model->update($post_data);
+
+		}
+		$this->load->library('user_agent');
+		redirect($this->agent->referrer());
+    }
+
+    public function particular_item_list_column()
+    {
+		if (!has_permission('settings', '', 'view')) {
+            access_denied('settings');
+        }
+		if ($this->input->post()) {
+            if (!has_permission('settings', '', 'edit')) {
+                access_denied('settings');
+            }
+           
+            $post_data = $this->input->post();
+			if (isset($post_data['settings']['particulars_items_list_column'])) {
+                $post_data['settings']['particulars_items_list_column'] = json_encode($post_data['settings']['particulars_items_list_column']);
+            }
+			$success = $this->settings_model->update($post_data);
+
+		}else{
+            $this->db->where('name','particulars_items_list_column');
+            $this->db->update(db_prefix().'options',['value'=>null]);
+        }
+		$this->load->library('user_agent');
+		redirect($this->agent->referrer());
+    }
+
     public function contacts_list_column()
     {
 		if (!has_permission('settings', '', 'view')) {

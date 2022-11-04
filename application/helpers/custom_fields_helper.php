@@ -1608,10 +1608,11 @@ $(document).ready(function(){
             $("#stotal").html('<p>'+sum.toFixed(2)+'</p>');    
                     if(method == 2) {
                         if(discount_value == 1 || discount_option == 1) {
-                            $('#topheading').html('<div class="col-md-2" style="width:20%;">Item</div><div class="col-md-2">Price</div><div class="col-md-1">Quantity</div><div class="col-md-2">Tax</div><div class="col-md-2">Discount %</div><div class="col-md-2">Total</div>');
+                            $('#topheading').html('<div class="">Item</div><?php echo get_particulars_item_ordered_headers() ?><div class="">Price</div><div class="">Quantity</div><div class="">Tax</div><div class="">Discount %</div><div class="">Total</div>');
                         } else {
-                            $('#topheading').html('<div class="col-md-2" style="width:20%;">Item</div><div class="col-md-2">Price</div><div class="col-md-1">Quantity</div><div class="col-md-2">Tax</div><div class="col-md-2">Total</div>');
+                            $('#topheading').html('<div class="">Item</div><?php echo get_particulars_item_ordered_headers() ?><div class="">Price</div><div class="">Quantity</div><div class="">Tax</div><div class="">Total</div>');
                         }
+                        addFooterEmptyCell();
                         //$("#stxt").html('<p>Subtotal</p>');
                         $("#stotal").html('<p>'+sum.toFixed(2)+'</p>');
                         //$('#'+index+' input[name="tax[]"]').val('');
@@ -1694,11 +1695,11 @@ $(document).ready(function(){
             }
                     if(method == 3) {
                         if(discount_value == 1 || discount_option == 1) {
-                            $('#topheading').html('<div class="col-md-2" style="width:20%;">Item</div><div class="col-md-2">Price</div><div class="col-md-1">Quantity</div><div class="col-md-2">Tax</div><div class="col-md-2">Discount %</div><div class="col-md-2">Total</div>');
+                            $('#topheading').html('<div class="">Item</div><?php echo get_particulars_item_ordered_headers() ?><div class="">Price</div><div class="">Quantity</div><div class="">Tax</div><div class="">Discount %</div><div class="">Total</div>');
                         } else {
-                            $('#topheading').html('<div class="col-md-2" style="width:20%;">Item</div><div class="col-md-2">Price</div><div class="col-md-1">Quantity</div><div class="col-md-2">Tax</div><div class="col-md-2">Total</div>');
+                            $('#topheading').html('<div class="">Item</div><?php echo get_particulars_item_ordered_headers() ?><div class="">Price</div><div class="">Quantity</div><div class="">Tax</div><div class="">Total</div>');
                         }
-                        
+                        addFooterEmptyCell();
                         
                         //$('#'+index+' input[name="tax[]"]').val('');
                         for (var index = 0; index <inps.length; index++) {
@@ -1757,11 +1758,11 @@ $(document).ready(function(){
                 data: {project:project,length:length,currency:currency},
                 success: function(msg){
                     if(discount_value == 1 || discount_option == 1) {
-                        $('#topheading').html('<div class="col-md-3">Item</div><div class="col-md-2">Price</div><div class="col-md-2">Quantity</div><div class="col-md-2">Discount %</div><div class="col-md-2">Total</div>');
+                        $('#topheading').html('<div class="">Item</div><?php echo get_particulars_item_ordered_headers() ?><div class="">Price</div><div class="">Quantity</div><div class="">Discount %</div><div class="">Total</div>');
                     } else {
-                        $('#topheading').html('<div class="col-md-3">Item</div><div class="col-md-2">Price</div><div class="col-md-2">Quantity</div><div class="col-md-2">Total</div>');
+                        $('#topheading').html('<div class="">Item</div><?php echo get_particulars_item_ordered_headers() ?><div class="">Price</div><div class="">Quantity</div><div class="">Total</div>');
                     }
-                    
+                    addFooterEmptyCell();
                     $('#product_index').val(length);
                     $('#method').val(1);
                     $(wrapperproduct).html(msg);
@@ -1870,10 +1871,11 @@ $(document).ready(function(){
                     $("#stotal").html('<p>'+sum.toFixed(2)+'</p>');    
                     if(method == 2) {
                         if(discount_value == 1 || discount_option == 1) {
-                            $('#topheading').html('<div class="col-md-2" style="width:20%;">Item</div><div class="col-md-2">Price</div><div class="col-md-1">Quantity</div><div class="col-md-2">Tax</div><div class="col-md-2">Discount %</div><div class="col-md-2">Total</div>');
+                            $('#topheading').html('<div class="">Item</div><?php echo get_particulars_item_ordered_headers() ?><div class="">Price</div><div class="">Quantity</div><div class="">Tax</div><div class="">Discount %</div><div class="">Total</div>');
                         } else {
-                            $('#topheading').html('<div class="col-md-2" style="width:20%;">Item</div><div class="col-md-2">Price</div><div class="col-md-1">Quantity</div><div class="col-md-2">Tax</div><div class="col-md-2">Total</div>');
+                            $('#topheading').html('<div class="">Item</div><?php echo get_particulars_item_ordered_headers() ?><div class="">Price</div><div class="">Quantity</div><div class="">Tax</div><div class="">Total</div>');
                         }
+                        addFooterEmptyCell();
                         //$("#stxt").html('<p>Subtotal</p>');
                         $("#stotal").html('<p>'+sum.toFixed(2)+'</p>');
                         //$('#'+index+' input[name="tax[]"]').val('');
@@ -1967,11 +1969,11 @@ $(document).ready(function(){
                     }
                     if(method == 3) {
                         if(discount_value == 1 || discount_option == 1) {
-                            $('#topheading').html('<div class="col-md-2" style="width:20%;">Item</div><div class="col-md-2">Price</div><div class="col-md-1">Quantity</div><div class="col-md-2">Tax</div><div class="col-md-2">Discount %</div><div class="col-md-2">Total</div>');
+                            $('#topheading').html('<div class="" >Item</div><?php echo get_particulars_item_ordered_headers() ?><div class="">Price</div><div class="">Quantity</div><div class="">Tax</div><div class="">Discount %</div><div class="">Total</div>');
                         } else {
-                            $('#topheading').html('<div class="col-md-2" style="width:20%;">Item</div><div class="col-md-2">Price</div><div class="col-md-1">Quantity</div><div class="col-md-2">Tax</div><div class="col-md-2">Total</div>');
+                            $('#topheading').html('<div class="">Item</div><?php echo get_particulars_item_ordered_headers() ?><div class="">Price</div><div class="">Quantity</div><div class="">Tax</div><div class="">Total</div>');
                         }
-                        
+                        addFooterEmptyCell();
                         
                         //$('#'+index+' input[name="tax[]"]').val('');
                         for (var index = 0; index <inps.length; index++) {
@@ -2015,6 +2017,7 @@ $(document).ready(function(){
     });
 
     $('#salesnotax').click(function(){
+
             $("#suptotaltxt").html('');
             $("#suptotal").html('');
             var discount_value = $('#discount_value').val();
@@ -2037,11 +2040,11 @@ $(document).ready(function(){
                 data: {project:project,length:length,currency:currency,item_type:item_type},
                 success: function(msg){
                     if(discount_value == 1 || discount_option == 1) {
-                        $('#topheading').html('<div class="col-md-3">Item</div><div class="col-md-2">Price</div><div class="col-md-2">Quantity</div><div class="col-md-2">Discount %</div><div class="col-md-2">Total</div>');
+                        $('#topheading').html('<div class="">Item</div><?php echo get_particulars_item_ordered_headers() ?><div class="">Price</div><div class="">Quantity</div><div class="">Discount %</div><div class="">Total</div>');
                     } else {
-                        $('#topheading').html('<div class="col-md-3">Item</div><div class="col-md-2">Price</div><div class="col-md-2">Quantity</div><div class="col-md-2">Total</div>');
+                        $('#topheading').html('<div class="">Item</div><?php echo get_particulars_item_ordered_headers() ?><div class="">Price</div><div class="">Quantity</div><div class="">Total</div>');
                     }
-                    
+                    addFooterEmptyCell();
                     $('#product_index').val(length);
                     $('#method').val(1);
                     $(wrapperproduct).html(msg);
@@ -2105,11 +2108,11 @@ $(document).ready(function(){
                 data: {project:project,length:length,currency:currency},
                 success: function(msg){
                     if(discount_value == 1 || discount_option == 1) {
-                        $('#topheading').html('<div class="col-md-3">Item</div><div class="col-md-2">Price</div><div class="col-md-2">Quantity</div><div class="col-md-2">Discount %</div><div class="col-md-2">Total</div>');
+                        $('#topheading').html('<div class="">Item</div><?php echo get_particulars_item_ordered_headers() ?><div class="">Price</div><div class="">Quantity</div><div class="">Discount %</div><div class="">Total</div>');
                     } else {
-                        $('#topheading').html('<div class="col-md-3">Item</div><div class="col-md-2">Price</div><div class="col-md-2">Quantity</div><div class="col-md-2">Total</div>');
+                        $('#topheading').html('<div class="">Item</div><?php echo get_particulars_item_ordered_headers() ?><div class="">Price</div><div class="">Quantity</div><div class="">Total</div>');
                     }
-                    
+                    addFooterEmptyCell();
                     $('#product_index').val(length);
                     $('#method').val(1);
                     $('.field_product_wrapper').html(msg);
@@ -2200,9 +2203,9 @@ $(document).ready(function(){
             $("#stotal").html('<p>'+sum.toFixed(2)+'</p>');    
                     if(method == 2) {
                         if(discount_value == 1 || discount_option == 1) {
-                            $('#topheading').html('<div class="col-md-2" style="width:20%;">Item</div><div class="col-md-2">Price</div><div class="col-md-1">Quantity</div><div class="col-md-2">Tax</div><div class="col-md-2">Discount %</div><div class="col-md-2">Total</div>');
+                            $('#topheading').html('<div class="" >Item</div><?php echo get_particulars_item_ordered_headers() ?><div class="">Price</div><div class="">Quantity</div><div class="">Tax</div><div class="">Discount %</div><div class="col-md-2">Total</div>');
                         } else {
-                            $('#topheading').html('<div class="col-md-2" style="width:20%;">Item</div><div class="col-md-2">Price</div><div class="col-md-1">Quantity</div><div class="col-md-2">Tax</div><div class="col-md-2">Total</div>');
+                            $('#topheading').html('<div class="" >Item</div><?php echo get_particulars_item_ordered_headers() ?><div class="">Price</div><div class="">Quantity</div><div class="">Tax</div><div class="">Total</div>');
                         }
                         
                         //$("#stxt").html('<p>Subtotal</p>');
@@ -2277,9 +2280,9 @@ $(document).ready(function(){
             }
                     if(method == 3) {
                         if(discount_value == 1 || discount_option == 1) {
-                            $('#topheading').html('<div class="col-md-2" style="width:20%;">Item</div><div class="col-md-2">Price</div><div class="col-md-1">Quantity</div><div class="col-md-2">Tax</div><div class="col-md-2">Discount %</div><div class="col-md-2">Total</div>');
+                            $('#topheading').html('<div class="">Item</div><?php echo get_particulars_item_ordered_headers() ?><div class="">Price</div><div class="">Quantity</div><div class="">Tax</div><div class="">Discount %</div><div class="">Total</div>');
                         } else {
-                            $('#topheading').html('<div class="col-md-2" style="width:20%;">Item</div><div class="col-md-2">Price</div><div class="col-md-1">Quantity</div><div class="col-md-2">Tax</div><div class="col-md-2">Total</div>');
+                            $('#topheading').html('<div class="">Item</div><?php echo get_particulars_item_ordered_headers() ?><div class="">Price</div><div class="">Quantity</div><div class="">Tax</div><div class="">Total</div>');
                         }
                         
                         //$('#'+index+' input[name="tax[]"]').val('');
@@ -2353,9 +2356,9 @@ $(document).ready(function(){
                 data: {project:project,length:length,currency:currency,item_type:item_type},
                 success: function(msg){
                     if(discount_value == 1 || discount_option == 1) {
-                        $('#topheading').html('<div class="col-md-3">Item</div><div class="col-md-2">Price</div><div class="col-md-2">Quantity</div><div class="col-md-2">Discount %</div><div class="col-md-2">Total</div>');
+                        $('#topheading').html('<div class="">Item</div><?php echo get_particulars_item_ordered_headers() ?><div class="">Price</div><div class="">Quantity</div><div class="">Discount %</div><div class="">Total</div>');
                     } else {
-                        $('#topheading').html('<div class="col-md-3">Item</div><div class="col-md-2">Price</div><div class="col-md-2">Quantity</div><div class="col-md-2">Total</div>');
+                        $('#topheading').html('<div class="">Item</div><?php echo get_particulars_item_ordered_headers() ?><div class="">Price</div><div class="">Quantity</div><div class="">Total</div>');
                     }
                     
                     $('#product_index').val(length);
@@ -2453,9 +2456,9 @@ $(document).ready(function(){
                     $("#stotal").html('<p>'+sum.toFixed(2)+'</p>');    
                     if(method == 2) {
                         if(discount_value == 1 || discount_option == 1) {
-                            $('#topheading').html('<div class="col-md-2" style="width:20%;">Item</div><div class="col-md-2">Price</div><div class="col-md-1">Quantity</div><div class="col-md-2">Tax</div><div class="col-md-2">Discount %</div><div class="col-md-2">Total</div>');
+                            $('#topheading').html('<div class="">Item</div><?php echo get_particulars_item_ordered_headers() ?><div class="">Price</div><div class="">Quantity</div><div class="">Tax</div><div class="">Discount %</div><div class="">Total</div>');
                         } else {
-                            $('#topheading').html('<div class="col-md-2" style="width:20%;">Item</div><div class="col-md-2">Price</div><div class="col-md-1">Quantity</div><div class="col-md-2">Tax</div><div class="col-md-2">Total</div>');
+                            $('#topheading').html('<div class="">Item</div><?php echo get_particulars_item_ordered_headers() ?><div class="">Price</div><div class="">Quantity</div><div class="">Tax</div><div class="">Total</div>');
                         }
                         
                         //$("#stxt").html('<p>Subtotal</p>');
@@ -2536,9 +2539,9 @@ $(document).ready(function(){
                     }
                     if(method == 3) {
                         if(discount_value == 1 || discount_option == 1) {
-                            $('#topheading').html('<div class="col-md-2" style="width:20%;">Item</div><div class="col-md-2">Price</div><div class="col-md-1">Quantity</div><div class="col-md-2">Tax</div><div class="col-md-2">Discount %</div><div class="col-md-2">Total</div>');
+                            $('#topheading').html('<div class="">Item</div><?php echo get_particulars_item_ordered_headers() ?><div class="">Price</div><div class="">Quantity</div><div class="">Tax</div><div class="">Discount %</div><div class="">Total</div>');
                         } else {
-                            $('#topheading').html('<div class="col-md-2" style="width:20%;">Item</div><div class="col-md-2">Price</div><div class="col-md-1">Quantity</div><div class="col-md-2">Tax</div><div class="col-md-2">Total</div>');
+                            $('#topheading').html('<div class="">Item</div><?php echo get_particulars_item_ordered_headers() ?><div class="">Price</div><div class="">Quantity</div><div class="">Tax</div><div class="">Total</div>');
                         }
                         
                         //$('#'+index+' input[name="tax[]"]').val('');
@@ -2858,8 +2861,30 @@ function getprice1(prod,index) {
     });
 }
 
-
+function get_particulars_ordered_details(prod,index){
+    
+    var id =prod.value;
+    if(id ==''){
+        $('.item_ordered_column').val('');
+    }else{
+        $.ajax({
+            type: "POST",
+            url: admin_url+'products/get_particulars_ordered_details/'+id,
+            dataType: 'json',
+            success: function(result){
+                $.each(result.data, function (key, val) {
+                    console.log('#ordered_column_'+key+'_'+index);
+                    $('#ordered_column_'+key+'_'+index).val(val);
+                });
+            
+            }
+        });
+    }
+    
+    
+}
 function getdealprodprice(prod,index) {
+    get_particulars_ordered_details(prod,index);
     var value = prod.value;
     var url =  admin_url+'products/getpricebyid';
     var currency = $('#currency').val();   
@@ -3774,4 +3799,76 @@ function get_custom_field_location_js_data()
         z-index:10000;
     }
     </style>'.$scripts;
+}
+
+function get_particulars_item_ordered_headers()
+{
+    $CI = &get_instance();
+    $CI->load->model('invoice_items_model');
+    $table_data_temp = $CI->invoice_items_model->get_all_table_fields();
+    $particulars_items_list_column_order = (array)json_decode(get_option('particulars_items_list_column'));
+    if($particulars_items_list_column_order){
+        $html ='';
+        foreach($particulars_items_list_column_order as $ckey => $cval){
+         $html .= '<div class="">'._l($table_data_temp[$ckey]['ll']).'</div>';
+        }
+        return $html;
+    }
+}
+
+function get_particulars_item_ordered_inputs($id=0,$product_id=0)
+{
+    $CI = &get_instance();
+    $CI->load->model('invoice_items_model');
+    $table_data_temp = $CI->invoice_items_model->get_all_table_fields();
+    if($product_id >0){
+        $item_details =$CI->invoice_items_model->get_particulars_ordered_details($product_id);
+    }
+    
+    $html ='';
+    $particulars_items_list_column_order = (array)json_decode(get_option('particulars_items_list_column'));
+    if($particulars_items_list_column_order){
+        foreach($particulars_items_list_column_order as $ckey => $cval){
+            $html .='<div class="text-muted"><input value="'.(isset($item_details->$ckey)?$item_details->$ckey:'').'" id="ordered_column_'.$ckey.'_'.$id.'" disabled class="form-control item_ordered_column" type="text" placeholder="'._l($table_data_temp[$ckey]['ll']).'"></div>';
+        }
+    }
+    return $html;
+}
+
+function get_particular_item_headers($method,$discount_option,$discount_value)
+{
+    ob_start();
+    if($method ==1){ ?>
+        <div class="">Item</div>
+        <?php echo get_particulars_item_ordered_headers() ?>
+        <div class="">Price</div>
+        <div class="">Quantity</div>
+        <?php if ($discount_value == 1 || $discount_option == 1) { ?>
+          <div class="">Discount %</div>
+        <?php } ?>
+        <div class="">Total</div>
+    <?php }elseif($method ==2 || $method ==3){ ?>
+        <div class="">Item</div>
+        <?php echo get_particulars_item_ordered_headers() ?>
+        <div class="">Price</div>
+        <div class="">Quantity</div>
+        <div class="">Tax</div>
+        <?php if ($discount_value == 1 || $discount_option == 1) { ?>
+          <div class="">Discount %</div>
+        <?php } ?>
+        <div class="">Total</div>
+    <?php }else{ ?>
+        <div class="">Item</div>
+        <?php echo get_particulars_item_ordered_headers() ?>
+        <div class="">Price</div>
+        <div class="">Quantity</div>
+        <?php if ($discount_value == 1 || $discount_option == 1) { ?>
+          <div class="">Discount %</div>
+        <?php } ?>
+        <div class="">Total</div>
+    <?php }
+
+    $contents = ob_get_contents();
+    ob_end_clean();
+    return $contents;
 }

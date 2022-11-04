@@ -7,17 +7,19 @@ $aColumns = [];
 if (has_permission('items', '', 'delete')) {
     $aColumns[] = '1';
 }
-
-$aColumns = array_merge($aColumns, [
-    db_prefix() . 'items.name',
-    'code',
-   // 'tax',
-    db_prefix() . 'item_category.cat_name',
-    'unit',
-	'description'
-    
-    ]);
-
+$aColumns_temp =array(
+    'name'=>db_prefix() . 'items.name',
+    'code'=>db_prefix() . 'items.code',
+    'cat_name'=> db_prefix() . 'item_category.cat_name',
+    'unit'=>db_prefix(). 'items.unit',
+    'description'=>db_prefix(). 'items.description',
+);
+$items_list_column_order = (array)json_decode(get_option('items_list_column'));
+if($items_list_column_order){
+    foreach($items_list_column_order as $orderkey => $ordervalue){
+        $aColumns [] =$aColumns_temp[$orderkey];
+    }
+}
 $sIndexColumn = 'id';
 $sTable       = db_prefix() . 'items';
 

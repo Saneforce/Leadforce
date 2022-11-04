@@ -27,7 +27,7 @@ class Products_model extends App_Model {
     public function getpricebyid($name = '') {
         $res = $this->db->query('SELECT id,tax,price,item_id,currency FROM ' . db_prefix() . 'item_price where item_id = "'.$_POST['value'].'" and currency = "'.$name.'"')->result_array();
         if($res[0]['tax'] > 0) {
-            $this->db->select('item_price.id,item_price.item_id,item_price.tax,item_price.price,item_price.id,currency' . db_prefix() . 'taxes.taxrate as prodtax');
+            $this->db->select('item_price.id,item_price.item_id,item_price.tax,item_price.price,item_price.id,'.db_prefix() . 'item_price.currency,' . db_prefix() . 'taxes.taxrate as prodtax');
             $this->db->where(db_prefix() . 'item_price.item_id', $_POST['value']);
             $this->db->where(db_prefix() . 'item_price.currency', $name);
             $this->db->join(db_prefix() . 'items', db_prefix() . 'items.id=' . db_prefix() . 'item_price.item_id');

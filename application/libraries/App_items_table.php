@@ -62,12 +62,21 @@ class App_items_table extends App_items_table_template
 
             $itemHTML .= '</td>';
 
+            // for ordered particulars columns
+            $CI = &get_instance();
+            $CI->load->model('invoice_items_model');
+            $details =$CI->invoice_items_model->get_particulars_ordered_details($item['productid']);
+            if($details){
+                foreach($details as $detail){
+                    $itemHTML .= '<td align="left">' . $detail . '</td>';
+                }
+            }
             /**
              * Item custom fields
              */
-            foreach ($custom_fields as $custom_field) {
-                $itemHTML .= '<td align="left">' . get_custom_field_value($item['id'], $custom_field['id'], 'items') . '</td>';
-            }
+            // foreach ($custom_fields as $custom_field) {
+            //     $itemHTML .= '<td align="left">' . get_custom_field_value($item['id'], $custom_field['id'], 'items') . '</td>';
+            // }
 
             /**
              * Item quantity
@@ -138,10 +147,20 @@ class App_items_table extends App_items_table_template
         $html .= '<th align="center">' . $this->number_heading() . '</th>';
         $html .= '<th class="description" width="20%" align="left">' . $this->item_heading() . '</th>';
 
-        $custom_fields = $this->get_custom_fields_for_table();
-        foreach ($custom_fields as $cf) {
-            $html .= '<th class="custom_field" align="left">' . $cf['name'] . '</th>';
+        $CI = &get_instance();
+        $CI->load->model('invoice_items_model');
+        $table_data_temp = $CI->invoice_items_model->get_all_table_fields();
+        $particulars_items_list_column_order = (array)json_decode(get_option('particulars_items_list_column'));
+        if($particulars_items_list_column_order){
+            foreach($particulars_items_list_column_order as $ckey => $cval){
+                $html .= '<th class="custom_field" align="left">' . _l($table_data_temp[$ckey]['ll']) . '</th>';
+            };
         }
+
+        // $custom_fields = $this->get_custom_fields_for_table();
+        // foreach ($custom_fields as $cf) {
+        //     $html .= '<th class="custom_field" align="left">' . $cf['name'] . '</th>';
+        // }
 
         $html .= '<th align="right">' . $this->qty_heading() . '</th>';
         $html .= '<th align="right">' . $this->rate_heading() . '</th>';

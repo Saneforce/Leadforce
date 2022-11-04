@@ -264,47 +264,11 @@
         </div>
       </div>
       <hr style="clear:both;">
-      <div style="height:60px;clear:both;">
-        
-        <?php 
-          if($pr['method'] == 1) {
-        ?>
-        <div style="height:40px;clear:both;" id="topheading">
-            <div class="col-md-3">Item</div>
-            <div class="col-md-2">Price</div>
-            <div class="col-md-2">Quantity</div>
-            <?php if($discount_value == 1 || $discount_option == 1) { ?>
-              <div class="col-md-2">Discount %</div>
-            <?php } ?>
-            <div class="col-md-2">Total</div>
+      <div class="css-table">
+        <div style="height:40px;clear:both;" class="css-table-header" id="topheading">
+        <?php echo get_particular_item_headers($pr['method'],$discount_option,$discount_value); ?>
         </div>
-
-        <?php 
-          }
-          elseif($pr['method'] == 2 || $pr['method'] == 3) {
-        ?>
-        <div style="height:40px;clear:both;" id="topheading">
-            <div class="col-md-2" style="width:20%;">Item</div>
-            <div class="col-md-2">Price</div>
-            <div class="col-md-1">Quantity</div>
-            <div class="col-md-2">Tax</div>
-            <?php if($discount_value == 1 || $discount_option == 1) { ?>
-              <div class="col-md-2">Discount %</div>
-            <?php } ?>
-            <div class="col-md-2">Total</div>
-        </div>
-          <?php } else { ?>
-            <div style="height:40px;clear:both;" id="topheading">
-            <div class="col-md-3">Item</div>
-            <div class="col-md-2">Price</div>
-            <div class="col-md-2">Quantity</div>
-            <?php if($discount_value == 1 || $discount_option == 1) { ?>
-              <div class="col-md-2">Discount %</div>
-            <?php } ?>
-            <div class="col-md-2">Total</div>
-        </div>
-          <?php } ?>
-        <div class="field_product_wrapper row">
+        <div class="field_product_wrapper row css-table-body">
               <?php if(isset($dealproducts) && !empty($dealproducts)) { ?>
                
                   <?php
@@ -316,10 +280,10 @@
                     foreach($dealproducts as $pr) {
                       if($pr['method'] == 1) {
                   ?>
-                    <div style="height:40px;clear:both;" class="productdiv" id="<?php echo $i; ?>">
-                        <div class="col-md-3 wcb">
+                    <div style="height:40px;clear:both;" class="productdiv css-table-row" id="<?php echo $i; ?>">
+                        <div class=" wcb">
                             <input type="hidden" name="no[]" value="<?php echo $i; ?>">
-                            <input type="checkbox" name="status_<?php echo $i; ?>" value="1" class="form-control cbox" <?php if($pr['status'] == 1){ echo 'checked'; } ?> >
+                            <input type="hidden" name="status_<?php echo $i; ?>" value="1" class="form-control cbox" <?php if($pr['status'] == 1){ echo 'checked'; } ?> >
                             <select name="product[]" class="form-control" onchange="getdealprodprice(this,<?php echo $i; ?>)" >
                                 <option value="">--Select Item--</option>
                             <?php
@@ -333,18 +297,19 @@
                             <?php  } ?>
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <?php echo get_particulars_item_ordered_inputs($i,$pr['productid']) ?>
+                        <div class="c">
                             <input type="text" name="price[]" value="<?php echo $pr['price']; ?>" placeholder="Price" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="price_update(this,<?php echo $i; ?>)" class="form-control" /> 
                         </div>
-                        <div class="col-md-2">
+                        <div class="">
                         <input type="number" name="qty[]" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" min="1" placeholder="Qty" value="<?php echo $pr['quantity']; ?>" onchange="qty_total(this,<?php echo $i; ?>)" class="form-control" /> 
                         </div>
                         <?php if($discount_value == 1 || $discount_option == 1) { ?>
-                          <div class="col-md-2">
+                          <div class="">
                           <input type="number" name="discount[]"  min="0" placeholder="Discount" value="<?php echo $pr['discount']; ?>" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="discount_total(this,<?php echo $i; ?>)" class="form-control" /> 
                           </div>
                         <?php } ?>
-                        <div class="col-md-2">
+                        <div class="">
                         <input type="number" name="total[]" value="<?php echo $pr['total_price']; ?>" placeholder="Total" readonly class="form-control" /> 
                         </div>
                         <span class="dropdown">
@@ -358,7 +323,7 @@
                         </span>
                         <?php 
                         if($pr['variation']) { ?>
-                          <div class="col-md-2" id="variation_<?php echo $i; ?>" style="width: 23.3%;margin: 4px 19px 15px;clear:both;">
+                          <div class="" id="variation_<?php echo $i; ?>" style="width: 23.3%;margin: 4px 19px 15px;clear:both;">
                           <label>VARIATION</label>    
                           <select name="variation_<?php echo $i; ?>" class="form-control" onchange="getvariationprodprice(this,<?php echo $i; ?>)">
                               <option value="">--Select Variation--</option>
@@ -388,10 +353,10 @@
                       }
                       if($pr['method'] == 2 || $pr['method'] == 3) {
                     ?>
-                      <div style="height:40px;clear:both;" class="productdiv" id="<?php echo $i; ?>">
-                        <div class="col-md-2 wcb" style="width:20%;">
+                      <div style="height:40px;clear:both;" class="productdiv css-table-row" id="<?php echo $i; ?>">
+                        <div class="wcb">
                             <input type="hidden" name="no[]" value="<?php echo $i; ?>">
-                            <input type="checkbox" name="status_<?php echo $i; ?>" value="1" class="form-control cbox" <?php if($pr['status'] == 1){ echo 'checked'; } ?> >
+                            <input type="hidden" name="status_<?php echo $i; ?>" value="1" class="form-control cbox" <?php if($pr['status'] == 1){ echo 'checked'; } ?> >
                             <select name="product[]" class="form-control" onchange="getdealprodprice(this,<?php echo $i; ?>)" >
                                 <option value="">--Select Item--</option>
                             <?php
@@ -405,21 +370,22 @@
                             <?php  } ?>
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <?php echo get_particulars_item_ordered_inputs($i,$pr['productid']) ?>
+                        <div class="">
                             <input type="text" name="price[]" value="<?php echo $pr['price']; ?>" placeholder="Price" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="price_update(this,<?php echo $i; ?>)" class="form-control" /> 
                         </div>
-                        <div class="col-md-1">
+                        <div class="">
                         <input type="number" name="qty[]"  min="1" placeholder="Qty" value="<?php echo $pr['quantity']; ?>" onchange="qty_total(this,<?php echo $i; ?>)" class="form-control" /> 
                         </div>
-                        <div class="col-md-2">
+                        <div class="">
                         <input type="number" name="tax[]"  min="0" placeholder="Tax" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" value="<?php echo $pr['tax']; ?>" onchange="tax_total(this,<?php echo $i; ?>)" class="form-control" /> 
                         </div>
                         <?php if($discount_value == 1 || $discount_option == 1) { ?>
-                          <div class="col-md-2">
+                          <div class="">
                           <input type="number" name="discount[]"  min="0" placeholder="Discount" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" value="<?php echo $pr['discount']; ?>" onchange="discount_total(this,<?php echo $i; ?>)" class="form-control" /> 
                           </div>
                         <?php } ?>
-                        <div class="col-md-2">
+                        <div class="">
                         <input type="number" name="total[]" value="<?php echo $pr['total_price']; ?>" placeholder="Total" readonly class="form-control" /> 
                         </div>
                         <span class="dropdown">
@@ -433,7 +399,7 @@
                         </span>
                         <?php 
                         if($pr['variation']) { ?>
-                          <div class="col-md-2" id="variation_<?php echo $i; ?>" style="width: 18.7%;margin: 4px 15px 15px;clear:both;">
+                          <div class="" id="variation_<?php echo $i; ?>" style="width: 18.7%;margin: 4px 15px 15px;clear:both;">
                           <label>VARIATION</label>    
                           <select name="variation_<?php echo $i; ?>" class="form-control" onchange="getvariationprodprice(this,<?php echo $i; ?>)">
                               <option value="">--Select Variation--</option>
@@ -495,10 +461,10 @@
             }
             } else { 
               ?>
-                    <div style="height:40px;clear:both;" class="productdiv" id="0">
-                        <div class="col-md-3 wcb">
+                    <div style="height:40px;clear:both;" class="productdiv css-table-row" id="0">
+                        <div class="wcb">
                           <input type="hidden" name="no[]" value="0">
-                            <input type="checkbox" name="status_0" value="1" class="form-control cbox">
+                            <input type="hidden" name="status_0" value="1" class="form-control cbox">
                             <select name="product[]" class="form-control" onchange="getdealprodprice(this,0)">
                                 <option value="">--Select Item--</option>
                             <?php
@@ -508,18 +474,19 @@
                             <?php  } ?>
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <?php echo get_particulars_item_ordered_inputs() ?>
+                        <div class="">
                             <input type="text" name="price[]" value="" placeholder="Price"  step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="price_update(this,0)" class="form-control" /> 
                         </div>
-                        <div class="col-md-2">
+                        <div class="">
                         <input type="number" name="qty[]"  min="1" placeholder="Qty" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" value="" onchange="qty_total(this,0)" class="form-control" /> 
                         </div>
                         <?php if($discount_value == 1 || $discount_option == 1) { ?>
-                          <div class="col-md-2">
+                          <div class="">
                           <input type="number" name="discount[]"  min="0" placeholder="Discount" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" value="" onchange="discount_total(this,0)" class="form-control" /> 
                           </div>
                         <?php } ?>
-                        <div class="col-md-2">
+                        <div class="">
                         <input type="number" name="total[]" value="" placeholder="Total" readonly class="form-control" /> 
                         </div>
                         <span class="dropdown">
@@ -535,7 +502,60 @@
             } ?>
               </div>
               <a href="javascript:void(0);" class="editproduts_notax_btn row" title="Add field" style="position:relative; top:10px; left:15px; clear:both; float:left; height:40px;"><i class="fa fa-plus"></i> Add a new line</a>  
-              <div class="col-md-9 text-right" style="padding-top:30px"><span id="stxt"><p>Subtotal <?php echo $discount; ?></p></span><span id="suptotaltxt"><?php echo $tax_txt; ?></span><b>Total</b></div><div class="col-md-2 text-right" style="padding-top:30px"><span id="stotal"><p><?php echo number_format($subtotal,2); ?></p></span><span id="suptotal"><?php echo $tax_val; ?></span><b><span id="grandtotal"><?php echo number_format($proj_cost,2); ?></span></b></div>
+              <div class="css-table-row" id="particularsrowfooter">
+                <div class="text-right" style="padding-top:30px">
+                  <span id="stxt"><p>Subtotal <?php echo $discount; ?></p></span>
+                  <span id="suptotaltxt"><?php echo $tax_txt; ?></span><b>Total</b>
+                </div>
+                <div class="text-right" style="padding-top:30px">
+                  <span id="stotal"><p><?php echo number_format($subtotal,2); ?></p></span><span id="suptotal"><?php echo $tax_val; ?></span><b><span id="grandtotal"><?php echo number_format($proj_cost,2); ?></span></b>
+                </div>
+              </div>
               <input type="hidden" name="grandtotal" id="gtot" value="<?php echo $proj_cost; ?>">
             </div>
 </div>
+
+
+<script>
+  function addFooterEmptyCell(){
+    var headercount =$('#topheading > div').length;
+    $('.footer-empty-cells').remove();
+    for (let index = 0; index < headercount-2; index++) {
+      $('#particularsrowfooter').prepend(`<div class="footer-empty-cells"></div>`);
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function(event) {
+    addFooterEmptyCell();
+  } );
+</script>
+
+<style>
+  .css-table {
+    display: table;
+    width: 100%;
+  }
+
+  .css-table-header {
+    display: table-header-group;
+  }
+
+  .css-table-body {
+    display: table-row-group;
+  }
+
+  .css-table-row {
+    display: table-row;
+  }
+
+  .css-table-header div,
+  .css-table-row div {
+    display: table-cell;
+    padding: 0 6px;
+  }
+
+  .css-table-header div {
+    text-align: left;
+    border: 1px solid rgb(255, 255, 255);
+  }
+</style>
