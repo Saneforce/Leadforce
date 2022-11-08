@@ -108,7 +108,7 @@
 					</div>
 					<div class="modal-body">
 						<div>
-							Create separate links to control access for different viewer groups and name each link accordingly. To revoke access, simply delete a link.
+							<?php echo _l('public_content');?>
 						</div>
 						<div id="public_all">
 							<?php if(!empty($links)){

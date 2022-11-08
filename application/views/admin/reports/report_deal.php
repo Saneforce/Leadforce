@@ -40,7 +40,7 @@
 			<div class="modal-body">
 				<div>
 				<input type="hidden" id="cur_report" >
-					Create separate links to control access for different viewer groups and name each link accordingly. To revoke access, simply delete a link.
+					<?php echo _l('public_content');?>
 				</div>
 				<div id="public_all">
 					

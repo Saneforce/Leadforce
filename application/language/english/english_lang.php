@@ -4186,3 +4186,17 @@ $lang['items_list_column']    = 'Item List Columns';
 $lang['particulars_items_list_column']    = 'Particular iItem List Columns';
 $lang['category']    = 'Category';
 $lang['code']    = 'Code';
+
+//dynamic dashboard
+$lang['all_member']			=	'All Member';
+$lang['public_link']		=	'Public Link';
+$lang['next_year']			=	'Next Year';
+$lang['next_month']			=	'Next Month';
+$lang['next_week']			=	'Next Week';
+$lang['yesterday']			=	'Yesterday';
+$lang['tomorrow']			=	'Tomorrow';
+$lang['custom_period']		=	'Custom Period';
+$lang['select_period']		=	'Select Period';
+$lang['public_content']		=	'Create separate links to control access for different viewer groups and name each link accordingly. To revoke access, simply delete a link.';
+$lang['check_delete']		=	'Are you want to delete?';
+$lang['dashboard']			=	'Dashboard';

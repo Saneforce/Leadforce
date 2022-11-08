@@ -369,7 +369,6 @@ function get_task_vals($fields,$fields1,$table,$qry_cond,$filters = array()){
 	if(str_contains($filters['report_name'], 'Email Performance')){
 		$type_cond = db_prefix().'tasks.tasktype = (select id from '.db_prefix().'tasktype where name="E-mail" and status ="Active" )';
 	}
-	
 	 if(!empty($qry_cond)){
 		 if(!empty($type_cond)){
 			 
@@ -399,13 +398,23 @@ function get_task_vals($fields,$fields1,$table,$qry_cond,$filters = array()){
 	  if(!empty($fields1)){
 		 $fields1 = "".$fields1;
 	 }
+	 $req_staff_id = get_staff_user_id();
+	 if(empty($req_staff_id)){
+		 $table .= " ,".db_prefix()."task_assigned ta1 ";
+	 }
 	 $my_staffids = $CI->staff_model->get_my_staffids();
 	 if(!is_admin(get_staff_user_id()) && $my_staffids){
 		 $table .= " ,".db_prefix()."task_assigned ta1 ";
-		 $qry_cond .= " and ((ta1.taskid = ".db_prefix()."tasks.id and ta1.staffid in(" . implode(',',$my_staffids) . ") ) or ( OR ".db_prefix()."tasks.rel_id IN(SELECT ".db_prefix()."projects.id FROM ". db_prefix()."projects join ".db_prefix()."project_members  on ".db_prefix()."project_members.project_id = " .db_prefix()."projects.id WHERE ".db_prefix()."project_members.staff_id in (". implode(',',$my_staffids)."))))";
+		 if(!empty($qry_cond)){
+			 $qry_cond = ltrim($qry_cond,"where ");
+			$qry_cond = " where ((ta1.taskid = ".db_prefix()."tasks.id and ta1.staffid in(" . implode(',',$my_staffids) . ") ) or (  ".db_prefix()."tasks.rel_id IN(SELECT ".db_prefix()."projects.id FROM ". db_prefix()."projects join ".db_prefix()."project_members  on ".db_prefix()."project_members.project_id = " .db_prefix()."projects.id WHERE ".db_prefix()."project_members.staff_id in (". implode(',',$my_staffids).")))) and ".$qry_cond;
+		 }
+		 else{
+			 $qry_cond = " where ((ta1.taskid = ".db_prefix()."tasks.id and ta1.staffid in(" . implode(',',$my_staffids) . ") ) or (  ".db_prefix()."tasks.rel_id IN(SELECT ".db_prefix()."projects.id FROM ". db_prefix()."projects join ".db_prefix()."project_members  on ".db_prefix()."project_members.project_id = " .db_prefix()."projects.id WHERE ".db_prefix()."project_members.staff_id in (". implode(',',$my_staffids)."))))  ";
+		 }
 	 }
+	 
 	 $CI			= & get_instance();
-	
 	 $task_vals 	= $CI->db->query("SELECT ".$fields."COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '1',".db_prefix(). "tasks.id,NULL)) AS upcoming,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '2',".db_prefix(). "tasks.id,NULL)) AS overdue,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '3',".db_prefix(). "tasks.id,NULL)) AS today,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '4',".db_prefix(). "tasks.id,NULL)) AS in_progress,COUNT(DISTINCT IF(".db_prefix(). "tasks.status = '5',".db_prefix(). "tasks.id,NULL)) AS completed ".$fields1." FROM ".$table.$qry_cond)->result_array();
 	return $task_vals;
  }
@@ -796,7 +805,7 @@ function get_task_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_
 			}
 			break;
 	}
-	if($view_type == 'date' && (check_activity_date($view_by))){
+	if( (check_activity_date($view_by))){
 		if($date_range == 'Monthly'){
 			$where['month('.db_prefix().'tasks.'.$req_view_by.')']  =  $crow;
 		}
@@ -962,9 +971,9 @@ function set_activity_summary($type){
 				}
 			}
 			$filter_data['view_type']	= '';
-			if($filter_data['view_by'] == 'date' && (check_activity_date($filter_data['view_by']))){
-			$filter_data['view_type']	=	'date';
-			$filter_data['date_range1']	=	_l('weekly');
+			if( (check_activity_date($filter_data['view_by']))){
+				$filter_data['view_type']	=	'date';
+				$filter_data['date_range1']	=	_l('weekly');
 			}
 			$filter_data['sel_measure']	=_l('deal_val');
 		}
@@ -1116,6 +1125,7 @@ function set_filter($type='',$all_clmns,$cus_flds){
 }
 function get_edit_data($type,$id){
 	$type = ($type == 'deal')?'deal':'activity';
+	$ch_filter = ($type == 'deal')?'':'activity_';
 	$CI		= & get_instance();
 	$data 	= array();
 	$data['title'] = _l('add_report');
@@ -1134,17 +1144,16 @@ function get_edit_data($type,$id){
 		$needed = get_tasks_need_fields();
 	}
 	$data['id'] = $id;
-	$data['type']= 'activity';
 	$check_report = $CI->db->query("SELECT id FROM " . db_prefix() . "report WHERE id = '".$id."' ")->row();
 	if(empty($check_report)){
 		redirect(admin_url('reports/view_deal_folder'));
 		exit;
 	}
-	$data['filters']	=	$filters = $CI->session->userdata('filters_edit_'.$id);
-	$data['filters1']	=	$CI->session->userdata('filters1_edit_'.$id);
-	$data['filters2']	=	$CI->session->userdata('filters2_edit_'.$id);
-	$data['filters3']	=	$CI->session->userdata('filters3_edit_'.$id);
-	$data['filters4']	=	$CI->session->userdata('filters4_edit_'.$id);
+	$data['filters']	=	$filters = $CI->session->userdata($ch_filter.'filters_edit_'.$id);
+	$data['filters1']	=	$CI->session->userdata($ch_filter.'filters1_edit_'.$id);
+	$data['filters2']	=	$CI->session->userdata($ch_filter.'filters2_edit_'.$id);
+	$data['filters3']	=	$CI->session->userdata($ch_filter.'filters3_edit_'.$id);
+	$data['filters4']	=	$CI->session->userdata($ch_filter.'filters4_edit_'.$id);
 	if(!empty($filters) && $type == 'deal'){
 		$i = 0;
 		foreach($filters as $filter1){
@@ -1216,4 +1225,442 @@ function get_th_column($view_by,$type){
 }
 function random_color() {
 	return $rand = '#'.str_pad(dechex(rand(0x000000, 0xFFFFFF)), 6, 0, STR_PAD_LEFT);
+}
+function deal_performance_summary($filters,$view_by='',$view_type='',$date_range='',$sel_measure='',$staff_ids=''){
+	$CI		= & get_instance();
+	$cur_year  = date('Y');
+	$data = array();
+	$data['rows']			=	array();
+	if(!empty($view_by))
+		$data['view_by']	=	$view_by;
+	else
+		$data['view_by']	=	$view_by = $CI->session->userdata('view_by');
+	if(!empty($view_type))
+		$data['view_type']	=	$view_type;
+	else
+		$data['view_type']	=	$CI->session->userdata('view_type');
+	if(!empty($date_range))
+		$data['date_range1']=	$date_range;
+	else
+		$data['date_range1']=	$CI->session->userdata('date_range1');
+	if(!empty($sel_measure))
+		$data['sel_measure']=	$sel_measure;
+	else
+		$data['sel_measure']=	$CI->session->userdata('sel_measure');
+	if($view_by == 'project_start_date'){
+		$view_by = 'start_date';
+	}
+	else if($view_by == 'project_deadline'){
+		$view_by = 'deadline';
+	}
+	else if($view_by == 'won_date' || $view_by == 'lost_date'){
+		$view_by = 'stage_on';
+	}
+	$data['columns']		=	array($view_by,'own','lost','open','avg_deal','total_val_deal','total_cnt_deal');
+	if($data['sel_measure'] == 'Deal Value'){
+		$data['columns']	=	array($view_by,'avg_deal','total_val_deal','total_cnt_deal');
+	}
+	if($data['sel_measure'] == 'Number of Products'){
+		$data['columns']	=	array($view_by,'open','own','total_num_prdts');
+	}
+	if($data['sel_measure'] == 'Product Value'){
+		$data['columns']	=	array($view_by,'open','own','avg_prdt_val','total_val_prdt');
+	}
+	if($view_by == 'project_status'){
+		$data['columns']	=	array($view_by,'avg_deal','total_val_deal','total_cnt_deal');
+	}
+	$i1 = 0;
+	if(!empty($data['columns'])){
+		foreach($data['columns'] as $clmn1){
+			$data['summary_cls'][$i1++]['vals'] = _l($clmn1);
+			$i1++;
+		}
+	}
+	if($data['view_type'] != 'date'){
+		$fields = get_table_fields($view_by);
+		$sum_data = summary_val($fields['tables'],$fields['fields'],$fields['qry_cond'],$data['sel_measure'],$view_by,$fields['cur_rows'],$filters,'deal');
+	}
+	else{
+		$months = array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
+		$own = $open = $lost = $tot_cnt = $tot_prt = $tot_val = $avg_deal = $tot_avg = 0; 
+		if($data['view_type'] == 'date' && ($data['date_range1'] == 'Monthly')){
+			if(!empty($months)){
+				$j = 1;$i = 0;
+				foreach($months as $month1){
+					if(check_activity_date($view_by)){
+						$j = $i+1;
+						$qry_cond   = " and MONTH(".$view_by.") = '".$j."' and YEAR(".$view_by.") = '".$cur_year."'";
+						$cur_row    = ($month1).' '.$cur_year;
+						$sum_data[$i]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);					
+						$i++;
+					}
+					else{
+						$cur_row    = ($month1).' '.$cur_year;
+						$j1 = $j;
+						if($j<10){
+							$j1 = '0'.$j;
+						}
+						$ch_value = $cur_year.'-'.$j1;
+						$qry_cond = '';
+						$customs   = $CI->db->query("SELECT relid  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and cv.value like '%".$ch_value."%' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
+						$cur_projects = '';
+						if(!empty($customs)){
+							foreach($customs as $custom1){
+								$cur_projects .= $custom1['relid'].',';
+							}	
+							$cur_projects = rtrim($cur_projects,",");
+							$qry_cond   = " and id in(".$cur_projects.")";
+						}
+						else{
+							$qry_cond   = " and id =''";
+						}
+						$cur_row    = ($month1).' '.$cur_year;
+						$sum_data[$i]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);
+						
+						$i++;
+						$j++;
+					}
+					$tot_avg = $tot_avg + $sum_data[$i-1]['avg_deal'];
+					$own	=	$own + $sum_data[$i-1]['own'];
+					$open	=	$open + $sum_data[$i-1]['open'];
+					$lost	=	$lost + $sum_data[$i-1]['lost'];
+					$tot_cnt=	$tot_cnt + $sum_data[$i-1]['total_cnt_deal'];
+					$tot_val=	$tot_val + $sum_data[$i-1]['total_val_deal'];
+				}
+				$sum_data[$i] = deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$i,$tot_avg);
+				$i++;
+				$sum_data[$i] = deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$tot_avg);
+			}
+		}
+		if($data['view_type'] == 'date' && ($data['date_range1'] == 'Weekly')){
+			$cur_month = date('M');
+			$cur_date  = date('d');
+			$num_dates = $m = $tot_avg = 0;
+			$sum_data  = array();
+			$months_num = array('Jan'=>31,'Feb'=>28,'Mar'=>31,'Apr'=>30,'May'=>31,'Jun'=>30,'Jul'=>31,'Aug'=>31,'Sep'=>30,'Oct'=>31,'Nov'=>30,'Dec'=>31);
+			if($cur_year % 4 == 0){
+				$months_num['Feb'] = 29;
+			}
+			if(!empty($months_num)){
+				foreach($months_num as $key => $month1){
+					if($key == $cur_month){
+						$num_dates = $num_dates + (int) $cur_date;
+						break;
+					}
+					else{
+						$num_dates = $num_dates + $month1;
+					}	
+				}
+			}
+			$weeks = ceil($num_dates/7);
+			if(!empty($weeks)){
+				$w_start_date	= 1;
+				$w_end_date		= 7;
+				for($i=0;$i<$weeks;$i++){
+					$j = $i +1;
+					$end_days	= $j*7;
+					$start_days	= $end_days - 6;
+					$num_month =  0;$k = 1;
+					$qry_cond = '';
+					foreach($months_num as $key => $req_month){
+						$num_month = $num_month + $req_month;
+						if($num_month >= $start_days && $num_month <= $end_days){
+							$start_date	= date('Y-m-d',strtotime($w_start_date.'-'.$key.'-'.$cur_year));
+							$end_date   = date('Y-m-d',strtotime($req_month.'-'.$key.'-'.$cur_year));
+							if(check_activity_date($view_by)){
+								$qry_cond   .= " and ".$view_by." >= '".$start_date."' ";
+							}
+							else{
+								$customs   = $CI->db->query("SELECT relid  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and CONVERT(cv.value,date)  >='".$start_date."' and CONVERT(cv.value,date) <='".$end_date."' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
+								$cur_projects = '';
+								if(!empty($customs)){
+									foreach($customs as $custom1){
+										$cur_projects .= $custom1['relid'].',';
+									}	
+									$cur_projects = rtrim($cur_projects,",");
+									$qry_cond   .= " and id in(".$cur_projects.")";
+								}
+								else{
+									$qry_cond   .= " and id=''";
+								}
+							}
+							$own	=	$own + $sum_data[$m-1]['own'];
+							$open	=	$open + $sum_data[$m-1]['open'];
+							$lost	=	$lost + $sum_data[$m-1]['lost'];
+							$tot_cnt=	$tot_cnt + $sum_data[$m-1]['total_cnt_deal'];
+							$k++;
+							$req_end_days = $w_end_date - $req_month;
+							$w_start_date	= 1;
+							$w_end_date		= $req_end_days;
+							
+							$req_key = array_search ($key, $months);
+							$start_date  = date('Y-m-d',strtotime($w_start_date.'-'.$months[$req_key+1].'-'.$cur_year));
+							$end_date	 = date('Y-m-d',strtotime($req_end_days.'-'.$months[$req_key+1].'-'.$cur_year));
+							if(check_activity_date($view_by)){
+								$qry_cond 	 .= " and ".$view_by." <= '".$end_date."'";
+							}else{
+								$customs   = $CI->db->query("SELECT relid  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and CONVERT(cv.value,date)  >='".$start_date."' and CONVERT(cv.value,date) <='".$end_date."' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
+								$cur_projects = '';
+								if(!empty($customs)){
+									foreach($customs as $custom1){
+										$cur_projects .= $custom1['relid'].',';
+									}	
+									$cur_projects = rtrim($cur_projects,",");
+									$qry_cond   .= " and id in(".$cur_projects.")";
+								}
+								else{
+									$qry_cond   .= " and id=''";
+								}
+							}
+							$cur_row    = 'W'.($m+1).' '.$cur_year;
+							$sum_data[$m]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);
+							$m++;
+							$own	=	$own + $sum_data[$m-1]['own'];
+							$open	=	$open + $sum_data[$m-1]['open'];
+							$lost	=	$lost + $sum_data[$m-1]['lost'];
+							$tot_cnt=	$tot_cnt + $sum_data[$m-1]['total_cnt_deal'];
+							$tot_val=	$tot_val + $sum_data[$m-1]['total_val_deal'];
+							$tot_avg = $tot_avg + $sum_data[$m-1]['avg_deal'];
+							
+							$w_start_date	= $w_end_date +1;
+							$w_end_date		= $w_end_date +7;
+							break;
+						}
+						else{
+							if($num_month >= $start_days){
+								$start_date  = date('Y-m-d',strtotime($w_start_date.'-'.$key.'-'.$cur_year));
+								$end_date	 = date('Y-m-d',strtotime($w_end_date.'-'.$key.'-'.$cur_year));
+								if(check_activity_date($view_by)){
+									$qry_cond 	 = " and ".$view_by." >= '".$start_date."' and ".$view_by." <= '".$end_date."'";
+								}
+								else{
+									$customs   = $CI->db->query("SELECT relid  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and CONVERT(cv.value,date)  >='".$start_date."' and CONVERT(cv.value,date) <='".$end_date."' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
+									$cur_projects = '';
+									if(!empty($customs)){
+										foreach($customs as $custom1){
+											$cur_projects .= $custom1['relid'].',';
+										}	
+										$cur_projects = rtrim($cur_projects,",");
+										$qry_cond   = " and id in(".$cur_projects.")";
+									}
+									else{
+										$qry_cond   = " and id=''";
+									}
+								}
+								$cur_row    = 'W'.($m+1).' '.$cur_year;
+								$sum_data[$m]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);
+								$m++;
+								$own	=	$own + $sum_data[$m-1]['own'];
+								$open	=	$open + $sum_data[$m-1]['open'];
+								$lost	=	$lost + $sum_data[$m-1]['lost'];
+								$tot_cnt=	$tot_cnt + $sum_data[$m-1]['total_cnt_deal'];
+								$tot_val=	$tot_val + $sum_data[$m-1]['total_val_deal'];
+								$tot_avg = $tot_avg + $sum_data[$m-1]['avg_deal'];
+								$w_start_date	= $w_end_date +1;
+								$w_end_date		= $w_end_date +7;
+								break;
+							}
+						}
+						$k++;
+					}
+				}
+				$sum_data[$m] = deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$m,$tot_avg);
+				$m++;
+				$sum_data[$m] = deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$tot_avg);
+			}
+		}
+		if($data['view_type'] == 'date' && ($data['date_range1'] == 'Quarterly')){	
+			$month_period = array(31,30,30,31);
+			$j = 1;
+			for($i=0;$i<=3;$i++){
+				$k = $j+2;
+				$start_date = $cur_year.'-'.$j.'-1';
+				$end_date   = $cur_year.'-'.$k.'-'.$month_period[$i];
+				if(check_activity_date($view_by)){
+					$qry_cond   = " and ".$view_by." >= '".$start_date."' and ".$view_by." <= '".$end_date."' ";
+				}
+				else{
+					$customs   = $CI->db->query("SELECT relid  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and CONVERT(cv.value,date)  >='".$start_date."' and CONVERT(cv.value,date) <='".$end_date."' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
+					$cur_projects = '';
+					if(!empty($customs)){
+						foreach($customs as $custom1){
+							$cur_projects .= $custom1['relid'].',';
+						}	
+						$cur_projects = rtrim($cur_projects,",");
+						$qry_cond   = " and id in(".$cur_projects.")";
+					}
+					else{
+						$qry_cond   = " and id=''";
+					}
+				}
+				$cur_row    = 'Q'.($i+1).' '.$cur_year;
+				$sum_data[$i]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);
+				$j = $j+3;
+				$tot_avg = $tot_avg + $sum_data[$i]['avg_deal'];
+				$own	=	$own + $sum_data[$i]['own'];
+				$open	=	$open + $sum_data[$i]['open'];
+				$lost	=	$lost + $sum_data[$i]['lost'];
+				$tot_cnt=	$tot_cnt + $sum_data[$i]['total_cnt_deal'];
+				$tot_val=	$tot_val + $sum_data[$i]['total_val_deal'];
+			}
+			$sum_data[$i] = deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$i,$tot_avg);
+			$i++;
+			$sum_data[$i] = deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$tot_avg);
+		}
+		if($data['view_type'] == 'date' && ($data['date_range1'] == 'Yearly')){	
+			$i = 0;
+			if(check_activity_date($view_by)){
+				$qry_cond   = " and YEAR(".$view_by.") = '".$cur_year."'";
+			}
+			else{
+				$customs   = $CI->db->query("SELECT relid  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and year(CONVERT(cv.value,date)) <='".$cur_year."' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
+					$cur_projects = '';
+					if(!empty($customs)){
+						foreach($customs as $custom1){
+							$cur_projects .= $custom1['relid'].',';
+						}	
+						$cur_projects = rtrim($cur_projects,",");
+						$qry_cond   = " and id in(".$cur_projects.")";
+					}
+					else{
+						$qry_cond   = " and id=''";
+					}
+			}
+			$sum_data[$i]	= date_summary($qry_cond,$cur_year,$data['sel_measure'],$view_by,$filters);
+			$own	=	$own + $sum_data[$i]['own'];
+			$open	=	$open + $sum_data[$i]['open'];
+			$lost	=	$lost + $sum_data[$i]['lost'];
+			$tot_cnt=	$tot_cnt + $sum_data[$i]['total_cnt_deal'];
+			$tot_val=	$tot_val + $sum_data[$i]['total_val_deal'];$tot_avg=   $tot_avg + $sum_data[$i]['avg_deal'];				
+			$i++;
+			$sum_data[$i] = deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,1,$tot_avg);
+			$i++;
+			$sum_data[$i] = deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$tot_avg );
+		}
+	}
+	$data['summary_cls'] = $sum_data;
+	if(isset($sum_data[0]['rows'])){
+		$data['rows'] = array_column($sum_data, 'rows');
+	}
+	return $data;
+}
+function get_public_dashboard($staff_id){
+	$CI   = &get_instance();
+	$req_out = '';
+	$links = $CI->db->query("SELECT id,staff_id,link_name,share_link FROM " . db_prefix() . "dashboard_public WHERE staff_id = '".$staff_id."' ")->result_array();
+	if(!empty($links)){
+		foreach($links as $link12){
+			$req_id = "'".$link12['id']."'";
+			$req_out .= '<div class="form-group" app-field-wrapper="name" style="float:left;width:100%"><label for="name" class="control-label"> '.$link12['link_name'].' <a href="javascript:void(0)" onclick="check_publick('.$req_id.')" style="margin-left:5px;" data-toggle="modal" data-target="#clientid_add_modal_public"><i class="fa fa-edit"></i></a></label><br><input type="text" id="name_'.$link12['id'].'" name="name" class="form-control" value="'.base_url('shared/dashboard/'.$link12['share_link']).'"  readonly style="width:75%;float:left;"><button onclick="myFunction('.$req_id.')" style="float:left;margin-left:15px;height:35px;">Copy Link</button><a href="javascript:void(0);" onclick="delete_link('.$req_id.')" style="margin-left:10px;float:left"><i class="fa fa-trash fa-2x" style="color:red"></i></a></div>
+					';
+		}
+	}
+	echo $req_out;
+}
+function get_report_filter($report_id){
+	$CI   = &get_instance();
+	$filters = $CI->db->query("SELECT filter_1,filter_2,filter_3,filter_4,filter_5 FROM " . db_prefix() . "report_filter WHERE report_id = '".$report_id."' ")->result_array();
+	return $filters;
+	
+}
+function get_dashboard_report($all_reports,$staff_id,$staff_ids=''){
+	$CI   = &get_instance();
+	$i1 = 0;
+	$cond = array('staff_id'=>$staff_id);
+	$CI->db->select('staff_id,period,date1,date2,member');
+	$CI->db->where($cond); 
+	$CI->db->from(db_prefix() . 'dashboard_filter');
+	$query = $CI->db->get();
+	$data['dashoard_data'] = $query->result_array();
+	if(!empty($all_reports)){
+		foreach($all_reports as $all_report1){
+			$data['rep_ids'][$i1]	=  $all_report1['report_id'];
+			$data['types'][$i1]		=  $all_report1['type'];
+			$data['names'][$i1]		=  $all_report1['report_name'];
+			$data['tabs2'][$i1] 	=  $all_report1['tab_2'];
+			$data['tabs1'][$i1] 	=  $all_report1['tab_1'];
+			$data['sorts1'][$i1] 	=  $all_report1['sort1'];
+			$data['sorts2'][$i1] 	=  $all_report1['sort2'];
+			$view_by				=	$all_report1['view_by'];
+			$view_type				=	$all_report1['view_type'];
+			$measure_by				=	$all_report1['measure_by'];
+			$date_range 			=	$all_report1['date_range'];
+			$data['dashboard_ids'][$i1] 	=  $all_report1['id'];
+			$data['report_types'][$i1]		=  $all_report1['type'];
+			$data['req_data'][$i1] 	= $req_data = get_edit_data($all_report1['type'],$all_report1['report_id']);
+			if($all_report1['type'] == 'deal'){
+				if(!empty($data['dashoard_data'])){
+					$j = count($req_data['filters']);
+					$req_arrs = array('project_start_date','project_deadline','won_date','lost_date','project_created','project_modified','deadline','start_date','stage_on','teamleader_name','members','modified_by','created_by');
+					$cond = array('fieldto'=>'projects','type'=>'date_picker');
+					$CI->db->select('slug');
+					$CI->db->where($cond); 
+					$CI->db->from(db_prefix() . 'customfields');
+					$query = $CI->db->get();
+					$customs = $query->result_array();
+					if(!empty($customs)){
+						$j1 = count($req_arrs);
+						foreach($customs as $custom_1){
+							$req_arrs[$j1] = $custom_1['slug'];
+							$j1++;
+						}
+					}
+					foreach($req_arrs as $req_arr_1){
+						if (in_array($req_arr_1, $req_data['filters'])){
+							$req_data['filters'][$j]	=	$req_arr_1;
+							$req_data['filters1'][$j]	=	'is';
+							if($req_arr_1 == 'teamleader_name' || $req_arr_1 == 'members' || $req_arr_1 == 'modified_by' || $req_arr_1 == 'created_by'){
+								$req_data['filters2'][$j]	=	$data['dashoard_data'][0]['member'];
+							}
+							else{
+								$req_data['filters2'][$j]	=	$data['dashoard_data'][0]['period'];
+								$req_data['filters3'][$j]	=	date('d-m-Y',strtotime($data['dashoard_data'][0]['date1']));
+								$req_data['filters4'][$j]	=	date('d-m-Y',strtotime($data['dashoard_data'][0]['date2']));
+							}
+							$j++;
+						}
+					}
+				}
+				$data['summary'][$i1] = deal_performance_summary($req_data,$view_by,$view_type,$date_range,$measure_by,$staff_ids);
+			}
+			else{
+				if(!empty($data['dashoard_data'])){
+					$j = count($req_data['filters']);
+					$req_arrs = task_get_fields();
+					$req_arrs = array_keys($req_arrs);
+					$cond = array('fieldto'=>'tasks','type'=>'date_picker');
+					$CI->db->select('slug');
+					$CI->db->where($cond); 
+					$CI->db->from(db_prefix() . 'customfields');
+					$query = $CI->db->get();
+					$customs = $query->result_array();
+					if(!empty($customs)){
+						$j1 = count($req_arrs);
+						foreach($customs as $custom_1){
+							$req_arrs[$j1] = $custom_1['slug'];
+							$j1++;
+						}
+					}
+					foreach($req_arrs as $req_arr_1){
+						if (in_array($req_arr_1, $req_data['filters'])){
+							$req_data['filters'][$j]	=	$req_arr_1;
+							$req_data['filters1'][$j]	=	'is';
+							if($req_arr_1 == 'teamleader_name' || $req_arr_1 == 'members' || $req_arr_1 == 'modified_by' || $req_arr_1 == 'created_by'){
+								$req_data['filters2'][$j]	=	$data['dashoard_data'][0]['member'];
+							}
+							else{
+								$req_data['filters2'][$j]	=	$data['dashoard_data'][0]['period'];
+								$req_data['filters3'][$j]	=	date('d-m-Y',strtotime($data['dashoard_data'][0]['date1']));
+								$req_data['filters4'][$j]	=	date('d-m-Y',strtotime($data['dashoard_data'][0]['date2']));
+							}
+							$j++;
+						}
+					}
+				}
+				$data['summary'][$i1] = activity_performance_summary($req_data,$view_by,$view_type,$date_range,$measure_by,$staff_ids);
+			}
+			$i1++;
+		}
+	}
+	return $data;
 }

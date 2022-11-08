@@ -420,6 +420,12 @@ function app_init_admin_sidebar_menu_items() {
             'position' => 8,
         ]);
 		$CI->app_menu->add_sidebar_children_item('reports', [
+            'slug' => 'dashboard-report',
+            'name' => _l('dashboard'),
+            'href' => admin_url('dashboard/report'),
+            'position' => 9,
+        ]);
+		$CI->app_menu->add_sidebar_children_item('reports', [
             'slug' => 'view-report',
             'name' => _l('shared_list'),
             'href' => admin_url('reports/all_share'),

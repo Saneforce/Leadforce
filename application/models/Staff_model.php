@@ -452,7 +452,35 @@ class Staff_model extends App_Model
         }
         return $category;
     }
-    
+     public function printHierarchyTree_staff($id) {
+        $ids = array();
+        $staffids = rtrim($this->getHierarchyTree($id), ',');
+        $ids = explode(',',$staffids);
+		$this->db->where('emp_id',  $id);
+        $followers = $this->db->get(db_prefix() . 'followers_permission')->row();
+        if(count((array)$followers) > 0){
+            if($followers->p_type == 1) {
+                $this->db->where('emp_id',  $id);
+                $follow = $this->db->select('follower_id')->get(db_prefix() . 'followers')->result();
+                //pre($follow);
+                foreach($follow as $sk => $sv){
+                    $ids[] = $sv->follower_id;
+                }
+            } else {
+                $rows = $this->db
+                        ->select('*')
+                        ->where('role != ', 1)
+                        ->where('action_for', 'Active')
+                        ->where('active', 1)
+                        ->get('tblstaff')
+                        ->result();
+                foreach($rows as $sk => $sv){
+                    $ids[] = $sv->staffid;
+                }
+            }
+        }
+        return array_filter($ids);
+	 }
     public function printHierarchyTree($id) {
         $ids = array();
         $staffids = rtrim($this->getHierarchyTree($id), ',');

@@ -230,7 +230,7 @@ function check_view_by(a){
 function load_share(a){
 	document.getElementById('overlay_deal123').style.display = '';
 	var data = {report_id:a};
-	 var ajaxRequest = $.ajax({
+	var ajaxRequest = $.ajax({
 		type: 'POST',
 		url: admin_url + 'reports/current_share',
 		data: data,
@@ -386,18 +386,18 @@ $(function(){
 		var name_val = $('#name').val();
 		$('#name_id').hide();
 		if((team!='' && shared =='Selected Person') || shared =='Everyone'){
-				var actionUrl = form.attr('action');
-				$.ajax({
-					type: form.attr('method'),
-					url: actionUrl,
-					data: form.serialize(), // serializes the form's elements.
-					success: function(data)
-					{
-						var obj = JSON.parse(data)
-						alert_float('success', obj.message);
-						$('#shared_add_modal').modal('toggle');
-					}
-				});
+			var actionUrl = form.attr('action');
+			$.ajax({
+				type: form.attr('method'),
+				url: actionUrl,
+				data: form.serialize(), // serializes the form's elements.
+				success: function(data)
+				{
+					var obj = JSON.parse(data)
+					alert_float('success', obj.message);
+					$('#shared_add_modal').modal('toggle');
+				}
+			});
 			document.getElementById('overlay_deal123').style.display = 'none';
 		}
 		else{
@@ -587,9 +587,13 @@ function del_filter(a){
 		dataType: '',
 		success: function(msg) {
 			alert_float('success', 'Filter Deleted Successfully');
+			set_storage();
 			location.reload();
 		}
 	});
+}
+function set_storage(){
+	localStorage.unload = 1;
 }
 function check_filter(a){
 	document.getElementById('overlay_deal').style.display = '';
@@ -817,6 +821,40 @@ function ch_staff(a){
 }
 function tab_summary(a){
 	$('#filter_tab').val(a);
+	$('#cur_tab_1').val(a);
+	$('#cur_tab_2').val('');
+	if(a==3){
+		$('#cur_tab_2').val(1);
+	}
+	$('#add_dashboard').show();
+	if(a == 2){
+		$('#add_dashboard').hide();
+	}
+}
+function tab_summary_1(a){
+	$('#filter_tab').val(3);
+	$('#cur_tab_1').val(3);
+	$('#cur_tab_2').val(a);
+}
+function update_report(report_url){
+	var tab1 = $('#cur_tab_1').val();
+	var tab2 = $('#cur_tab_2').val();
+	
+	var view_by		= $('#summary_view_by').val();
+	var view_type	= $('#summary_view_type').val();
+	var measure		= $('#summary_sel_measure').val();
+	var date_range	= $('#summary_date_range').val();
+	window.location.href = report_url+'/'+tab1+'/'+tab2+'?view_by='+view_by+'&view_type='+view_type+'&measure='+measure+"&date_range="+date_range;
+}
+function update_dashboard(report_url){
+	var tab1 = $('#cur_tab_1').val();
+	var tab2 = $('#cur_tab_2').val();
+	var view_by		= $('#summary_view_by').val();
+	var view_type	= $('#summary_view_type').val();
+	var measure		= $('#summary_sel_measure').val();
+	var date_range	= $('#summary_date_range').val();
+	set_storage();
+	window.location.href = report_url+'/'+tab1+'/'+tab2+'?view_by='+view_by+'&view_type='+view_type+'&measure='+measure+"&date_range="+date_range;
 }
 $(function(){
 	 $( "#sortable" ).sortable();
@@ -835,5 +873,40 @@ $(function(){
 		 });
 		 initDataTable('.table-tasks_order', admin_url+'reports/deal_table/<?php echo $id;?>?type=activity', undefined, [0], TasksServerParams, <?php echo hooks()->apply_filters('tasks_table_default_order', json_encode(array())); ?>);
 	 <?php }?>
+	
 });
+</script>
+<script>
+/* window.onbeforeunload = function (e) {
+    e = e || window.event;
+    // For IE and Firefox prior to version 4
+	 var targetHost = new URL(e.target.URL).hostname;
+	 console.info(targetHost);
+    if (e) {
+        e.returnValue = 'Sure?';
+    }
+
+    // For Safari
+    return 'Sure?';
+}; */  
+</script>
+<script type="text/javascript">
+window.addEventListener('beforeunload', (event) => {
+	console.info(event);
+
+	if(localStorage.unload!=1){
+		event.preventDefault();
+		// Google Chrome requires returnValue to be set.
+		event.returnValue = '';
+		 //removeEventListener("beforeunload", event, {capture: true});
+	}
+	else{
+		localStorage.unload = '';
+		console.info(event);
+		 addEventListener('beforeunload', beforeUnloadListener, {capture: true});
+
+	} 
+	localStorage.unload = 1;
+}, {capture: true}); 
+
 </script>

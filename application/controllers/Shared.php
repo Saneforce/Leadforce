@@ -8,6 +8,8 @@ class Shared extends App_Controller
         hooks()->do_action('admin_auth_init');
 		$this->load->helper('report_summary');
 		$this->load->helper('reports');
+		$this->load->model('dashboard_model');
+		$this->load->model('staff_model');
     }
     public function index($shared)
     {
@@ -37,6 +39,28 @@ class Shared extends App_Controller
 		$data['clientid'] = '';
 		$this->load->view('admin/reports/public',$data);
     }
+	public function dashboard($shared = '')
+	{
+		
+		$data = array();
+		
+        $links = $this->db->query("SELECT id,staff_id,link_name,share_link FROM " . db_prefix() . "dashboard_public WHERE share_link = '".$shared."' ")->result_array();
+		$req_staff = $staff_id = $links[0]['staff_id'];
+		$low_hie = '';
+		$lowlevel = $this->staff_model->printHierarchyTree_staff($staff_id,$prefix = '');
+		if(!empty($lowlevel)) {
+			$low_hie = ' OR staffid IN ('.implode(',', $lowlevel).')';
+		}
+		$staffdetails =  $this->db->query('SELECT *, staffid as staff_id FROM ' . db_prefix() . 'staff WHERE staffid = "'.$staff_id.'"'.$low_hie)->result_array();
+		$data['project_members'] =  $staffdetails;
+		$all_staff_id = array_column($data['project_members'],'staff_id');
+		$staff_ids = implode(',',$all_staff_id);
+		$all_reports =  $this->db->query('SELECT d.id,d.staff_id,d.report_id,d.type,d.tab_1,d.tab_2,d.sort1,d.sort2,r.view_by,r.view_type,r.measure_by,r.report_name,r.date_range,r.report_type FROM '. db_prefix().'dashboard d,'. db_prefix().'report r  WHERE d.staff_id in ('.$staff_ids.') and r.id = d.report_id order by d.sort1,d.sort2 asc')->result_array();
+		
+		$data = get_dashboard_report($all_reports,$req_staff,$staff_ids);
+		$data['public'] = 'shared';
+		$this->load->view('admin/dashboard/dashboard_public', $data);
+	}
 	public function deal_edit_table($id = '')
     {
 		$type = $_REQUEST['type'];

@@ -55,6 +55,10 @@ function get_dashboard_widgets()
            'path'      => 'admin/dashboard/widgets/projects_activity',
            'container' => 'left-12',
        ],
+	   [
+           'path'      => 'admin/dashboard/widgets/user_reports',
+           'container' => 'report-4',
+       ],
     ];
 
     return hooks()->apply_filters('get_dashboard_widgets', $widgets);

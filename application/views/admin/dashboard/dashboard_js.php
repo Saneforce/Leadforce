@@ -1,37 +1,74 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <script>
     var weekly_payments_statistics;
-    var user_dashboard_visibility = <?php echo $user_dashboard_visibility; ?>;
+	<?php if(!empty($user_dashboard_visibility)){?>
+		var user_dashboard_visibility = <?php echo $user_dashboard_visibility; ?>;
+	<?php }else{ ?>
+		var user_dashboard_visibility = '';
+	<?php }
+	$last_seg = end($this->uri->segment_array());?>
     $(function() {
-        $( "[data-container]" ).sortable({
-            connectWith: "[data-container]",
-            helper:'clone',
-            handle:'.widget-dragger',
-            tolerance:'pointer',
-            forcePlaceholderSize: true,
-            placeholder: 'placeholder-dashboard-widgets',
-            start:function(event,ui) {
-                $("body,#wrapper").addClass('noscroll');
-                $('body').find('[data-container]').css('min-height','20px');
-            },
-            stop:function(event,ui) {
-                $("body,#wrapper").removeClass('noscroll');
-                $('body').find('[data-container]').removeAttr('style');
-            },
-            update: function(event, ui) {
-                if (this === ui.item.parent()[0]) {
-                    var data = {};
-                    $.each($("[data-container]"),function(){
-                        var cId = $(this).attr('data-container');
-                        data[cId] = $(this).sortable('toArray');
-                        if(data[cId].length == 0) {
-                            data[cId] = 'empty';
-                        }
-                    });
-                    $.post(admin_url+'staff/save_dashboard_widgets_order', data, "json");
-                }
-            }
-        });
+		<?php if($this->uri->segment(2) == 'dashboard' && $last_seg == 'report'){?>
+			$( "[data-container]" ).sortable({
+				connectWith: "[data-container]",
+				helper:'clone',
+				handle:'.widget-dragger',
+				tolerance:'pointer',
+				forcePlaceholderSize: true,
+				placeholder: 'placeholder-dashboard-widgets',
+				start:function(event,ui) {
+					$("body,#wrapper").addClass('noscroll');
+					$('body').find('[data-container]').css('min-height','20px');
+				},
+				stop:function(event,ui) {
+					$("body,#wrapper").removeClass('noscroll');
+					$('body').find('[data-container]').removeAttr('style');
+				},
+				update: function(event, ui) {
+					if (this === ui.item.parent()[0]) {
+						var data = {};
+						$.each($("[data-container]"),function(){
+							var cId = $(this).attr('data-container');
+							data[cId] = $(this).sortable('toArray');
+							if(data[cId].length == 0) {
+								data[cId] = 'empty';
+							}
+						});
+						$.post(admin_url+'dashboard/report_widgets_order', data, "json");
+					}
+				}
+			});
+		<?php }else{?>
+			$( "[data-container]" ).sortable({
+				connectWith: "[data-container]",
+				helper:'clone',
+				handle:'.widget-dragger',
+				tolerance:'pointer',
+				forcePlaceholderSize: true,
+				placeholder: 'placeholder-dashboard-widgets',
+				start:function(event,ui) {
+					$("body,#wrapper").addClass('noscroll');
+					$('body').find('[data-container]').css('min-height','20px');
+				},
+				stop:function(event,ui) {
+					$("body,#wrapper").removeClass('noscroll');
+					$('body').find('[data-container]').removeAttr('style');
+				},
+				update: function(event, ui) {
+					if (this === ui.item.parent()[0]) {
+						var data = {};
+						$.each($("[data-container]"),function(){
+							var cId = $(this).attr('data-container');
+							data[cId] = $(this).sortable('toArray');
+							if(data[cId].length == 0) {
+								data[cId] = 'empty';
+							}
+						});
+						$.post(admin_url+'staff/save_dashboard_widgets_order', data, "json");
+					}
+				}
+			});
+		<?php }?>
 
         // Read more for dashboard todo items
         $('.read-more').readmore({
@@ -122,14 +159,22 @@
             // Tickets awaiting reply by department chart
             var tickets_dep_chart = new Chart(tickets_chart_departments, {
                 type: 'doughnut',
-                data: <?php echo $tickets_awaiting_reply_by_department; ?>,
+				<?php if(!empty($tickets_awaiting_reply_by_department)){?>
+					data: <?php echo $tickets_awaiting_reply_by_department; ?>,
+				<?php }else{?>
+					data: '',
+				<?php }?>
             });
         }
         if (tickets_chart_status.length > 0) {
             // Tickets awaiting reply by department chart
             new Chart(tickets_chart_status, {
                 type: 'doughnut',
-                data: <?php echo $tickets_reply_by_status; ?>,
+				<?php if(!empty($tickets_reply_by_status)){?>
+					data: <?php echo $tickets_reply_by_status; ?>,
+				<?php }else{?>
+					data: '',
+				<?php }?>
                 options: {
                    onClick:function(evt){
                     onChartClickRedirect(evt,this);
@@ -141,7 +186,11 @@
             // Leads overview status
             new Chart(leads_chart, {
                 type: 'doughnut',
-                data: <?php echo $leads_status_stats; ?>,
+				<?php if(!empty($leads_status_stats)){?>
+					data: <?php echo $leads_status_stats; ?>,
+				<?php }else{?>
+					data: '',
+				<?php }?>
                 options:{
                     maintainAspectRatio:false,
                     onClick:function(evt){
@@ -154,7 +203,11 @@
             // Projects statuses
             new Chart(projects_chart, {
                 type: 'doughnut',
-                data: <?php echo $projects_status_stats; ?>,
+				<?php if(!empty($projects_status_stats)){?>
+					data: <?php echo $projects_status_stats; ?>,
+				<?php }else{?>
+					data: '',
+				<?php }?>
                 options: {
                     maintainAspectRatio:false,
                     onClick:function(evt){

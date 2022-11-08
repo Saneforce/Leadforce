@@ -961,7 +961,7 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 			$where[db_prefix().'projects.id']   =  '0';
 		}
 	}
-	if($view_type == 'date' && (check_activity_date($view_by))){
+	if((check_activity_date($view_by))){
 		if($date_range == 'Monthly'){
 			$where['month('.db_prefix().'projects.'.$req_view_by.')']  =  $crow;
 		}
@@ -1307,4 +1307,328 @@ function get_custom_res($view_by,$view_type,$date_range,$crow,$cond2){
 		$results = array();
 	}
 	return $results;
+}
+function activity_performance_summary($filters,$view_by='',$view_type='',$date_range='',$sel_measure='',$staff_ids=''){
+	$CI		= & get_instance();
+	$cur_year  = date('Y');
+	$data 	   = array();
+	$data['rows']			=	array();
+	if(!empty($view_by)){
+		$data['view_by']	=   $view_by;
+	}
+	else{
+		$data['view_by']	=	$view_by = $CI->session->userdata('view_by');
+	}
+	$view_type = '';
+	if(check_activity_date($view_by)){
+		$view_type = 'date';
+	}
+	if(empty($view_by)){
+		$data['view_by']	=   $view_by = 'status';
+	}
+	if(!empty($view_type))
+		$data['view_type']	=	$view_type;
+	else
+		$data['view_type']	=	$CI->session->userdata('view_type');
+	if(!empty($date_range))
+		$data['date_range1']=	$date_range;
+	else
+		$data['date_range1']=	$CI->session->userdata('date_range1');
+	if(!empty($sel_measure))
+		$data['sel_measure']=	$sel_measure;
+	else
+		$data['sel_measure']=	$CI->session->userdata('sel_measure');
+	$data['columns']		=	array($view_by,'upcoming','overdue','today','completed','total_val_task');
+	$i1 = $upcoming  = $overdue =  $today = $in_progress = $completed = 0;
+	if(!empty($data['columns'])){
+		foreach($data['columns'] as $clmn1){
+			$data['summary_cls'][$i1++]['vals'] = _l($clmn1);
+			$i1++;
+		}
+	}
+	if($data['view_type'] != 'date'){
+		$fields   = get_task_table_fields($view_by);
+		if(empty($fields['qry_cond']) && !empty($staff_ids)){
+			$fields['qry_cond'] = "((ta1.taskid = ".db_prefix()."tasks.id and ta1.staffid in(" . $staff_ids . ") ) or (".db_prefix()."tasks.rel_id IN(SELECT ".db_prefix()."projects.id FROM ". db_prefix()."projects join ".db_prefix()."project_members  on ".db_prefix()."project_members.project_id = " .db_prefix()."projects.id WHERE ".db_prefix()."project_members.staff_id in (". $staff_ids."))))";
+		}
+		else if(!empty($fields['qry_cond']) && !empty($staff_ids)){
+			
+			$fields['qry_cond'] = "((ta1.taskid = ".db_prefix()."tasks.id and ta1.staffid in(" . $staff_ids . ") ) or (".db_prefix()."tasks.rel_id IN(SELECT ".db_prefix()."projects.id FROM ". db_prefix()."projects join ".db_prefix()."project_members  on ".db_prefix()."project_members.project_id = " .db_prefix()."projects.id WHERE ".db_prefix()."project_members.staff_id in (". $staff_ids.")))) and ".$fields['qry_cond'];
+		}
+		$sum_data = summary_val($fields['tables'],$fields['fields'],$fields['qry_cond'],$data['sel_measure'],$view_by,$fields['cur_rows'],$filters,'activity');
+	}
+	else{
+		$months = array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
+		$tot_cnt = $tot_prt = $tot_val = $avg_deal = $tot_avg = 0; 
+		if($data['view_type'] == 'date' && ($data['date_range1'] == 'Monthly')){
+			if(!empty($months)){
+				$j = 1;$i = 0;
+				foreach($months as $month1){
+					if(check_activity_date($view_by)){
+						$j = $i+1;
+						$qry_cond   = " MONTH(".db_prefix()."tasks.".$view_by.") = '".$j."' and YEAR(".db_prefix()."tasks.".$view_by.") = '".$cur_year."'";
+						$cur_row    = ($month1).' '.$cur_year;
+						$sum_data[$i]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);
+						$i++;
+					}
+					else{
+						$cur_row    = ($month1).' '.$cur_year;
+						$j1 = $j;
+						if($j<10){
+							$j1 = '0'.$j;
+						}
+						$ch_value = $cur_year.'-'.$j1;
+						$qry_cond = '';
+						$customs   = $CI->db->query("SELECT relid  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'tasks' and cv.value like '%".$ch_value."%' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
+						$cur_projects = '';
+						if(!empty($customs)){
+							foreach($customs as $custom1){
+								$cur_projects .= $custom1['relid'].',';
+							}	
+							$cur_projects = rtrim($cur_projects,",");
+							$qry_cond   = " ".db_prefix()."tasks.id in(".$cur_projects.")";
+						}
+						else{
+							$qry_cond   = " ".db_prefix()."tasks.id =''";
+						}
+						$cur_row    = ($month1).' '.$cur_year;
+						$sum_data[$i]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);
+						$i++;
+						$j++;
+					}
+					$tot_avg 	= 	$tot_avg + $sum_data[$i-1]['avg_task'];
+					$upcoming	=	$upcoming + $sum_data[$i-1]['upcoming'];
+					$overdue	=	$overdue + $sum_data[$i-1]['overdue'];
+					$today		=	$today + $sum_data[$i-1]['today'];
+					$in_progress=	$in_progress + $sum_data[$i-1]['in_progress'];
+					$completed	=	$completed + $sum_data[$i-1]['completed'];
+					$tot_cnt=	$tot_cnt + $sum_data[$i-1]['total_val_task'];
+					$tot_val=	$tot_val + $sum_data[$i-1]['total_val_task'];
+				}
+				$sum_data[$i] = task_avg($upcoming,$overdue,$today,$in_progress,$completed,$tot_cnt,$tot_val,$view_by,$i,$tot_avg);
+				$i++;
+				$sum_data[$i] = task_total($upcoming,$overdue,$today,$in_progress,$completed,$tot_cnt,$tot_val,$view_by,$tot_avg);
+			}
+		}
+		if($data['view_type'] == 'date' && ($data['date_range1'] == 'Weekly')){
+			$cur_month = date('M');
+			$cur_date  = date('d');
+			$num_dates = $m = $tot_avg = 0;
+			$sum_data  = array();
+			$months_num = array('Jan'=>31,'Feb'=>28,'Mar'=>31,'Apr'=>30,'May'=>31,'Jun'=>30,'Jul'=>31,'Aug'=>31,'Sep'=>30,'Oct'=>31,'Nov'=>30,'Dec'=>31);
+			if($cur_year % 4 == 0){
+				$months_num['Feb'] = 29;
+			}
+			if(!empty($months_num)){
+				foreach($months_num as $key => $month1){
+					if($key == $cur_month){
+						$num_dates = $num_dates + (int) $cur_date;
+						break;
+					}
+					else{
+						$num_dates = $num_dates + $month1;
+					}	
+				}
+			}
+			$weeks = ceil($num_dates/7);
+			if(!empty($weeks)){
+				$w_start_date	= 1;
+				$w_end_date		= 7;
+				for($i=0;$i<$weeks;$i++){
+					$j = $i +1;
+					$end_days	= $j*7;
+					$start_days	= $end_days - 6;
+					$num_month =  0;$k = 1;
+					$qry_cond = '';
+					foreach($months_num as $key => $req_month){
+						$num_month = $num_month + $req_month;
+						if($num_month >= $start_days && $num_month <= $end_days){
+							$start_date	= date('Y-m-d',strtotime($w_start_date.'-'.$key.'-'.$cur_year));
+							$end_date   = date('Y-m-d',strtotime($req_month.'-'.$key.'-'.$cur_year));
+							if(check_activity_date($view_by)){
+								$qry_cond   .= "  ".db_prefix()."tasks.".$view_by." >= '".$start_date."' ";
+							}
+							else{
+								$customs   = $CI->db->query("SELECT relid  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and CONVERT(cv.value,date)  >='".$start_date."' and CONVERT(cv.value,date) <='".$end_date."' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
+								$cur_projects = '';
+								if(!empty($customs)){
+									foreach($customs as $custom1){
+										$cur_projects .= $custom1['relid'].',';
+									}	
+									$cur_projects = rtrim($cur_projects,",");
+									$qry_cond   .= " ".db_prefix()."tasks.id in(".$cur_projects.")";
+								}
+								else{
+									$qry_cond   .= " and ".db_prefix()."tasks.id=''";
+								}
+							}
+							$upcoming	=	$upcoming + $sum_data[$m-1]['upcoming'];
+							$overdue	=	$overdue + $sum_data[$m-1]['overdue'];
+							$today		=	$today + $sum_data[$m-1]['today'];
+							$in_progress=	$in_progress + $sum_data[$m-1]['in_progress'];
+							$completed	=	$completed + $sum_data[$m-1]['completed'];
+							$tot_cnt=	$tot_cnt + $sum_data[$m-1]['total_val_task'];
+							$tot_val=	$tot_val + $sum_data[$m-1]['total_val_task'];
+							$k++;
+							$req_end_days = $w_end_date - $req_month;
+							$w_start_date	= 1;
+							$w_end_date		= $req_end_days;
+							
+							$req_key = array_search ($key, $months);
+							$start_date  = date('Y-m-d',strtotime($w_start_date.'-'.$months[$req_key+1].'-'.$cur_year));
+							$end_date	 = date('Y-m-d',strtotime($req_end_days.'-'.$months[$req_key+1].'-'.$cur_year));
+							if(check_activity_date($view_by)){
+								$qry_cond 	 .= " and ".db_prefix()."tasks.".$view_by." <= '".$end_date."'";
+							}else{
+								$customs   = $CI->db->query("SELECT relid  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and CONVERT(cv.value,date)  >='".$start_date."' and CONVERT(cv.value,date) <='".$end_date."' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
+								$cur_projects = '';
+								if(!empty($customs)){
+									foreach($customs as $custom1){
+										$cur_projects .= $custom1['relid'].',';
+									}	
+									$cur_projects = rtrim($cur_projects,",");
+									$qry_cond   .= " and ".db_prefix()."tasks.id in(".$cur_projects.")";
+								}
+								else{
+									$qry_cond   .= " and ".db_prefix()."tasks.id=''";
+								}
+							}
+							$cur_row    = 'W'.($m+1).' '.$cur_year;
+							$sum_data[$m]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);
+							$m++;
+							
+							$w_start_date	= $w_end_date +1;
+							$w_end_date		= $w_end_date +7;
+							break;
+						}
+						else{
+							if($num_month >= $start_days){
+								$start_date  = date('Y-m-d',strtotime($w_start_date.'-'.$key.'-'.$cur_year));
+								$end_date	 = date('Y-m-d',strtotime($w_end_date.'-'.$key.'-'.$cur_year));
+								if(check_activity_date($view_by)){
+									$qry_cond 	 = " ".db_prefix()."tasks.".$view_by." >= '".$start_date."' and ".db_prefix()."tasks.".$view_by." <= '".$end_date."'";
+								}
+								else{
+									$customs   = $CI->db->query("SELECT relid  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and CONVERT(cv.value,date)  >='".$start_date."' and CONVERT(cv.value,date) <='".$end_date."' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
+									$cur_projects = '';
+									if(!empty($customs)){
+										foreach($customs as $custom1){
+											$cur_projects .= $custom1['relid'].',';
+										}	
+										$cur_projects = rtrim($cur_projects,",");
+										$qry_cond   = " ".db_prefix()."tasks.id in(".$cur_projects.")";
+									}
+									else{
+										$qry_cond   = " ".db_prefix()."tasks.id=''";
+									}
+								}
+								$cur_row    = 'W'.($m+1).' '.$cur_year;
+								$sum_data[$m]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);
+								$m++;
+								$upcoming	=	$upcoming + $sum_data[$m-1]['upcoming'];
+								$overdue	=	$overdue + $sum_data[$m-1]['overdue'];
+								$today		=	$today + $sum_data[$m-1]['today'];
+								$in_progress=	$in_progress + $sum_data[$m-1]['in_progress'];
+								$completed	=	$completed + $sum_data[$m-1]['completed'];
+								$tot_cnt=	$tot_cnt + $sum_data[$m-1]['total_val_task'];
+								$tot_val=	$tot_val + $sum_data[$m-1]['total_val_task'];
+								$tot_avg = $tot_avg + $sum_data[$m-1]['avg_task'];
+								$w_start_date	= $w_end_date +1;
+								$w_end_date		= $w_end_date +7;
+								break;
+							}
+						}
+						$k++;
+					}
+				}
+				$upcoming	= array_sum(array_column($sum_data,'upcoming'));
+				$overdue	= array_sum(array_column($sum_data,'overdue'));
+				$today		= array_sum(array_column($sum_data,'today'));
+				$in_progress= array_sum(array_column($sum_data,'in_progress'));
+				$completed	= array_sum(array_column($sum_data,'completed'));
+				$tot_cnt	= $tot_val = $upcoming + $overdue + $today + $in_progress+ $completed;
+				$sum_data[$m] = task_avg($upcoming,$overdue,$today,$in_progress,$completed,$tot_cnt,$tot_val,$view_by,$m,$tot_avg);
+				$m++;
+				$sum_data[$m] = task_total($upcoming,$overdue,$today,$in_progress,$completed,$tot_cnt,$tot_val,$view_by,$tot_avg);
+			}
+		}
+		if($data['view_type'] == 'date' && ($data['date_range1'] == 'Quarterly')){	
+			$month_period = array(31,30,30,31);
+			$j = 1;
+			for($i=0;$i<=3;$i++){
+				$k = $j+2;
+				$start_date = $cur_year.'-'.$j.'-1';
+				$end_date   = $cur_year.'-'.$k.'-'.$month_period[$i];
+				if(check_activity_date($view_by)){
+					$qry_cond   = " ".db_prefix()."tasks.".$view_by." >= '".$start_date."' and ".db_prefix()."tasks.".$view_by." <= '".$end_date."' ";
+				}
+				else{
+					$customs   = $CI->db->query("SELECT relid  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and CONVERT(cv.value,date)  >='".$start_date."' and CONVERT(cv.value,date) <='".$end_date."' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
+					$cur_projects = '';
+					if(!empty($customs)){
+						foreach($customs as $custom1){
+							$cur_projects .= $custom1['relid'].',';
+						}	
+						$cur_projects = rtrim($cur_projects,",");
+						$qry_cond   = " ".db_prefix()."tasks.id in(".$cur_projects.")";
+					}
+					else{
+						$qry_cond   = " ".db_prefix()."tasks.id=''";
+					}
+				}
+				$cur_row    = 'Q'.($i+1).' '.$cur_year;
+				$sum_data[$i]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);
+				
+				$j = $j+3;
+				$tot_avg = $tot_avg + $sum_data[$i]['avg_task'];
+				$upcoming	=	$upcoming + $sum_data[$i]['upcoming'];
+				$overdue	=	$overdue + $sum_data[$i]['overdue'];
+				$today		=	$today + $sum_data[$i]['today'];
+				$in_progress=	$in_progress + $sum_data[$i]['in_progress'];
+				$completed	=	$completed + $sum_data[$i]['completed'];
+				$tot_cnt=	$tot_cnt + $sum_data[$i]['total_val_task'];
+				$tot_val=	$tot_val + $sum_data[$i]['total_val_task'];
+			}
+			$sum_data[$i] = task_avg($upcoming,$overdue,$today,$in_progress,$completed,$tot_val,$tot_val,$view_by,$i,$tot_avg);
+			$i++;
+			$sum_data[$i] = task_total($upcoming,$overdue,$today,$in_progress,$completed,$tot_cnt,$tot_val,$view_by,$tot_avg);
+		}
+		if($data['view_type'] == 'date' && ($data['date_range1'] == 'Yearly')){	
+			$i = 0;
+			if(check_activity_date($view_by)){
+				$qry_cond   = " YEAR(".db_prefix()."tasks.".$view_by.") = '".$cur_year."'";
+			}
+			else{
+				$customs   = $CI->db->query("SELECT relid  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and year(CONVERT(cv.value,date)) <='".$cur_year."' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
+					$cur_projects = '';
+					if(!empty($customs)){
+						foreach($customs as $custom1){
+							$cur_projects .= $custom1['relid'].',';
+						}	
+						$cur_projects = rtrim($cur_projects,",");
+						$qry_cond   = " ".db_prefix()."tasks.id in(".$cur_projects.")";
+					}
+					else{
+						$qry_cond   = " id=''";
+					}
+			}
+			$sum_data[$i]	= date_summary($qry_cond,$cur_year,$data['sel_measure'],$view_by,$filters);
+			$upcoming	=	$upcoming + $sum_data[$i]['upcoming'];
+			$overdue	=	$overdue + $sum_data[$i]['overdue'];
+			$today		=	$today + $sum_data[$i]['today'];
+			$in_progress=	$in_progress + $sum_data[$i]['in_progress'];
+			$completed	=	$completed + $sum_data[$i]['completed'];
+			$tot_val	=	$tot_val + $sum_data[$i]['total_val_task'];
+			$tot_avg	=   $tot_avg + $sum_data[$i]['avg_task'];				
+			$i++;
+			$sum_data[$i] = task_avg($upcoming,$overdue,$today,$in_progress,$completed,$tot_val,$tot_val,$view_by,1,$tot_avg);
+			$i++;
+			$sum_data[$i] = task_total($upcoming,$overdue,$today,$in_progress,$completed,$tot_val,$tot_val,$view_by,$tot_avg );
+		}
+	}
+	$data['summary_cls'] = $sum_data;
+	if(isset($sum_data[0]['rows'])){
+		$data['rows'] = array_column($sum_data, 'rows');
+	}
+	return $data;
 }

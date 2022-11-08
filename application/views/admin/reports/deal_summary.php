@@ -24,7 +24,7 @@ foreach($custom_fields as $cfkey=>$cfval){
 ?>
 <div class="row">
 	<div class="col-md-12 m-bt-10">
-		<?php echo form_open(admin_url('reports/summary'),array('id'=>'deal_summary','method'=>'post')); ?>
+		<?php echo form_open(admin_url('reports/summary'),array('id'=>'deal_summary','method'=>'post','onsubmit'=>'return set_storage()')); ?>
 			<input type="hidden" value="<?php echo $id;?>" name="summary_edit">
 			<input type="hidden" value="deal" name="summary_val">
 			<div class="col-md-1 mar-11">
@@ -112,10 +112,13 @@ foreach($custom_fields as $cfkey=>$cfval){
 						<button group="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
 					</div>
 			</div>
-		</div>
+		</div> 
 	</div>
 	<div class="col-md-12 m-bt-10">
-		<?php $k = '';
+		<?php 
+		$data['summary'] = $summary;
+		$this->load->view('admin/reports/summary_view',$data);
+		/*$k = '';
 		if(!empty($summary['columns'])){
 			$i = 0;
 		?>
@@ -134,7 +137,7 @@ foreach($custom_fields as $cfkey=>$cfval){
 					</tr>
 				</thead>
 				<tbody>
-					<?php  
+					<?php 
 					$date_range = (!empty($summary['date_range1']))?$summary['date_range1']:'';
 					if(!empty($summary['rows'])){
 						$i = 0;
@@ -160,7 +163,6 @@ foreach($custom_fields as $cfkey=>$cfval){
 											<?php if($j != 0 && $j != $k  && $summary['summary_cls'][$i][$summary['columns'][0]] !='Average'&& $summary['summary_cls'][$i][$summary['columns'][0]] !='Total'){
 												?>
 												<a href="javascript:void(0);" onclick="get_deal('<?php echo $clm1; ?>','<?php echo $req_row; ?>','<?php echo $summary['view_by']; ?>','<?php echo $summary['sel_measure']; ?>','<?php echo $date_range;?>','<?php echo $summary['summary_cls'][$i]['req_id'];?>')" data-toggle="modal" data-target="#summary_model" >
-												
 											<?php }?>
 											<?php if(_l($clm1) == 'Stage' && $j ==0){
 												if($summary['summary_cls'][$i][$clm1] == '0'){
@@ -202,7 +204,7 @@ foreach($custom_fields as $cfkey=>$cfval){
 					}?>
 				</tbody>
 			</table>
-		<?php }?>
+		<?php }*/?>
 	</div>
 </div>
 <style>

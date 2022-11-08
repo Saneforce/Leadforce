@@ -1,5 +1,5 @@
 <?php 
-	echo form_open(admin_url('reports/save_filter_report/'.$report_page),array('id'=>'save_filter_report'));
+	echo form_open(admin_url('reports/save_filter_report/'.$report_page),array('id'=>'save_filter_report','onsubmit'=>'set_storage()'));
  ?>
 	<div class="panel_s project-menu-panel" style="margin-top:-1px;">
 		<div class="panel-body">

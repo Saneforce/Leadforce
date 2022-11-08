@@ -22,10 +22,16 @@
 							<span class="edit-title"><?php echo _l('add_report'); ?></span>
 						</h4>
 					</div>
-					<?php echo form_open('admin/reports/save_report',array('id'=>'clientid_add_group_modal')); ?>
+					<?php echo form_open('admin/reports/save_report',array('id'=>'clientid_add_group_modal','onsubmit'=>'set_storage()')); ?>
 					<div class="modal-body">
 						<input type="hidden" id="cur_id12" value="<?php echo $id;?>" name="cur_id12">
+						<input type="hidden" id="cur_tab_1" value="<?php echo $cur_tab;?>" name="cur_tab_1">
+						<input type="hidden" id="cur_tab_2" value="<?php echo $cur_tab2;?>" name="cur_tab_2">
 						<input type="hidden" name="folder_type" value="<?php echo $report_page;?>">
+						<input type="hidden" name="summary_view_by" id="summary_view_by" value="<?php echo $summary['view_by'];?>">
+						<input type="hidden" name="summary_view_type" id="summary_view_type" value="<?php echo $summary['view_type'];?>">
+						<input type="hidden" name="summary_sel_measure" id="summary_sel_measure" value="<?php echo $summary['sel_measure'];?>">
+						<input type="hidden" name="summary_date_range" id="summary_date_range" value="<?php echo $summary['date_range1'];?>">
 							<?php $attrs = array('autofocus'=>true, 'required'=>true,'onblur'=>"check_name(this)",'onkeyup'=>"check_validate(this)", 'maxlength'=>"150"); ?>
 							<?php echo render_input( 'name', 'name','','text',$attrs); ?>
 							<div class="text-danger" id="name_id" style="display:none"><?php echo _l('valid_name');?></div>
@@ -119,8 +125,11 @@
 								<button type="button" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" data-toggle="modal" data-target="#shared_add_modal" onclick="load_share('<?php echo $id;?>')"><?php echo _l('shared');?></button>
 								<button type="button" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" data-toggle="modal" data-target="#public_add_modal" onclick="load_public('<?php echo $id;?>')"><?php echo _l('public_link');?></button>
 							<?php }?>
-							<a href="<?php echo admin_url('reports/update_report/'.$id.'/'.$report_page);?>" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" ><?php echo _l('submit');?></a>
+							<a onclick="update_report('<?php echo admin_url('reports/update_report/'.$id.'/'.$report_page);?>')" href="javascript:void(0);" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" ><?php echo _l('submit');?></a>
 							<button type="button" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" data-toggle="modal" data-target="#clientid_add_modal"><?php echo _l('save_new');?></button>
+							<span id="add_dashboard" <?php if(!empty($cur_tab) && $cur_tab == 2){ ?> style="display:none"<?php } ?>>
+								<button type="button" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" onclick="update_dashboard('<?php echo admin_url('reports/update_dashboard/'.$id.'/'.$report_page);?>')"><?php echo _l('add_to_dashboard');?></button>
+							</span>
 						</div>
 					<?php }?>
 				</div>
@@ -141,7 +150,7 @@
 						</div>
 						<div class="modal-body">
 							<div>
-								Create separate links to control access for different viewer groups and name each link accordingly. To revoke access, simply delete a link.
+								<?php echo _l('public_content');?>
 							</div>
 							<div id="public_all">
 								<?php if(!empty($links)){
@@ -246,11 +255,14 @@
 			<div class="panel-body">
 				<div class="horizontal-tabs">
 					<ul class="nav nav-pills">
-						<li class="<?php if(empty($_GET['filter_tab']) || $_GET['filter_tab'] == 1){ echo 'active';}?>">
+						<li class="<?php if(!empty($_GET['filter_tab'])){if(empty($_GET['filter_tab']) || $_GET['filter_tab'] == 1){ echo 'active';}}else{if(empty($cur_tab) || $cur_tab == 1){ echo 'active';}}?>">
 							<a data-toggle="pill" href="#summary_table" onclick="tab_summary('1');"><?php echo _l('summary');?></a>
 						</li>
-						<li class="<?php if(!empty($_GET['filter_tab']) && $_GET['filter_tab'] == 2){ echo 'active';}?>">
+						<li class="<?php if(!empty($_GET['filter_tab'])){if(!empty($_GET['filter_tab']) && $_GET['filter_tab'] == 2){ echo 'active';}}else{if(!empty($cur_tab) && $cur_tab == 2){ echo 'active';}}?>">
 							<a data-toggle="pill" href="#report_table" onclick="tab_summary('2');"><?php echo ($report_page=='deal')? _l('deals'):_l('activity');?></a>
+						</li>
+						<li class="<?php if(!empty($_GET['filter_tab'])){if(!empty($_GET['filter_tab']) && $_GET['filter_tab'] == 3){ echo 'active';}}else{if(!empty($cur_tab) && $cur_tab == 3){ echo 'active';}}?>">
+							<a data-toggle="pill" href="#chart_view" onclick="tab_summary('3');"><?php echo _l('chart_view');?></a>
 						</li>
 						
 					</ul>
@@ -263,7 +275,7 @@
 				<div class="col-md-12">
 					<div id="overlay_deal" style="display: none;"><div class="spinner"></div></div>
 					 <div class="tab-content">
-						<div id="report_table" class="tab_summary tab-pane fade <?php if(!empty($_GET['filter_tab']) && $_GET['filter_tab'] == 2){ echo 'in active';}?>" >
+						<div id="report_table" class="tab_summary tab-pane fade <?php if(!empty($_GET['filter_tab'])){if(!empty($_GET['filter_tab']) && $_GET['filter_tab'] == 2){ echo 'in active';}}else{if(!empty($cur_tab) && $cur_tab == 2){ echo 'in active';}}?>" >
 								<?php 
 								if($report_page == 'deal'){
 									$this->load->view('admin/reports/deal_list_column');
@@ -282,7 +294,7 @@
 								}
 								?>
 						</div>
-						<div id="summary_table" class="tab_summary tab-pane fade <?php if(empty($_GET['filter_tab']) || $_GET['filter_tab'] == 1){ echo 'in active';}?> ">
+						<div id="summary_table" class="tab_summary tab-pane fade <?php if(!empty($_GET['filter_tab'])){if(empty($_GET['filter_tab']) || $_GET['filter_tab'] == 1){ echo 'in active';}}else{if(empty($cur_tab) || $cur_tab == 1){ echo 'in active';}}?> ">
 							<?php 
 							if($report_page == 'deal'){
 								$this->load->view('admin/reports/deal_summary',$data); 
@@ -292,6 +304,9 @@
 								$this->load->view('admin/reports/activity_summary',$data);
 							}								
 								?>
+						</div>
+						<div id="chart_view"  class="tab_summary tab-pane fade <?php if(!empty($_GET['filter_tab'])){if(!empty($_GET['filter_tab']) && $_GET['filter_tab'] == 3){ echo 'in active';}}else{if(!empty($cur_tab) && $cur_tab == 3){ echo 'in active';}}?> ">
+							<?php $this->load->view('admin/reports/summary_chart',$data);?>
 						</div>
 					</div>
 				</div>
@@ -304,4 +319,124 @@
 	<input type="hidden" id="check_search_id">
 </div>
 <?php init_tail(); app_admin_ajax_search_function();?>
-<?php echo $report_footer;?>
+<?php echo $report_footer;
+$req_label = $req_data = $req_color = '';
+$i = 0;
+if(!empty($summary['rows'])){ 
+	foreach($summary['rows'] as $sum_row){
+		if($sum_row!='Average' && $sum_row!='Total'){
+			if($summary['view_by'] == 'priority'){
+				if($sum_row == '1'){
+					$sum_row =  _l('task_priority_low');
+				}
+				else if($sum_row == '2'){
+					$sum_row =  _l('task_priority_medium');
+				}
+				else if($sum_row == '3'){
+					$sum_row =  _l('task_priority_high');
+				}
+				else if($sum_row == '4'){
+					$sum_row =  _l('task_priority_urgent');
+				}
+			}
+			else if($summary['view_by'] == 'project_status'){
+				if($sum_row == '0'){
+					$sum_row =  _l('proposal_status_open');
+				}
+				else if($sum_row == '1'){
+					$sum_row =  _l('project-status-won');
+				}
+				else if($sum_row == '2'){
+					$sum_row =  _l('project-status-loss');
+				}
+			}
+			$req_label .= '"'.$sum_row.'",';
+			if($report_page == 'deal')
+				$req_data .= '"'.$summary['summary_cls'][$i]['total_cnt_deal'].'",';
+			else	
+				$req_data .= '"'.$summary['summary_cls'][$i]['total_val_task'].'",';
+			if($summary['view_by'] == 'status'){
+				$this->db->select('color');
+				$this->db->where('name', $sum_row);
+				$progress =  $this->db->get(db_prefix() . 'projects_status')->row();
+				$req_color .= '"'.$progress->color.'",';
+			}
+			else{
+				$req_color .= '"'.random_color().'",';
+			}
+		}
+		$i++;
+	}
+	$req_label	= rtrim($req_label,',');
+	$req_data	= rtrim($req_data,',');
+	$req_color	= rtrim($req_color,',');
+}
+?>
+<script>
+$(function() {
+	var pie_chart = $('#report_pie_chart');
+	if(pie_chart.length > 0){
+		 new Chart(pie_chart, {
+			type: 'pie',
+			data: {"labels":[<?php echo $req_label;?>],"datasets":[{"data":[<?php echo $req_data;?>],"backgroundColor":[<?php echo $req_color;?>],"label":"<?php echo _l('summary');?>"}]},
+			options: {
+				responsive:true,
+				maintainAspectRatio:false,
+		   }
+	   });
+	}
+	var bar_chart = $('#report_bar_chart');
+	if(bar_chart.length > 0){
+		new Chart(bar_chart, {
+			type: 'bar',
+			data: {"labels":[<?php echo $req_label;?>],"datasets":[{"data":[<?php echo $req_data;?>],"backgroundColor":[<?php echo $req_color;?>],"label":"<?php echo _l('summary');?>"}]},
+			options:{
+				responsive:true,
+				maintainAspectRatio:false,
+				scales: {
+					xAxes: [{
+					  scaleLabel: {
+						display: true,
+						labelString: '<?php echo _l($summary['view_by']);?>'
+					  }
+					}],
+					yAxes: [{
+					  scaleLabel: {
+						display: true,
+						labelString: '<?php echo $summary['sel_measure'];?>'
+					  }
+					}],
+				}
+			}
+		});
+	}
+	var horizontalBar = $('#report_horizontal_chart');
+	if(horizontalBar.length > 0){
+		new Chart(horizontalBar, {
+			type: 'horizontalBar',
+			data: {"labels":[<?php echo $req_label;?>],"datasets":[{"data":[<?php echo $req_data;?>],"backgroundColor":[<?php echo $req_color;?>],"label":"<?php echo _l('summary');?>"}]},
+			options:{
+				responsive:true,
+				maintainAspectRatio:false,
+				scales: {
+					yAxes: [{
+					  scaleLabel: {
+						display: true,
+						labelString: '<?php echo _l($summary['view_by']);?>'
+					  }
+					}],
+					xAxes: [{
+					  scaleLabel: {
+						display: true,
+						labelString: '<?php echo $summary['sel_measure'];?>'
+					  }
+					}]
+				}
+			}
+		});
+	}
+});
+</script>
+<script>
+
+</script>

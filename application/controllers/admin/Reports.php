@@ -263,11 +263,17 @@ class Reports extends AdminController
 	public function summary(){
 		if(isset($_POST['submit'])){
 			$filter_data['view_by']		=	$_POST['view_by'];
+			$filter_data['date_range1']	=	'';
+			if(check_activity_date($filter_data['view_by'])){
+				$filter_data['date_range1']	=	$_POST['date_range1'];
+			}
 			$filter_data['view_type']	=	$_POST['view_type'];
-			$filter_data['date_range1']	=	$_POST['date_range1'];
+			
 			$filter_data['sel_measure']	=	$_POST['sel_measure'];
+			
 			$type = $_POST['summary_val'];
 			$type = ($type=='deal')?'':'activity_';
+			$filter_data['report_type']	=	($type=='')?'deal':'activity';
 			$this->session->set_userdata($filter_data);
 			if(!empty($_POST['summary_edit'])){
 				redirect(admin_url($type.'reports/edit/'.$_POST['summary_edit']));
@@ -291,7 +297,7 @@ class Reports extends AdminController
 		$query = $this->db->get();
 		$filters = $query->result_array();
 		
-		$fields = "report_type";
+		$fields = "report_type,view_type,date_range,measure_by,view_by";
 		$condition = array('id'=>$id);
 		$this->db->select($fields);
 		$this->db->from(db_prefix() . "report");
@@ -300,6 +306,11 @@ class Reports extends AdminController
 		$reports = $query->result_array();
 		$filter_data = array();
 		$filter_data['report_type']	=	$reports[0]['report_type'];
+		$filter_data['view_type']	=	$reports[0]['view_type'];
+		$filter_data['view_by']		=	$reports[0]['view_by'];
+		$filter_data['date_range1']	=	$reports[0]['date_range'];
+		$filter_data['sel_measure']	=	$reports[0]['measure_by'];
+		
 		if(!empty($filters)){
 			$i = 0;
 			foreach($filters as $filter12){
@@ -313,8 +324,8 @@ class Reports extends AdminController
 		}
 		$summary_filter = set_activity_summary($type);
 		$this->session->set_userdata($filter_data);
+		unset($summary_filter['view_by']);
 		$this->session->set_userdata($summary_filter);
-
 		if(empty($shared_id)){
 			if($type == 'deal'){
 				redirect(admin_url('reports/edit/'.$id));
@@ -453,7 +464,9 @@ class Reports extends AdminController
 		$data['report_filter'] =  $this->load->view('admin/reports/filter', $data,true);
 		$data['report_footer'] =  $this->load->view('admin/reports/report_footer', $data,true);
 		$data['teamleaders'] = $this->staff_model->get('', [ 'active' => 1]);
-		$data['summary'] = $this->performance_summary($data);
+		$data['summary'] = deal_performance_summary($data);
+		$data['cur_tab']  = '1';
+		$data['cur_tab2'] = '';
         $this->load->view('admin/reports/deals_views', $data);
 	}
 	public function get_deal_summary($type = ''){
@@ -524,311 +537,6 @@ class Reports extends AdminController
 			echo json_encode($data,true);
 		}
 	}
-	public function performance_summary($filters){
-		$cur_year  = date('Y');
-		$data = array();
-		$data['rows']			=	array();
-		$data['view_by']		=	$view_by = $this->session->userdata('view_by');
-		$data['view_type']		=	$this->session->userdata('view_type');
-		$data['date_range1']	=	$this->session->userdata('date_range1');
-		$data['sel_measure']	=	$this->session->userdata('sel_measure');
-		if($view_by == 'project_start_date'){
-			$view_by = 'start_date';
-		}
-		else if($view_by == 'project_deadline'){
-			$view_by = 'deadline';
-		}
-		else if($view_by == 'won_date' || $view_by == 'lost_date'){
-			$view_by = 'stage_on';
-		}
-		$data['columns']		=	array($view_by,'own','lost','open','avg_deal','total_val_deal','total_cnt_deal');
-		if($data['sel_measure'] == 'Deal Value'){
-			$data['columns']	=	array($view_by,'avg_deal','total_val_deal','total_cnt_deal');
-		}
-		if($data['sel_measure'] == 'Number of Products'){
-			$data['columns']	=	array($view_by,'open','own','total_num_prdts');
-		}
-		if($data['sel_measure'] == 'Product Value'){
-			$data['columns']	=	array($view_by,'open','own','avg_prdt_val','total_val_prdt');
-		}
-		if($view_by == 'project_status'){
-			$data['columns']	=	array($view_by,'avg_deal','total_val_deal','total_cnt_deal');
-		}
-		$i1 = 0;
-		if(!empty($data['columns'])){
-			foreach($data['columns'] as $clmn1){
-				$data['summary_cls'][$i1++]['vals'] = _l($clmn1);
-				$i1++;
-			}
-		}
-		if($data['view_type'] != 'date'){
-			$fields = get_table_fields($view_by);
-			$sum_data = summary_val($fields['tables'],$fields['fields'],$fields['qry_cond'],$data['sel_measure'],$view_by,$fields['cur_rows'],$filters,'deal');
-		}
-		else{
-			$months = array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
-			$own = $open = $lost = $tot_cnt = $tot_prt = $tot_val = $avg_deal = $tot_avg = 0; 
-			if($data['view_type'] == 'date' && ($data['date_range1'] == 'Monthly')){
-				if(!empty($months)){
-					$j = 1;$i = 0;
-					foreach($months as $month1){
-						if(check_activity_date($view_by)){
-							$j = $i+1;
-							$qry_cond   = " and MONTH(".$view_by.") = '".$j."' and YEAR(".$view_by.") = '".$cur_year."'";
-							$cur_row    = ($month1).' '.$cur_year;
-							$sum_data[$i]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);					
-							$i++;
-						}
-						else{
-							$cur_row    = ($month1).' '.$cur_year;
-							$j1 = $j;
-							if($j<10){
-								$j1 = '0'.$j;
-							}
-							$ch_value = $cur_year.'-'.$j1;
-							$qry_cond = '';
-							$customs   = $this->db->query("SELECT relid  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and cv.value like '%".$ch_value."%' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
-							$cur_projects = '';
-							if(!empty($customs)){
-								foreach($customs as $custom1){
-									$cur_projects .= $custom1['relid'].',';
-								}	
-								$cur_projects = rtrim($cur_projects,",");
-								$qry_cond   = " and id in(".$cur_projects.")";
-							}
-							else{
-								$qry_cond   = " and id =''";
-							}
-							$cur_row    = ($month1).' '.$cur_year;
-							$sum_data[$i]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);
-							
-							$i++;
-							$j++;
-						}
-						$tot_avg = $tot_avg + $sum_data[$i-1]['avg_deal'];
-						$own	=	$own + $sum_data[$i-1]['own'];
-						$open	=	$open + $sum_data[$i-1]['open'];
-						$lost	=	$lost + $sum_data[$i-1]['lost'];
-						$tot_cnt=	$tot_cnt + $sum_data[$i-1]['total_cnt_deal'];
-						$tot_val=	$tot_val + $sum_data[$i-1]['total_val_deal'];
-					}
-					$sum_data[$i] = deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$i,$tot_avg);
-					$i++;
-					$sum_data[$i] = deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$tot_avg);
-				}
-			}
-			if($data['view_type'] == 'date' && ($data['date_range1'] == 'Weekly')){
-				$cur_month = date('M');
-				$cur_date  = date('d');
-				$num_dates = $m = $tot_avg = 0;
-				$sum_data  = array();
-				$months_num = array('Jan'=>31,'Feb'=>28,'Mar'=>31,'Apr'=>30,'May'=>31,'Jun'=>30,'Jul'=>31,'Aug'=>31,'Sep'=>30,'Oct'=>31,'Nov'=>30,'Dec'=>31);
-				if($cur_year % 4 == 0){
-					$months_num['Feb'] = 29;
-				}
-				if(!empty($months_num)){
-					foreach($months_num as $key => $month1){
-						if($key == $cur_month){
-							$num_dates = $num_dates + (int) $cur_date;
-							break;
-						}
-						else{
-							$num_dates = $num_dates + $month1;
-						}	
-					}
-				}
-				$weeks = ceil($num_dates/7);
-				if(!empty($weeks)){
-					$w_start_date	= 1;
-					$w_end_date		= 7;
-					for($i=0;$i<$weeks;$i++){
-						$j = $i +1;
-						$end_days	= $j*7;
-						$start_days	= $end_days - 6;
-						$num_month =  0;$k = 1;
-						$qry_cond = '';
-						foreach($months_num as $key => $req_month){
-							$num_month = $num_month + $req_month;
-							if($num_month >= $start_days && $num_month <= $end_days){
-								$start_date	= date('Y-m-d',strtotime($w_start_date.'-'.$key.'-'.$cur_year));
-								$end_date   = date('Y-m-d',strtotime($req_month.'-'.$key.'-'.$cur_year));
-								if(check_activity_date($view_by)){
-									$qry_cond   .= " and ".$view_by." >= '".$start_date."' ";
-								}
-								else{
-									$customs   = $this->db->query("SELECT relid  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and CONVERT(cv.value,date)  >='".$start_date."' and CONVERT(cv.value,date) <='".$end_date."' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
-									$cur_projects = '';
-									if(!empty($customs)){
-										foreach($customs as $custom1){
-											$cur_projects .= $custom1['relid'].',';
-										}	
-										$cur_projects = rtrim($cur_projects,",");
-										$qry_cond   .= " and id in(".$cur_projects.")";
-									}
-									else{
-										$qry_cond   .= " and id=''";
-									}
-								}
-								$own	=	$own + $sum_data[$m-1]['own'];
-								$open	=	$open + $sum_data[$m-1]['open'];
-								$lost	=	$lost + $sum_data[$m-1]['lost'];
-								$tot_cnt=	$tot_cnt + $sum_data[$m-1]['total_cnt_deal'];
-								$k++;
-								$req_end_days = $w_end_date - $req_month;
-								$w_start_date	= 1;
-								$w_end_date		= $req_end_days;
-								
-								$req_key = array_search ($key, $months);
-								$start_date  = date('Y-m-d',strtotime($w_start_date.'-'.$months[$req_key+1].'-'.$cur_year));
-								$end_date	 = date('Y-m-d',strtotime($req_end_days.'-'.$months[$req_key+1].'-'.$cur_year));
-								if(check_activity_date($view_by)){
-									$qry_cond 	 .= " and ".$view_by." <= '".$end_date."'";
-								}else{
-									$customs   = $this->db->query("SELECT relid  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and CONVERT(cv.value,date)  >='".$start_date."' and CONVERT(cv.value,date) <='".$end_date."' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
-									$cur_projects = '';
-									if(!empty($customs)){
-										foreach($customs as $custom1){
-											$cur_projects .= $custom1['relid'].',';
-										}	
-										$cur_projects = rtrim($cur_projects,",");
-										$qry_cond   .= " and id in(".$cur_projects.")";
-									}
-									else{
-										$qry_cond   .= " and id=''";
-									}
-								}
-								$cur_row    = 'W'.($m+1).' '.$cur_year;
-								$sum_data[$m]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);
-								$m++;
-								$own	=	$own + $sum_data[$m-1]['own'];
-								$open	=	$open + $sum_data[$m-1]['open'];
-								$lost	=	$lost + $sum_data[$m-1]['lost'];
-								$tot_cnt=	$tot_cnt + $sum_data[$m-1]['total_cnt_deal'];
-								$tot_val=	$tot_val + $sum_data[$m-1]['total_val_deal'];
-								$tot_avg = $tot_avg + $sum_data[$m-1]['avg_deal'];
-								
-								$w_start_date	= $w_end_date +1;
-								$w_end_date		= $w_end_date +7;
-								break;
-							}
-							else{
-								if($num_month >= $start_days){
-									$start_date  = date('Y-m-d',strtotime($w_start_date.'-'.$key.'-'.$cur_year));
-									$end_date	 = date('Y-m-d',strtotime($w_end_date.'-'.$key.'-'.$cur_year));
-									if(check_activity_date($view_by)){
-										$qry_cond 	 = " and ".$view_by." >= '".$start_date."' and ".$view_by." <= '".$end_date."'";
-									}
-									else{
-										$customs   = $this->db->query("SELECT relid  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and CONVERT(cv.value,date)  >='".$start_date."' and CONVERT(cv.value,date) <='".$end_date."' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
-										$cur_projects = '';
-										if(!empty($customs)){
-											foreach($customs as $custom1){
-												$cur_projects .= $custom1['relid'].',';
-											}	
-											$cur_projects = rtrim($cur_projects,",");
-											$qry_cond   = " and id in(".$cur_projects.")";
-										}
-										else{
-											$qry_cond   = " and id=''";
-										}
-									}
-									$cur_row    = 'W'.($m+1).' '.$cur_year;
-									$sum_data[$m]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);
-									$m++;
-									$own	=	$own + $sum_data[$m-1]['own'];
-									$open	=	$open + $sum_data[$m-1]['open'];
-									$lost	=	$lost + $sum_data[$m-1]['lost'];
-									$tot_cnt=	$tot_cnt + $sum_data[$m-1]['total_cnt_deal'];
-									$tot_val=	$tot_val + $sum_data[$m-1]['total_val_deal'];
-									$tot_avg = $tot_avg + $sum_data[$m-1]['avg_deal'];
-									$w_start_date	= $w_end_date +1;
-									$w_end_date		= $w_end_date +7;
-									break;
-								}
-							}
-							$k++;
-						}
-					}
-					$sum_data[$m] = deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$m,$tot_avg);
-					$m++;
-					$sum_data[$m] = deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$tot_avg);
-				}
-			}
-			if($data['view_type'] == 'date' && ($data['date_range1'] == 'Quarterly')){	
-				$month_period = array(31,30,30,31);
-				$j = 1;
-				for($i=0;$i<=3;$i++){
-					$k = $j+2;
-					$start_date = $cur_year.'-'.$j.'-1';
-					$end_date   = $cur_year.'-'.$k.'-'.$month_period[$i];
-					if(check_activity_date($view_by)){
-						$qry_cond   = " and ".$view_by." >= '".$start_date."' and ".$view_by." <= '".$end_date."' ";
-					}
-					else{
-						$customs   = $this->db->query("SELECT relid  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and CONVERT(cv.value,date)  >='".$start_date."' and CONVERT(cv.value,date) <='".$end_date."' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
-						$cur_projects = '';
-						if(!empty($customs)){
-							foreach($customs as $custom1){
-								$cur_projects .= $custom1['relid'].',';
-							}	
-							$cur_projects = rtrim($cur_projects,",");
-							$qry_cond   = " and id in(".$cur_projects.")";
-						}
-						else{
-							$qry_cond   = " and id=''";
-						}
-					}
-					$cur_row    = 'Q'.($i+1).' '.$cur_year;
-					$sum_data[$i]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);
-					$j = $j+3;
-					$tot_avg = $tot_avg + $sum_data[$i]['avg_deal'];
-					$own	=	$own + $sum_data[$i]['own'];
-					$open	=	$open + $sum_data[$i]['open'];
-					$lost	=	$lost + $sum_data[$i]['lost'];
-					$tot_cnt=	$tot_cnt + $sum_data[$i]['total_cnt_deal'];
-					$tot_val=	$tot_val + $sum_data[$i]['total_val_deal'];
-				}
-				$sum_data[$i] = deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$i,$tot_avg);
-				$i++;
-				$sum_data[$i] = deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$tot_avg);
-			}
-			if($data['view_type'] == 'date' && ($data['date_range1'] == 'Yearly')){	
-				$i = 0;
-				if(check_activity_date($view_by)){
-					$qry_cond   = " and YEAR(".$view_by.") = '".$cur_year."'";
-				}
-				else{
-					$customs   = $this->db->query("SELECT relid  FROM " . db_prefix() . "customfieldsvalues cv,".db_prefix()."customfields cf where cv.fieldto = 'projects' and year(CONVERT(cv.value,date)) <='".$cur_year."' and cf.slug ='".$view_by."' and cf.id = cv.fieldid")->result_array();
-						$cur_projects = '';
-						if(!empty($customs)){
-							foreach($customs as $custom1){
-								$cur_projects .= $custom1['relid'].',';
-							}	
-							$cur_projects = rtrim($cur_projects,",");
-							$qry_cond   = " and id in(".$cur_projects.")";
-						}
-						else{
-							$qry_cond   = " and id=''";
-						}
-				}
-				$sum_data[$i]	= date_summary($qry_cond,$cur_year,$data['sel_measure'],$view_by,$filters);
-				$own	=	$own + $sum_data[$i]['own'];
-				$open	=	$open + $sum_data[$i]['open'];
-				$lost	=	$lost + $sum_data[$i]['lost'];
-				$tot_cnt=	$tot_cnt + $sum_data[$i]['total_cnt_deal'];
-				$tot_val=	$tot_val + $sum_data[$i]['total_val_deal'];$tot_avg=   $tot_avg + $sum_data[$i]['avg_deal'];				
-				$i++;
-				$sum_data[$i] = deal_avg($own,$open,$lost,$tot_cnt,$tot_val,$view_by,1,$tot_avg);
-				$i++;
-				$sum_data[$i] = deal_total($own,$open,$lost,$tot_cnt,$tot_val,$view_by,$tot_avg );
-			}
-		}
-		$data['summary_cls'] = $sum_data;
-		if(isset($sum_data[0]['rows'])){
-			$data['rows'] = array_column($sum_data, 'rows');
-		}
-		return $data;
-	}
 	public function edit($id){
 		if (!has_permission('reports', '', 'create')) {
             access_denied('reports');
@@ -839,8 +547,29 @@ class Reports extends AdminController
 		$this->load->model('pipeline_model');
 		$data = array();
 		$data = get_edit_data('deal',$id);
-		$data['summary'] = $this->performance_summary($data);
+		$fields = 'tab_1,tab_2,view_by,view_type,date_range,measure_by';
+		$condition = array('id'=>$id);
+		$this->db->select($fields);
+		$this->db->from(db_prefix().'report');
+		$this->db->where($condition); 
+		$query = $this->db->get();
+		$res = $query->result_array();
 		$data['report_page'] = 'deal';
+		$view_by	=	$this->session->userdata('view_by');
+		$view_type  =	$this->session->userdata('view_type');
+		$date_range =	$this->session->userdata('date_range1');
+		$measure_by =	$this->session->userdata('sel_measure');
+		if(empty($view_by)){
+			$view_by	= $res[0]['view_by'];
+			$view_type	= $res[0]['view_type'];
+			$date_range	= $res[0]['date_range'];
+		}
+		if(empty($measure_by)){
+			$measure_by	= $res[0]['measure_by'];
+		}
+		$data['summary'] = deal_performance_summary($data,$view_by,$view_type,$date_range,$measure_by);
+		$data['cur_tab']  = $res[0]['tab_1'];
+		$data['cur_tab2'] = $res[0]['tab_2'];
         $this->load->view('admin/reports/deals_views', $data);
 	}
 	public function current_share(){
@@ -1976,10 +1705,79 @@ class Reports extends AdminController
 		$data = array();
 		$this->load->view('admin/reports/public',$data);
 	}
-	public function update_report($req_id,$type=''){
+	public function update_dashboard($req_id,$type='',$tab1='',$tab2=''){
+		$type = ($type=='')?'deal':$type;
+		$this->user_report($req_id,$type,$tab1,$tab2);
+		$this->dashboard_report($req_id,$type,$tab1,$tab2);
+		redirect(admin_url('dashboard/report'));
+	}
+	public function dashboard_report($req_id,$type='',$tab1='',$tab2=''){
+		$fields = 'tab_1,tab_2';
+		$staffid = get_staff_user_id();
+		$condition = array('report_id'=>$req_id,'staff_id'=>$staffid);
+		$this->db->select($fields);
+		$this->db->from(db_prefix().'dashboard');
+		$this->db->where($condition); 
+		$query = $this->db->get();
+		$res = $query->result_array();
+		if(!empty($res)){
+			if(!empty($tab1) && $tab1!=2){
+				$upd_dashboard['tab_1']	=	$tab1;
+			}
+			if(!empty($tab2) ){
+				$upd_dashboard['tab_2']	=	$tab2;
+			}
+			$this->db->update(db_prefix() . 'dashboard', $upd_dashboard, $condition);
+			set_alert('success', _l('updated_successfully', _l('add_to_dashboard')));
+		}
+		else{
+			$ins_dashboard = array();
+			$ins_dashboard['report_id']	=	$req_id;
+			$ins_dashboard['type']		=	$type;
+			$ins_dashboard['staff_id']	=	$staffid;
+			if(!empty($tab1) && $tab1!=2){
+				$ins_dashboard['tab_1']	=	$tab1;
+			}
+			if(!empty($tab2) ){
+				$ins_dashboard['tab_2']	=	$tab2;
+			}
+			$this->db->insert(db_prefix() . 'dashboard', $ins_dashboard);
+			set_alert('success', _l('added_successfully', _l('add_to_dashboard')));
+		}
+		return true;
+	}
+	public function user_report($req_id,$type='',$tab1='',$tab2=''){
+		$condition = array('id'=>$req_id);
+		if(empty($tab1)){
+			$tab1 = 1;
+		}
+		$upd_report['tab_1']	=	$tab1;
+		$upd_report['tab_2']	=	$tab2;
+
+		$upd_report['view_by']	=	$upd_report['view_type'] = $upd_report['date_range'] = $upd_report['measure_by'] = '';
+		if(!empty($_GET['view_by'])){
+			$upd_report['view_by']	=	$_GET['view_by'];
+		}
+		if(!empty($_GET['view_type'])){
+			$upd_report['view_type']	=	$_GET['view_type'];
+		}
+		if(!empty($_GET['date_range'])){
+			$upd_report['date_range']	=	$_GET['date_range'];
+		}
+		if(!empty($_GET['measure'])){
+			$upd_report['measure_by']	=	$_GET['measure'];
+		}
+		if(!empty($upd_report)){
+			$this->db->update(db_prefix() . 'report', $upd_report, $condition);
+		}
+		return true;
+	}
+	public function update_report($req_id,$type='',$tab1='',$tab2=''){
 		$cur_id12 = '_edit_'.$req_id;
 		$type = ($type=='')?'deal':$type;
 		$req_filter = ($type=='deal')?'':'activity_';
+		
+		$this->user_report($req_id,$type,$tab1,$tab2);
 		$condition = array('report_id'=>$req_id);
 		$table = db_prefix() . 'report_filter';
 		$this->db->where($condition);
@@ -2075,6 +1873,17 @@ class Reports extends AdminController
 		$ins_report = array();
 		$ins_report['folder_id']	=	$folder;
 		$ins_report['report_name']	=	$name;
+		if(!empty($cur_tab_1) && $cur_tab_1!=1){
+			$ins_report['tab_1']	=	$cur_tab_1;
+		}
+		if(!empty($cur_tab_2) ){
+			$ins_report['tab_2']	=	$cur_tab_2;
+		}
+		$ins_report['report_name']	=	$name;
+		$ins_report['view_by']		=	$summary_view_by;
+		$ins_report['view_type']	=	$summary_view_type;
+		$ins_report['measure_by']	=	$summary_sel_measure;
+		$ins_report['date_range']	=	$summary_date_range;
 		if(empty($cur_id12))
 			$ins_report['report_type']	=	$this->session->userdata('report_type');
 		else{
