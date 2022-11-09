@@ -409,7 +409,8 @@ class Projects extends AdminController
         }
         $data['my_staffids'] = $this->staff_model->get_my_staffids();
         $data['viewIds'] = $this->staff_model->getFollowersViewList();
-		
+		$data['cur_id']	 = $id;
+		$data['cur_staff_id'] = get_staff_user_id();
         $this->load->view('admin/projects/project', $data);
     }
 

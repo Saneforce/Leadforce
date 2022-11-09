@@ -28,7 +28,10 @@
 
             
                         <?php 
-                         $teamleaderselected = ((isset($project) && !empty($project->teamleader)) ? $project->teamleader : '');
+						if(!empty($cur_id))
+							$teamleaderselected = ((isset($project) && !empty($project->teamleader)) ? $project->teamleader : '');
+						else
+							$teamleaderselected = $cur_staff_id;
                             if(isset($project)) {
                                 if(in_array(get_staff_user_id(),$ownerHierarchy) || $project->teamleader == get_staff_user_id() || is_admin(get_staff_user_id()))
                                     echo render_select('teamleader', $teamleaders, array('staffid', array('firstname', 'lastname')), 'teamleader', $teamleaderselected, $assigned_attrs);
