@@ -108,7 +108,19 @@ class Activity_reports extends AdminController
 		$this->db->where($condition); 
 		$query = $this->db->get();
 		$res = $query->result_array();
-		$data['summary'] = activity_performance_summary($data,$res[0]['view_by'],$res[0]['view_type'],$res[0]['date_range'],$res[0]['measure_by']);
+		$view_by	=	$this->session->userdata('view_by');
+		$view_type  =	$this->session->userdata('view_type');
+		$date_range =	$this->session->userdata('date_range1');
+		$measure_by =	$this->session->userdata('sel_measure');
+		if(empty($view_by)){
+			$view_by	= $res[0]['view_by'];
+			$view_type	= $res[0]['view_type'];
+			$date_range	= $res[0]['date_range'];
+		}
+		if(empty($measure_by)){
+			$measure_by	= $res[0]['measure_by'];
+		}
+		$data['summary'] = activity_performance_summary($data,$view_by,$view_type,$date_range,$measure_by);
 		$data['cur_tab']  = $res[0]['tab_1'];
 		$data['cur_tab2'] = $res[0]['tab_2'];
         $this->load->view('admin/reports/deals_views', $data);

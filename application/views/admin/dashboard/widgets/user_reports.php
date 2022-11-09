@@ -33,7 +33,7 @@
 											</a>
 										
 											<div class="inline-block label" style="color:black">
-												<div class="dropdown " style="position: absolute;top: 17px;right: 50%;">
+												<div class="dropdown " style="position: absolute;top: 17px;right: 14%;">
 													<a href="javascript:void(0);" class="dropdown-toggle text-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" >
 														<span data-toggle="tooltip">
 															<?php echo _l('more');?> <i class="fa fa-caret-down" aria-hidden="true"></i>

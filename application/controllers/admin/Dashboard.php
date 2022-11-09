@@ -226,6 +226,37 @@ class Dashboard extends AdminController
 									$req_label[] = $sum_row;
 								}
 							}
+							else if($sum1['view_by'] == 'project_status'){
+								if($sum_row == '0'){
+									$req_label[] =  _l('proposal_status_open');
+								}
+								else if($sum_row == '1'){
+									$req_label[] =  _l('project-status-won');
+								}
+								else if($sum_row == '2'){
+									$req_label[] = _l('project-status-loss');
+								}
+								else{
+									$req_label[] = $sum_row;
+								}
+							}
+							else if($data['types'][$i1] == 'activity' && $sum1['view_by'] == 'status'){
+								if($sum_row == '1'){
+									$req_label[] = _l('task_status_1');
+								}
+								else if($sum_row == '2'){
+									$req_label[] =  _l('task_status_2');
+								}
+								else if($sum_row == '3'){
+									$req_label[] =   _l('task_status_3');
+								}
+								else if($sum_row == '4'){
+									$req_label[] =  _l('task_status_4');
+								}
+								else if($sum_row == '5'){
+									$req_label[] =  _l('task_status_5');
+								}
+							}
 							else{
 								$req_label[] = $sum_row;
 							}
@@ -233,7 +264,7 @@ class Dashboard extends AdminController
 								$req_data[]= $sum1['summary_cls'][$i]['total_cnt_deal'];
 							 else	
 								$req_data[] = $sum1['summary_cls'][$i]['total_val_task'];
-							if($sum1['view_by'] == 'status'){
+							if($data['types'][$i1] != 'activity' && $sum1['view_by'] == 'status'){
 								$this->db->select('color');
 								$this->db->where('name', $sum_row);
 								$progress =  $this->db->get(db_prefix() . 'projects_status')->row();

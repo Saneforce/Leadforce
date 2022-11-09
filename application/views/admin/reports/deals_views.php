@@ -350,12 +350,29 @@ if(!empty($summary['rows'])){
 					$sum_row =  _l('project-status-loss');
 				}
 			}
+			else if($report_page == 'activity' && $summary['view_by'] == 'status'){
+				if($sum_row == '1'){
+					$sum_row =  _l('task_status_1');
+				}
+				else if($sum_row == '2'){
+					$sum_row =  _l('task_status_2');
+				}
+				else if($sum_row == '3'){
+					$sum_row =  _l('task_status_3');
+				}
+				else if($sum_row == '4'){
+					$sum_row =  _l('task_status_4');
+				}
+				else if($sum_row == '5'){
+					$sum_row =  _l('task_status_5');
+				}
+			}
 			$req_label .= '"'.$sum_row.'",';
 			if($report_page == 'deal')
 				$req_data .= '"'.$summary['summary_cls'][$i]['total_cnt_deal'].'",';
 			else	
 				$req_data .= '"'.$summary['summary_cls'][$i]['total_val_task'].'",';
-			if($summary['view_by'] == 'status'){
+			if($report_page != 'activity' && $summary['view_by'] == 'status'){
 				$this->db->select('color');
 				$this->db->where('name', $sum_row);
 				$progress =  $this->db->get(db_prefix() . 'projects_status')->row();

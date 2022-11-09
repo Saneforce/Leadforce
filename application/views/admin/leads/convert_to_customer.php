@@ -28,7 +28,7 @@
            <?php echo render_input('name','lead_convert_to_dealname',$lead->name); ?>
            <?php echo render_select('pipeline',$pipelines, array('id',array('name')),'pipeline',$this->input->post('pipeline'), array('required' => true)); ?>
             <div class="form_status">
-              <?php echo render_select('status',$statuses, array('id',array('name')),'lead_import_status',$this->input->post('status'), array('required' => true)); ?>
+              <?php echo render_select('status',$statuses, array('id',array('name')),'project_status',$this->input->post('status'), array('required' => true)); ?>
             </div>
            <div class="form_teamleader">
               <?php echo render_select('teamleader',$teamleaders,array('staffid',array('firstname','lastname')),'teamleader',$lead->assigned, array('required' => true)); ?>

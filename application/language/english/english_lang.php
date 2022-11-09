@@ -4200,3 +4200,4 @@ $lang['select_period']		=	'Select Period';
 $lang['public_content']		=	'Create separate links to control access for different viewer groups and name each link accordingly. To revoke access, simply delete a link.';
 $lang['check_delete']		=	'Are you want to delete?';
 $lang['dashboard']			=	'Dashboard';
+$lang['add_to_dashboard']	=	'Add To Dashboard';
