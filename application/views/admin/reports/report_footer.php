@@ -317,6 +317,39 @@ function delete_link(a){
 	});
 }
 $(function(){
+	$("#dashboard_add_modal").submit(function(e) {
+		e.preventDefault();
+		var report = $('#dashboard_report').val();
+		var dashboard = $('#dashboard').val();
+		var form = $('#dashboard_add_group_modal');
+		var actionUrl = form.attr('action');
+		var data = {report:report,dashboard:dashboard};
+		 var ajaxRequest = $.ajax({
+			type: 'POST',
+			url: admin_url + 'reports/check_dashboard',
+			data: data,
+			dataType: '',
+			success: function(data) {
+				if(data == 1){
+					$.ajax({
+							type: form.attr('method'),
+							url: actionUrl,
+							data: form.serialize(), // serializes the form's elements.
+							success: function(data1)
+							{
+								alert_float('success', 'Add To Dashboard Successfully');
+								set_storage();
+								window.location.href = admin_url+'/dashboard/report';
+							}
+						});
+				}
+				else{
+					alert_float('danger', 'This report already added to this dashboard');
+					return false;
+				}
+			}
+		});
+	});
 	$('#clientid_add_group_modal').on('submit', function () {
 		var name_val = $('#name').val();
 		$('#name_id').hide();
@@ -327,6 +360,33 @@ $(function(){
 		}
         return true;
     });
+	$("#dashboard_add").submit(function(e) {
+		var name_val = $('#dashboard_name').val();
+		e.preventDefault(); // avoid to execute the actual submit of the form.
+		var form = $(this);
+		var actionUrl = form.attr('action');
+		if ( name_val.match(/^[a-zA-Z0-9]+/) && name_val!='' ) {
+			$.ajax({
+				type: form.attr('method'),
+				url: actionUrl,
+				data: form.serialize(), // serializes the form's elements.
+				success: function(data)
+				{
+					if(data != ''){
+						alert_float('success', 'Dashboard Added Successfully');
+						var emp = jQuery.parseJSON(data); 
+						$("#dashboard").empty().append(emp.success);
+						$('#dashboard').selectpicker('refresh');
+						$('#dashboard_modal').modal('toggle');
+					}
+					else{
+						$('#dashboard_name_id').html('Name already exists');
+					}
+				}
+			});
+		}
+		
+	});
 	$("#section_add").submit(function(e) {
 		var name_val = $('#name1').val();
 		e.preventDefault(); // avoid to execute the actual submit of the form.
@@ -821,11 +881,11 @@ function ch_staff(a){
 }
 function tab_summary(a){
 	$('#filter_tab').val(a);
-	$('#cur_tab_1').val(a);
-	$('#cur_tab_2').val('');
+	$('.cur_tab_1').val(a);
+	/* $('.cur_tab_2').val('');
 	if(a==3){
-		$('#cur_tab_2').val(1);
-	}
+		$('.cur_tab_2').val(1);
+	} */
 	$('#add_dashboard').show();
 	if(a == 2){
 		$('#add_dashboard').hide();

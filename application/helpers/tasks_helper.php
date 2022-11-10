@@ -2798,19 +2798,19 @@ function task_count_cond(){
 		$where_cond = " where ".db_prefix()."tasks.startdate like '%".$yesterday."%' ";
 	}
 	if(!empty($_REQUEST['thisweek_tasks']) || (!empty($_REQUEST['cur_val1']) && $_REQUEST['cur_val1']=='thisweek_tasks')){
-		$week_start = date('Y-m-d',strtotime('sunday this week')).' 00:00:00';
+		$week_start = date('Y-m-d',strtotime('sunday this week',strtotime("-1 week +1 day"))).' 00:00:00';
 		$week_end = date('Y-m-d',strtotime('saturday this week')).' 23:59:59';
-		$where_cond = " where ".db_prefix()."tasks.startdate >= '".$week_start."' and ".db_prefix()."tasks.startdate >= '".$week_end."' ";
+		$where_cond = " where ".db_prefix()."tasks.startdate >= '".$week_start."' and ".db_prefix()."tasks.startdate <= '".$week_end."' ";
 	}
 	if(!empty($_REQUEST['lastweek_tasks']) || (!empty($_REQUEST['cur_val1']) && $_REQUEST['cur_val1']=='lastweek_tasks')){
-		$week_start = date('Y-m-d',strtotime('sunday this week',strtotime("-1 week +1 day"))).' 00:00:00';
+		$week_start = date('Y-m-d',strtotime('sunday this week',strtotime("-2 week +1 day"))).' 00:00:00';
 		$week_end = date('Y-m-d',strtotime('saturday this week',strtotime("-1 week +1 day"))).' 23:59:59';
-		$where_cond = " where ".db_prefix()."tasks.startdate >= '".$week_start."' and ".db_prefix()."tasks.startdate >= '".$week_end."' ";
+		$where_cond = " where ".db_prefix()."tasks.startdate >= '".$week_start."' and ".db_prefix()."tasks.startdate <= '".$week_end."' ";
 	} 
 	if(!empty($_REQUEST['nextweek_tasks']) || (!empty($_REQUEST['cur_val1']) && $_REQUEST['cur_val1']=='nextweek_tasks')){
-		$week_start = date('Y-m-d',strtotime('sunday this week',strtotime("+1 week +1 day"))).' 00:00:00';
+		$week_start = date('Y-m-d',strtotime('sunday this week',strtotime("+0 week +1 day"))).' 00:00:00';
 		$week_end = date('Y-m-d',strtotime('saturday this week',strtotime("+1 week +1 day"))).' 23:59:59';
-		$where_cond = " where ".db_prefix()."tasks.startdate >= '".$week_start."' and ".db_prefix()."tasks.startdate >= '".$week_end."' ";
+		$where_cond = " where ".db_prefix()."tasks.startdate >= '".$week_start."' and ".db_prefix()."tasks.startdate <= '".$week_end."' ";
 	}
 	if(!empty($_REQUEST['thismonth_tasks']) || (!empty($_REQUEST['cur_val1']) && $_REQUEST['cur_val1']=='thismonth_tasks')){
 		$where_cond = " where month(".db_prefix()."tasks.startdate) = '".date('m')."' and year(".db_prefix()."tasks.startdate) = '".date('Y')."' ";

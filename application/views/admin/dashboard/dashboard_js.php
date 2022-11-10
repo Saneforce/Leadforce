@@ -6,9 +6,9 @@
 	<?php }else{ ?>
 		var user_dashboard_visibility = '';
 	<?php }
-	$last_seg = end($this->uri->segment_array());?>
+	 $last_seg = $this->uri->segment(3);?>
     $(function() {
-		<?php if($this->uri->segment(2) == 'dashboard' && $last_seg == 'report'){?>
+		<?php if($this->uri->segment(2) == 'dashboard' && $last_seg == 'view'){?>
 			$( "[data-container]" ).sortable({
 				connectWith: "[data-container]",
 				helper:'clone',

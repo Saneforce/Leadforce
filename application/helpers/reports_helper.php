@@ -1123,7 +1123,19 @@ function set_filter($type='',$all_clmns,$cus_flds){
 	}
 	return $filter_data;
 }
-function get_edit_data($type,$id){
+function get_dashboard($staff_id){
+	$CI		= & get_instance();
+	$fields = "id,dashboard_name";
+	$condition = array('staff_id'=>$staff_id);
+	$CI->db->select($fields);
+	$CI->db->from(db_prefix().'dashboard_report');
+	$CI->db->where($condition); 
+	$CI->db->order_by('dashboard_name','asc');
+	$query = $CI->db->get();
+	$res = $query->result_array();
+	return $res;
+}
+function get_edit_data($type,$id,$staff_id){
 	$type = ($type == 'deal')?'deal':'activity';
 	$ch_filter = ($type == 'deal')?'':'activity_';
 	$CI		= & get_instance();
@@ -1168,6 +1180,93 @@ function get_edit_data($type,$id){
 		}
 	}
 	$data['folders']	=	get_report_folder($type);
+	$data['dashboards']	=	get_dashboard($staff_id);
+	$data['teamleaders'] = $CI->staff_model->get('', [ 'active' => 1]);
+	$data['links'] = $CI->db->query("SELECT report_id,link_name,link_name FROM " . db_prefix() . "report_public WHERE report_id = '".$id."' ")->result_array();
+	$reports1 = $CI->db->query("SELECT report_name,report_type,folder_id FROM " . db_prefix() . "report WHERE id = '".$id."' ")->row();
+	if (($key = array_search('id', $needed['need_fields'])) !== false) {
+		unset($needed['need_fields'][$key]);
+	}
+	if (($key = array_search('project_created', $needed['need_fields'])) !== false ) {
+		unset($needed['need_fields'][$key]);
+	}
+	if (($key = array_search('product_count', $needed['need_fields'])) !== false ) {
+		unset($needed['need_fields'][$key]);
+	}
+	if(empty($reports1)){
+		redirect(admin_url());exit;
+	}
+	$data['report_name']		=	$reports1->report_name.'('.$reports1->report_type.')';
+	$data['folder_id']			=	$reports1->folder_id;
+	$data['need_fields']		=	$needed['need_fields'];
+	$data['need_fields_label']	=	$needed['need_fields_label'];
+	$data['need_fields_edit']	=	$needed['need_fields_edit'];
+	$data['mandatory_fields1']	=	$needed['mandatory_fields1'];
+	$data['report_page'] = $type;
+	$data['report_filter'] =  $CI->load->view('admin/reports/filter', $data,true);
+	$data['report_footer'] =  $CI->load->view('admin/reports/report_footer', $data,true);
+	$shares = $CI->db->query("SELECT share_type,id FROM " . db_prefix() ."shared where  report_id = '".$id."'")->result_array();
+	$data['share_types'] = $data['share_persons'] = array();
+	$share_id = '';
+	if(!empty($shares)){
+		$i = 0;
+		foreach($shares as $share12){
+			$data['share_types'][$i] = $share12['share_type'];
+			$share_id = $share12['id'];
+			$i++;
+		}
+	}
+	$share_persons = $CI->db->query("SELECT staff_id FROM " . db_prefix() ."shared_staff where  share_id = '".$share_id."'")->result_array();
+	if(!empty($share_persons)){
+		$i = 0;
+		foreach($share_persons as $share_person12){
+			$data['share_persons'][$i] = $share_person12['staff_id'];
+			$i++;
+		}
+	}
+	return $data;
+}
+function get_edit_report_data($type,$id,$staff_id){
+	$type = ($type == 'deal')?'deal':'activity';
+	$ch_filter = ($type == 'deal')?'':'activity_';
+	$CI		= & get_instance();
+	$data 	= array();
+	$data['title'] = _l('add_report');
+	if($type == 'deal'){
+		$deal_val = deal_values();
+		$data =  json_decode($deal_val, true);
+		$fields = deal_needed_fields();
+		$needed = array();
+		if(!empty($fields) && $fields != 'null'){
+			$needed = json_decode($fields,true);
+		}
+	}
+	else{
+		$deal_val = task_values();
+		$data =  json_decode($deal_val, true);
+		$needed = get_tasks_need_fields();
+	}
+	$data['id'] = $id;
+	$check_report = $CI->db->query("SELECT id FROM " . db_prefix() . "report WHERE id = '".$id."' ")->row();
+	if(empty($check_report)){
+		redirect(admin_url('reports/view_deal_folder'));
+		exit;
+	}
+	$data['filters']	=	$data['filters1'] = $data['filters2'] = $data['filters3'] = $data['filters4'] = array();
+	$filters = $CI->db->query("SELECT filter_1,filter_2,filter_3,filter_4,filter_5 FROM " . db_prefix() . "report_filter WHERE report_id = '".$id."' ")->result_array();
+	if(!empty($filters)){
+		foreach($filters as $filter12){
+			$data['filters'][]	=	$filter12['filter_1'];
+			$data['filters1'][]	=	$filter12['filter_2'];
+			$data['filters2'][]	=	$filter12['filter_3'];
+			if(!empty($filter12['filter_4']))
+				$data['filters3'][]	=	$filter12['filter_4'];
+			if(!empty($filter12['filter_5']))
+				$data['filters4'][]	=	$filter12['filter_5'];
+		}	
+	}
+	$data['folders']	=	get_report_folder($type);
+	$data['dashboards']	=	get_dashboard($staff_id);
 	$data['teamleaders'] = $CI->staff_model->get('', [ 'active' => 1]);
 	$data['links'] = $CI->db->query("SELECT report_id,link_name,link_name FROM " . db_prefix() . "report_public WHERE report_id = '".$id."' ")->result_array();
 	$reports1 = $CI->db->query("SELECT report_name,report_type,folder_id FROM " . db_prefix() . "report WHERE id = '".$id."' ")->row();
@@ -1291,7 +1390,7 @@ function deal_performance_summary($filters,$view_by='',$view_type='',$date_range
 						$j = $i+1;
 						$qry_cond   = " and MONTH(".$view_by.") = '".$j."' and YEAR(".$view_by.") = '".$cur_year."'";
 						$cur_row    = ($month1).' '.$cur_year;
-						$sum_data[$i]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);					
+						$sum_data[$i]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);		
 						$i++;
 					}
 					else{
@@ -1544,10 +1643,10 @@ function deal_performance_summary($filters,$view_by='',$view_type='',$date_range
 	}
 	return $data;
 }
-function get_public_dashboard($staff_id){
+function get_public_dashboard($staff_id,$dash_id){
 	$CI   = &get_instance();
 	$req_out = '';
-	$links = $CI->db->query("SELECT id,staff_id,link_name,share_link FROM " . db_prefix() . "dashboard_public WHERE staff_id = '".$staff_id."' ")->result_array();
+	$links = $CI->db->query("SELECT id,staff_id,link_name,share_link FROM " . db_prefix() . "dashboard_public WHERE staff_id = '".$staff_id."' and dashboard_id = '".$dash_id."' ")->result_array();
 	if(!empty($links)){
 		foreach($links as $link12){
 			$req_id = "'".$link12['id']."'";
@@ -1587,7 +1686,7 @@ function get_dashboard_report($all_reports,$staff_id,$staff_ids=''){
 			$date_range 			=	$all_report1['date_range'];
 			$data['dashboard_ids'][$i1] 	=  $all_report1['id'];
 			$data['report_types'][$i1]		=  $all_report1['type'];
-			$data['req_data'][$i1] 	= $req_data = get_edit_data($all_report1['type'],$all_report1['report_id']);
+			$data['req_data'][$i1] 	= $req_data = get_edit_report_data($all_report1['type'],$all_report1['report_id'],$staff_id);
 			if($all_report1['type'] == 'deal'){
 				if(!empty($data['dashoard_data'])){
 					$j = count($req_data['filters']);
@@ -1614,13 +1713,14 @@ function get_dashboard_report($all_reports,$staff_id,$staff_ids=''){
 							}
 							else{
 								$req_data['filters2'][$j]	=	$data['dashoard_data'][0]['period'];
-								$req_data['filters3'][$j]	=	date('d-m-Y',strtotime($data['dashoard_data'][0]['date1']));
-								$req_data['filters4'][$j]	=	date('d-m-Y',strtotime($data['dashoard_data'][0]['date2']));
+									$req_data['filters3'][$j]	=	date('d-m-Y',strtotime($data['dashoard_data'][0]['date1']));
+									$req_data['filters4'][$j]	=	date('d-m-Y',strtotime($data['dashoard_data'][0]['date2']));
 							}
 							$j++;
 						}
 					}
 				}
+				$req_data = array_unique($req_data);
 				$data['summary'][$i1] = deal_performance_summary($req_data,$view_by,$view_type,$date_range,$measure_by,$staff_ids);
 			}
 			else{
@@ -1657,6 +1757,8 @@ function get_dashboard_report($all_reports,$staff_id,$staff_ids=''){
 						}
 					}
 				}
+				$req_data = array_unique($req_data);
+				
 				$data['summary'][$i1] = activity_performance_summary($req_data,$view_by,$view_type,$date_range,$measure_by,$staff_ids);
 			}
 			$i1++;

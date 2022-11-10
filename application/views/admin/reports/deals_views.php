@@ -13,6 +13,45 @@
 		} 
 		$record_val = end($this->uri->segment_array());
 		?>
+		<div class="modal fade" id="dashboard_add_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-keyboard="false" data-backdrop="static">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button group="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title" id="myModalLabel">
+							<span class="edit-title"><?php echo _l('add_to_dashboard'); ?></span>
+						</h4>
+					</div>
+					<?php echo form_open('admin/reports/update_dashboard',array('id'=>'dashboard_add_group_modal')); ?>
+					<div class="modal-body">
+						<input type="hidden" id="dashboard_report" value="<?php echo $id;?>" name="cur_id12">
+						<input type="hidden" class="cur_tab_1" value="<?php echo $cur_tab;?>" name="cur_tab_1">
+						<input type="hidden" class="cur_tab_2" value="<?php echo $cur_tab2;?>" name="cur_tab_2">
+						<input type="hidden" name="dashboard_type" value="<?php echo $report_page;?>">
+						<div id="companyname_exists_info" class="hide"></div>
+						<div class="form-group select-placeholder contactsdiv" >
+							<label for="project_contacts_selectpicker"
+							class="control-label"><small class="req text-danger">* </small><?php echo _l('name'); ?></label>
+							 <div class="input-group input-group-select ">
+							 <?php 
+							 $selected = '';
+							 echo render_select('dashboard',$dashboards,array('id',array('dashboard_name')),false,$selected,array('aria-describedby'=>'project_contacts-error','style'=>'height:21px;'),array(),'cur_class','',false);?>
+							 <div class="input-group-addon" style="opacity: 1;">
+								<a href="#" data-toggle="modal" data-target="#dashboard_modal" ><i class="fa fa-plus"></i></a>
+								</div>
+							</div>
+							
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button group="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+						<button group="submit" class="btn btn-info"><?php echo _l('submit'); ?></button>
+						
+					</div>
+					<?php echo form_close(); ?>
+				</div>
+			</div>
+		</div>
 		<div class="modal fade" id="clientid_add_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-keyboard="false" data-backdrop="static">
 			<div class="modal-dialog" role="document">
 				<div class="modal-content">
@@ -25,8 +64,8 @@
 					<?php echo form_open('admin/reports/save_report',array('id'=>'clientid_add_group_modal','onsubmit'=>'set_storage()')); ?>
 					<div class="modal-body">
 						<input type="hidden" id="cur_id12" value="<?php echo $id;?>" name="cur_id12">
-						<input type="hidden" id="cur_tab_1" value="<?php echo $cur_tab;?>" name="cur_tab_1">
-						<input type="hidden" id="cur_tab_2" value="<?php echo $cur_tab2;?>" name="cur_tab_2">
+						<input type="hidden" class="cur_tab_1" value="<?php echo $cur_tab;?>" name="cur_tab_1">
+						<input type="hidden" class="cur_tab_2" value="<?php echo $cur_tab2;?>" name="cur_tab_2">
 						<input type="hidden" name="folder_type" value="<?php echo $report_page;?>">
 						<input type="hidden" name="summary_view_by" id="summary_view_by" value="<?php echo $summary['view_by'];?>">
 						<input type="hidden" name="summary_view_type" id="summary_view_type" value="<?php echo $summary['view_type'];?>">
@@ -96,6 +135,42 @@
 				</div>
 			</div>
 		</div>
+		<div class="modal fade" id="dashboard_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-keyboard="false" data-backdrop="static">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button group="button" class="close" data-dismiss="modal" aria-label="Close"><span
+								aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title" id="myModalLabel">
+							<span class="edit-title"><?php echo _l('add_new',_l('dashboard')); ?></span>
+						</h4>
+					</div>
+					<?php 
+					echo form_open('admin/reports/add_dashboard',array('id'=>'dashboard_add')); 
+					?>
+					<div class="modal-body">
+						<div class="row">
+							<div class="col-md-12">
+								<?php $attrs = array('autofocus'=>true, 'required'=>true,'onblur'=>"check_name(this)",'onkeyup'=>"check_validate(this)", 'maxlength'=>"150"); ?>
+								<?php echo render_input( 'dashboard_name', 'name','','',$attrs); ?>
+								<div id="contact_exists_info" class="hide"></div>
+								<div class="text-danger" id="dashboard_name_id" style="display:none"><?php echo _l('valid_name');?></div>								
+								<div class="input_fields_wrap_ae">
+								
+								</div>
+								
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button group="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+						<button group="submit" class="btn btn-info"><?php echo _l('submit'); ?></button>
+
+					</div>
+					<?php echo form_close(); ?>
+				</div>
+			</div>
+		</div>
 		<div class="panel_s project-menu-panel" style="margin-bottom:0px;">
 			<div class="panel-body">
 				<div class="horizontal-tabs">
@@ -125,10 +200,10 @@
 								<button type="button" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" data-toggle="modal" data-target="#shared_add_modal" onclick="load_share('<?php echo $id;?>')"><?php echo _l('shared');?></button>
 								<button type="button" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" data-toggle="modal" data-target="#public_add_modal" onclick="load_public('<?php echo $id;?>')"><?php echo _l('public_link');?></button>
 							<?php }?>
-							<a onclick="update_report('<?php echo admin_url('reports/update_report/'.$id.'/'.$report_page);?>')" href="javascript:void(0);" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" ><?php echo _l('submit');?></a>
+							<a onclick="update_report('<?php echo admin_url('reports/update_report/'.$id.'/'.$report_page);?>')" href="javascript:void(0);" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;"  ><?php echo _l('submit');?></a>
 							<button type="button" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" data-toggle="modal" data-target="#clientid_add_modal"><?php echo _l('save_new');?></button>
 							<span id="add_dashboard" <?php if(!empty($cur_tab) && $cur_tab == 2){ ?> style="display:none"<?php } ?>>
-								<button type="button" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" onclick="update_dashboard('<?php echo admin_url('reports/update_dashboard/'.$id.'/'.$report_page);?>')"><?php echo _l('add_to_dashboard');?></button>
+								<button type="button" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;" <?php /*onclick="update_dashboard('<?php echo admin_url('reports/update_dashboard/'.$id.'/'.$report_page);?>')" */?> data-toggle="modal" data-target="#dashboard_add_modal"><?php echo _l('add_to_dashboard');?></button>
 							</span>
 						</div>
 					<?php }?>

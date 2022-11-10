@@ -12,7 +12,7 @@
 	<body>
 		<div id="wrapper1">
 			<div class="content">
-				<h1><?php echo _l('dashboard');?></h1>
+				<h1><?php echo $title;?></h1>
 				<div class="row">
 					<div class="col-md-12 " >
 						<?php render_dashboard_widgets('report-4'); ?>

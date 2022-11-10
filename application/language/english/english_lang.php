@@ -4201,3 +4201,4 @@ $lang['public_content']		=	'Create separate links to control access for differen
 $lang['check_delete']		=	'Are you want to delete?';
 $lang['dashboard']			=	'Dashboard';
 $lang['add_to_dashboard']	=	'Add To Dashboard';
+$lang['view_dashboard']		=	'View Dashboard';

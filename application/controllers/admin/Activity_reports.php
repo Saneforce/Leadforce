@@ -98,7 +98,8 @@ class Activity_reports extends AdminController
         }
 		$this->load->model('pipeline_model');
 		$data = array();
-		$data = get_edit_data('activity',$id);
+		$staff_id = get_staff_user_id();
+		$data = get_edit_data('activity',$id,$staff_id);
 		//$data['summary'] = $this->performance_summary($data);
 		$data['report_page'] = 'activity';
 		$fields = 'tab_1,tab_2,view_by,view_type,date_range,measure_by';

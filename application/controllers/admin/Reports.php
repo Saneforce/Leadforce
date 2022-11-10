@@ -546,7 +546,8 @@ class Reports extends AdminController
         }
 		$this->load->model('pipeline_model');
 		$data = array();
-		$data = get_edit_data('deal',$id);
+		$staff_id = get_staff_user_id();
+		$data = get_edit_data('deal',$id,$staff_id);
 		$fields = 'tab_1,tab_2,view_by,view_type,date_range,measure_by';
 		$condition = array('id'=>$id);
 		$this->db->select($fields);
@@ -1705,45 +1706,84 @@ class Reports extends AdminController
 		$data = array();
 		$this->load->view('admin/reports/public',$data);
 	}
-	public function update_dashboard($req_id,$type='',$tab1='',$tab2=''){
-		$type = ($type=='')?'deal':$type;
-		$this->user_report($req_id,$type,$tab1,$tab2);
-		$this->dashboard_report($req_id,$type,$tab1,$tab2);
-		redirect(admin_url('dashboard/report'));
-	}
-	public function dashboard_report($req_id,$type='',$tab1='',$tab2=''){
-		$fields = 'tab_1,tab_2';
+	public function add_dashboard(){
+		extract($_POST);
 		$staffid = get_staff_user_id();
-		$condition = array('report_id'=>$req_id,'staff_id'=>$staffid);
+		$condition = array('staff_id'=>$req_id,'dashboard_name'=>$dashboard_name);
+		$this->db->select('id,dashboard_name');
+		$this->db->from(db_prefix().'dashboard_report');
+		$this->db->where($condition); 
+		$query = $this->db->get();
+		$res = $query->result_array();
+		if(empty($res)){
+			$ins_dashboard = array();
+			$ins_dashboard['dashboard_name']	=	$dashboard_name;
+			$ins_dashboard['staff_id']			=	$staffid;
+			$this->db->insert(db_prefix() . 'dashboard_report', $ins_dashboard);
+			$data =  get_dashboard($staffid);
+			$options = '';
+			foreach($data as $val) {
+				$options .= '<option value="'.$val['id'].'">'.$val['dashboard_name'].'</option>';
+			}
+			echo json_encode([
+				'success' => $options
+			]);
+		}
+		else{
+			echo  '';
+		}
+	}
+	public function update_dashboard(){
+		extract($_POST);
+		$this->dashboard_report($cur_id12,$dashboard_type,$cur_tab_1,$cur_tab_2,$dashboard);
+		return true;
+	}
+	public function check_dashboard(){
+		extract($_POST);
+		$fields = 'sort1,sort2';
+		$condition = array('dashboard_id'=>$dashboard,'report_id'=>$report);
 		$this->db->select($fields);
 		$this->db->from(db_prefix().'dashboard');
 		$this->db->where($condition); 
 		$query = $this->db->get();
 		$res = $query->result_array();
 		if(!empty($res)){
-			if(!empty($tab1) && $tab1!=2){
-				$upd_dashboard['tab_1']	=	$tab1;
-			}
-			if(!empty($tab2) ){
-				$upd_dashboard['tab_2']	=	$tab2;
-			}
-			$this->db->update(db_prefix() . 'dashboard', $upd_dashboard, $condition);
-			set_alert('success', _l('updated_successfully', _l('add_to_dashboard')));
+			echo -1;
 		}
 		else{
-			$ins_dashboard = array();
-			$ins_dashboard['report_id']	=	$req_id;
-			$ins_dashboard['type']		=	$type;
-			$ins_dashboard['staff_id']	=	$staffid;
-			if(!empty($tab1) && $tab1!=2){
-				$ins_dashboard['tab_1']	=	$tab1;
-			}
-			if(!empty($tab2) ){
-				$ins_dashboard['tab_2']	=	$tab2;
-			}
-			$this->db->insert(db_prefix() . 'dashboard', $ins_dashboard);
-			set_alert('success', _l('added_successfully', _l('add_to_dashboard')));
+			echo 1;
 		}
+	}
+	public function dashboard_report($report_id,$type,$tab1,$tab2,$dashboard_id){
+		$staff_id = get_staff_user_id();
+		$fields = 'sort1,sort2';
+		$condition = array('dashboard_id'=>$dashboard_id);
+		$this->db->select($fields);
+		$this->db->from(db_prefix().'dashboard');
+		$this->db->where($condition); 
+		$this->db->order_by('sort1 desc'); 
+		$query = $this->db->get();
+		$res = $query->result_array();
+		$ins_dashboard = array();
+		if(!empty($res)){
+			$sort1 = $res[0]['sort1']+1;
+			$ins_dashboard['sort1']		=	$sort1;
+		}
+		$ins_dashboard['report_id']		=	$report_id;
+		$ins_dashboard['dashboard_id']	=	$dashboard_id;
+		$ins_dashboard['type']			=	$type;
+		$ins_dashboard['staff_id']		=	$staff_id;
+		if($tab1!=2){
+			if($tab1 == 0){
+				$tab1 = 1;
+			}
+			$ins_dashboard['tab_1']		=	$tab1;
+		}
+		if($tab1==3 ){
+			$ins_dashboard['tab_2']	=	$tab2;
+		}
+		$this->db->insert(db_prefix() . 'dashboard', $ins_dashboard);
+		set_alert('success', _l('added_successfully', _l('add_to_dashboard')));
 		return true;
 	}
 	public function user_report($req_id,$type='',$tab1='',$tab2=''){
@@ -2006,6 +2046,12 @@ class Reports extends AdminController
 		$req_out = '';
 		$result = $this->db->query("SELECT folder FROM " . db_prefix() . "folder WHERE id = '".$folder_id."' ")->row();
 		echo $result->folder;
+	}
+	public function edit_dashboard(){
+		$id = $_REQUEST['cur_id'];
+		$req_out = '';
+		$result = $this->db->query("SELECT dashboard_name FROM " . db_prefix() . "dashboard_report WHERE id = '".$id."' ")->row();
+		echo $result->dashboard_name;
 	}
 	public function report_edit(){
 		$report_id = $_REQUEST['cur_id'];

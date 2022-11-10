@@ -3,10 +3,11 @@
 <div id="wrapper">
     <div class="content">
         <div class="row">
+		
             <?php hooks()->do_action('after_dashboard_half_container'); ?>
 			<?php  if(!empty($types)){?>
 				<div class="col-md-12 " style="margin-bottom:10px;" >
-					<?php echo form_open(admin_url('dashboard/report/'),array());?>
+					<?php echo form_open(admin_url('dashboard/view/'.$id),array());?>
 						<div class="col-md-6">
 							<div class="col-md-3 <?php if(empty($dashoard_data[0]['period'])){ echo 'w_100';}?>" id="period">
 								<select data-live-search="false" data-width="100%" class="ajax-search selectpicker" data-none-selected-text="Nothing selected" tabindex="-98" id="year" onchange="change_2_filter(this)" name="filter_1">
@@ -54,7 +55,7 @@
 						</div>
 						<div class="col-md-2">
 							<?php if(!empty($types)){?>
-								<button type="button" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;float:right" data-toggle="modal" data-target="#public_add_modal" onclick="load_public('<?php echo $staffid;?>')"><?php echo _l('public_link');?></button>
+								<button type="button" class="btn btn-primary pull-right1" style="background-color:#61c786 !important;float:right" data-toggle="modal" data-target="#public_add_modal" onclick="load_public('<?php echo $staffid;?>',<?php echo $id;?>)"><?php echo _l('public_link');?></button>
 								<input type="hidden" id="cur_report" value="<?php echo $staffid;?>">
 							<?php }?>
 						</div>
@@ -62,6 +63,7 @@
 				</div>
 			<?php }?>
 			<div class="col-md-12 " >
+					<h1><?php echo $title;?></h1>
                 <?php render_dashboard_widgets('report-4'); ?>
             </div>
             <?php hooks()->do_action('after_dashboard'); ?>
@@ -81,6 +83,7 @@
 			<?php echo form_open(admin_url('dashboard/update_public_name'),array('id'=>'update_public_name')); ?>
 			<div class="modal-body">
 				<input type="hidden" id="link_id" name="link_id">
+				<input type="hidden" id="dashboard_id1" name="dashboard_id" value="<?php echo $id;?>">
 					<?php $attrs = array('autofocus'=>true, 'required'=>true); ?>
 					<?php echo render_input( 'ch_name12', 'name','','text',$attrs); ?>
 					<div id="companyname_exists_info" class="hide"></div>
@@ -119,7 +122,7 @@
 					}?>
 				
 				</div>
-				<div class="row"> <div class="col-md-12"><a href="javascript:void(0)" onclick="add_public_link('<?php echo $staffid;?>')"><?php echo _l('add_link');?></a></div></div>
+				<div class="row"> <div class="col-md-12"><a href="javascript:void(0)" onclick="add_public_link('<?php echo $staffid;?>','<?php echo $id;?>')"><?php echo _l('add_link');?></a></div></div>
 			</div>
 			<div class="modal-footer">
 				<button group="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
@@ -308,7 +311,8 @@ $( function() {
 				document.getElementById('overlay_deal12').style.display = 'none';
 				$('#clientid_add_modal_public').modal('toggle');
 				var a = $('#cur_report').val();
-				load_public(a);
+				var b = $('#dashboard_id1').val();
+				load_public(a,b);
 			}
 		});
 		

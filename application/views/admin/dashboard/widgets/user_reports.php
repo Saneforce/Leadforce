@@ -150,9 +150,9 @@ ul.dropdown-menu li:first-child{
 }
 </style>
 <script>
-function load_public(a){
+function load_public(a,b){
   document.getElementById('overlay_deal_public').style.display = '';
-  var data = {cur_id:a};
+  var data = {cur_id:a,dash_id:b};
   $('#cur_report').val(a);
 	var ajaxRequest = $.ajax({
 		type: 'POST',
@@ -165,8 +165,8 @@ function load_public(a){
 		}
 	});
 }
-function add_public_link(a){
-	var data = {req_val:a};
+function add_public_link(a,b){
+	var data = {req_val:a,d_id:b};
 	 var ajaxRequest = $.ajax({
 		type: 'POST',
 		url: admin_url + 'dashboard/public_link',
@@ -194,8 +194,8 @@ function check_publick(a){
 }
 function delete_link(a){
 	document.getElementById('overlay_deal_public').style.display = '';
-	var cur_id12 = $('#cur_report').val();
-	var data = {req_val:a,cur_id12:cur_id12};
+	var b = $('#dashboard_id1').val();
+	var data = {req_val:a,dash_id:b};
 	 var ajaxRequest = $.ajax({
 		type: 'POST',
 		url: admin_url + 'dashboard/delete_link',

@@ -122,6 +122,31 @@ class Dashboard extends AdminController
         }
     }
 	public function report(){
+		if (!has_permission('reports', '', 'view')) {
+            access_denied('reports');
+        }
+		$data = array();
+		$data['title']   =  _l('view_dashboard');
+		$this->load->view('admin/dashboard/view_dashboard', $data);
+	}
+	public function view_dashboard(){
+		if (!has_permission('reports', '', 'view')) {
+            ajax_access_denied();
+        }
+        $this->app->get_table_data('view_dashboard');
+	}
+	public function edit_dashboard(){
+		if ($this->input->is_ajax_request()) {
+			$upd_dashboard = array();
+			$upd_dashboard['dashboard_name'] = $_REQUEST['name'];
+			$cond['id']			  = $_REQUEST['dashboard_id'];
+			$result = $this->db->update(db_prefix() . 'dashboard_report', $upd_dashboard, $cond);
+			echo json_encode([
+				'success' => 'success'
+			]);
+		}
+	}
+	public function view($id){
 		if(!is_admin(get_staff_user_id())) {
             
             $low_hie = '';
@@ -141,41 +166,47 @@ class Dashboard extends AdminController
 		if(isset($_POST['apply_filter'])){
 			extract($_POST);
 			$staff_id = get_staff_user_id();
-			$cond = array('staff_id'=>$staff_id);
+			$cond = array('staff_id'=>$staff_id,'dashboard_id'=>$id);
 			$this->db->where($cond);
 			$this->db->delete(db_prefix() . 'dashboard_filter');
 			
 			$ins_data = array();
-			$ins_data['staff_id']	=	$staff_id;
+			$ins_data['staff_id']		=	$staff_id;
+			$ins_data['dashboard_id']	=	$id;
 			if(!empty($filter_1)){
-				$ins_data['period']	=	$filter_1;
+				$ins_data['period']		=	$filter_1;
 				if(!empty($filter_2))
 					$ins_data['date1']	=	date('Y-m-d',strtotime($filter_2));
 				if(!empty($filter_3))
 					$ins_data['date2']	=	date('Y-m-d',strtotime($filter_3));
 			}
 			else{
-				$ins_data['period']	=	'';
-				$ins_data['date1']	=	'';
-				$ins_data['date2']	=	'';
+				$ins_data['period']		=	'';
+				$ins_data['date1']		=	'';
+				$ins_data['date2']		=	'';
 			}
 			if(!empty($filter_4))
-				$ins_data['member']	=	$filter_4;
+				$ins_data['member']		=	$filter_4;
 			else
-				$ins_data['member']	=	'';
+				$ins_data['member']		=	'';
 			$this->db->insert(db_prefix() . 'dashboard_filter', $ins_data);
-			redirect(admin_url('dashboard/report'));
+			redirect(admin_url('dashboard/view/'.$id));
 			exit;
 		}
 		$all_staff_id = array_column($data['project_members'],'staff_id');
 		$staff_ids = implode(',',$all_staff_id);
-		$all_reports =  $this->db->query('SELECT d.id,d.staff_id,d.report_id,d.type,d.tab_1,d.tab_2,d.sort1,d.sort2,r.view_by,r.view_type,r.measure_by,r.report_name,r.date_range,r.report_type FROM '. db_prefix().'dashboard d,'. db_prefix().'report r  WHERE d.staff_id in ('.$staff_ids.') and r.id = d.report_id group by d.report_id order by d.sort1,d.sort2 asc')->result_array();
-		
+		$all_reports =  $this->db->query('SELECT d.id,d.staff_id,d.report_id,d.type,d.tab_1,d.tab_2,d.sort1,d.sort2,r.view_by,r.view_type,r.measure_by,r.report_name,r.date_range,r.report_type FROM '. db_prefix().'dashboard d,'. db_prefix().'report r  WHERE d.staff_id in ('.$staff_ids.') and r.id = d.report_id and d.dashboard_id = "'.$id.'" group by d.report_id order by d.sort1,d.sort2 asc')->result_array();
+		if(empty($all_reports)){
+			redirect(admin_url('dashboard/report'));
+			exit;
+		}
 		$staff_id = get_staff_user_id();
 		$data = get_dashboard_report($all_reports,$staff_id);
-		
+		$data['id'] = $id;
 		$data['public'] = '';
 		$data['project_members'] = $all_members;
+		$dashboard_report = $this->db->query("SELECT id,dashboard_name FROM " . db_prefix() . "dashboard_report WHERE id = '".$id."' ")->result_array();
+		$data['title']  = $dashboard_report[0]['dashboard_name'];
 		$this->load->view('admin/dashboard/report_dashboard', $data);
 	}
 	public function refresh_chart(){
@@ -361,19 +392,22 @@ class Dashboard extends AdminController
 	}
 	public function public_link(){
 		$staff_id = $_REQUEST['req_val'];
+		$d_id 	  = $_REQUEST['d_id'];
 		$ins_public = array();
-		$ins_public['staff_id']	=	$staff_id;
+		$ins_public['staff_id']		=	$staff_id;
+		$ins_public['dashboard_id']	=	$d_id;
 		$this->db->insert(db_prefix() . 'dashboard_public', $ins_public);
 		$public_id	=	$this->db->insert_id();
 		$cond = array('id'=>$public_id);
 		$upd_public['share_link'] = md5($public_id.$staff_id.'_sharelink');
 		$this->db->update(db_prefix() . 'dashboard_public', $upd_public, $cond);
-		$req_out = get_public_dashboard($staff_id);
+		$req_out = get_public_dashboard($staff_id,$d_id);
 		echo $req_out;
 	}
 	public function load_public(){
 		$staff_id = $_REQUEST['cur_id'];
-		$req_out = get_public_dashboard($staff_id);
+		$dash_id  = $_REQUEST['dash_id'];
+		$req_out  = get_public_dashboard($staff_id,$dash_id);
 		echo $req_out;
 	}
 	public function check_publick(){
@@ -390,13 +424,13 @@ class Dashboard extends AdminController
 		return true;
 	}
 	public function delete_link(){
-		$staff_id = $_REQUEST['cur_id12'];
+		$staff_id =  get_staff_user_id();;
 		$cur_id12  = $_REQUEST['req_val'];
 		$cond = array('id'=>$cur_id12);
 		$this->db->where($cond);
 		$this->db->delete(db_prefix() . 'dashboard_public');
 		$req_out = '';
-		$req_out = get_public_dashboard($staff_id);
+		$req_out = get_public_dashboard($staff_id,$_REQUEST['dash_id']);
 		echo $req_out;
 		
 	}
