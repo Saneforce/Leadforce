@@ -612,13 +612,8 @@ class Clients extends AdminController
                         die;
                     }
                 }
-                if(isset($data['clientid'])){
-                    $data['userid'] = $data['userids'] = $data['clientid'];
-                    unset($data['clientid']);
-                }else{
-                    $data['userid'] = $data['userids'] = $customer_id;
-                }
-                    
+                $data['userid'] = $data['userids'] = $data['clientid'];
+                unset($data['clientid']);
                
                 if (isset($data['deals'])) {
                     $deals = $data['deals'];
@@ -1305,9 +1300,9 @@ class Clients extends AdminController
                 $dbFields[$key] = 'contact_phonenumber';
             }
         }
-
         $dbFields = array_merge($dbFields, $this->db->list_fields(db_prefix().'clients'));
-
+		
+		$dbFields = array_merge($dbFields,array('staffmail'));
         $this->load->library('import/import_customers', [], 'import');
 
         $this->import->setDatabaseFields($dbFields)

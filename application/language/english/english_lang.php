@@ -4202,3 +4202,5 @@ $lang['check_delete']		=	'Are you want to delete?';
 $lang['dashboard']			=	'Dashboard';
 $lang['add_to_dashboard']	=	'Add To Dashboard';
 $lang['view_dashboard']		=	'View Dashboard';
+$lang['is_any_of']			=	'Is Any Of';
+$lang['this_year']			=	'This Year';

@@ -197,8 +197,22 @@ class Clients_model extends App_Model {
         $data = hooks()->apply_filters('before_client_added', $data);
 		if(isset($data['progress']))
 			unset($data['progress']);
+		if(isset($data['userids']))
+			unset($data['userids']);
+		if(isset($data['alternative_emails']))
+			unset($data['alternative_emails']);
+		if(isset($data['alternative_phonenumber']))
+			unset($data['alternative_phonenumber']);
+		if(isset($data['staffmail'])){
+			if(!empty($data['staffmail'])){
+				$this->db->where('email', $data['staffmail']);
+				$cur_staff = $this->db->get(db_prefix() . 'staff')->row();
+				if(!empty($cur_staff->staffid))
+					$data['addedfrom'] = $cur_staff->staffid;
+			}
+			unset($data['staffmail']);
+		}
         $this->db->insert(db_prefix() . 'clients', $data);
-
         $userid = $this->db->insert_id();
         if ($userid) {
             if (isset($custom_fields)) {
