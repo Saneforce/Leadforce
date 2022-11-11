@@ -192,7 +192,6 @@ class Clients_model extends App_Model {
         if (is_staff_logged_in()) {
             $data['addedfrom'] = get_staff_user_id();
         }
-
         // New filter action
         $data = hooks()->apply_filters('before_client_added', $data);
 		if(isset($data['progress']))
@@ -215,6 +214,7 @@ class Clients_model extends App_Model {
         $this->db->insert(db_prefix() . 'clients', $data);
         $userid = $this->db->insert_id();
         if ($userid) {
+			$contact_data['userids'] = $userid;
             if (isset($custom_fields)) {
                 $_custom_fields = $custom_fields;
                 // Possible request from the register area with 2 types of custom fields for contact and for comapny/customer
@@ -234,7 +234,7 @@ class Clients_model extends App_Model {
              * Used in Import, Lead Convert, Register
              */
             if ($client_or_lead_convert_request == true) {
-                //$contact_id = $this->add_contact($contact_data, $userid, $client_or_lead_convert_request);
+                $contact_id = $this->add_contact($contact_data, $userid, $client_or_lead_convert_request);
             }
             if (isset($groups_in)) {
                 foreach ($groups_in as $group) {

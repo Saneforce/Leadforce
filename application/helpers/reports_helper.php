@@ -1758,7 +1758,6 @@ function get_dashboard_report($all_reports,$staff_id,$staff_ids=''){
 					}
 				}
 				$req_data = array_unique($req_data);
-				
 				$data['summary'][$i1] = activity_performance_summary($req_data,$view_by,$view_type,$date_range,$measure_by,$staff_ids);
 			}
 			$i1++;
