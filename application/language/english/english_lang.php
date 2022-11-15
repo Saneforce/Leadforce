@@ -4183,7 +4183,7 @@ $lang['workflow_deal_merge_fields']			            =	"Deals";
 $lang['workflow_activity_merge_fields']			        =	"Activities";
 
 $lang['items_list_column']    = 'Item List Columns';
-$lang['particulars_items_list_column']    = 'Particular iItem List Columns';
+$lang['particulars_items_list_column']    = 'Columns in Proposal';
 $lang['category']    = 'Category';
 $lang['code']    = 'Code';
 
