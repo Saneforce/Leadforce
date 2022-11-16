@@ -169,27 +169,28 @@ class Dashboard extends AdminController
 			$cond = array('staff_id'=>$staff_id,'dashboard_id'=>$id);
 			$this->db->where($cond);
 			$this->db->delete(db_prefix() . 'dashboard_filter');
-			
-			$ins_data = array();
-			$ins_data['staff_id']		=	$staff_id;
-			$ins_data['dashboard_id']	=	$id;
-			if(!empty($filter_1)){
-				$ins_data['period']		=	$filter_1;
-				if(!empty($filter_2))
-					$ins_data['date1']	=	date('Y-m-d',strtotime($filter_2));
-				if(!empty($filter_3))
-					$ins_data['date2']	=	date('Y-m-d',strtotime($filter_3));
+			if(!empty($filter_1) || !empty($filter_4) ){
+				$ins_data = array();
+				$ins_data['staff_id']		=	$staff_id;
+				$ins_data['dashboard_id']	=	$id;
+				if(!empty($filter_1)){
+					$ins_data['period']		=	$filter_1;
+					if(!empty($filter_2))
+						$ins_data['date1']	=	date('Y-m-d',strtotime($filter_2));
+					if(!empty($filter_3))
+						$ins_data['date2']	=	date('Y-m-d',strtotime($filter_3));
+				}
+				else{
+					$ins_data['period']		=	'';
+					$ins_data['date1']		=	'';
+					$ins_data['date2']		=	'';
+				}
+				if(!empty($filter_4))
+					$ins_data['member']		=	$filter_4;
+				else
+					$ins_data['member']		=	'';
+				$this->db->insert(db_prefix() . 'dashboard_filter', $ins_data);
 			}
-			else{
-				$ins_data['period']		=	'';
-				$ins_data['date1']		=	'';
-				$ins_data['date2']		=	'';
-			}
-			if(!empty($filter_4))
-				$ins_data['member']		=	$filter_4;
-			else
-				$ins_data['member']		=	'';
-			$this->db->insert(db_prefix() . 'dashboard_filter', $ins_data);
 			redirect(admin_url('dashboard/view/'.$id));
 			exit;
 		}
@@ -202,6 +203,7 @@ class Dashboard extends AdminController
 		}
 		$staff_id = get_staff_user_id();
 		$data = get_dashboard_report($all_reports,$staff_id);
+		
 		$data['id'] = $id;
 		$data['public'] = '';
 		$data['project_members'] = $all_members;

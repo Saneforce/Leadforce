@@ -3,13 +3,15 @@
 <div id="wrapper">
     <div class="content">
         <div class="row">
-		
+			<div class="col-md-12">
+				<h1><?php echo $title;?></h1>
+			</div>
             <?php hooks()->do_action('after_dashboard_half_container'); ?>
 			<?php  if(!empty($types)){?>
 				<div class="col-md-12 " style="margin-bottom:10px;" >
 					<?php echo form_open(admin_url('dashboard/view/'.$id),array());?>
 						<div class="col-md-6">
-							<div class="col-md-3 <?php if(empty($dashoard_data[0]['period'])){ echo 'w_100';}?>" id="period">
+							<div class="col-md-3 <?php if(empty($dashoard_data[0]['period'])){ echo 'w_100';}?>" id="period"  style="margin-left:-13px;">
 								<select data-live-search="false" data-width="100%" class="ajax-search selectpicker" data-none-selected-text="Nothing selected" tabindex="-98" id="year" onchange="change_2_filter(this)" name="filter_1">
 									<option value=""><?php echo _l('select_period');?></option>
 									<option value="this_year" <?php if(!empty($dashoard_data[0]['period']) && $dashoard_data[0]['period'] == 'this_year' ){ echo 'selected';}?>><?php echo _l('this_year');?></option>
@@ -63,7 +65,7 @@
 				</div>
 			<?php }?>
 			<div class="col-md-12 " >
-					<h1><?php echo $title;?></h1>
+					
                 <?php render_dashboard_widgets('report-4'); ?>
             </div>
             <?php hooks()->do_action('after_dashboard'); ?>
@@ -141,7 +143,6 @@ if(!empty($summary)){
 		if(!empty($sum1['rows'])){ 
 			foreach($sum1['rows'] as $sum_row){
 				$report_page = $types[$i1];
-				
 				if($sum_row!='Average' && $sum_row!='Total'){
 					if($sum1['view_by'] == 'priority'){
 						if($sum1['summary_cls'][$i]['priority'] == '1'){
@@ -232,6 +233,9 @@ if(!empty($summary)){
 							data: {"labels":[<?php echo $req_label;?>],"datasets":[{"data":[<?php echo $req_data;?>],"backgroundColor":[<?php echo $req_color;?>],"label":"<?php echo _l('summary');?>"}]},
 							options: {
 								responsive:true,
+								legend: {
+									display: false
+								},
 								maintainAspectRatio:false,
 						   }
 					   });
@@ -244,17 +248,20 @@ if(!empty($summary)){
 							options:{
 								responsive:true,
 								maintainAspectRatio:false,
+								legend: {
+									display: false
+								},
 								scales: {
 									xAxes: [{
 									  scaleLabel: {
 										display: true,
-										labelString: '<?php echo _l($summary['view_by']);?>'
+										labelString: '<?php echo _l($sum1['view_by']);?>'
 									  }
 									}],
 									yAxes: [{
 									  scaleLabel: {
 										display: true,
-										labelString: '<?php echo $summary['sel_measure'];?>'
+										labelString: '<?php echo $sum1['sel_measure'];?>'
 									  }
 									}],
 								}
@@ -269,17 +276,20 @@ if(!empty($summary)){
 							options:{
 								responsive:true,
 								maintainAspectRatio:false,
+								legend: {
+									display: false
+								},
 								scales: {
 									yAxes: [{
 									  scaleLabel: {
 										display: true,
-										labelString: '<?php echo _l($summary['view_by']);?>'
+										labelString: '<?php echo _l($sum1['view_by']);?>'
 									  }
 									}],
 									xAxes: [{
 									  scaleLabel: {
 										display: true,
-										labelString: '<?php echo $summary['sel_measure'];?>'
+										labelString: '<?php echo $sum1['sel_measure'];?>'
 									  }
 									}]
 								}
@@ -295,6 +305,17 @@ if(!empty($summary)){
 }
 ?>
 <script>
+$( function() {
+	
+/*     $( ".check_widget" ).resizable({
+		start: function(event,ui){
+			console.info(ui);
+			$('.check_widget1').css('width', 'auto !important');
+			//$('.check_widget1').css('width', 'auto !important')
+		}
+	  
+	}); */
+  } );
 $( function() {
 	$("#update_public_name").submit(function(e) {
 		e.preventDefault(); // avoid to execute the actual submit of the form.
@@ -344,7 +365,6 @@ $( function() {
 	});
 	appDatepicker();
 });
-
 </script>
 </body>
 </html>

@@ -14,9 +14,9 @@
 		}
 		if(!isset($sorts1[$i1-1]) || $sorts1[$i1-1] != $sorts1[$i1]){
 ?>	
-			<div class="col-md-4" data-container="<?php echo $i2;?>">
+			<div class="col-md-3  check_widget1" data-container="<?php echo $i2;?>">
 		<?php }?>
-			<div class="widget<?php if(!is_staff_member() && empty($public)){echo ' hide';} ?>" id="<?php echo $dashboard_ids[$i1];?>" data-name="<?php echo _l('s_chart',_l('leads')); ?>">
+			<div class="check_widget widget padding-10 <?php if(!is_staff_member() && empty($public)){echo ' hide';} ?>" id="<?php echo $dashboard_ids[$i1];?>" data-name="<?php echo _l('s_chart',_l('leads')); ?>">
 			   <?php if(is_staff_member() || !empty($public)){ ?>
 					<div class="row">
 						<div class="col-md-12">
@@ -26,14 +26,21 @@
 									<div class="widget-dragger"></div>
 								<?php }?>
 									<p class="padding-5">
-										<?php echo $names[$i1].'('.$report_types[$i1].')'; ?>
+										<span title="<?php echo $names[$i1].' ('.$report_types[$i1].')'; ?>">
+											<?php 
+											if(strlen($names[$i1].' ('.$report_types[$i1].')')>22)
+												echo substr($names[$i1].' ('.$report_types[$i1].')',0,22).'...';
+											else
+												echo $names[$i1].' ('.$report_types[$i1].')';
+											?>
+										<span>
 										<?php if(empty($public)){?>
 											<a href="javascript:void(0);" class="a_padding" onclick="refresh_chart('chart_<?php echo $i1;?>','<?php echo $dashboard_ids[$i1];?>','<?php echo $tabs1[$i1];?>','<?php echo $tabs2[$i1];?>','<?php echo $i;?>')">
 												<i class="fa fa-refresh" aria-hidden="true"></i>
 											</a>
 										
 											<div class="inline-block label" style="color:black">
-												<div class="dropdown " style="position: absolute;top: 17px;right: 14%;">
+												<div class="dropdown " style="position: absolute;margin-top:-5px;right: 14%;">
 													<a href="javascript:void(0);" class="dropdown-toggle text-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" >
 														<span data-toggle="tooltip">
 															<?php echo _l('more');?> <i class="fa fa-caret-down" aria-hidden="true"></i>
@@ -56,37 +63,61 @@
 									<?php 
 									$cur_cnt = 1;$req_filter = '';$all_filters = array(); 
 									if(!empty($filters)){
-										echo '<p>';
+										echo '<p class="all_filters1">';
 										foreach($filters as $filter_1){
 									?>
 											<?php 
 											if($cur_cnt<=1){
-												$req_filter .= ' '._l($filter_1['filter_1']).' '._l($filter_1['filter_2']).' '._l($filter_1['filter_3']).',';
+												if(empty($dashoard_data[0]['period'])){
+													$req_filter .= ' '._l($filter_1['filter_1']).' '._l($filter_1['filter_2']).' '._l($filter_1['filter_3']).',';
+												}
+												else{
+													$req_filter .= ' '._l($filter_1['filter_1']).' '._l($dashoard_data[0]['period']).' '._l($dashoard_data[0]['date1']).' '._l($dashoard_data[0]['date2']).',';
+												}
 											}
-											$all_filters[] = ' '._l($filter_1['filter_1']).' '._l($filter_1['filter_2']).' '._l($filter_1['filter_3']).' '._l($filter_1['filter_4']).' '._l($filter_1['filter_5']);
+											if(check_activity_date($filter_1['filter_1'])){
+												if(empty($dashoard_data[0]['period'])){
+													$all_filters[] = ' '._l($filter_1['filter_1']).' '._l($filter_1['filter_2']).' '._l($filter_1['filter_3']).' '._l($filter_1['filter_4']).' '._l($filter_1['filter_5']);
+												}
+												else{
+													$all_filters[] = ' '._l($filter_1['filter_1']).' '._l($dashoard_data[0]['period']).' '._l($dashoard_data[0]['date1']).' '._l($dashoard_data[0]['date2']);
+												}
+											}
+											else{
+												$all_filters[] = ' '._l($filter_1['filter_1']).' '._l($filter_1['filter_2']).' '._l($filter_1['filter_3']);
+											}
 											$cur_cnt++;
-											
 										}
-										echo rtrim($req_filter,",");
+										?>
+										<div class="dropdown1 " style=" position: absolute;top: 8%;">
+										<a href="javascript:void(0)" class="dropdown-toggle text-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+											<span title="<?php echo rtrim($req_filter,",");?>">
+										<?php
+											if(strlen(rtrim($req_filter,","))>25){
+												echo substr(rtrim($req_filter,","),0,25).'...';
+											}
+											else
+												echo rtrim($req_filter,",");
+										?>
+											</span>
+										<?php
 										if(!empty($all_filters)){
 										?>
-											<div class="dropdown1 " style=" position: absolute;top: 8%; float: right;right: 15px;">
-												<a href="javascript:void(0)" class="dropdown-toggle text-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-												<?php echo _l('more');?>
-												</a>
-												<ul class="dropdown-menu dropdown-menu-right">
+											</a>
+												<ul class="dropdown-menu dropdown-menu-left">
 													<?php foreach($all_filters as $all_filter12){?>
 														<li class="drop_li"><?php echo $all_filter12;?></li>
 													<?php }?>
 												</ul>
-											</div>
+											
 										<?php }?>
+										</div>
 										</p>
 										<?php
 									}?>
 									<hr class="hr-panel-heading-dashboard" >
 									<div class="relative" style="height:490px;<?php if($tabs1[$i1] == 1){?>overflow:scroll;<?php }?>" id="div_<?php echo $dashboard_ids[$i1];?>">
-										<?php if($tabs1[$i1] == 3 && $tabs2[$i1] == 1){?>
+										<?php if($tabs1[$i1] == 3 && ($tabs2[$i1] == 0 || $tabs2[$i1] == 1)){?>
 											<canvas class="chart" height="250" id="report_pie_chart_<?php echo $i1;?>"></canvas>
 										<?php }else if($tabs1[$i1] == 3 && $tabs2[$i1] == 2){?>
 											<canvas class="chart" height="250" id="report_bar_chart_<?php echo $i1;?>"></canvas>
@@ -147,6 +178,9 @@ ul.dropdown-menu li:first-child{
 .drop_li{
 	white-space: nowrap;
     padding: 10px;
+}
+.all_filters1{
+	position:absolute;top:8%
 }
 </style>
 <script>
@@ -266,6 +300,9 @@ function refresh_chart(a,b,c,tab_id,cur_id){
 							data: {"labels":res.labels,"datasets":[{"data":res.data,"backgroundColor":res.color,"label":res.label}]},
 							options: {
 								responsive:true,
+								legend: {
+									display: false
+								},
 								maintainAspectRatio:false,
 						   }
 					   });
@@ -279,6 +316,9 @@ function refresh_chart(a,b,c,tab_id,cur_id){
 							data: {"labels":res.labels,"datasets":[{"data":res.data,"backgroundColor":res.color,"label":res.label}]},
 							options:{
 								responsive:true,
+								legend: {
+									display: false
+								},
 								maintainAspectRatio:false,
 								scales: {
 									xAxes: [{
@@ -306,6 +346,9 @@ function refresh_chart(a,b,c,tab_id,cur_id){
 							data: {"labels":res.labels,"datasets":[{"data":res.data,"backgroundColor":res.color,"label":res.label}]},
 							options:{
 								responsive:true,
+								legend: {
+									display: false
+								},
 								maintainAspectRatio:false,
 								scales: {
 									yAxes: [{
