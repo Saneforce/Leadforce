@@ -11,7 +11,7 @@ if($project->approved==0 && !$deal_rejected){
 if($project->approved==0 && $deal_rejected && get_staff_user_id() != $project->created_by){
    $can_user_edit =false;
 }
-
+$hasHIstory =$this->approval_model->hasHistory('projects',$project->id)?true:false;
 $hasApprovalFlow = $this->workflow_model->getflows('deal_approval',0,['service'=>'approval_level']);
 
 ?>
@@ -805,7 +805,7 @@ echo $items->table();
 
 <?php endif; ?>
 
-<?php if($hasApprovalFlow): ?>
+<?php if($hasApprovalFlow && ($hasHIstory || $project->approved ==0)): ?>
    <?php if($deal_rejected): ?>
       <?php approvalFlowTree($approval_history) ?>
       <?php $reopenedHistory =$this->approval_model->getReopenedHistory('projects',$project->id); ?>
