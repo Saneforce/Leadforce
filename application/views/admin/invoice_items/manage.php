@@ -59,7 +59,7 @@
                     <div class="modal-content">
                       <?php echo form_open_multipart(admin_url('settings/item_list_column'), array('id' => 'items_list_column')); ?>
                       <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel"><?php echo _l('clients_list_column'); ?></h5>
+                        <h5 class="modal-title" id="exampleModalLabel"><?php echo _l('items_list_column'); ?></h5>
                       </div>
                       <div class="modal-body">
                         <div class="form-group">
@@ -97,7 +97,7 @@
                 <!-- start particulars column order -->
                 <div class="btn-group pull-right mleft4 mbot25 btn-with-tooltip-group _filter_data" data-toggle="tooltip" data-title="<?php echo _l('particulars_items_list_column'); ?>">
                   <button type="button" class="btn btn-default" data-toggle="modal" data-target="#particulars_items_list_column_orderModal">
-                    <i class="fa fa-list" aria-hidden="true"></i>
+                    <i class="fa fa-money" aria-hidden="true"></i>
                   </button>
                 </div>
                 <!-- Modal -->
@@ -106,7 +106,7 @@
                     <div class="modal-content">
                       <?php echo form_open_multipart(admin_url('settings/particular_item_list_column'), array('id' => 'particulars_items_list_column')); ?>
                       <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel"><?php echo _l('clients_list_column'); ?></h5>
+                        <h5 class="modal-title" id="exampleModalLabel"><?php echo _l('particulars_items_list_column'); ?></h5>
                       </div>
                       <div class="modal-body">
                         <div class="form-group">
@@ -156,10 +156,6 @@
               if (isset($table_data_temp[$ckey])) {
                 $table_data[] = _l($table_data_temp[$ckey]['ll']);
               }
-            }
-            $cf = get_custom_fields('items');
-            foreach ($cf as $custom_field) {
-              array_push($table_data, $custom_field['name']);
             }
             render_datatable($table_data, 'invoice-items'); ?>
           </div>

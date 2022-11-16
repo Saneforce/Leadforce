@@ -618,7 +618,7 @@ class Leads extends AdminController
             $this->db->where('id', $data['leadid']);
             $this->db->update(db_prefix() . 'leads', ['project_id' => $deal_id, 'deleted_status' => 1]);
             
-            hooks()->do_action('after_add_project_approval', $deal_id);
+            // hooks()->do_action('after_add_project_approval', $deal_id);
         
             set_alert('success', _l('lead_to_client_base_converted_success'));
 

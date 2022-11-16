@@ -26,7 +26,7 @@ class App_items_table extends App_items_table_template
     public function items()
     {
         $html          = '';
-        $custom_fields = $this->get_custom_fields_for_table();
+        // $custom_fields = $this->get_custom_fields_for_table();
 
         $i = 1;
         foreach ($this->items as $item) {
@@ -66,9 +66,16 @@ class App_items_table extends App_items_table_template
             $CI = &get_instance();
             $CI->load->model('invoice_items_model');
             $details =$CI->invoice_items_model->get_particulars_ordered_details($item['productid']);
-            if($details){
-                foreach($details as $detail){
-                    $itemHTML .= '<td align="left">' . $detail . '</td>';
+            $particulars_items_list_column_order = (array)json_decode(get_option('particulars_items_list_column'));
+            if($particulars_items_list_column_order){
+                foreach($particulars_items_list_column_order as $key => $detail){
+                    if(isset($details->$key)){
+                        $itemHTML .= '<td align="left">' .$details->$key . '</td>';
+                    }
+                    else{
+                        $itemHTML .= '<td align="left"></td>';
+                    }
+                        
                 }
             }
             /**
@@ -81,7 +88,13 @@ class App_items_table extends App_items_table_template
             /**
              * Item quantity
              */
-            $itemHTML .= '<td align="right">' . floatVal($item['qty']);
+            if(isset($item['qty'])){
+                $itemHTML .= '<td align="right">' . floatVal($item['qty']);
+            }elseif(isset($item['quantity'])){
+                $itemHTML .= '<td align="right">' . floatVal($item['quantity']);
+            }else{
+                $itemHTML .= '<td align="right">';
+            }
 
             /**
              * Maybe item has added unit?
@@ -96,11 +109,21 @@ class App_items_table extends App_items_table_template
              * Item rate
              * @var string
              */
-            $rate = hooks()->apply_filters(
-                'item_preview_rate',
-                app_format_money($item['rate'], $this->transaction->currency_name, $this->exclude_currency()),
-                ['item' => $item, 'transaction' => $this->transaction]
-            );
+            if(isset($item['price'])){
+                $rate = hooks()->apply_filters(
+                    'item_preview_rate',
+                    app_format_money($item['price'], $this->transaction->currency_name, $this->exclude_currency()),
+                    ['item' => $item, 'transaction' => $this->transaction]
+                );
+            }elseif(isset($item['rate'])){
+                $rate = hooks()->apply_filters(
+                    'item_preview_rate',
+                    app_format_money($item['rate'], $this->transaction->currency_name, $this->exclude_currency()),
+                    ['item' => $item, 'transaction' => $this->transaction]
+                );
+            }else{
+                $rate =0;
+            }
 
             $itemHTML .= '<td align="right">' . $rate . '</td>';
 
@@ -185,10 +208,10 @@ class App_items_table extends App_items_table_template
         // If show item taxes is disabled in PDF we should increase the item width table heading
         $item_width = $this->show_tax_per_item() == 0 ? $item_width + 15 : $item_width;
 
-        $custom_fields_items = $this->get_custom_fields_for_table();
+        // $custom_fields_items = $this->get_custom_fields_for_table();
         // Calculate headings width, in case there are custom fields for items
         $total_headings = $this->show_tax_per_item() == 1 ? 4 : 3;
-        $total_headings += count($custom_fields_items);
+        // $total_headings += count($custom_fields_items);
         $headings_width = (100 - ($item_width + 6)) / $total_headings;
 
         $tblhtml = '<tr height="30" bgcolor="' . get_option('pdf_table_heading_color') . '" style="color:' . get_option('pdf_table_heading_text_color') . ';">';
@@ -196,9 +219,9 @@ class App_items_table extends App_items_table_template
         $tblhtml .= '<th width="5%;" align="center">' . $this->number_heading() . '</th>';
         $tblhtml .= '<th width="' . $item_width . '%" align="left">' . $this->item_heading() . '</th>';
 
-        foreach ($custom_fields_items as $cf) {
-            $tblhtml .= '<th width="' . $headings_width . '%" align="left">' . $cf['name'] . '</th>';
-        }
+        // foreach ($custom_fields_items as $cf) {
+        //     $tblhtml .= '<th width="' . $headings_width . '%" align="left">' . $cf['name'] . '</th>';
+        // }
 
         $tblhtml .= '<th width="' . $headings_width . '%" align="right">' . $this->qty_heading() . '</th>';
         $tblhtml .= '<th width="' . $headings_width . '%" align="right">' . $this->rate_heading() . '</th>';

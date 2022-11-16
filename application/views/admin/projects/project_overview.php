@@ -12,6 +12,8 @@ if($project->approved==0 && $deal_rejected && get_staff_user_id() != $project->c
    $can_user_edit =false;
 }
 
+$hasApprovalFlow = $this->workflow_model->getflows('deal_approval',0,['service'=>'approval_level']);
+
 ?>
 <style>
 .project-overview-left a[href="#"]{
@@ -348,10 +350,12 @@ if($project->approved==0 && $deal_rejected && get_staff_user_id() != $project->c
 				<div class="data_display" >
 					<?php echo $value; ?>
 					<?php if($field['type']!='link'){?>
+                  <?php if($can_user_edit ==true){ ?>
 						<button class="btn btn-link pull-right no-padding data_display_btn"
 					data-val="<?php echo $field['slug'];?>" >
 							<i class="fa fa-pencil"></i>
 						</button>
+					   <?php }?>
 					<?php }?>
 				</div>
 				<div class="data_edit" style=" display:none;">
@@ -631,6 +635,25 @@ if($project->approved==0 && $deal_rejected && get_staff_user_id() != $project->c
 </div>
 
 <?php }?>
+<hr class="hr-panel-heading project-area-separation">
+<p class="bold font-size-14 project-info">
+      <?php echo _l('items'); ?>
+</p>
+
+<?php if(!$dealproducts): ?>
+   <div class="clearfix"></div>
+   <p class="text-muted mtop10 no-mbot">No items added</p>
+<?php else: ?>
+<div class="table-responsive">
+<?php
+$project->items =$dealproducts;
+$items = get_items_table_data($project, 'estimate');
+echo $items->table();
+?>
+</div>
+<?php endif; ?>
+
+
 </div>
 <div class="col-md-6 project-overview-right">
 
@@ -779,8 +802,10 @@ if($project->approved==0 && $deal_rejected && get_staff_user_id() != $project->c
    <canvas id="timesheetsChart" style="max-height:300px;" width="300" height="300"></canvas>
 </div>
   -->
-</div>
-<?php else: ?>
+
+<?php endif; ?>
+
+<?php if($hasApprovalFlow): ?>
    <?php if($deal_rejected): ?>
       <?php approvalFlowTree($approval_history) ?>
       <?php $reopenedHistory =$this->approval_model->getReopenedHistory('projects',$project->id); ?>
@@ -888,6 +913,7 @@ if($project->approved==0 && $deal_rejected && get_staff_user_id() != $project->c
       <h3>Approval doesnot provided</h3>
    <?php endif; ?>
 <?php endif; ?>
+</div>
 </div>
 <div class="modal fade" id="add-edit-members" tabindex="-1" role="dialog">
    <div class="modal-dialog">

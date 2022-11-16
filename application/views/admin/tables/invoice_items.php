@@ -17,7 +17,8 @@ $aColumns_temp =array(
 $items_list_column_order = (array)json_decode(get_option('items_list_column'));
 if($items_list_column_order){
     foreach($items_list_column_order as $orderkey => $ordervalue){
-        $aColumns [] =$aColumns_temp[$orderkey];
+        if(isset($aColumns_temp[$orderkey]))
+            $aColumns [] =$aColumns_temp[$orderkey];
     }
 }
 $sIndexColumn = 'id';
@@ -39,6 +40,9 @@ $custom_fields = get_custom_fields('items');
 
 $locationCustomFields =[];
 foreach ($custom_fields as $key => $field) {
+
+    if(!isset($items_list_column_order[$field['slug']]))
+        continue;
     $selectAs = (is_cf_date($field) ? 'date_picker_cvalue_' . $key : 'cvalue_' . $key);
 
     if($field['type'] =='location'){

@@ -48,8 +48,8 @@ function workflow_deal_created_approval($deal_id)
     $CI->load->model('workflow_model');
     $approval_success =$CI->deal_approval_workflow->trigger($deal_id);
     if($approval_success ===true){
-        set_alert('success', _l('deal_created_sent_for_approval'));
-        redirect(admin_url('projects/index_list?approvalList=1'));
+        set_alert('success', _l('deal_sent_for_approval'));
+        redirect(admin_url('projects/view/'.$deal_id));
     }
     
 }

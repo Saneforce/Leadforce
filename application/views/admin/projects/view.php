@@ -9,6 +9,10 @@ if($project->approved==0){
 if($deal_rejected && get_staff_user_id() == $project->created_by){
    $can_user_edit =true;
 }
+
+$hasHIstory =$this->approval_model->hasHistory('projects',$project->id)?true:false;
+$hasApprovalFlow = $this->workflow_model->getflows('deal_approval',0,['service'=>'approval_level']);
+
 ?>
 <?php init_head(); ?>
 
@@ -81,6 +85,9 @@ if($deal_rejected && get_staff_user_id() == $project->created_by){
                      <?php
                      if(is_admin(get_staff_user_id()) || $project->teamleader == get_staff_user_id() || in_array(get_staff_user_id(),$ownerHierarchy) || (!empty($my_staffids) && in_array($project->teamleader,$my_staffids) && !in_array($project->teamleader,$viewIds))) { ?>
                         <div class="btn-group">
+                            <?php if($hasApprovalFlow && !$hasHIstory && $project->approved ==1): ?>
+                            <a href="<?php echo admin_url('projects/sendtoapproval/'.$project->id); ?>" style="" class="btn btn-info"><?php echo _l('send_to_approval'); ?></a>
+                            <?php endif; ?>
                             <?php if($deal_rejected && get_staff_user_id() == $project->created_by) { ?>
                                 <a href="<?php echo admin_url('projects/approvalReopen/'.$project->id); ?>" style="" class="btn btn-info"><?php echo _l('approval_reopen'); ?></a>
                             <?php } ?>
@@ -88,12 +95,14 @@ if($deal_rejected && get_staff_user_id() == $project->created_by){
                                 <a href="<?php echo admin_url('projects/restore_project/'.$project->id); ?>" style="" class="btn btn-info"><?php echo _l('restore'); ?></a>
                             <?php } else { ?>
 							<?php if($project->stage_of == 0 && $project->approved ==1){ ?>
+                            <?php if(!$hasApprovalFlow || $hasHIstory): ?>
 							<button type="button" class="btn btn-success" onclick="ch_deal_s_to('1')">
 								<?php echo _l('project-status-won'); ?>
 							</button>
 							<button type="button" class="btn btn-danger" onclick="ch_deal_s_to('2')">
 								<?php echo _l('project-status-loss'); ?>
 							</button>
+                            <?php endif; ?>
 							<?php }elseif($project->approved ==1){ ?>
 							<span class="btn ">
 							<span style="margin: 5px ; font-weight:bold;" class="label label-<?php echo ($project->stage_of == 1)?'success':'danger'; ?>"><?php echo _l('project-status-'.$project->stage_of); ?></span>

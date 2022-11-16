@@ -455,8 +455,7 @@ class Invoice_items_model extends App_Model
             $custom_fields = get_custom_fields('items');
             
             foreach ($custom_fields as $key => $field) {
-                $selectAs = (is_cf_date($field) ? 'date_picker_cvalue_' . $key : 'cvalue_' . $key);
-                $this->db->select('ctable_' . $key . '.value as ' . $selectAs);
+                $this->db->select('ctable_' . $key . '.value as ' . $field['slug']);
                 $this->db->join(db_prefix() . 'customfieldsvalues as ctable_' . $key,db_prefix() . 'items.id = ctable_' . $key . '.relid AND ctable_' . $key . '.fieldto="items_pr" AND ctable_' . $key . '.fieldid=' . $field['id'],'left');
             }
             if($selects){
