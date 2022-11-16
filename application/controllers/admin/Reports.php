@@ -1740,7 +1740,7 @@ class Reports extends AdminController
 	}
 	public function check_dashboard(){
 		extract($_POST);
-		$fields = 'sort1,sort2';
+		$fields = 'sort';
 		$condition = array('dashboard_id'=>$dashboard,'report_id'=>$report);
 		$this->db->select($fields);
 		$this->db->from(db_prefix().'dashboard');
@@ -1756,18 +1756,18 @@ class Reports extends AdminController
 	}
 	public function dashboard_report($report_id,$type,$tab1,$tab2,$dashboard_id){
 		$staff_id = get_staff_user_id();
-		$fields = 'sort1,sort2';
+		$fields = 'sort';
 		$condition = array('dashboard_id'=>$dashboard_id);
 		$this->db->select($fields);
 		$this->db->from(db_prefix().'dashboard');
 		$this->db->where($condition); 
-		$this->db->order_by('sort1 desc'); 
+		$this->db->order_by('sort desc'); 
 		$query = $this->db->get();
 		$res = $query->result_array();
 		$ins_dashboard = array();
 		if(!empty($res)){
-			$sort1 = $res[0]['sort1']+1;
-			$ins_dashboard['sort1']		=	$sort1;
+			$sort1 = $res[0]['sort']+1;
+			$ins_dashboard['sort']		=	$sort1;
 		}
 		$ins_dashboard['report_id']		=	$report_id;
 		$ins_dashboard['dashboard_id']	=	$dashboard_id;

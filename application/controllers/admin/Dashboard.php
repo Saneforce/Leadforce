@@ -196,7 +196,7 @@ class Dashboard extends AdminController
 		}
 		$all_staff_id = array_column($data['project_members'],'staff_id');
 		$staff_ids = implode(',',$all_staff_id);
-		$all_reports =  $this->db->query('SELECT d.id,d.staff_id,d.report_id,d.type,d.tab_1,d.tab_2,d.sort1,d.sort2,r.view_by,r.view_type,r.measure_by,r.report_name,r.date_range,r.report_type FROM '. db_prefix().'dashboard d,'. db_prefix().'report r  WHERE d.staff_id in ('.$staff_ids.') and r.id = d.report_id and d.dashboard_id = "'.$id.'" group by d.report_id order by d.sort1,d.sort2 asc')->result_array();
+		$all_reports =  $this->db->query('SELECT d.id,d.staff_id,d.report_id,d.type,d.tab_1,d.tab_2,d.sort,r.view_by,r.view_type,r.measure_by,r.report_name,r.date_range,r.report_type FROM '. db_prefix().'dashboard d,'. db_prefix().'report r  WHERE d.staff_id in ('.$staff_ids.') and r.id = d.report_id and d.dashboard_id = "'.$id.'" group by d.report_id order by d.sort asc')->result_array();
 		if(empty($all_reports)){
 			redirect(admin_url('dashboard/report'));
 			exit;
@@ -384,7 +384,10 @@ class Dashboard extends AdminController
 					foreach($p_arrays as $key=>$dashboard){
 						if(!empty($dashboard)){
 							$cond = array('id'=>$dashboard);
-							$upd_data = array('sort1'=>$p_key,'sort2'=>$key);
+							$req_sort = $p_key + (4*$key);
+							
+							
+							$upd_data = array('sort'=>$req_sort);
 							$this->db->update(db_prefix() . "dashboard", $upd_data, $cond);
 						}
 					}

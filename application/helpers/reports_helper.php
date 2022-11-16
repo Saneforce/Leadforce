@@ -387,7 +387,7 @@ function get_task_vals($fields,$fields1,$table,$qry_cond,$filters = array()){
 			}
 			$qry_cond = " where ".db_prefix()."tasks.id !='' ".$conds.$type_cond.$qry_cond;
 	 }else{
-			if(empty($type_cond) && !empty($filters)){
+			if(!empty($type_cond) ){
 				$conds = " AND " ;
 			}
 		  $qry_cond = " where ".db_prefix()."tasks.id !='' ".$conds.$type_cond;
@@ -1677,8 +1677,7 @@ function get_dashboard_report($all_reports,$staff_id,$staff_ids=''){
 			$data['names'][$i1]		=  $all_report1['report_name'];
 			$data['tabs2'][$i1] 	=  $all_report1['tab_2'];
 			$data['tabs1'][$i1] 	=  $all_report1['tab_1'];
-			$data['sorts1'][$i1] 	=  $all_report1['sort1'];
-			$data['sorts2'][$i1] 	=  $all_report1['sort2'];
+			$data['sorts'][$i1] 	=  $all_report1['sort'];
 			$view_by				=	$all_report1['view_by'];
 			$view_type				=	$all_report1['view_type'];
 			$measure_by				=	$all_report1['measure_by'];

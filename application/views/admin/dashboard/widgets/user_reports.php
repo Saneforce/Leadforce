@@ -1,22 +1,22 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php if(!empty($types)){
 	$i1 = $i2 =0;
-?>
-<?php 
 	foreach($types as $type1){ 
 		$report_id	=	$req_data[$i1]['id'];
 		$filters	=	get_report_filter($report_id);
-		if(!in_array($i2, $sorts1)){
-		?>
-			<div class="col-md-4" data-container="<?php echo $i2;?>"></div>
-		<?php 
-			$i2++;
+		//if(!isset($sorts1[$i1-1]) || $sorts1[$i1-1] != $sorts1[$i1]){
+		if($i2 != $sorts[$i1]){
+			for($i2;$i2 < $sorts[$i1];$i2++){
+			?>
+				<div class="col-md-3" data-container="<?php echo $i2;?>"></div>
+				
+			<?php
+			}
 		}
-		if(!isset($sorts1[$i1-1]) || $sorts1[$i1-1] != $sorts1[$i1]){
 ?>	
-			<div class="col-md-3  check_widget1" data-container="<?php echo $i2;?>">
-		<?php }?>
-			<div class="check_widget widget padding-10 <?php if(!is_staff_member() && empty($public)){echo ' hide';} ?>" id="<?php echo $dashboard_ids[$i1];?>" data-name="<?php echo _l('s_chart',_l('leads')); ?>">
+		<div class="col-md-3 check_widget" data-container="<?php echo $i2;?>">
+			
+			<div data-ids="<?php echo 'check_'.$i2;?>" class=" widget padding-10 <?php if(!is_staff_member() && empty($public)){echo ' hide';} ?>" id="<?php echo $dashboard_ids[$i1];?>" data-name="<?php echo _l('s_chart',_l('leads')); ?>">
 			   <?php if(is_staff_member() || !empty($public)){ ?>
 					<div class="row">
 						<div class="col-md-12">
@@ -26,7 +26,7 @@
 									<div class="widget-dragger"></div>
 								<?php }?>
 									<p class="padding-5">
-										<span title="<?php echo $names[$i1].' ('.$report_types[$i1].')'; ?>">
+										<span title="<?php echo $names[$i1].' ('.$report_types[$i1].')'; ?>" class="font_wieght_bold">
 											<?php 
 											if(strlen($names[$i1].' ('.$report_types[$i1].')')>22)
 												echo substr($names[$i1].' ('.$report_types[$i1].')',0,22).'...';
@@ -38,7 +38,6 @@
 											<a href="javascript:void(0);" class="a_padding" onclick="refresh_chart('chart_<?php echo $i1;?>','<?php echo $dashboard_ids[$i1];?>','<?php echo $tabs1[$i1];?>','<?php echo $tabs2[$i1];?>','<?php echo $i;?>')">
 												<i class="fa fa-refresh" aria-hidden="true"></i>
 											</a>
-										
 											<div class="inline-block label" style="color:black">
 												<div class="dropdown " style="position: absolute;margin-top:-5px;right: 14%;">
 													<a href="javascript:void(0);" class="dropdown-toggle text-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" >
@@ -65,6 +64,44 @@
 									if(!empty($filters)){
 										echo '<p class="all_filters1">';
 										foreach($filters as $filter_1){
+											if($type1 == 'activity'){
+												if($filter_1['filter_1'] == 'project_status' ){
+													$sql = " select name from ".db_prefix()."projects_status where id in(".$filter_1['filter_3'].")";
+													$query = $this->db->query($sql);
+													$status_results = $query->result_array();
+													if(!empty($status_results)){
+														$filter_1['filter_3'] = '';
+														foreach($status_results as $status_result1){
+															$filter_1['filter_3'] .= $status_result1['name'].',';
+														}
+														$filter_1['filter_3'] =  rtrim($filter_1['filter_3'],',');
+													}
+												}
+											}
+											if($filter_1['filter_1'] == 'project_currency' ){
+												$sql = " select name from ".db_prefix()."currencies where id in(".$filter_1['filter_3'].")";
+												$query = $this->db->query($sql);
+												$status_results = $query->result_array();
+												if(!empty($status_results)){
+													$filter_1['filter_3'] = '';
+													foreach($status_results as $status_result1){
+														$filter_1['filter_3'] .= $status_result1['name'].',';
+													}
+													$filter_1['filter_3'] =  rtrim($filter_1['filter_3'],',');
+												}
+											}
+											if($filter_1['filter_1']  == 'pipeline_id'){
+												$sql = " select name from ".db_prefix()."pipeline where id in(".$filter_1['filter_3'].")";
+												$query = $this->db->query($sql);
+												$status_results = $query->result_array();
+												if(!empty($status_results)){
+													$filter_1['filter_3'] = '';
+													foreach($status_results as $status_result1){
+														$filter_1['filter_3'] .= $status_result1['name'].',';
+													}
+													$filter_1['filter_3'] =  rtrim($filter_1['filter_3'],',');
+												}
+											}
 									?>
 											<?php 
 											if($cur_cnt<=1){
@@ -91,7 +128,7 @@
 										?>
 										<div class="dropdown1 " style=" position: absolute;top: 8%;">
 										<a href="javascript:void(0)" class="dropdown-toggle text-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-											<span title="<?php echo rtrim($req_filter,",");?>">
+											<span title="<?php echo rtrim($req_filter,",");?>" class="font_wieght_bold">
 										<?php
 											if(strlen(rtrim($req_filter,","))>25){
 												echo substr(rtrim($req_filter,","),0,25).'...';
@@ -135,10 +172,10 @@
 					</div>
 			   <?php } ?>
 			</div>
-		<?php if(!isset($sorts1[$i1+1]) || $sorts1[$i1+1] != $sorts1[$i1]){?>
+		<?php //if(!isset($sorts1[$i1+1]) || $sorts1[$i1+1] != $sorts1[$i1]){?>
 			</div> 
 		<?php $i2++;
-		}
+		//}
 		$i1++;		
 	}
 }else{
@@ -181,6 +218,12 @@ ul.dropdown-menu li:first-child{
 }
 .all_filters1{
 	position:absolute;top:8%
+}
+.font_wieght_bold{
+	font-weight:bold;
+}
+th.cur_thead{
+	font-weight:bold !important;
 }
 </style>
 <script>
