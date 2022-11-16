@@ -83,4 +83,11 @@ class Approval_model extends App_Model
         $this->db->insert(db_prefix().'approval_history',$data);
         return true;
     }
+
+    public function hasHistory($rel_type,$rel_id)
+    {
+        $this->db->where('rel_type',$rel_type);
+        $this->db->where('rel_id',$rel_id);
+        return $this->db->get(db_prefix().'approval_history')->result_object();
+    }
 }

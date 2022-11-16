@@ -4151,6 +4151,7 @@ $lang['rejected_projects']      =   "Rejected Deals";
 $lang['approval_reopen']      =     "Reopen";
 $lang['deal_approval_list']      =  "Deal approval list";
 $lang['deal_created_sent_for_approval']      =  "Deal created and sent for approval";
+$lang['deal_sent_for_approval']      =  "Deal sent for approval";
 # Deal Rejection Reasons
 $lang['new_DealRejectionReasons']				= 'New Deal Rejection Reasons';
 $lang['all_DealRejectionReasons']				= 'All Deal Rejection Reasons';
@@ -4173,6 +4174,7 @@ $lang['notification']			=	"Notification";
 $lang['system']			        =	"System";
 $lang['remarks']			    =	"Remarks";
 $lang['reason']			        =	"Reason";
+$lang['send_to_approval']			        =	"Send to approval";
 $lang['workflow_others_merge_fields']			        =	"Others";
 $lang['workflow_customer_merge_fields']			        =	"Customesr";
 $lang['workflow_invoice_merge_fields']			        =	"Invoices";

@@ -88,7 +88,13 @@ class App_items_table extends App_items_table_template
             /**
              * Item quantity
              */
-            $itemHTML .= '<td align="right">' . floatVal($item['qty']);
+            if(isset($item['qty'])){
+                $itemHTML .= '<td align="right">' . floatVal($item['qty']);
+            }elseif(isset($item['quantity'])){
+                $itemHTML .= '<td align="right">' . floatVal($item['quantity']);
+            }else{
+                $itemHTML .= '<td align="right">';
+            }
 
             /**
              * Maybe item has added unit?
@@ -103,11 +109,21 @@ class App_items_table extends App_items_table_template
              * Item rate
              * @var string
              */
-            $rate = hooks()->apply_filters(
-                'item_preview_rate',
-                app_format_money($item['rate'], $this->transaction->currency_name, $this->exclude_currency()),
-                ['item' => $item, 'transaction' => $this->transaction]
-            );
+            if(isset($item['price'])){
+                $rate = hooks()->apply_filters(
+                    'item_preview_rate',
+                    app_format_money($item['price'], $this->transaction->currency_name, $this->exclude_currency()),
+                    ['item' => $item, 'transaction' => $this->transaction]
+                );
+            }elseif(isset($item['rate'])){
+                $rate = hooks()->apply_filters(
+                    'item_preview_rate',
+                    app_format_money($item['rate'], $this->transaction->currency_name, $this->exclude_currency()),
+                    ['item' => $item, 'transaction' => $this->transaction]
+                );
+            }else{
+                $rate =0;
+            }
 
             $itemHTML .= '<td align="right">' . $rate . '</td>';
 

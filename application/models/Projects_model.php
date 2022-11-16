@@ -1316,7 +1316,7 @@ class Projects_model extends App_Model
                 $this->projects_model->add_primary_contacts($primary_contact, $insert_id);
             }
 
-            hooks()->do_action('after_add_project_approval', $insert_id);
+            // hooks()->do_action('after_add_project_approval', $insert_id);
             hooks()->do_action('after_add_project', $insert_id);
 
             log_activity('New Project Created [ID: ' . $insert_id . ']');

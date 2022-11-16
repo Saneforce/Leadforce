@@ -3958,4 +3958,13 @@ class Projects extends AdminController
         set_alert('success', 'Reopened Successfully');
         redirect(admin_url('projects/view/'.$deal_id));
     }
+
+    public function sendtoapproval($deal_id)
+    {
+        $this->load->model('approval_model');
+        $hasHistory =$this->approval_model->hasHistory('projects',$deal_id);
+        if(!$hasHistory){
+            hooks()->do_action('after_add_project_approval', $deal_id);
+        }
+    }
 }
