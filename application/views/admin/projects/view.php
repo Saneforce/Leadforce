@@ -85,7 +85,7 @@ $hasApprovalFlow = $this->workflow_model->getflows('deal_approval',0,['service'=
                      <?php
                      if(is_admin(get_staff_user_id()) || $project->teamleader == get_staff_user_id() || in_array(get_staff_user_id(),$ownerHierarchy) || (!empty($my_staffids) && in_array($project->teamleader,$my_staffids) && !in_array($project->teamleader,$viewIds))) { ?>
                         <div class="btn-group">
-                            <?php if($hasApprovalFlow && !$hasHIstory && $project->approved ==1): ?>
+                            <?php if($hasApprovalFlow && !$hasHIstory && $project->approved ==1 && $project->stage_of ==0): ?>
                             <a href="<?php echo admin_url('projects/sendtoapproval/'.$project->id); ?>" style="" class="btn btn-info"><?php echo _l('send_to_approval'); ?></a>
                             <?php endif; ?>
                             <?php if($deal_rejected && get_staff_user_id() == $project->created_by) { ?>
