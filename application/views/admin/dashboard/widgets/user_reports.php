@@ -8,15 +8,15 @@
 		if($i2 != $sorts[$i1]){
 			for($i2;$i2 < $sorts[$i1];$i2++){
 			?>
-				<div class="col-md-3" data-container="<?php echo $i2;?>"></div>
+				<div class="col-md-3 <?php echo 'check_'.$i2;?>" data-container="<?php echo $i2;?>"></div>
 				
 			<?php
 			}
 		}
 ?>	
-		<div class="col-md-3 check_widget" data-container="<?php echo $i2;?>">
+		<div class="col-md-3 <?php echo 'check_'.$i2;?> <?php if(!empty($width[$i1])){ echo 'rm_width';}?>" data-container="<?php echo $i2;?>" >
 			
-			<div data-ids="<?php echo 'check_'.$i2;?>" class=" widget padding-10 <?php if(!is_staff_member() && empty($public)){echo ' hide';} ?>" id="<?php echo $dashboard_ids[$i1];?>" data-name="<?php echo _l('s_chart',_l('leads')); ?>">
+			<div data-ids="<?php echo 'check_'.$i2;?>" class=" widget padding-10 check_widget <?php if(!is_staff_member() && empty($public)){echo ' hide';} ?>" id="<?php echo $dashboard_ids[$i1];?>" data-name="<?php echo _l('s_chart',_l('leads')); ?>" style="<?php if(!empty($width[$i1])){ echo 'width:'.$width[$i1].'px;';} if(!empty($height[$i1])){ echo 'height:'.$height[$i1].'px';}?>">
 			   <?php if(is_staff_member() || !empty($public)){ ?>
 					<div class="row">
 						<div class="col-md-12">
@@ -224,6 +224,9 @@ ul.dropdown-menu li:first-child{
 }
 th.cur_thead{
 	font-weight:bold !important;
+}
+.rm_width{
+	width:unset !important;
 }
 </style>
 <script>

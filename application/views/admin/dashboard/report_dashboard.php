@@ -11,7 +11,7 @@
 				<div class="col-md-12 " style="margin-bottom:10px;" >
 					<?php echo form_open(admin_url('dashboard/view/'.$id),array());?>
 						<div class="col-md-6">
-							<div class="col-md-3 <?php if(empty($dashoard_data[0]['period'])){ echo 'w_100';}?>" id="period"  style="margin-left:-13px;">
+							<div class="col-md-3 <?php if(empty($dashoard_data[0]['period'])){ echo 'w_100';}?>" id="period"  >
 								<select data-live-search="false" data-width="100%" class="ajax-search selectpicker" data-none-selected-text="Nothing selected" tabindex="-98" id="year" onchange="change_2_filter(this)" name="filter_1">
 									<option value=""><?php echo _l('select_period');?></option>
 									<option value="this_year" <?php if(!empty($dashoard_data[0]['period']) && $dashoard_data[0]['period'] == 'this_year' ){ echo 'selected';}?>><?php echo _l('this_year');?></option>
@@ -140,20 +140,28 @@ $this->load->view('admin/dashboard/report_dashboard_js',$req_data); ?>
 <script>
 $( function() {
 	
-   /*  $( ".check_widget" ).resizable({
+     $( ".check_widget" ).resizable({
 		start: function(event,ui){
 			var par_class = $(this).attr("data-ids");
-			console.log(par_class);
-			  $("."+par_class).addClass("rm_width");
-			$('.'+par_class).css('width', 'auto !important');
-			//$('.check_widget1').css('width', 'auto !important')
+			$("."+par_class).addClass("rm_width");
 		},
-		update: function(event, ui) {
-			//alert('23');
-			//console.info(ui.item.parent()[0]);
-		}
+		stop:function(event, ui){
+			var cur_id	  = $(this).attr("id");
+			var cur_width = ui.size.width;
+			var cur_height= ui.size.height;
+			var data = {id:cur_id,width:cur_width,height:cur_height};
+			$.ajax({
+				type: 'POST',
+				url: admin_url+"dashboard/update_size_widget",
+				data: data, 
+				success: function(data)
+				{
+				}
+			});
+		},
+		 minWidth:290
 	  
-	});  */
+	});  
   } );
 $( function() {
 	$("#update_public_name").submit(function(e) {
