@@ -216,7 +216,7 @@ class Clients_model extends App_Model {
         $this->db->insert(db_prefix() . 'clients', $data);
         $userid = $this->db->insert_id();
         if ($userid) {
-			$contact_data['userids'] = $userid;
+			$contact_data['userid'] = $userid;
 			
             if (isset($custom_fields)) {
                 $_custom_fields = $custom_fields;
