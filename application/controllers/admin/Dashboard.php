@@ -169,39 +169,41 @@ class Dashboard extends AdminController
 			$cond = array('staff_id'=>$staff_id,'dashboard_id'=>$id);
 			$this->db->where($cond);
 			$this->db->delete(db_prefix() . 'dashboard_filter');
-			
-			$ins_data = array();
-			$ins_data['staff_id']		=	$staff_id;
-			$ins_data['dashboard_id']	=	$id;
-			if(!empty($filter_1)){
-				$ins_data['period']		=	$filter_1;
-				if(!empty($filter_2))
-					$ins_data['date1']	=	date('Y-m-d',strtotime($filter_2));
-				if(!empty($filter_3))
-					$ins_data['date2']	=	date('Y-m-d',strtotime($filter_3));
+			if(!empty($filter_1) || !empty($filter_4) ){
+				$ins_data = array();
+				$ins_data['staff_id']		=	$staff_id;
+				$ins_data['dashboard_id']	=	$id;
+				if(!empty($filter_1)){
+					$ins_data['period']		=	$filter_1;
+					if(!empty($filter_2))
+						$ins_data['date1']	=	date('Y-m-d',strtotime($filter_2));
+					if(!empty($filter_3))
+						$ins_data['date2']	=	date('Y-m-d',strtotime($filter_3));
+				}
+				else{
+					$ins_data['period']		=	'';
+					$ins_data['date1']		=	'';
+					$ins_data['date2']		=	'';
+				}
+				if(!empty($filter_4))
+					$ins_data['member']		=	$filter_4;
+				else
+					$ins_data['member']		=	'';
+				$this->db->insert(db_prefix() . 'dashboard_filter', $ins_data);
 			}
-			else{
-				$ins_data['period']		=	'';
-				$ins_data['date1']		=	'';
-				$ins_data['date2']		=	'';
-			}
-			if(!empty($filter_4))
-				$ins_data['member']		=	$filter_4;
-			else
-				$ins_data['member']		=	'';
-			$this->db->insert(db_prefix() . 'dashboard_filter', $ins_data);
 			redirect(admin_url('dashboard/view/'.$id));
 			exit;
 		}
 		$all_staff_id = array_column($data['project_members'],'staff_id');
 		$staff_ids = implode(',',$all_staff_id);
-		$all_reports =  $this->db->query('SELECT d.id,d.staff_id,d.report_id,d.type,d.tab_1,d.tab_2,d.sort1,d.sort2,r.view_by,r.view_type,r.measure_by,r.report_name,r.date_range,r.report_type FROM '. db_prefix().'dashboard d,'. db_prefix().'report r  WHERE d.staff_id in ('.$staff_ids.') and r.id = d.report_id and d.dashboard_id = "'.$id.'" group by d.report_id order by d.sort1,d.sort2 asc')->result_array();
+		$all_reports =  $this->db->query('SELECT d.id,d.staff_id,d.report_id,d.type,d.tab_1,d.tab_2,d.sort,d.width,d.height,r.view_by,r.view_type,r.measure_by,r.report_name,r.date_range,r.report_type FROM '. db_prefix().'dashboard d,'. db_prefix().'report r  WHERE d.staff_id in ('.$staff_ids.') and r.id = d.report_id and d.dashboard_id = "'.$id.'" group by d.report_id order by d.sort asc')->result_array();
 		if(empty($all_reports)){
 			redirect(admin_url('dashboard/report'));
 			exit;
 		}
 		$staff_id = get_staff_user_id();
 		$data = get_dashboard_report($all_reports,$staff_id);
+		
 		$data['id'] = $id;
 		$data['public'] = '';
 		$data['project_members'] = $all_members;
@@ -211,7 +213,7 @@ class Dashboard extends AdminController
 	}
 	public function refresh_chart(){
 		extract($_REQUEST);
-		$all_reports =  $this->db->query('SELECT d.id,d.staff_id,d.report_id,d.type,d.tab_1,d.tab_2,d.sort1,d.sort2,r.view_by,r.view_type,r.measure_by,r.report_name,r.date_range,r.report_type FROM '. db_prefix().'dashboard d,'. db_prefix().'report r  WHERE d.id ="'.$dashboard_id.'" and r.id = d.report_id order by d.sort1,d.sort2 asc')->result_array();
+		$all_reports =  $this->db->query('SELECT d.id,d.staff_id,d.report_id,d.type,d.tab_1,d.tab_2,d.sort,d.width,d.height,r.view_by,r.view_type,r.measure_by,r.report_name,r.date_range,r.report_type FROM '. db_prefix().'dashboard d,'. db_prefix().'report r  WHERE d.id ="'.$dashboard_id.'" and r.id = d.report_id order by d.sort1,d.sort2 asc')->result_array();
 		$i1 = 0;
 		$staff_id = get_staff_user_id();
 		$data = get_dashboard_report($all_reports,$staff_id);
@@ -382,12 +384,23 @@ class Dashboard extends AdminController
 					foreach($p_arrays as $key=>$dashboard){
 						if(!empty($dashboard)){
 							$cond = array('id'=>$dashboard);
-							$upd_data = array('sort1'=>$p_key,'sort2'=>$key);
+							$req_sort = $p_key + (4*$key);
+							
+							
+							$upd_data = array('sort'=>$req_sort);
 							$this->db->update(db_prefix() . "dashboard", $upd_data, $cond);
 						}
 					}
 				}
 			}
+		}
+	}
+	public function update_size_widget(){
+		if(!empty($_POST)){
+			extract($_POST);
+			$cond = array('id'=>$id);
+			$upd_data = array('width'=>$width,'height'=>$height);
+			$this->db->update(db_prefix() . "dashboard", $upd_data, $cond);
 		}
 	}
 	public function public_link(){

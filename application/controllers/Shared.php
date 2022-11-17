@@ -59,8 +59,7 @@ class Shared extends App_Controller
 		$data['project_members'] =  $staffdetails;
 		$all_staff_id = array_column($data['project_members'],'staff_id');
 		$staff_ids = implode(',',$all_staff_id);
-		$all_reports =  $this->db->query('SELECT d.id,d.staff_id,d.report_id,d.type,d.tab_1,d.tab_2,d.sort1,d.sort2,r.view_by,r.view_type,r.measure_by,r.report_name,r.date_range,r.report_type FROM '. db_prefix().'dashboard d,'. db_prefix().'report r  WHERE d.staff_id in ('.$staff_ids.') and r.id = d.report_id and d.dashboard_id = "'.$links[0]['dashboard_id'].'" order by d.sort1,d.sort2 asc')->result_array();
-		
+		$all_reports =  $this->db->query('SELECT d.id,d.staff_id,d.report_id,d.type,d.tab_1,d.tab_2,d.sort,d.width,d.height,r.view_by,r.view_type,r.measure_by,r.report_name,r.date_range,r.report_type FROM '. db_prefix().'dashboard d,'. db_prefix().'report r  WHERE d.staff_id in ('.$staff_ids.') and r.id = d.report_id and d.dashboard_id = "'.$links[0]['dashboard_id'].'" order by d.sort asc')->result_array();
 		$data = get_dashboard_report($all_reports,$req_staff,$staff_ids);
 		$data['public'] = 'shared';
 		$data['title']  = $dashboard_report[0]['dashboard_name'];

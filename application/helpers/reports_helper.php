@@ -387,7 +387,7 @@ function get_task_vals($fields,$fields1,$table,$qry_cond,$filters = array()){
 			}
 			$qry_cond = " where ".db_prefix()."tasks.id !='' ".$conds.$type_cond.$qry_cond;
 	 }else{
-			if(empty($type_cond) && !empty($filters)){
+			if(!empty($type_cond) ){
 				$conds = " AND " ;
 			}
 		  $qry_cond = " where ".db_prefix()."tasks.id !='' ".$conds.$type_cond;
@@ -1411,11 +1411,10 @@ function deal_performance_summary($filters,$view_by='',$view_type='',$date_range
 							$qry_cond   = " and id in(".$cur_projects.")";
 						}
 						else{
-							$qry_cond   = " and id =''";
+							//$qry_cond   = " and id =''";
 						}
 						$cur_row    = ($month1).' '.$cur_year;
 						$sum_data[$i]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);
-						
 						$i++;
 						$j++;
 					}
@@ -1480,7 +1479,7 @@ function deal_performance_summary($filters,$view_by='',$view_type='',$date_range
 									$qry_cond   .= " and id in(".$cur_projects.")";
 								}
 								else{
-									$qry_cond   .= " and id=''";
+									//$qry_cond   .= " and id=''";
 								}
 							}
 							$own	=	$own + $sum_data[$m-1]['own'];
@@ -1508,7 +1507,7 @@ function deal_performance_summary($filters,$view_by='',$view_type='',$date_range
 									$qry_cond   .= " and id in(".$cur_projects.")";
 								}
 								else{
-									$qry_cond   .= " and id=''";
+									//$qry_cond   .= " and id=''";
 								}
 							}
 							$cur_row    = 'W'.($m+1).' '.$cur_year;
@@ -1543,7 +1542,7 @@ function deal_performance_summary($filters,$view_by='',$view_type='',$date_range
 										$qry_cond   = " and id in(".$cur_projects.")";
 									}
 									else{
-										$qry_cond   = " and id=''";
+										//$qry_cond   = " and id=''";
 									}
 								}
 								$cur_row    = 'W'.($m+1).' '.$cur_year;
@@ -1589,7 +1588,7 @@ function deal_performance_summary($filters,$view_by='',$view_type='',$date_range
 						$qry_cond   = " and id in(".$cur_projects.")";
 					}
 					else{
-						$qry_cond   = " and id=''";
+						//$qry_cond   = " and id=''";
 					}
 				}
 				$cur_row    = 'Q'.($i+1).' '.$cur_year;
@@ -1622,7 +1621,7 @@ function deal_performance_summary($filters,$view_by='',$view_type='',$date_range
 						$qry_cond   = " and id in(".$cur_projects.")";
 					}
 					else{
-						$qry_cond   = " and id=''";
+						//$qry_cond   = " and id=''";
 					}
 			}
 			$sum_data[$i]	= date_summary($qry_cond,$cur_year,$data['sel_measure'],$view_by,$filters);
@@ -1678,14 +1677,15 @@ function get_dashboard_report($all_reports,$staff_id,$staff_ids=''){
 			$data['names'][$i1]		=  $all_report1['report_name'];
 			$data['tabs2'][$i1] 	=  $all_report1['tab_2'];
 			$data['tabs1'][$i1] 	=  $all_report1['tab_1'];
-			$data['sorts1'][$i1] 	=  $all_report1['sort1'];
-			$data['sorts2'][$i1] 	=  $all_report1['sort2'];
+			$data['sorts'][$i1] 	=  $all_report1['sort'];
+			$data['width'][$i1] 	=  $all_report1['width'];
+			$data['height'][$i1] 	=  $all_report1['height'];
 			$view_by				=	$all_report1['view_by'];
 			$view_type				=	$all_report1['view_type'];
 			$measure_by				=	$all_report1['measure_by'];
 			$date_range 			=	$all_report1['date_range'];
 			$data['dashboard_ids'][$i1] 	=  $all_report1['id'];
-			$data['report_types'][$i1]		=  $all_report1['type'];
+			$data['report_types'][$i1]		=  $all_report1['report_type'];
 			$data['req_data'][$i1] 	= $req_data = get_edit_report_data($all_report1['type'],$all_report1['report_id'],$staff_id);
 			if($all_report1['type'] == 'deal'){
 				if(!empty($data['dashoard_data'])){
@@ -1706,21 +1706,38 @@ function get_dashboard_report($all_reports,$staff_id,$staff_ids=''){
 					}
 					foreach($req_arrs as $req_arr_1){
 						if (in_array($req_arr_1, $req_data['filters'])){
-							$req_data['filters'][$j]	=	$req_arr_1;
-							$req_data['filters1'][$j]	=	'is';
+							 $cur_key = array_search ($req_arr_1, $req_data['filters']);
+							$req_data['filters'][$cur_key]	=	$req_arr_1;
+							$req_data['filters1'][$cur_key]	=	'is';
 							if($req_arr_1 == 'teamleader_name' || $req_arr_1 == 'members' || $req_arr_1 == 'modified_by' || $req_arr_1 == 'created_by'){
-								$req_data['filters2'][$j]	=	$data['dashoard_data'][0]['member'];
+								//$req_data['filters2'][$j]	=	$data['dashoard_data'][0]['member'];
 							}
 							else{
-								$req_data['filters2'][$j]	=	$data['dashoard_data'][0]['period'];
-									$req_data['filters3'][$j]	=	date('d-m-Y',strtotime($data['dashoard_data'][0]['date1']));
-									$req_data['filters4'][$j]	=	date('d-m-Y',strtotime($data['dashoard_data'][0]['date2']));
+								$req_data['filters2'][$cur_key]	=	$data['dashoard_data'][0]['period'];
+								$req_data['filters3'][$cur_key]	=	date('d-m-Y',strtotime($data['dashoard_data'][0]['date1']));
+								$req_data['filters4'][$cur_key]	=	date('d-m-Y',strtotime($data['dashoard_data'][0]['date2']));
 							}
+							//$j++;
+						}
+						if(!empty($data['dashoard_data'][0]['member'])){
+							$req_data['filters'][$j]	=	'teamleader_name';
+							$req_data['filters1'][$j]	=	'is';
+							$req_data['filters2'][$j]	=	$data['dashoard_data'][0]['member'];
 							$j++;
 						}
 					}
 				}
-				$req_data = array_unique($req_data);
+				$i2 = 0;
+				foreach($req_data['filters'] as $filter_12){
+					if(empty($req_data['filters2'][$i2]) || (check_activity_date($filter_12) && ( empty($req_data['filters3'][$i2]) || empty($req_data['filters4'][$i2]) ) )){
+						unset($req_data['filters'][$i2]);
+						unset($req_data['filters1'][$i2]);
+						unset($req_data['filters2'][$i2]);
+						unset($req_data['filters3'][$i2]);
+						unset($req_data['filters4'][$i2]);
+					}
+					$i2++;
+				}
 				$data['summary'][$i1] = deal_performance_summary($req_data,$view_by,$view_type,$date_range,$measure_by,$staff_ids);
 			}
 			else{
@@ -1757,7 +1774,17 @@ function get_dashboard_report($all_reports,$staff_id,$staff_ids=''){
 						}
 					}
 				}
-				$req_data = array_unique($req_data);
+				$i2 = 0;
+				 foreach($req_data['filters'] as $filter_12){
+					if(empty($req_data['filters2'][$i2]) || (check_activity_date($filter_12) && ( empty($req_data['filters3'][$i2]) || empty($req_data['filters4'][$i2]) ) )){
+						unset($req_data['filters'][$i2]);
+						unset($req_data['filters1'][$i2]);
+						unset($req_data['filters2'][$i2]);
+						unset($req_data['filters3'][$i2]);
+						unset($req_data['filters4'][$i2]);
+					}
+					$i2++;
+				}
 				$data['summary'][$i1] = activity_performance_summary($req_data,$view_by,$view_type,$date_range,$measure_by,$staff_ids);
 			}
 			$i1++;

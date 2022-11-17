@@ -1349,10 +1349,11 @@ function activity_performance_summary($filters,$view_by='',$view_type='',$date_r
 	if($data['view_type'] != 'date'){
 		$fields   = get_task_table_fields($view_by);
 		if(empty($fields['qry_cond']) && !empty($staff_ids)){
+			$fields['tables'] .= " ,".db_prefix()."task_assigned ta1 ";
 			$fields['qry_cond'] = "((ta1.taskid = ".db_prefix()."tasks.id and ta1.staffid in(" . $staff_ids . ") ) or (".db_prefix()."tasks.rel_id IN(SELECT ".db_prefix()."projects.id FROM ". db_prefix()."projects join ".db_prefix()."project_members  on ".db_prefix()."project_members.project_id = " .db_prefix()."projects.id WHERE ".db_prefix()."project_members.staff_id in (". $staff_ids."))))";
 		}
 		else if(!empty($fields['qry_cond']) && !empty($staff_ids)){
-			
+			$fields['tables'] .= " ,".db_prefix()."task_assigned ta1 ";
 			$fields['qry_cond'] = "((ta1.taskid = ".db_prefix()."tasks.id and ta1.staffid in(" . $staff_ids . ") ) or (".db_prefix()."tasks.rel_id IN(SELECT ".db_prefix()."projects.id FROM ". db_prefix()."projects join ".db_prefix()."project_members  on ".db_prefix()."project_members.project_id = " .db_prefix()."projects.id WHERE ".db_prefix()."project_members.staff_id in (". $staff_ids.")))) and ".$fields['qry_cond'];
 		}
 		$sum_data = summary_val($fields['tables'],$fields['fields'],$fields['qry_cond'],$data['sel_measure'],$view_by,$fields['cur_rows'],$filters,'activity');
@@ -1389,7 +1390,7 @@ function activity_performance_summary($filters,$view_by='',$view_type='',$date_r
 							$qry_cond   = " ".db_prefix()."tasks.id in(".$cur_projects.")";
 						}
 						else{
-							$qry_cond   = " ".db_prefix()."tasks.id =''";
+							//$qry_cond   = " ".db_prefix()."tasks.id =''";
 						}
 						$cur_row    = ($month1).' '.$cur_year;
 						$sum_data[$i]	= date_summary($qry_cond,$cur_row,$data['sel_measure'],$view_by,$filters);
@@ -1459,7 +1460,7 @@ function activity_performance_summary($filters,$view_by='',$view_type='',$date_r
 									$qry_cond   .= " ".db_prefix()."tasks.id in(".$cur_projects.")";
 								}
 								else{
-									$qry_cond   .= " and ".db_prefix()."tasks.id=''";
+									//$qry_cond   .= " and ".db_prefix()."tasks.id=''";
 								}
 							}
 							$upcoming	=	$upcoming + $sum_data[$m-1]['upcoming'];
@@ -1490,7 +1491,7 @@ function activity_performance_summary($filters,$view_by='',$view_type='',$date_r
 									$qry_cond   .= " and ".db_prefix()."tasks.id in(".$cur_projects.")";
 								}
 								else{
-									$qry_cond   .= " and ".db_prefix()."tasks.id=''";
+									//$qry_cond   .= " and ".db_prefix()."tasks.id=''";
 								}
 							}
 							$cur_row    = 'W'.($m+1).' '.$cur_year;
@@ -1519,7 +1520,7 @@ function activity_performance_summary($filters,$view_by='',$view_type='',$date_r
 										$qry_cond   = " ".db_prefix()."tasks.id in(".$cur_projects.")";
 									}
 									else{
-										$qry_cond   = " ".db_prefix()."tasks.id=''";
+										//$qry_cond   = " ".db_prefix()."tasks.id=''";
 									}
 								}
 								$cur_row    = 'W'.($m+1).' '.$cur_year;
@@ -1573,7 +1574,7 @@ function activity_performance_summary($filters,$view_by='',$view_type='',$date_r
 						$qry_cond   = " ".db_prefix()."tasks.id in(".$cur_projects.")";
 					}
 					else{
-						$qry_cond   = " ".db_prefix()."tasks.id=''";
+						//$qry_cond   = " ".db_prefix()."tasks.id=''";
 					}
 				}
 				$cur_row    = 'Q'.($i+1).' '.$cur_year;
@@ -1609,7 +1610,7 @@ function activity_performance_summary($filters,$view_by='',$view_type='',$date_r
 						$qry_cond   = " ".db_prefix()."tasks.id in(".$cur_projects.")";
 					}
 					else{
-						$qry_cond   = " id=''";
+						//$qry_cond   = " id=''";
 					}
 			}
 			$sum_data[$i]	= date_summary($qry_cond,$cur_year,$data['sel_measure'],$view_by,$filters);

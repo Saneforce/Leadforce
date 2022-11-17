@@ -3,13 +3,15 @@
 <div id="wrapper">
     <div class="content">
         <div class="row">
-		
+			<div class="col-md-12">
+				<h1><?php echo $title;?></h1>
+			</div>
             <?php hooks()->do_action('after_dashboard_half_container'); ?>
 			<?php  if(!empty($types)){?>
 				<div class="col-md-12 " style="margin-bottom:10px;" >
 					<?php echo form_open(admin_url('dashboard/view/'.$id),array());?>
 						<div class="col-md-6">
-							<div class="col-md-3 <?php if(empty($dashoard_data[0]['period'])){ echo 'w_100';}?>" id="period">
+							<div class="col-md-3 <?php if(empty($dashoard_data[0]['period'])){ echo 'w_100';}?>" id="period"  >
 								<select data-live-search="false" data-width="100%" class="ajax-search selectpicker" data-none-selected-text="Nothing selected" tabindex="-98" id="year" onchange="change_2_filter(this)" name="filter_1">
 									<option value=""><?php echo _l('select_period');?></option>
 									<option value="this_year" <?php if(!empty($dashoard_data[0]['period']) && $dashoard_data[0]['period'] == 'this_year' ){ echo 'selected';}?>><?php echo _l('this_year');?></option>
@@ -63,7 +65,7 @@
 				</div>
 			<?php }?>
 			<div class="col-md-12 " >
-					<h1><?php echo $title;?></h1>
+					
                 <?php render_dashboard_widgets('report-4'); ?>
             </div>
             <?php hooks()->do_action('after_dashboard'); ?>
@@ -132,169 +134,35 @@
 </div>
 <?php init_tail(); ?>
 <?php $this->load->view('admin/dashboard/dashboard_js'); ?>
-<?php
-$i1 = 0;
-if(!empty($summary)){
-	foreach($summary as $sum1){
-		$req_label = $req_data = $req_color = '';
-		$i = 0;
-		if(!empty($sum1['rows'])){ 
-			foreach($sum1['rows'] as $sum_row){
-				$report_page = $types[$i1];
-				
-				if($sum_row!='Average' && $sum_row!='Total'){
-					if($sum1['view_by'] == 'priority'){
-						if($sum1['summary_cls'][$i]['priority'] == '1'){
-							$req_label .= '"'._l('task_priority_low').'",';
-						}
-						else if($sum1['summary_cls'][$i]['priority'] == '2'){
-							$req_label .= '"'._l('task_priority_medium').'",';
-						}
-						else if($sum1['summary_cls'][$i]['priority'] == '3'){
-							$req_label .= '"'._l('task_priority_high').'",';
-						}
-						else if($sum1['summary_cls'][$i]['priority'] == '4'){
-							$req_label .= '"'._l('task_priority_urgent').'",';
-						}
-						else{
-							$req_label .= '"'.$sum_row.'",';
-						}
-					}
-					else if($sum1['view_by'] == 'project_status'){
-						if($sum_row == '0'){
-							$req_label .= '"'.  _l('proposal_status_open').'",';
-						}
-						else if($sum_row == '1'){
-							$req_label .= '"'. _l('project-status-won').'",';
-						}
-						else if($sum_row == '2'){
-							$req_label .= '"'. _l('project-status-loss').'",';
-						}
-						else{
-							$req_label .= '"'.$sum_row.'",';
-						}
-					}
-					else if($report_page == 'activity' && $sum1['view_by'] == 'status'){
-						if($sum_row == '1'){
-							$req_label .= '"'. _l('task_status_1').'",';
-						}
-						else if($sum_row == '2'){
-							$req_label .= '"'.  _l('task_status_2').'",';
-						}
-						else if($sum_row == '3'){
-							$req_label .= '"'.  _l('task_status_3').'",';
-						}
-						else if($sum_row == '4'){
-							$req_label .= '"'.  _l('task_status_4').'",';
-						}
-						else if($sum_row == '5'){
-							$req_label .= '"'.  _l('task_status_5').'",';
-						}
-					}
-					else{
-						$req_label .= '"'.$sum_row.'",';
-					}
-					if($report_page == 'deal'){
-						if(!empty($sum1['summary_cls'][$i]['total_cnt_deal']))
-							$req_data .= '"'.$sum1['summary_cls'][$i]['total_cnt_deal'].'",';
-						else
-							$req_data .= '"0",';
-					}
-					else{
-						if(!empty($sum1['summary_cls'][$i]['total_val_task']))						
-							$req_data .= '"'.$sum1['summary_cls'][$i]['total_val_task'].'",';
-						else
-							$req_data .= '"0",';
-					}
-					if($report_page != 'activity' && $sum1['view_by'] == 'status'){
-						$this->db->select('color');
-						$this->db->where('name', $sum_row);
-						$progress =  $this->db->get(db_prefix() . 'projects_status')->row();
-						$req_color .= '"'.$progress->color.'",';
-					}
-					else{
-						$req_color .= '"'.random_color().'",';
-					}
-				}
-				$i++;
-			}
-			$req_label	= rtrim($req_label,',');
-			$req_data	= rtrim($req_data,',');
-			$req_color	= rtrim($req_color,',');
-			
-			?>
-				<script>
-				$(function() {
-					var pie_chart = $('#report_pie_chart_<?php echo $i1;?>');
-					if(pie_chart.length > 0){
-						 new Chart(pie_chart, {
-							type: 'pie',
-							data: {"labels":[<?php echo $req_label;?>],"datasets":[{"data":[<?php echo $req_data;?>],"backgroundColor":[<?php echo $req_color;?>],"label":"<?php echo _l('summary');?>"}]},
-							options: {
-								responsive:true,
-								maintainAspectRatio:false,
-						   }
-					   });
-					}
-					var bar_chart = $('#report_bar_chart_<?php echo $i1;?>');
-					if(bar_chart.length > 0){
-						new Chart(bar_chart, {
-							type: 'bar',
-							data: {"labels":[<?php echo $req_label;?>],"datasets":[{"data":[<?php echo $req_data;?>],"backgroundColor":[<?php echo $req_color;?>],"label":"<?php echo _l('summary');?>"}]},
-							options:{
-								responsive:true,
-								maintainAspectRatio:false,
-								scales: {
-									xAxes: [{
-									  scaleLabel: {
-										display: true,
-										labelString: '<?php echo _l($summary['view_by']);?>'
-									  }
-									}],
-									yAxes: [{
-									  scaleLabel: {
-										display: true,
-										labelString: '<?php echo $summary['sel_measure'];?>'
-									  }
-									}],
-								}
-							}
-						});
-					}
-					var horizontalBar = $('#report_horizontal_chart_<?php echo $i1;?>');
-					if(horizontalBar.length > 0){
-						new Chart(horizontalBar, {
-							type: 'horizontalBar',
-							data: {"labels":[<?php echo $req_label;?>],"datasets":[{"data":[<?php echo $req_data;?>],"backgroundColor":[<?php echo $req_color;?>],"label":"<?php echo _l('summary');?>"}]},
-							options:{
-								responsive:true,
-								maintainAspectRatio:false,
-								scales: {
-									yAxes: [{
-									  scaleLabel: {
-										display: true,
-										labelString: '<?php echo _l($summary['view_by']);?>'
-									  }
-									}],
-									xAxes: [{
-									  scaleLabel: {
-										display: true,
-										labelString: '<?php echo $summary['sel_measure'];?>'
-									  }
-									}]
-								}
-							}
-						});
-					}
-				});
-				</script>
-			<?php 
-		}
-		$i1++;
-	}
-}
-?>
+<?php 
+$req_data['summary'] = $summary;
+$this->load->view('admin/dashboard/report_dashboard_js',$req_data); ?>
 <script>
+$( function() {
+	
+     $( ".check_widget" ).resizable({
+		start: function(event,ui){
+			var par_class = $(this).attr("data-ids");
+			$("."+par_class).addClass("rm_width");
+		},
+		stop:function(event, ui){
+			var cur_id	  = $(this).attr("id");
+			var cur_width = ui.size.width;
+			var cur_height= ui.size.height;
+			var data = {id:cur_id,width:cur_width,height:cur_height};
+			$.ajax({
+				type: 'POST',
+				url: admin_url+"dashboard/update_size_widget",
+				data: data, 
+				success: function(data)
+				{
+				}
+			});
+		},
+		 minWidth:290
+	  
+	});  
+  } );
 $( function() {
 	$("#update_public_name").submit(function(e) {
 		e.preventDefault(); // avoid to execute the actual submit of the form.
@@ -344,7 +212,6 @@ $( function() {
 	});
 	appDatepicker();
 });
-
 </script>
 </body>
 </html>

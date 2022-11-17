@@ -17,7 +17,7 @@
 				forcePlaceholderSize: true,
 				placeholder: 'placeholder-dashboard-widgets',
 				start:function(event,ui) {
-					$("body,#wrapper").addClass('noscroll');
+					//$("body,#wrapper").addClass('noscroll');
 					$('body').find('[data-container]').css('min-height','20px');
 				},
 				stop:function(event,ui) {

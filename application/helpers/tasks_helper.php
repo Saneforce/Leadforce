@@ -2852,10 +2852,10 @@ function task_count_cond(){
 	}
 	if(!empty($in_cond)){
 		$in_cond= rtrim($in_cond, ',');
-		if(!empty($where_cond))
+		//if(!empty($where_cond))
 			$where_cond .= " and ".db_prefix()."tasks.status in(".$in_cond.") ";
-		else
-			$where_cond  = " where ".db_prefix()."tasks.status in(".$in_cond.") ";
+		/* else
+			$where_cond  = " and ".db_prefix()."tasks.status in(".$in_cond.") "; */
 	}
 	$cond	= array('taskid!='=>'0');
 	$CI->db->select('staffid');

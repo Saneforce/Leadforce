@@ -206,15 +206,18 @@ class Clients_model extends App_Model {
 			if(!empty($data['staffmail'])){
 				$this->db->where('email', $data['staffmail']);
 				$cur_staff = $this->db->get(db_prefix() . 'staff')->row();
-				if(!empty($cur_staff->staffid))
+				if(!empty($cur_staff->staffid)){
 					$data['addedfrom'] = $cur_staff->staffid;
+					$contact_data['addedfrom'] = $data['addedfrom'];
+				}
 			}
 			unset($data['staffmail']);
 		}
         $this->db->insert(db_prefix() . 'clients', $data);
         $userid = $this->db->insert_id();
         if ($userid) {
-			$contact_data['userids'] = $userid;
+			$contact_data['userid'] = $userid;
+			
             if (isset($custom_fields)) {
                 $_custom_fields = $custom_fields;
                 // Possible request from the register area with 2 types of custom fields for contact and for comapny/customer

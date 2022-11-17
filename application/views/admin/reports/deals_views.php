@@ -473,6 +473,10 @@ $(function() {
 			data: {"labels":[<?php echo $req_label;?>],"datasets":[{"data":[<?php echo $req_data;?>],"backgroundColor":[<?php echo $req_color;?>],"label":"<?php echo _l('summary');?>"}]},
 			options: {
 				responsive:true,
+				showInLegend:true,
+				legend: {
+					display: false
+				},
 				maintainAspectRatio:false,
 		   }
 	   });
@@ -484,6 +488,9 @@ $(function() {
 			data: {"labels":[<?php echo $req_label;?>],"datasets":[{"data":[<?php echo $req_data;?>],"backgroundColor":[<?php echo $req_color;?>],"label":"<?php echo _l('summary');?>"}]},
 			options:{
 				responsive:true,
+				legend: {
+					display: false
+				},
 				maintainAspectRatio:false,
 				scales: {
 					xAxes: [{
@@ -509,6 +516,9 @@ $(function() {
 			data: {"labels":[<?php echo $req_label;?>],"datasets":[{"data":[<?php echo $req_data;?>],"backgroundColor":[<?php echo $req_color;?>],"label":"<?php echo _l('summary');?>"}]},
 			options:{
 				responsive:true,
+				legend: {
+					display: false
+				},
 				maintainAspectRatio:false,
 				scales: {
 					yAxes: [{

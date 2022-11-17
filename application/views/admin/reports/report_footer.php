@@ -597,8 +597,8 @@ function add_filter(){
 				 $('#filter_option_'+i).selectpicker('refresh');
 				 $('#filter_'+i).selectpicker('refresh');
 				 $('#end_date_edit_'+i).datepicker({
-					 dateFormat:'dd-mm-yy',
-					 calendarWeeks: true,
+					dateFormat:'dd-mm-yy',
+					calendarWeeks: true,
 					autoclose: true,
 					changeMonth: true,
 					changeYear: true,
@@ -609,13 +609,13 @@ function add_filter(){
 					}
 				});
 				$('#start_date_edit_'+i).datepicker({
-					 dateFormat:'dd-mm-yy',
-					   timepicker: false,
-					   calendarWeeks: true,
-					  changeMonth: true,
-					  changeYear: true,
+					dateFormat:'dd-mm-yy',
+					timepicker: false,
+					calendarWeeks: true,
+					changeMonth: true,
+					changeYear: true,
 					todayHighlight: true,
-					  onSelect: function(selectedDate) {
+					onSelect: function(selectedDate) {
 						$('#end_date_edit_'+i).datepicker('option', 'minDate', selectedDate);
 						$('#year_'+i).val('custom_period');
 						$('#year_'+i).selectpicker('refresh');
@@ -624,9 +624,7 @@ function add_filter(){
 				appDatepicker();
 				var a1 = 'filter_'+i;
 				var b1 = $('#filter_'+i).val();
-				
 				change_filter1(a1,b1);
-				
 				document.getElementById('overlay_deal').style.display = 'none';
 			 }
 		},
@@ -893,12 +891,12 @@ function tab_summary(a){
 }
 function tab_summary_1(a){
 	$('#filter_tab').val(3);
-	$('#cur_tab_1').val(3);
-	$('#cur_tab_2').val(a);
+	$('.cur_tab_1').val(3);
+	$('.cur_tab_2').val(a);
 }
 function update_report(report_url){
-	var tab1 = $('#cur_tab_1').val();
-	var tab2 = $('#cur_tab_2').val();
+	var tab1 = $('.cur_tab_1').val();
+	var tab2 = $('.cur_tab_2').val();
 	
 	var view_by		= $('#summary_view_by').val();
 	var view_type	= $('#summary_view_type').val();
@@ -907,8 +905,8 @@ function update_report(report_url){
 	window.location.href = report_url+'/'+tab1+'/'+tab2+'?view_by='+view_by+'&view_type='+view_type+'&measure='+measure+"&date_range="+date_range;
 }
 function update_dashboard(report_url){
-	var tab1 = $('#cur_tab_1').val();
-	var tab2 = $('#cur_tab_2').val();
+	var tab1 = $('.cur_tab_1').val();
+	var tab2 = $('.cur_tab_2').val();
 	var view_by		= $('#summary_view_by').val();
 	var view_type	= $('#summary_view_type').val();
 	var measure		= $('#summary_sel_measure').val();
@@ -935,25 +933,8 @@ $(function(){
 	 <?php }?>
 	
 });
-</script>
-<script>
-/* window.onbeforeunload = function (e) {
-    e = e || window.event;
-    // For IE and Firefox prior to version 4
-	 var targetHost = new URL(e.target.URL).hostname;
-	 console.info(targetHost);
-    if (e) {
-        e.returnValue = 'Sure?';
-    }
-
-    // For Safari
-    return 'Sure?';
-}; */  
-</script>
-<script type="text/javascript">
 window.addEventListener('beforeunload', (event) => {
 	console.info(event);
-
 	if(localStorage.unload!=1){
 		event.preventDefault();
 		// Google Chrome requires returnValue to be set.
@@ -968,5 +949,4 @@ window.addEventListener('beforeunload', (event) => {
 	} 
 	localStorage.unload = 1;
 }, {capture: true}); 
-
 </script>
