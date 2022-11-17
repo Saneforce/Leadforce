@@ -198,8 +198,8 @@ class Dashboard extends AdminController
 		$staff_ids = implode(',',$all_staff_id);
 		$all_reports =  $this->db->query('SELECT d.id,d.staff_id,d.report_id,d.type,d.tab_1,d.tab_2,d.sort,d.width,d.height,r.view_by,r.view_type,r.measure_by,r.report_name,r.date_range,r.report_type FROM '. db_prefix().'dashboard d,'. db_prefix().'report r  WHERE d.staff_id in ('.$staff_ids.') and r.id = d.report_id and d.dashboard_id = "'.$id.'" group by d.report_id order by d.sort asc')->result_array();
 		if(empty($all_reports)){
-			redirect(admin_url('dashboard/report'));
-			exit;
+			//redirect(admin_url('dashboard/report'));
+			//exit;
 		}
 		$staff_id = get_staff_user_id();
 		$data = get_dashboard_report($all_reports,$staff_id);
