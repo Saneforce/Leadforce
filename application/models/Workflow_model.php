@@ -12,10 +12,14 @@ class Workflow_model extends App_Model
     public function getFlow($id)
     {
         $this->db->where('id',$id);
-        return $this->db->get(db_prefix().'workflow')->row();
+        $data = $this->db->get(db_prefix().'workflow')->row();
+        if($data){
+            $data->configure =json_decode($data->configure,true);
+        }
+        return $data;
     }
 
-    public function addFlow()
+    public function addApprovalFlow()
     {
         $this->form_validation->set_rules('action', 'Action', 'required');
         $this->form_validation->set_rules('service', 'Service', 'required');
@@ -62,6 +66,48 @@ class Workflow_model extends App_Model
         
     }
 
+    public function addFlow()
+    {
+        if($this->input->post('action') =='deal_approval'){
+            return $this->addApprovalFlow();
+        }
+        if($this->input->post('module')=='lead' && ($this->input->post('action')=='lead_created' || $this->input->post('action')=='lead_updated' || $this->input->post('action')=='lead_deleted' || $this->input->post('action')=='lead_cronjob')){
+            $this->db->where('module',$this->input->post('module'));
+            $this->db->where('action',$this->input->post('action'));
+            $this->db->where('parent_id',$this->input->post('parent_id'));
+            $exists =$this->db->get(db_prefix().'workflow')->row();
+            if($exists){
+                return array(
+                    'success'=>false,
+                    'msg'=>'Trigger already exists'
+                );
+            }
+        }elseif($this->input->post('module')=='deal' && ($this->input->post('action')=='deal_approval')){
+            $this->db->where('module',$this->input->post('module'));
+            $this->db->where('action',$this->input->post('action'));
+            $this->db->where('parent_id',$this->input->post('parent_id'));
+            $exists =$this->db->get(db_prefix().'workflow')->row();
+            if($exists){
+                return array(
+                    'success'=>false,
+                    'msg'=>'Trigger already exists'
+                );
+            }
+        }
+        $data =array(
+            'module'=>$this->input->post('module'),
+            'action'=>$this->input->post('action'),
+            'service'=>$this->input->post('service'),
+            'parent_id'=>$this->input->post('parent_id')
+        );
+        $this->db->insert(db_prefix().'workflow',$data);
+        return array(
+            'success'=>true,
+            'inserted_id'=>$this->db->insert_id(),
+            'msg'=>'Flow added successfully'
+        );
+    }
+
     public function updateFlowConfigure($id,$configure)
     {
         $this->db->where('id',$id);
@@ -101,6 +147,29 @@ class Workflow_model extends App_Model
             $this->db->where($where);
         }
         $this->db->where('action',$action);
-        return $this->db->get(db_prefix().'workflow')->result_object();
+        $all_flows =$this->db->get(db_prefix().'workflow')->result_object();
+        if($all_flows){
+            foreach($all_flows as $key => $flow){
+                $all_flows[$key]->configure = json_decode($flow->configure,true);
+            }
+        }
+        return $all_flows;
+    }
+
+    public function getmoduleflows($module,$where=array())
+    {
+        $this->db->select('id,action,parent_id,configure');
+        $this->db->where('module',$module);
+        if($where){
+            $this->db->where($where);
+        }
+        $all_flows =$this->db->get(db_prefix().'workflow')->result_object();
+        if($all_flows){
+            foreach($all_flows as $key => $flow){
+                $all_flows[$key]->configure = json_decode($flow->configure,true);
+            }
+        }
+        
+        return $all_flows;
     }
 }

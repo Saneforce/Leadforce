@@ -52,7 +52,7 @@ class Approval_model extends App_Model
                     $flowCounter++;
                     $configure =false;
                     if($flow->configure){
-                        $configure =json_decode($flow->configure ,true);
+                        $configure =$flow->configure;
                         if($configure['approver'] =='REPORTING_LEVEL'){
                             if(isset($staffLevels[$flowCounter-1])){
                                 $levels []=$staffLevels[$flowCounter-1];

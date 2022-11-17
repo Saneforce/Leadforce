@@ -140,7 +140,7 @@ class App_workflow
     {
         $CI = &get_instance();
         $CI->load->helper('whatsapp_helper');
-        $configure = json_decode($flow->configure,true);
+        $configure = $flow->configure;
         $fields =$configure['variables'];
         $whatsappFields =array();
         if($fields){

@@ -21,7 +21,7 @@ if($approvalList){
     if($approval_flows){
         foreach ($approval_flows as $key => $flow) {
             if($flow->configure){
-                $configure =json_decode($flow->configure,true);
+                $configure =$flow->configure;
                 if($configure['approver'] ==get_staff_user_id()){
                     $userAccessApproval =true;
                     break;

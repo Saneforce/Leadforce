@@ -212,7 +212,7 @@ class Deal_approval_workflow extends App_workflow
         $CI->db->where('staffid',$staffid);
         $staff = $CI->db->get(db_prefix().'staff')->row();
         if($staff){
-            $configure =json_decode($flow->configure,true);
+            $configure =$flow->configure;
             $subject =$configure['subject'];
             $fromname =$configure['fromname'];
             $message =$configure['message'];

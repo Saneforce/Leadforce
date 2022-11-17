@@ -31,15 +31,39 @@ class Workflow extends AdminController
         $this->load->view('admin/workflow/flow',$data);
     }
 
+    public function module($module)
+    {
+        $this->load->model("roles_model");
+        $this->load->model("designation_model");
+        // hooks()->do_action('lead_created','138');`
+        if (!has_permission($this->moudle_permission_name, '', 'edit')) {
+            access_denied($this->moudle_permission_name);
+        }
+        $data =['title'=>_l('workflow_automation')];
+
+        $moduleDetails =$this->workflow_app->getModuleDetails($module);
+        if($moduleDetails){
+            $data['flows'] =$this->workflow_model->getmoduleflows($module);
+
+            $this->db->where('active',1);
+            $this->db->where('action_for','Active');
+            $staffs =$this->db->get(db_prefix().'staff')->result_object();
+            $data['staffs'] =[];
+            foreach ($staffs as $staff) {
+                $data['staffs'] [$staff->staffid] =$staff->firstname.' '.$staff->lastname;
+            }
+            $data ['staff_role'] = $this->roles_model->get();
+            $data ['staff_designation'] = $this->designation_model->get();
+            $data['moduleDetails'] =$moduleDetails;
+            $this->load->view('admin/workflow/workflow',$data);
+        }
+    }
+
     public function addflow()
     {
-
         echo json_encode(
             $this->workflow_model->addFlow()
         );
-
-        
-        
     }
 
     public function updateFlowStatus($id,$status)
@@ -63,7 +87,7 @@ class Workflow extends AdminController
         $data ['workflow'] =$this->$class->getWorkFlow($flow->action);
         $data ['service'] =$data['workflow']['services'][$flow->service];
         if($flow->configure){
-            $configure =json_decode($flow->configure,true);
+            $configure =$flow->configure;
             $data['configure'] =$configure;
         }
         switch ($data['workflow']['services'][$flow->service]['medium']) {
@@ -145,6 +169,10 @@ class Workflow extends AdminController
 
     public function saveapprovalconfig($id)
     {
+        if (!has_permission($this->moudle_permission_name, '', 'edit')) {
+            access_denied($this->moudle_permission_name);
+        }
+
         $this->form_validation->set_rules('approver', 'Assing approver', 'required');
         if ($this->form_validation->run() == FALSE){
             echo json_encode([
@@ -187,6 +215,50 @@ class Workflow extends AdminController
                 'success'=> true,
                 'msg' => _l('updated_successfully')
             ]);
+        }
+    }
+
+    public function saveconfig($id)
+    {
+        if (!has_permission($this->moudle_permission_name, '', 'edit')) {
+            access_denied($this->moudle_permission_name);
+        }
+        $this->workflow_model->updateFlowConfigure($id,json_encode($_POST));
+        echo json_encode([
+            'success'=> true,
+            'msg' => _l('updated_successfully')
+        ]);
+    }
+
+    public function getflow($id)
+    {
+        if (!has_permission($this->moudle_permission_name, '', 'edit')) {
+            access_denied($this->moudle_permission_name);
+        }
+        $data =$this->workflow_model->getFlow($id);
+        echo json_encode([
+            'success'=> true,
+            'data' => $data
+        ]);
+    }
+
+    public function getapproverslist()
+    {
+        if (!has_permission($this->moudle_permission_name, '', 'edit')) {
+            access_denied($this->moudle_permission_name);
+        }
+
+        if($_POST['approval_level']){
+            $this->db->where('active',1);
+            $this->db->where('action_for','Active');
+            $staffs =$this->db->get(db_prefix().'staff')->result_object();
+
+            $data =[];
+            $data [0]='Reporting Level '.$_POST['approval_level'];
+            foreach ($staffs as $staff) {
+                $data [$staff->staffid] =$staff->firstname.' '.$staff->lastname;
+            }
+            echo json_encode(array('success'=>true,'data'=>$data));
         }
     }
 }
