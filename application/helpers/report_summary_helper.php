@@ -586,7 +586,7 @@ function check_year_week($view_by){
 								$qry_cond   .= " and id in(".$cur_projects.")";
 							}
 							else{
-								$qry_cond   .= " and id=''";
+								//$qry_cond   .= " and id=''";
 							}
 						}
 						$k++;
@@ -610,7 +610,7 @@ function check_year_week($view_by){
 								$qry_cond   .= " and id in(".$cur_projects.")";
 							}
 							else{
-								$qry_cond   .= " and id=''";
+								//$qry_cond   .= " and id=''";
 							}
 						}
 						$cur_row    	= 'W'.($m+1).' '.$cur_year;
@@ -637,7 +637,7 @@ function check_year_week($view_by){
 									$qry_cond   .= " and id in(".$cur_projects.")";
 								}
 								else{
-									$qry_cond   .= " and id=''";
+									//$qry_cond   .= " and id=''";
 								}
 							}
 							$cur_row    = 'W'.($m+1).' '.$cur_year;
@@ -756,11 +756,11 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 		 else if($ckey == 'project_deadline'){
 			 $ckey = 'deadline';
 		 }
-		 else if($ckey == 'won_date' || $ckey == 'lost_date'){
-			 $ckey = 'stage_on';
-		 }
 		 if(isset($aColumns_temp[$ckey])){
 			$aColumns[] =$aColumns_temp[$ckey];
+		 }
+		 if($ckey == 'won_date' || $ckey == 'lost_date'){
+			 $ckey = 'stage_on';
 		 }
 		}
 	}
@@ -934,7 +934,7 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 				$where_in[db_prefix().'projects.id']   =  $projects;
 			}
 			else{
-				$where[db_prefix().'projects.id']  =  '';
+				//$where[db_prefix().'projects.id']  =  '';
 			}
 			break;
 	}
@@ -958,7 +958,7 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 			$where_in[db_prefix().'projects.id']   =  $projects;
 		}
 		else{
-			$where[db_prefix().'projects.id']   =  '0';
+			//$where[db_prefix().'projects.id']   =  '0';
 		}
 	}
 	if((check_activity_date($view_by))){

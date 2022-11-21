@@ -16,6 +16,7 @@
 					$cus_1[$cfval['slug']] = $colarr[$cfval['slug']] = array("ins"=>$cfval['name'],"ll"=>$cfval['name']);
 				}
 				$projects_lists = (array)json_decode(get_option('report_deal_list_column_order')); 
+				
 				if(!empty($projects_lists)){
 				?>
 					<tr>
@@ -46,6 +47,7 @@
 							if(!empty($projects_lists)){
 								foreach($projects_lists as $ckey => $cval){
 									if((!empty($need_fields) && in_array($ckey, $need_fields)) || !empty($cus_1[$ckey])){
+										$req_key = $ckey;
 										 if($ckey == 'project_start_date'){
 											 $ckey = 'start_date';
 										 }
@@ -59,7 +61,23 @@
 							?>
 										<td class="sum_td">
 											<?php 
-											 if(_l($colarr[$ckey]['ll']) !='Status'){
+											if(_l($colarr[$req_key]['ll']) =='Won Date'){
+												if($row_1['project_status'] == 1){
+													echo $row_1['won_date'];
+												}
+												else{
+													echo '-';
+												}
+											}
+											else if(_l($colarr[$req_key]['ll']) =='Lost Date'){
+												if($row_1['project_status'] != 1){
+													echo $row_1['lost_date'];
+												}
+												else{
+													echo '-';
+												}
+											}
+											else if(_l($colarr[$ckey]['ll']) !='Status' && _l($colarr[$ckey]['ll']) !='stage_on'){
 												 if(isset($row_1[$ckey]) || $row_1[$ckey]!=''){
 													 echo $row_1[$ckey];
 												 }
@@ -75,7 +93,7 @@
 													 echo 'Open';
 												 }
 												 else if($row_1[$ckey] ==1){
-													echo 'Own';
+													echo 'Won';
 												 }
 												 else if($row_1[$ckey] ==2){
 													echo 'Lost';
