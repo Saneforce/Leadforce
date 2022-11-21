@@ -844,7 +844,7 @@ function get_task_table_fields($view_by){
 			break;
 		case 'assignees':
 			$data['tables']		= db_prefix()."task_assigned ta,".db_prefix()."tasks,".db_prefix()."staff s";
-			$data['fields']		= ",s.firstname,s.lastname,count(ta.staffid) tot_val,s.staffid req_id";
+			$data['fields']		= ",s.firstname,s.lastname,count(ta.staffid) tot_val,".db_prefix()."tasks.rel_id req_id ";
 			$data['qry_cond']   = " ta.taskid = ".db_prefix()."tasks.id and s.staffid = ta.staffid  group by ta.staffid  order by s.firstname asc";
 			$data['cur_rows']	= "firstname,lastname";
 			break;
@@ -852,6 +852,12 @@ function get_task_table_fields($view_by){
 			$data['tables']		= db_prefix() . "tasks, " . db_prefix() . "tags t, ". db_prefix() . "taggables ta ";
 			$data['fields']		= ",t.name,count(ta.tag_id) tot_val,ta.tag_id req_id ";
 			$data['qry_cond']   = " ta.rel_id = ".db_prefix()."tasks.id and t.id = ta.tag_id and ta.rel_type= 'task' group by ta.tag_id order by t.name asc";
+			$data['cur_rows']	= "name";
+			break;
+		case 'tasktype':
+			$data['tables']		= db_prefix() . "tasks, " . db_prefix() . "tasktype t ";
+			$data['fields']		= ",t.name,count(".db_prefix()."tasks.tasktype) tot_val,t.id req_id ";
+			$data['qry_cond']   = " t.id = ".db_prefix()."tasks.tasktype and ".db_prefix()."tasks.rel_type= 'task' group by ".db_prefix()."tasks.tasktype order by t.name asc";
 			$data['cur_rows']	= "name";
 			break;
 		case 'project_status':
@@ -1181,6 +1187,7 @@ function get_edit_data($type,$id,$staff_id){
 			$i++;
 		}
 	}
+
 	$data['folders']	=	get_report_folder($type);
 	$data['dashboards']	=	get_dashboard($staff_id);
 	$data['teamleaders'] = $CI->staff_model->get('', [ 'active' => 1]);

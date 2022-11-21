@@ -7,6 +7,7 @@ class Dashboard extends AdminController
     {
         parent::__construct();
         $this->load->model('dashboard_model');
+		$this->load->helper('filters');
 		$this->load->helper('report_summary');
 		$this->load->helper('reports');
     }

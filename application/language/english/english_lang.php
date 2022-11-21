@@ -4208,3 +4208,4 @@ $lang['is_any_of']			=	'Is Any Of';
 $lang['this_year']			=	'This Year';
 $lang['live_updates']		=	'Live Updates';
 $lang['project_currency']	=	'Currency';
+$lang['task_type']			=	'Activity type';
