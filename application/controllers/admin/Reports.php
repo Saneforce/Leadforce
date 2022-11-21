@@ -472,7 +472,7 @@ class Reports extends AdminController
         $this->load->view('admin/reports/deals_views', $data);
 	}
 	public function get_deal_summary($type = ''){
-		//if ($this->input->is_ajax_request()) {	
+		if ($this->input->is_ajax_request()) {	
 			$type = ($type == '' || $type == 'deal')?'':'activity_'; 
 			if($type == ''){
 				$deal_val = deal_values();
@@ -540,7 +540,7 @@ class Reports extends AdminController
 			}
 			$data['summary']=	$this->load->view('admin/reports/'.$type.'summary_table', $data,true);
 			echo json_encode($data,true);
-		//}
+		}
 	}
 	public function edit($id){
 		if (!has_permission('reports', '', 'create')) {

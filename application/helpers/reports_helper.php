@@ -616,7 +616,14 @@ function get_task_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_
 		case'datefinished':
 			break;
 		case'status':
-			$where[db_prefix().'tasks.status']   =  $sum_id;
+			$where_in[db_prefix().'tasks.status']   =  $sum_id;
+			//$where[db_prefix().'tasks.status']   =  $sum_id;
+			break;
+		case'tasktype':
+			$where[db_prefix().'tasks.tasktype']   =  $sum_id;
+			break;
+		case'rel_type':
+			$where[db_prefix().'tasks.rel_type']   =  $sum_id;
 			break;
 		case'assignees':
 			$cond2 = (!empty($req_status))?" and t.status = '".$req_status."' ":'';
@@ -842,6 +849,12 @@ function get_task_table_fields($view_by){
 			$data['qry_cond']   = db_prefix()."tasks.status != '' group by ".db_prefix()."tasks.status order by ".db_prefix()."tasks.status asc  ";
 			$data['cur_rows']	= "status";
 			break;
+		case 'rel_type':
+			$data['tables']		= db_prefix() . "tasks ".db_prefix().'tasks ';
+			$data['fields']		= ",".db_prefix()."tasks.rel_type,count(".db_prefix()."tasks.rel_type) tot_val,".db_prefix()."tasks.rel_type req_id";
+			$data['qry_cond']   = db_prefix()."tasks.rel_type != '' group by ".db_prefix()."tasks.rel_type order by ".db_prefix()."tasks.rel_type asc  ";
+			$data['cur_rows']	= "rel_type";
+			break;
 		case 'assignees':
 			$data['tables']		= db_prefix()."task_assigned ta,".db_prefix()."tasks,".db_prefix()."staff s";
 			$data['fields']		= ",s.firstname,s.lastname,count(ta.staffid) tot_val,".db_prefix()."tasks.rel_id req_id ";
@@ -856,8 +869,8 @@ function get_task_table_fields($view_by){
 			break;
 		case 'tasktype':
 			$data['tables']		= db_prefix() . "tasks, " . db_prefix() . "tasktype t ";
-			$data['fields']		= ",t.name,count(".db_prefix()."tasks.tasktype) tot_val,t.id req_id ";
-			$data['qry_cond']   = " t.id = ".db_prefix()."tasks.tasktype and ".db_prefix()."tasks.rel_type= 'task' group by ".db_prefix()."tasks.tasktype order by t.name asc";
+			$data['fields']		= ",t.name,count(".db_prefix()."tasks.tasktype) tot_val,".db_prefix()."tasks.tasktype req_id ";
+			$data['qry_cond']   = " t.id = ".db_prefix()."tasks.tasktype group by ".db_prefix()."tasks.tasktype order by t.name asc";
 			$data['cur_rows']	= "name";
 			break;
 		case 'project_status':
