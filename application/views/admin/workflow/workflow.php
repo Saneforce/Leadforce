@@ -1,5 +1,33 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
+
+<script src="<?php echo base_url('assets/js/workflow.js') ?>"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function(event) {
+        // initiating workflow
+        var module = <?= json_encode($this->workflow_app->getModuleDetails($moduleDetails['name']), JSON_PRETTY_PRINT); ?>;
+        workflowl(module);
+
+        // set placeholders
+        workflowl.setPlaceHolders(<?= json_encode($this->workflow_app->getMergeFields($moduleDetails['name']), JSON_PRETTY_PRINT); ?>);
+
+        // set module triggers
+        var triggers = <?= json_encode($this->workflow_app->getTriggers($moduleDetails['name']), JSON_PRETTY_PRINT); ?>;
+
+        workflowl.setTriggers(triggers);
+
+        $('body').on('click','.placeholder-picker .click-to-copy',function(){
+            var targetinput =$(this).closest('.placeholder-picker').attr('data-targer-input');
+            cursor =$(targetinput).attr('data-cursor');
+            var v = $(targetinput).val();
+            var textBefore = v.substring(0,  cursor);
+            var textAfter  = v.substring(cursor, v.length);
+            $(targetinput).val(textBefore + $(this).attr('data-placeholder') + textAfter);
+        });
+
+        
+    })
+</script>
 <div id="wrapper">
     <div class="content">
         <div class="row">
@@ -7,7 +35,7 @@
                 <div class="panel_s">
                     <div class="panel-body" id="workflowwrapper" style="overflow-x: auto; overflow-y:auto; height:90vh;">
                         <ul class="tree">
-                            
+
                         </ul>
                     </div>
                 </div>
@@ -35,6 +63,9 @@
                                     <div class="sidebar-setup" id="sidebarsetupemail">
                                         <?php $this->load->view('admin/workflow/email'); ?>
                                     </div>
+                                    <div class="sidebar-setup" id="sidebarsetupwhatsapp">
+                                        <?php $this->load->view('admin/workflow/whatsapp'); ?>
+                                    </div>
 
                                     <div class="sidebar-setup" id="sidebarsetupapproval">
                                         <?php $this->load->view('admin/workflow/approval'); ?>
@@ -43,7 +74,7 @@
                                     <div class="sidebar-setup" id="sidebarsetupcondition">
                                         <?php $this->load->view('admin/workflow/condition'); ?>
                                     </div>
-                                    <?php if($moduleDetails['name'] =='lead'): ?>
+                                    <?php if ($moduleDetails['name'] == 'lead') : ?>
                                         <div class="sidebar-setup" id="sidebarsetupleadstaffassign">
                                             <?php $this->load->view('admin/workflow/lead/assign_staff'); ?>
                                         </div>
@@ -61,7 +92,7 @@
                                     <h5>Trigger</h5>
                                     <p class="text-muted">Click trigger to add to workflow.</p>
                                 </div>
-                                
+
                                 <ul class="triggers collapse" id="sidebarTriggers" data-parent="#accordionsidebar"></ul>
                             </div>
                         </div>
@@ -84,6 +115,7 @@
     body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
     }
+
     #workflowwrapper {
         cursor: grab;
         background-image: url('<?php echo base_url(); ?>assets/images/tile.png');
@@ -177,7 +209,9 @@
         cursor: text;
     }
 
-    .tree .selected, .tree .block:hover, .triggers .trigger:hover {
+    .tree .selected,
+    .tree .block:hover,
+    .triggers .trigger:hover {
         color: #415164;
         background-color: #f1f5f7;
         border: 1px solid #000;
@@ -194,6 +228,7 @@
         position: absolute;
         top: calc(calc(-1 * var(--gutter)) - calc(var(--line-width) / 2));
     }
+
     .tree ul.current-flow:before,
     .tree .block.current-flow:before {
         outline: solid calc(var(--line-width) / 2) red;
@@ -299,7 +334,8 @@
         margin-top: 15px;
         border-radius: 0.2em;
     }
-    .trigger-icon{
+
+    .trigger-icon {
         font-size: 25px;
         padding: 10px 20px;
         display: flex;
@@ -309,7 +345,8 @@
     .block-content {
         display: flex;
     }
-    .block-content .block-icon{
+
+    .block-content .block-icon {
         font-size: 25px;
         padding: 10px 20px;
         display: flex;
@@ -322,17 +359,18 @@
         float: right;
         transition: all 0.5s;
     }
+
     .collapsible.collapsed:before {
         -webkit-transform: rotate(180deg);
         -moz-transform: rotate(180deg);
         transform: rotate(180deg);
     }
 
-    .sidebar-setup{
+    .sidebar-setup {
         display: none;
     }
 
-    .sidebar-setup.show{
+    .sidebar-setup.show {
         display: block;
     }
 
@@ -340,29 +378,36 @@
         cursor: pointer;
     }
 
-    
-    
+    .placeholder-picker .dropdown-menu{
+        padding: 10px 15px;
+        height: 500px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    .placeholder-picker .dropdown-item{
+        display: block;
+        padding: 5px 10px;
+    }
+    .placeholder-picker .add-placeholder-btn{
+        float:right; 
+        margin-top:5px;
+        cursor: pointer;
+    }
+
+    .placeholder-picker .click-to-copy{
+        cursor: pointer;
+    }
 </style>
-<script src="<?php echo base_url('assets/js/workflow.js') ?>"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-extendext/1.0.0/jquery-extendext.min.js" integrity="sha512-pAU2x/rE9QHeYHtKS3RJccBEx8v8Lyyo4kVsxg+K3N+w/kbwrj2C9mp02XGQA+cOwlF1FdbEzTxnKg3DrQgWuA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dot/1.1.3/doT.min.js" integrity="sha512-mv9iHAP8cyGYB1TX54qMIFYFbHpFoqo1StdcuIUoAxTXIiFfOu22TjJGrFMpY+iR4QmGkElLlHBVx5C+PiIdvg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.jsdelivr.net/npm/jQuery-QueryBuilder/dist/js/query-builder.min.js"></script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function(event) {
-        // initiating workflow
-        var module = <?= json_encode($this->workflow_app->getModuleDetails($moduleDetails['name']),JSON_PRETTY_PRINT); ?>;
-        workflowl(module);
-
-        // set module triggers
-        var triggers = <?= json_encode($this->workflow_app->getTriggers($moduleDetails['name']),JSON_PRETTY_PRINT); ?>;
-
-        workflowl.setTriggers(triggers);
-
         // make flow tree
-        var flows = <?php echo json_encode($flows,JSON_PRETTY_PRINT); ?>;
+        var flows = <?php echo json_encode($flows, JSON_PRETTY_PRINT); ?>;
         workflowl.Init(flows);
-    });
+    })
 </script>
 </body>
 

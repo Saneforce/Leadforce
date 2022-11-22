@@ -4183,6 +4183,11 @@ $lang['workflow_lead_merge_fields']			            =	"Leads";
 $lang['workflow_staff_merge_fields']			        =	"Staffs";
 $lang['workflow_deal_merge_fields']			            =	"Deals";
 $lang['workflow_activity_merge_fields']			        =	"Activities";
+$lang['message']	=	'Message';
+$lang['header']	=	'Header';
+$lang['media_link']	=	'Media link';
+$lang['media_caption']	=	'Media caption';
+$lang['header_variable']	=	'Header Variable';
 
 $lang['items_list_column']    = 'Item List Columns';
 $lang['particulars_items_list_column']    = 'Columns in Proposal';

@@ -22,25 +22,25 @@ class Lead_workflow extends Workflow_app
             'title'=>'Lead Created',
             'description'=>'Workflow starts when new lead created.',
             'icon'=>'<i class="fa fa-plus text-success" aria-hidden="true"></i>',
-            'triggers'=>['condition','send_email','lead_assign_staff'],
+            'triggers'=>['condition','send_email','lead_assign_staff','send_whatsapp','send_sms'],
         ],
         'lead_updated'=>[
             'title'=>'Lead Updated',
             'description'=>'Workflow starts when lead deleted.',
             'icon'=>'<i class="fa fa-pencil-square-o text-primary" aria-hidden="true"></i>',
-            'triggers'=>['condition','send_email'],
+            'triggers'=>['condition','send_email','send_whatsapp','send_sms'],
         ],
         'lead_deleted'=>[
             'title'=>'Lead Deleted',
             'description'=>'Workflow starts when lead deleted.',
             'icon'=>'<i class="fa fa-trash text-danger" aria-hidden="true"></i>',
-            'triggers'=>['condition','send_email'],
+            'triggers'=>['condition','send_email','send_whatsapp','send_sms'],
         ],
         'lead_cronjob'=>[
             'title'=>'Lead Scheduler',
             'description'=>'Workflow starts when lead deleted.',
             'icon'=>'<i class="fa fa-clock-o text-warning" aria-hidden="true"></i>',
-            'triggers'=>['condition','send_email'],
+            'triggers'=>['condition','send_email','send_whatsapp','send_sms'],
         ],
         'condition'=>[
             'title'=>'Conditions',
@@ -52,7 +52,7 @@ class Lead_workflow extends Workflow_app
             'title'=>'Assign Staff',
             'description'=>'Assign staff to lead.',
             'icon'=>'<i class="fa fa-user-plus text-success" aria-hidden="true"></i>',
-            'triggers'=>['send_email'],
+            'triggers'=>['send_email','send_whatsapp','send_sms'],
         ],
         'send_email'=>[
             'title'=>'Send Email',
@@ -62,17 +62,35 @@ class Lead_workflow extends Workflow_app
             'icon'=>'<i class="fa fa-envelope" style="color:#BB001B" aria-hidden="true"></i>',
             'triggers'=>[],
         ],
+        'send_whatsapp'=>[
+            'title'=>'Send Whatsapp',
+            'type'=>'notification',
+            'medium'=>'whatsapp',
+            'description'=>'Send Whatsapp notification.',
+            'icon'=>'<i class="fa fa-whatsapp " style="color:#25D366" aria-hidden="true"></i>
+            ',
+            'triggers'=>[],
+        ],
+        // 'send_sms'=>[
+        //     'title'=>'Send SMS',
+        //     'type'=>'notification',
+        //     'medium'=>'sms',
+        //     'description'=>'Send SMS notification.',
+        //     'icon'=>'<i class="fa fa-commenting text-primary" aria-hidden="true"></i>
+        //     ',
+        //     'triggers'=>[],
+        // ],
         'true'=>[
             'title'=>'True',
             'description'=>'If condition true.',
             'icon'=>'<i class="fa fa-check text-success" aria-hidden="true"></i>',
-            'triggers'=>['send_email','condition','lead_assign_staff'],
+            'triggers'=>['send_email','condition','lead_assign_staff','send_whatsapp','send_sms'],
         ],
         'false'=>[
             'title'=>'False',
             'description'=>'If condition false.',
             'icon'=>'<i class="fa fa-times text-danger" aria-hidden="true"></i>',
-            'triggers'=>['send_email','condition','lead_assign_staff'],
+            'triggers'=>['send_email','condition','lead_assign_staff','send_whatsapp','send_sms'],
         ],
     );
 
@@ -261,16 +279,6 @@ class Lead_workflow extends Workflow_app
             }elseif($flow->configure['sendto'] =='customer'){
                 $sendto =$this->lead->email;
             }
-            // echo 'Fromname : ';
-            // pr($fromname);
-            // echo '<hr>';
-            // echo 'Subject : ';
-            // pr($subject);
-            // echo '<hr>';
-            // echo 'Message : ';
-            // pr($message);
-            // echo '<hr>';
-            // pre('sending email to '.$sendto.'   ...');
             $this->sendEmail($fromname,$sendto,$subject,$message,'workflow lead created');
         }
     }
@@ -357,9 +365,27 @@ class Lead_workflow extends Workflow_app
                 break;
         }
         if($staff_id){
+            
+            $this->lead->assigned =$staff_id;
+            // pr('assgined to '.$this->lead->assigned);
             $this->ci->db->where('id',$this->lead_id);
             $this->ci->db->update(db_prefix().'leads',['assigned'=>$staff_id]);
         }
         
+    }
+
+    protected function run_whatsapp($flow)
+    {
+        if($flow->configure){
+            $sendto =$flow->configure['sendto'];
+            if($flow->configure['sendto'] =='staff'){
+                $this->ci->db->where('staffid', $this->lead->assigned);
+                $staff = $this->ci->db->get(db_prefix() . 'staff')->row();
+                $sendto =$this->getCountryCallingCode($staff->phone_country_code) . $staff->phonenumber;
+            }elseif($flow->configure['sendto'] =='customer'){
+                $sendto =$this->getCountryCallingCode($this->lead->phone_country_code) .$this->lead->phonenumber;
+            }
+            $this->sendWhatsapp($sendto, $flow, $this->merge_fields);
+        }
     }
 }

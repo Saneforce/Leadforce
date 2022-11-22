@@ -1,46 +1,48 @@
 
 
+document.addEventListener("DOMContentLoaded", function (event) {
+    const container = document.querySelector('#workflowwrapper');
 
-const container = document.querySelector('#workflowwrapper');
-                
-let startY;
-let startX;
-let scrollLeft;
-let scrollTop;
-let isDown;
+    let startY;
+    let startX;
+    let scrollLeft;
+    let scrollTop;
+    let isDown;
 
-container.addEventListener('mousedown',e => mouseIsDown(e));  
-container.addEventListener('mouseup',e => mouseUp(e))
-container.addEventListener('mouseleave',e=>mouseLeave(e));
-container.addEventListener('mousemove',e=>mouseMove(e));
+    container.addEventListener('mousedown', e => mouseIsDown(e));
+    container.addEventListener('mouseup', e => mouseUp(e))
+    container.addEventListener('mouseleave', e => mouseLeave(e));
+    container.addEventListener('mousemove', e => mouseMove(e));
 
-function mouseIsDown(e){
-  isDown = true;
-  startY = e.pageY - container.offsetTop;
-  startX = e.pageX - container.offsetLeft;
-  scrollLeft = container.scrollLeft;
-  scrollTop = container.scrollTop; 
-}
-function mouseUp(e){
-  isDown = false;
-}
-function mouseLeave(e){
-  isDown = false;
-}
-function mouseMove(e){
-  if(isDown){
-    e.preventDefault();
-    //Move vertcally
-    const y = e.pageY - container.offsetTop;
-    const walkY = y - startY;
-    container.scrollTop = scrollTop - walkY;
+    function mouseIsDown(e) {
+        isDown = true;
+        startY = e.pageY - container.offsetTop;
+        startX = e.pageX - container.offsetLeft;
+        scrollLeft = container.scrollLeft;
+        scrollTop = container.scrollTop;
+    }
+    function mouseUp(e) {
+        isDown = false;
+    }
+    function mouseLeave(e) {
+        isDown = false;
+    }
+    function mouseMove(e) {
+        if (isDown) {
+            e.preventDefault();
+            //Move vertcally
+            const y = e.pageY - container.offsetTop;
+            const walkY = y - startY;
+            container.scrollTop = scrollTop - walkY;
 
-    //Move Horizontally
-    const x = e.pageX - container.offsetLeft;
-    const walkX = x - startX;
-    container.scrollLeft = scrollLeft - walkX;
-  }
-}
+            //Move Horizontally
+            const x = e.pageX - container.offsetLeft;
+            const walkX = x - startX;
+            container.scrollLeft = scrollLeft - walkX;
+        }
+    }
+
+});
 
 var workflowl =function(module){
 
@@ -52,6 +54,8 @@ var workflowl =function(module){
 
     var workflowmergefields ={};
 
+    var moudleplacehoders ={};
+    var whatsappVariables ={};
     var workflowlnotificationto={
         customer:'Send to customer',
         staff:'Send to staff',
@@ -119,6 +123,14 @@ var workflowl =function(module){
                     }
                     var description =flow.configure.subject;
                     workflowl.updateBlockContent(flow.id,title,description);
+                }else if(trigger.type =='notification' && trigger.medium =='whatsapp'){
+                    if(flow.configure.sendto =='customer'){
+                        var title ='Send to customer';
+                    }else if(flow.configure.sendto =='staff'){
+                        var title ='Send to staff';
+                    }
+                    var description =flow.configure.template;
+                    workflowl.updateBlockContent(flow.id,title,'Template : <b>'+description+'</b>');
                 }else if(flow.action =='approval_level'){
                     if(flow.configure){
                         description =`Assigned to `;
@@ -289,6 +301,24 @@ var workflowl =function(module){
                 }
                 $('#sidebarSettingsTitle').html("Setup email template");
                 $('#sidebarsetupemail').addClass('show');
+            }else if(trigger.type =='notification' && trigger.medium =='whatsapp'){
+                if(flow.configure){
+                    workflowl.setWhatsappVariables(flow.configure.variables);
+                    $('form#WhatsappConfig [name="sendto"]').val(flow.configure.sendto);
+                    $('form#WhatsappConfig [name="template"]').val(flow.configure.template).trigger('change');
+
+                    if(typeof flow.configure.header_variable != 'undefined'){
+                        $('form#WhatsappConfig [name="header_variable"]').val(flow.configure.header_variable);
+                    }
+                    if(typeof flow.configure.header_media_link != 'undefined'){
+                        $('form#WhatsappConfig [name="header_media_link"]').val(flow.configure.header_media_link);
+                    }
+                    if(typeof flow.configure.header_media_caption != 'undefined'){
+                        $('form#WhatsappConfig [name="header_media_caption"]').val(flow.configure.header_media_caption);
+                    }
+                }
+                $('#sidebarSettingsTitle').html("Setup whatsapp template");
+                $('#sidebarsetupwhatsapp').addClass('show');
             }else if(blockname =='approval_level'){
                 $('#ApprovalConfig [name="approver"] option[value="0"]').html(`Reporting Level `);
                 if(flow.configure){
@@ -356,5 +386,37 @@ var workflowl =function(module){
             $('.block[data-id="'+id+'"] .block-description').html(description);
         }
     }
+
+    workflowl.setPlaceHolders =function(placehoders){
+        moudleplacehoders =placehoders;
+    }
+
+    workflowl.getPlaceHolderPicker =function (){
+        var placeholdershtml =`
+        <a type="button" class="dropdown-toggle add-placeholder-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fa fa-plus" aria-hidden="true"></i>Add placeholder
+        </a>
+        <div class="dropdown-menu"><div class="row">`;
+            $.each(moudleplacehoders, function(field, fieldsData) {
+                placeholdershtml +=`<div class="col-md-12"><h5>`+fieldsData.name+`</h5></div>`;
+                $.each(fieldsData.placeholders, function(placeholder, placeholderName) {
+                    placeholdershtml +=`<div class="col-md-6"><a class="dropdown-item click-to-copy" data-placeholder="`+placeholder+`" data-toggle="tooltip" data-placement="bottom" title="Click to add">`+placeholderName+`  </a></div>`;
+                });
+                placeholdershtml +=`<hr class="hr-panel-heading">`;
+            });
+            placeholdershtml +=`</div>
+        </div>`;
+
+        return placeholdershtml;
+    }
+
+    workflowl.setWhatsappVariables= function(variables){
+        whatsappVariables = variables;
+    }
+
+    workflowl.getWhatsappVariables= function(){
+        return whatsappVariables;
+    }
+
 
 }
