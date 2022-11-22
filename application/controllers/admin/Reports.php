@@ -21,6 +21,7 @@ class Reports extends AdminController
 		$this->load->model('clients_model');
 		$this->load->model('pipeline_model');
 		$this->load->model('callsettings_model');
+		$this->load->helper('filters');
 		$this->load->helper('report_summary');
 		$this->load->helper('reports');
     }
@@ -262,6 +263,7 @@ class Reports extends AdminController
 	}
 	public function summary(){
 		if(isset($_POST['submit'])){
+			
 			$filter_data['view_by']		=	$_POST['view_by'];
 			$filter_data['date_range1']	=	'';
 			if(check_activity_date($filter_data['view_by'])){
@@ -273,7 +275,7 @@ class Reports extends AdminController
 			
 			$type = $_POST['summary_val'];
 			$type = ($type=='deal')?'':'activity_';
-			$filter_data['report_type']	=	($type=='')?'deal':'activity';
+			//$filter_data['report_type']	=	($type=='')?'deal':'activity';
 			$this->session->set_userdata($filter_data);
 			if(!empty($_POST['summary_edit'])){
 				redirect(admin_url($type.'reports/edit/'.$_POST['summary_edit']));
@@ -516,6 +518,9 @@ class Reports extends AdminController
 					$data['view_by']	=	'stage_on';
 				}
 				$data['results']		=	get_qry($data['clmn'],$data['crow'],$data['view_by'],$data['measure'],$data['date_range'],$data['view_type'],$data['sum_id'],$deals);
+				if($data['date_range'] == 'weekly'){
+					$data['results'] = get_week_result($data['results'],$data['crow'],$data['view_by']);
+				}
 			}
 			else{
 				$data['results']		=	get_task_qry($data['clmn'],$data['crow'],$data['view_by'],$data['measure'],$data['date_range'],$data['view_type'],$data['sum_id'],$deals);
@@ -523,7 +528,7 @@ class Reports extends AdminController
 			if($data['date_range']	==	'Monthly' && $data['view_type'] == 'date'){
 				$req_month =  (int) $data['crow'];
 				$req_date  = '01-'.$req_month.'-'.date('Y');
-				$data['cur_record']	=	date('M',strtotime($req_date)).' '.date('Y').', '.ucfirst($data['clmn']).' deals';
+				$data['cur_record']	=	date('M',strtotime($req_date)).' '.date('Y').', '._l($data['clmn']);
 			}
 			else{
 				if($data['clmn'] == 'total_cnt_deal' || $data['clmn'] == 'total_cnt_task'){

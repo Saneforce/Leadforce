@@ -53,6 +53,10 @@
 												echo _l('task_priority_urgent');
 											}
 										}
+										else if(_l($colarr[$ckey]['ll']) =='Deal Owner'){
+											$p_teamleader = $this->staff_model->get($cval['p_teamleader']);
+											echo  isset($p_teamleader->firstname)?$p_teamleader->firstname:' ';
+										}
 										else if(_l($colarr[$ckey]['ll']) !='Status'){
 											 if(isset($row_1[$ckey]) || $row_1[$ckey]!=''){
 												if($row_1[$ckey] == 'project'){

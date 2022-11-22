@@ -10,9 +10,13 @@ if(!empty($summary['columns'])){
 						$k = $i;
 					}
 					$clm2 = get_th_column(_l($clm1),'projects');
+					if($clm2 == 'stage_on'){
 				?>
-					<th class="cur_thead"><?php echo _l($clm2);?></th>
-				<?php $i++;
+						<th class="cur_thead"><?php echo _l($summary['view_by']);?></th>
+					<?php }else{ ?>
+						<th class="cur_thead"><?php echo _l($clm2);?></th>
+					
+					<?php }$i++;
 				}?>
 			</tr>
 		</thead>

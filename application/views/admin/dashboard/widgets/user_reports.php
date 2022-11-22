@@ -14,9 +14,9 @@
 			}
 		}
 ?>	
-		<div class="col-md-3 <?php echo 'check_'.$i2;?> <?php if(!empty($width[$i1])){ echo 'rm_width';}?>" data-container="<?php echo $i2;?>" >
+		<div class="col-md-3   <?php echo 'check_'.$i2;?> <?php /* if(!empty($width[$i1])){ echo 'rm_width';} */?>" data-container="<?php echo $i2;?>" style="<?php if(!empty($width[$i1])){ echo 'width:'.$width[$i1].'px;';} if(!empty($height[$i1])){ /* echo 'height:'.$height[$i1].'px;'; */}?>">
 			
-			<div data-ids="<?php echo 'check_'.$i2;?>" class=" widget padding-10 check_widget <?php if(!is_staff_member() && empty($public)){echo ' hide';} ?>" id="<?php echo $dashboard_ids[$i1];?>" data-name="<?php echo _l('s_chart',_l('leads')); ?>" style="<?php if(!empty($width[$i1])){ echo 'width:'.$width[$i1].'px;';} if(!empty($height[$i1])){ echo 'height:'.$height[$i1].'px';}?>">
+			<div data-ids="<?php echo 'check_'.$i2;?>" class=" widget padding-10 check_widget <?php if(!is_staff_member() && empty($public)){echo ' hide';} ?>" id="<?php echo $dashboard_ids[$i1];?>" data-name="<?php echo _l('s_chart',_l('leads')); ?>" style="<?php if(!empty($height[$i1])){ echo 'height:'.$height[$i1].'px;';}?>">
 			   <?php if(is_staff_member() || !empty($public)){ ?>
 					<div class="row">
 						<div class="col-md-12">

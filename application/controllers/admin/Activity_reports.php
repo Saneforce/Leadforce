@@ -21,6 +21,7 @@ class Activity_reports extends AdminController
 		$this->load->model('clients_model');
 		$this->load->model('pipeline_model');
 		$this->load->model('callsettings_model');
+		$this->load->helper('filters');
 		$this->load->helper('report_summary');
 		$this->load->helper('reports');
     }

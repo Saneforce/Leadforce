@@ -215,7 +215,7 @@ function get_flters($req_filters,$check_data=''){
 		foreach($filters as $filter12){
 			if ((!empty($needed['need_fields']) && in_array($filter12, $needed['need_fields'])) || in_array($filter12, $customs)){
 				$check_cond = filter_cond($filters2[$i1]);
-				$deal_vals 	= $CI->db->query("SELECT filter_name,filter_cond,filter_type,date_field,filter FROM ".$table." where filter_name = '".$filter12."' and filter_type= '".$filters1[$i1]."' and filter = 'deal' ")->result_array();
+				/*$deal_vals 	= $CI->db->query("SELECT filter_name,filter_cond,filter_type,date_field,filter FROM ".$table." where filter_name = '".$filter12."' and filter_type= '".$filters1[$i1]."' and filter = 'deal' ")->result_array();
 				if(!empty($deal_vals)){
 					$cur_cond = $deal_vals[0]['filter_cond'];
 					$cur_cond = str_replace('db_prefix()', db_prefix(), $cur_cond);
@@ -255,7 +255,9 @@ function get_flters($req_filters,$check_data=''){
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
 				}
-				else if($filter12 == 'status' ){
+				else*/ 
+				$cur_cond12 = get_filter_cond($filter12,$filters1[$i1]);
+				if($filter12 == 'status' ){
 					if($filters1[$i1]=='is'  && $check_cond){
 						$cur_cond = " AND ( p.status in (SELECT id FROM ".db_prefix() ."projects_status where id = '".$filters2[$i1]."') )";
 						$req_cond .= $cur_cond;
@@ -333,6 +335,44 @@ function get_flters($req_filters,$check_data=''){
 						$req_cond .= $cur_cond;
 						array_push($where, $cur_cond);
 					}
+				}
+				else if($cur_cond12!=''){
+					$cur_cond = str_replace('db_prefix()', db_prefix(), $cur_cond12);
+					if(($filters1[$i1]=='is' || $filters1[$i1]=='is_more_than' || $filters1[$i1]=='is_less_than' || $filters1[$i1]=='is_not') && $deal_vals[0]['date_field'] ==0){
+						if($check_cond){
+							$cur_cond = str_replace('!!cond1', "'".$filters2[$i1]."'", $cur_cond);
+						}
+						else{
+							$cur_cond = '';
+						}
+					}
+					if($filters1[$i1]=='is_any_of'){
+						if($check_cond){
+							$req_arrs = explode(',',$filters2[$i1]);
+							$req_arr = '';
+							if(!empty($req_arrs)){
+								foreach($req_arrs as $req_arr1){
+									$req_arr .= "'".$req_arr1."',";
+								}
+							}
+							$req_arr = rtrim($req_arr,",");
+							$cur_cond = str_replace('!!in_cond', $req_arr, $cur_cond);
+						}
+						else{
+							$cur_cond = '';
+						}
+					}
+					if (str_contains($cur_cond, '!!date1')) {
+						$date1 = "'".date('Y-m-d',strtotime($filters3[$i1]))."'";
+						$cur_cond = str_replace('!!date1', $date1, $cur_cond);
+					}
+					if (str_contains($cur_cond, '!!date2')) {
+						$date2 = "'".date('Y-m-d',strtotime($filters4[$i1]))."'";
+						
+						$cur_cond = str_replace('!!date2', $date2, $cur_cond);
+					}
+					$req_cond .= $cur_cond;
+					array_push($where, $cur_cond);
 				}
 				else if(in_array($filter12, $customs)){
 					if($filters1[$i1]=='is'){
@@ -586,7 +626,7 @@ function check_year_week($view_by){
 								$qry_cond   .= " and id in(".$cur_projects.")";
 							}
 							else{
-								$qry_cond   .= " and id=''";
+								//$qry_cond   .= " and id=''";
 							}
 						}
 						$k++;
@@ -610,7 +650,7 @@ function check_year_week($view_by){
 								$qry_cond   .= " and id in(".$cur_projects.")";
 							}
 							else{
-								$qry_cond   .= " and id=''";
+								//$qry_cond   .= " and id=''";
 							}
 						}
 						$cur_row    	= 'W'.($m+1).' '.$cur_year;
@@ -637,7 +677,7 @@ function check_year_week($view_by){
 									$qry_cond   .= " and id in(".$cur_projects.")";
 								}
 								else{
-									$qry_cond   .= " and id=''";
+									//$qry_cond   .= " and id=''";
 								}
 							}
 							$cur_row    = 'W'.($m+1).' '.$cur_year;
@@ -716,9 +756,7 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 		if(!empty($qry_cond)){
 			$req_cond .= $qry_cond;
 		}
-		
 		$ress = $CI->db->query("SELECT id FROM " . db_prefix() . "projects p where p.deleted_status = '0' ".$req_cond)->result_array();	
-			
 		if(!empty($ress)){
 			foreach($ress as $res1){
 				$projects[$i] = $res1['id'];
@@ -732,7 +770,6 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 			$req_projects = 0;
 		}
 	}
-	
 	$aColumns_temp = get_qry_fields();
 	$sIndexColumn = 'id';
 	$sTable       = db_prefix() . 'projects ';
@@ -750,18 +787,18 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 		if($ckey == 'pipeline_id') {
 			$aColumns[] = '(SELECT name FROM ' . db_prefix() . 'pipeline WHERE id = ' . db_prefix() . 'projects.pipeline_id) as pipeline_id';
 		} else {
-		 if($ckey == 'project_start_date'){
+			if($ckey == 'project_start_date'){
 			 $ckey = 'start_date';
-		 }
-		 else if($ckey == 'project_deadline'){
+			}
+			else if($ckey == 'project_deadline'){
 			 $ckey = 'deadline';
-		 }
-		 else if($ckey == 'won_date' || $ckey == 'lost_date'){
-			 $ckey = 'stage_on';
-		 }
-		 if(isset($aColumns_temp[$ckey])){
+			}
+			if(isset($aColumns_temp[$ckey])){
 			$aColumns[] =$aColumns_temp[$ckey];
-		 }
+			}
+			if($ckey == 'won_date' || $ckey == 'lost_date'){
+			 $ckey = 'stage_on';
+			}
 		}
 	}
 	$fields = implode(',',$aColumns);
@@ -934,7 +971,7 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 				$where_in[db_prefix().'projects.id']   =  $projects;
 			}
 			else{
-				$where[db_prefix().'projects.id']  =  '';
+				//$where[db_prefix().'projects.id']  =  '';
 			}
 			break;
 	}
@@ -958,7 +995,7 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 			$where_in[db_prefix().'projects.id']   =  $projects;
 		}
 		else{
-			$where[db_prefix().'projects.id']   =  '0';
+			//$where[db_prefix().'projects.id']   =  '0';
 		}
 	}
 	if((check_activity_date($view_by))){
@@ -981,7 +1018,6 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 			}
 		}
 	}
-	
 	if($clmn == 'lost'){
 		$where[db_prefix().'projects.stage_of']  =  '2';
 	}

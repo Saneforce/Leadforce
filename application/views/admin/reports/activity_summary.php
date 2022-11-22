@@ -23,7 +23,7 @@ foreach($custom_fields as $cfkey=>$cfval){
 ?>
 <div class="row">
 	<div class="col-md-12 m-bt-10">
-		<?php echo form_open(admin_url('reports/summary'),array('id'=>'deal_summary','method'=>'post')); ?>
+		<?php echo form_open(admin_url('reports/summary'),array('id'=>'deal_summary','method'=>'post','onsubmit'=>'return set_storage()')); ?>
 			<input type="hidden" value="<?php echo $id;?>" name="summary_edit">
 			<input type="hidden" value="activity" name="summary_val">
 			<div class="col-md-1 mar-11">

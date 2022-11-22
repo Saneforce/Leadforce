@@ -6,6 +6,7 @@ class Shared extends App_Controller
     {
         parent::__construct();
         hooks()->do_action('admin_auth_init');
+		$this->load->helper('filters');
 		$this->load->helper('report_summary');
 		$this->load->helper('reports');
 		$this->load->model('dashboard_model');

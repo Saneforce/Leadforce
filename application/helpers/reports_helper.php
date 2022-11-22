@@ -616,7 +616,14 @@ function get_task_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_
 		case'datefinished':
 			break;
 		case'status':
-			$where[db_prefix().'tasks.status']   =  $sum_id;
+			$where_in[db_prefix().'tasks.status']   =  $sum_id;
+			//$where[db_prefix().'tasks.status']   =  $sum_id;
+			break;
+		case'tasktype':
+			$where[db_prefix().'tasks.tasktype']   =  $sum_id;
+			break;
+		case'rel_type':
+			$where[db_prefix().'tasks.rel_type']   =  $sum_id;
 			break;
 		case'assignees':
 			$cond2 = (!empty($req_status))?" and t.status = '".$req_status."' ":'';
@@ -842,9 +849,15 @@ function get_task_table_fields($view_by){
 			$data['qry_cond']   = db_prefix()."tasks.status != '' group by ".db_prefix()."tasks.status order by ".db_prefix()."tasks.status asc  ";
 			$data['cur_rows']	= "status";
 			break;
+		case 'rel_type':
+			$data['tables']		= db_prefix() . "tasks ".db_prefix().'tasks ';
+			$data['fields']		= ",".db_prefix()."tasks.rel_type,count(".db_prefix()."tasks.rel_type) tot_val,".db_prefix()."tasks.rel_type req_id";
+			$data['qry_cond']   = db_prefix()."tasks.rel_type != '' group by ".db_prefix()."tasks.rel_type order by ".db_prefix()."tasks.rel_type asc  ";
+			$data['cur_rows']	= "rel_type";
+			break;
 		case 'assignees':
 			$data['tables']		= db_prefix()."task_assigned ta,".db_prefix()."tasks,".db_prefix()."staff s";
-			$data['fields']		= ",s.firstname,s.lastname,count(ta.staffid) tot_val,s.staffid req_id";
+			$data['fields']		= ",s.firstname,s.lastname,count(ta.staffid) tot_val,".db_prefix()."tasks.rel_id req_id ";
 			$data['qry_cond']   = " ta.taskid = ".db_prefix()."tasks.id and s.staffid = ta.staffid  group by ta.staffid  order by s.firstname asc";
 			$data['cur_rows']	= "firstname,lastname";
 			break;
@@ -852,6 +865,12 @@ function get_task_table_fields($view_by){
 			$data['tables']		= db_prefix() . "tasks, " . db_prefix() . "tags t, ". db_prefix() . "taggables ta ";
 			$data['fields']		= ",t.name,count(ta.tag_id) tot_val,ta.tag_id req_id ";
 			$data['qry_cond']   = " ta.rel_id = ".db_prefix()."tasks.id and t.id = ta.tag_id and ta.rel_type= 'task' group by ta.tag_id order by t.name asc";
+			$data['cur_rows']	= "name";
+			break;
+		case 'tasktype':
+			$data['tables']		= db_prefix() . "tasks, " . db_prefix() . "tasktype t ";
+			$data['fields']		= ",t.name,count(".db_prefix()."tasks.tasktype) tot_val,".db_prefix()."tasks.tasktype req_id ";
+			$data['qry_cond']   = " t.id = ".db_prefix()."tasks.tasktype group by ".db_prefix()."tasks.tasktype order by t.name asc";
 			$data['cur_rows']	= "name";
 			break;
 		case 'project_status':
@@ -1168,8 +1187,10 @@ function get_edit_data($type,$id,$staff_id){
 	$data['filters4']	=	$CI->session->userdata($ch_filter.'filters4_edit_'.$id);
 	if(!empty($filters) && $type == 'deal'){
 		$i = 0;
+		$custom_fields = get_table_custom_fields('projects');
+		$customs = array_column($custom_fields, 'slug');
 		foreach($filters as $filter1){
-			if (!empty($needed['need_fields']) && !in_array($filter1, $needed['need_fields'])){
+			if (!empty($needed['need_fields']) && !in_array($filter1, $needed['need_fields']) && (!in_array($filter1, $customs)) ){
 				unset($data['filters'][$i]);
 				unset($data['filters1'][$i]);
 				unset($data['filters2'][$i]);
@@ -1179,6 +1200,7 @@ function get_edit_data($type,$id,$staff_id){
 			$i++;
 		}
 	}
+
 	$data['folders']	=	get_report_folder($type);
 	$data['dashboards']	=	get_dashboard($staff_id);
 	$data['teamleaders'] = $CI->staff_model->get('', [ 'active' => 1]);
@@ -1347,12 +1369,13 @@ function deal_performance_summary($filters,$view_by='',$view_type='',$date_range
 	else
 		$data['sel_measure']=	$CI->session->userdata('sel_measure');
 	if($view_by == 'project_start_date'){
-		$view_by = 'start_date';
+		$view_by = $view_by1 = 'start_date';
 	}
 	else if($view_by == 'project_deadline'){
-		$view_by = 'deadline';
+		$view_by = $view_by1 = 'deadline';
 	}
 	else if($view_by == 'won_date' || $view_by == 'lost_date'){
+		$view_by1 = $view_by;
 		$view_by = 'stage_on';
 	}
 	$data['columns']		=	array($view_by,'own','lost','open','avg_deal','total_val_deal','total_cnt_deal');
@@ -1360,7 +1383,7 @@ function deal_performance_summary($filters,$view_by='',$view_type='',$date_range
 		$data['columns']	=	array($view_by,'avg_deal','total_val_deal','total_cnt_deal');
 	}
 	if($data['sel_measure'] == 'Number of Products'){
-		$data['columns']	=	array($view_by,'open','own','total_num_prdts');
+		$data['columns']	=	array($view_by,'own','lost','open','total_num_prdts');
 	}
 	if($data['sel_measure'] == 'Product Value'){
 		$data['columns']	=	array($view_by,'open','own','avg_prdt_val','total_val_prdt');
@@ -1649,8 +1672,7 @@ function get_public_dashboard($staff_id,$dash_id){
 	if(!empty($links)){
 		foreach($links as $link12){
 			$req_id = "'".$link12['id']."'";
-			$req_out .= '<div class="form-group" app-field-wrapper="name" style="float:left;width:100%"><label for="name" class="control-label"> '.$link12['link_name'].' <a href="javascript:void(0)" onclick="check_publick('.$req_id.')" style="margin-left:5px;" data-toggle="modal" data-target="#clientid_add_modal_public"><i class="fa fa-edit"></i></a></label><br><input type="text" id="name_'.$link12['id'].'" name="name" class="form-control" value="'.base_url('shared/dashboard/'.$link12['share_link']).'"  readonly style="width:75%;float:left;"><button onclick="myFunction('.$req_id.')" style="float:left;margin-left:15px;height:35px;">Copy Link</button><a href="javascript:void(0);" onclick="delete_link('.$req_id.')" style="margin-left:10px;float:left"><i class="fa fa-trash fa-2x" style="color:red"></i></a></div>
-					';
+			$req_out .= '<div class="form-group" app-field-wrapper="name" style="float:left;width:100%"><label for="name" class="control-label"> '.$link12['link_name'].' <a href="javascript:void(0)" onclick="check_publick('.$req_id.')" style="margin-left:5px;" data-toggle="modal" data-target="#clientid_add_modal_public"><i class="fa fa-edit"></i></a></label><br><input type="text" id="name_'.$link12['id'].'" name="name" class="form-control" value="'.base_url('shared/dashboard/'.$link12['share_link']).'"  readonly style="width:75%;float:left;"><button onclick="myFunction('.$req_id.')" style="float:left;margin-left:15px;height:35px;">Copy Link</button><a href="javascript:void(0);" onclick="delete_link('.$req_id.')" style="margin-left:10px;float:left"><i class="fa fa-trash fa-2x" style="color:red"></i></a></div>';
 		}
 	}
 	echo $req_out;
@@ -1791,4 +1813,46 @@ function get_dashboard_report($all_reports,$staff_id,$staff_ids=''){
 		}
 	}
 	return $data;
+}
+function getStartAndEndDate($week, $year) {
+  $dto = new DateTime();
+  $dto->setISODate($year, $week);
+  $ret['week_start'] = $dto->format('Y-m-d');
+  
+  $dto->modify('+6 days');
+  $ret['week_end'] = $dto->format('Y-m-d');
+  return $ret;
+}
+function getDatesFromRange($start, $end, $format = 'Y-m-d') {
+    $array = array();
+    $interval = new DateInterval('P1D');
+
+    $realEnd = new DateTime($end);
+    $realEnd->add($interval);
+
+    $period = new DatePeriod(new DateTime($start), $interval, $realEnd);
+
+    foreach($period as $date) { 
+        $array[] = strtotime($date->format($format)); 
+    }
+
+    return $array;
+}
+function get_week_result($results,$crow,$view_by){
+	$req_results = array();
+	$cur_row	= explode(' ',$crow);
+	$req_row	= explode('W',$cur_row[0]);
+	$cur_week	= (int)$req_row[1] - 1;
+	$week_array	= getStartAndEndDate($cur_week,date('Y'));
+	$weeks		= getDatesFromRange($week_array['week_start'],$week_array['week_end']);
+	if(!empty($results)){
+		$k1 = 0;
+		foreach($results as $result1){
+			if (in_array(strtotime($result1[$view_by]), $weeks)){
+				$req_results[$k1] = $result1;
+				$k1++;
+			}
+		}
+	}
+	return $req_results;
 }

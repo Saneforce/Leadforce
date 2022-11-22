@@ -2723,6 +2723,7 @@ function task_get_fields(){
 	$colarr = array(
 		"id"=>_l("the_number_sign"),
 		"task_name"=>_l("tasks_dt_name"),
+		"tasktype"=>_l("task_type"),
 		"status"=>_l("task_status"),
 		"description"=>_l("description"),
 		"startdate"=>_l("scheduled_date"),
