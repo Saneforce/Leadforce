@@ -16,6 +16,31 @@ class Proposal extends ClientsController
         }
 
         $identity_confirmation_enabled = get_option('proposal_accept_identity_confirmation');
+
+        if($this->input->get()){
+            $action = $this->input->get('action');
+            switch ($action) {
+                case 'proposal_pdf':
+                        $proposal_number = format_proposal_number($id);
+                        $companyname     = get_option('invoice_company_name');
+                        
+                        if ($companyname != '') {
+                            $proposal_number .= '-' . mb_strtoupper(slug_it($companyname), 'UTF-8');
+                        }
+                        try {
+                            $pdf = proposal_pdf($proposal);
+                        } catch (Exception $e) {
+                            echo $e->getMessage();
+                            die;
+                        }
+                        $pdf->Output($proposal_number . '.pdf', 'I');
+                        die;
+                    break;
+
+                default:
+                    break;
+            }
+        }
         if ($this->input->post()) {
             $action = $this->input->post('action');
             switch ($action) {

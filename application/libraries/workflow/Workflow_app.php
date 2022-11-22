@@ -107,6 +107,7 @@ class Workflow_app
         $this->ci = &get_instance();
         $this->ci->load->model('workflow_model');
         $this->ci->load->model('designation_model');
+        $this->ci->load->helper('whatsapp_helper');
     }
     
     protected function setModule($name,$title,$description,$icon,$triggers)
@@ -200,6 +201,20 @@ class Workflow_app
 
     protected function sendEmail($fromname,$send_to,$subject,$message,$servicename)
     {
+
+        echo 'Fromname : ';
+        pr($fromname);
+        echo '<hr>';
+        echo 'Subject : ';
+        pr($subject);
+        echo '<hr>';
+        echo 'Message : ';
+        pr($message);
+        echo '<hr>';
+        pr('sending email to '.$send_to.'   ...');
+        echo '<hr>';
+        echo '<hr>';
+        return true;
         $this->ci->load->config('email');
 
         $this->ci->email->clear(true);
@@ -228,10 +243,14 @@ class Workflow_app
         $child_flows =$this->ci->workflow_model->getmoduleflows($module,['parent_id'=>$parent_id]);
         if($child_flows){
             foreach($child_flows as $flow){
+                
                 $continue =false;
                 switch($flow->action){
                     case 'send_email':
                         $this->run_email($flow);
+                        break;
+                    case 'send_whatsapp':
+                        $this->run_whatsapp($flow);
                         break;
                     case 'condition':
                         $condition =$this->run_condition($flow);
@@ -243,6 +262,7 @@ class Workflow_app
                                 }
                             }
                         }else{
+                            
                             $false_flows =$this->ci->workflow_model->getmoduleflows($module,['parent_id'=>$flow->id,'action'=>'false']);
                             if($false_flows){
                                 foreach($false_flows as $false_flow){
@@ -250,7 +270,7 @@ class Workflow_app
                                 }
                             }
                         }
-                        $content =true;
+                        $continue =true;
                         break;
                     default:
                         $this->check_flow($flow);
@@ -299,5 +319,88 @@ class Workflow_app
             }
         }
         return $staff_ids;
+    }
+
+    public function getCountryCallingCode($iso2)
+    {
+        $CI = &get_instance();
+        $CI->db->where('iso2',$iso2);
+        $country =$CI->db->get(db_prefix().'countries')->row();
+        if($country){
+            return $country->calling_code;
+        }else{
+            return '91';
+        }
+    }
+
+    public function sendWhatsapp($to,$flow,$mergeFields)
+    {
+        $configure = $flow->configure;
+        $fields =$configure['variables'];
+        $whatsappFields =array();
+        if($fields){
+            foreach($fields as $field){
+                foreach ($mergeFields as $key => $val) {
+                    $val =strlen($val)>0?$val:' ';
+                    $field = stripos($field, $key) !== false
+                        ? str_ireplace($key, $val, $field)
+                        : str_ireplace($key, '""', $field);
+                }
+                $whatsappFields [] =$field;
+            }
+        }
+
+        if(isset($flow->configure['header_media_caption'])){
+            $header_media_caption =$flow->configure['header_media_caption'];
+        }
+        if(isset($flow->configure['header_media_link'])){
+            $header_media_link =$flow->configure['header_media_link'];
+        }
+        if(isset($flow->configure['header_variable'])){
+            $header_variable =$flow->configure['header_variable'];
+        }
+
+        foreach ($mergeFields as $key => $val) {
+            if(isset($flow->configure['header_variable'])){
+                $header_variable = stripos($header_variable, $key) !== false
+                ? str_ireplace($key, $val, $header_variable)
+                : str_ireplace($key, '""', $header_variable);
+            }
+            if(isset($flow->configure['header_media_link'])){
+                $header_media_link = stripos( $header_media_link, $key) !== false
+                ? str_ireplace($key, $val,  $header_media_link)
+                : str_ireplace($key, '""',  $header_media_link);
+            }
+            if(isset($flow->configure['header_media_caption'])){
+                $header_media_caption = stripos($header_media_caption, $key) !== false
+                ? str_ireplace($key, $val, $header_media_caption)
+                : str_ireplace($key, '""', $header_media_caption);
+
+            }
+        }
+        $headers =[];
+        if($flow->configure['header_format']){
+            $headers =array(
+                'header_format'=>$flow->configure['header_format'],
+                'header_variable'=>$header_variable,
+                'header_media_link'=>$header_media_link,
+                'header_media_caption'=>$header_media_caption,
+            );
+        }
+
+        // echo 'Headers';
+        // pr($header_variable);
+        // pr($header_media_caption);
+        // pr($header_media_link);
+        // echo 'Fromname : ';
+        // pr($configure['template']);
+        // echo '<hr>';
+        // echo 'Fields : ';
+        // pr($whatsappFields);
+        // echo '<hr>';
+        // pr('sending whatsapp message to '.$to.'   ...');
+        // echo '<hr>';
+        // return true;
+        whatsapp_send_template_message($to,$configure['template'],$whatsappFields,$headers);
     }
 }

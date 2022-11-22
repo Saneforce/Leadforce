@@ -44,7 +44,7 @@ function whatsapp_count_variables($message)
     return 0;
 }
 
-function whatsapp_send_template_message($to,$template,$variables)
+function whatsapp_send_template_message($to,$template,$variables,$header=array())
 {
     $parameters =array();
     if($variables){
@@ -60,6 +60,62 @@ function whatsapp_send_template_message($to,$template,$variables)
     $CI = &get_instance();
     $CI->load->model('whatsapp_model');
     $whatsapp_account =$CI->whatsapp_model->getSettings();
+
+    if($header){
+        if($header['header_format'] =='TEXT'){
+            $headerstring ='{
+                "type": "header",
+                "parameters": [
+                    {
+                        "type": "text",
+                        "text": '.$header['header_variable'].'
+                    }
+                ]
+            },';
+        }elseif($header['header_format'] =='DOCUMENT'){
+            $headerstring ='{
+                "type": "header",
+                "parameters": [
+                    {
+                        "type": "document",
+                        "document": {
+                          "link": "'.$header['header_media_link'].'",
+                          "filename": "'.$header['header_media_caption'].'"
+                        }
+                    }
+                ]
+            },';
+        }elseif($header['header_format'] =='VIDEO'){
+            $headerstring ='{
+                "type": "header",
+                "parameters": [
+                    {
+                        "type": "video",
+                        "video": {
+                          "link": "'.$header['header_media_link'].'"
+                        }
+                    }
+                ]
+            },';
+        }elseif($header['header_format'] =='IMAGE'){
+            $headerstring ='{
+                "type": "header",
+                "parameters": [
+                    {
+                        "type": "image",
+                        "image": {
+                          "link": "'.$header['header_media_link'].'"
+                        }
+                    }
+                ]
+            },';
+        }
+        
+    }else{
+        $headerstring ='';
+    }
+    // pr($headerstring);
+    // pre('sending whatsapp message to '.$to.'  ......');
 
     if($whatsapp_account){
         curl_setopt_array($curl, array(
@@ -82,6 +138,7 @@ function whatsapp_send_template_message($to,$template,$variables)
                     "code": "en_US"
                 },
                 "components": [
+                    '.$headerstring.'
                     {
                         "type": "body",
                         "parameters": '.json_encode($parameters).'
