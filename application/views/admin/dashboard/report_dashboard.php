@@ -141,6 +141,7 @@ $this->load->view('admin/dashboard/report_dashboard_js',$req_data); ?>
 $( function() {
 	
      $( ".check_widget" ).resizable({
+		
 		start: function(event,ui){
 			var par_class = $(this).attr("data-ids");
 			$("."+par_class).addClass("rm_width");
@@ -159,7 +160,10 @@ $( function() {
 				}
 			});
 		},
-		 minWidth:290
+		 minWidth:290,
+		 autoHide:true,
+		 minHeight:430,
+		 maxHeight:430
 	  
 	});  
   } );

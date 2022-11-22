@@ -8,14 +8,13 @@
 		if($i2 != $sorts[$i1]){
 			for($i2;$i2 < $sorts[$i1];$i2++){
 			?>
-				<div class="col-md-3 <?php echo 'check_'.$i2;?>" data-container="<?php echo $i2;?>"></div>
+				<div class="col-md-3 <?php echo 'check_'.$i2;?>" data-container="<?php echo $i2;?>" style="display:contents"></div>
 				
 			<?php
 			}
 		}
 ?>	
-		<div class="col-md-3   <?php echo 'check_'.$i2;?> <?php /* if(!empty($width[$i1])){ echo 'rm_width';} */?>" data-container="<?php echo $i2;?>" style="<?php if(!empty($width[$i1])){ echo 'width:'.$width[$i1].'px;';} if(!empty($height[$i1])){ /* echo 'height:'.$height[$i1].'px;'; */}?>">
-			
+		<div class="col-md-3   <?php echo 'check_'.$i2;?> <?php /* if(!empty($width[$i1])){ echo 'rm_width';} */?>" data-container="<?php echo $i2;?>" style="<?php if(!empty($width[$i1])){ echo 'width:'.$width[$i1].'px;';} /* if(!empty($height[$i1])){  echo 'height:'.$height[$i1].'px;'; } */?>">
 			<div data-ids="<?php echo 'check_'.$i2;?>" class=" widget padding-10 check_widget <?php if(!is_staff_member() && empty($public)){echo ' hide';} ?>" id="<?php echo $dashboard_ids[$i1];?>" data-name="<?php echo _l('s_chart',_l('leads')); ?>" style="<?php if(!empty($height[$i1])){ echo 'height:'.$height[$i1].'px;';}?>">
 			   <?php if(is_staff_member() || !empty($public)){ ?>
 					<div class="row">
@@ -78,6 +77,21 @@
 													}
 												}
 											}
+											else{
+												if($filter_1['filter_1'] == 'status' ){
+													$filter_1['filter_1'] = 'project_status';
+													$sql = " select name from ".db_prefix()."projects_status where id in(".$filter_1['filter_3'].")";
+													$query = $this->db->query($sql);
+													$status_results = $query->result_array();
+													if(!empty($status_results)){
+														$filter_1['filter_3'] = '';
+														foreach($status_results as $status_result1){
+															$filter_1['filter_3'] .= $status_result1['name'].',';
+														}
+														$filter_1['filter_3'] =  rtrim($filter_1['filter_3'],',');
+													}
+												}
+											}
 											if($filter_1['filter_1'] == 'project_currency' ){
 												$sql = " select name from ".db_prefix()."currencies where id in(".$filter_1['filter_3'].")";
 												$query = $this->db->query($sql);
@@ -114,14 +128,14 @@
 											}
 											if(check_activity_date($filter_1['filter_1'])){
 												if(empty($dashoard_data[0]['period'])){
-													$all_filters[] = ' '._l($filter_1['filter_1']).' '._l($filter_1['filter_2']).' '._l($filter_1['filter_3']).' '._l($filter_1['filter_4']).' '._l($filter_1['filter_5']);
+													$all_filters[] = ' '._l($filter_1['filter_1']).' '._l($filter_1['filter_2']).' '._l($filter_1['filter_3']).': '._l($filter_1['filter_4']).' '._l($filter_1['filter_5']);
 												}
 												else{
-													$all_filters[] = ' '._l($filter_1['filter_1']).' '._l($dashoard_data[0]['period']).' '._l($dashoard_data[0]['date1']).' '._l($dashoard_data[0]['date2']);
+													$all_filters[] = ' '._l($filter_1['filter_1']).' '._l($dashoard_data[0]['period']).': '._l($dashoard_data[0]['date1']).' '._l($dashoard_data[0]['date2']);
 												}
 											}
 											else{
-												$all_filters[] = ' '._l($filter_1['filter_1']).' '._l($filter_1['filter_2']).' '._l($filter_1['filter_3']);
+												$all_filters[] = ' '._l($filter_1['filter_1']).' '._l($filter_1['filter_2']).': '._l($filter_1['filter_3']);
 											}
 											$cur_cnt++;
 										}
@@ -153,13 +167,13 @@
 										<?php
 									}?>
 									<hr class="hr-panel-heading-dashboard" >
-									<div class="relative" style="height:490px;<?php if($tabs1[$i1] == 1){?>overflow:scroll;<?php }?>" id="div_<?php echo $dashboard_ids[$i1];?>">
+									<div class="relative" style="height:300px;<?php if($tabs1[$i1] == 1){?>overflow:scroll;<?php }?>" id="div_<?php echo $dashboard_ids[$i1];?>">
 										<?php if($tabs1[$i1] == 3 && ($tabs2[$i1] == 0 || $tabs2[$i1] == 1)){?>
-											<canvas class="chart" height="250" id="report_pie_chart_<?php echo $i1;?>"></canvas>
+											<canvas class="chart"  id="report_pie_chart_<?php echo $i1;?>"></canvas>
 										<?php }else if($tabs1[$i1] == 3 && $tabs2[$i1] == 2){?>
-											<canvas class="chart" height="250" id="report_bar_chart_<?php echo $i1;?>"></canvas>
+											<canvas class="chart"  id="report_bar_chart_<?php echo $i1;?>"></canvas>
 										<?php }else if($tabs1[$i1] == 3 && $tabs2[$i1] == 3){?>
-											<canvas class="chart" height="250" id="report_horizontal_chart_<?php echo $i1;?>"></canvas>
+											<canvas class="chart"  id="report_horizontal_chart_<?php echo $i1;?>"></canvas>
 										<?php }else if($tabs1[$i1] == 1){
 											$data['summary'] = $summary[$i1];
 											$this->load->view('admin/reports/summary_view',$data);
