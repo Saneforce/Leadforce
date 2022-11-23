@@ -108,7 +108,7 @@
                                     var placeholderpicker = `<div class="btn-group placeholder-picker" data-targer-input="#variable_` + index + `" style="width:100%">` + workflowl.getPlaceHolderPicker() + `<div>`;
 
                                     $('#WhatsappConfig #bodyVariables').append(`<div class="form-group">
-                                    <label for="message" class="control-label">Variable {{` + index + `}}</label>
+                                    <label for="variable_` + index + `" class="control-label">Variable {{` + index + `}}</label>
                                     <input type="text" id="variable_` + index + `" value="` + variableValue + `" name="variable_` + index + `" class="form-control variablesfield">
                                 ` + placeholderpicker + `</div>`);
                                     $('#WhatsappConfig #variable_' + index).attr('required', "");

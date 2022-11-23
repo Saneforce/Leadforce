@@ -66,7 +66,9 @@
                                     <div class="sidebar-setup" id="sidebarsetupwhatsapp">
                                         <?php $this->load->view('admin/workflow/whatsapp'); ?>
                                     </div>
-
+                                    <div class="sidebar-setup" id="sidebarsetupsms">
+                                        <?php $this->load->view('admin/workflow/sms'); ?>
+                                    </div>
                                     <div class="sidebar-setup" id="sidebarsetupapproval">
                                         <?php $this->load->view('admin/workflow/approval'); ?>
                                     </div>
@@ -258,7 +260,6 @@
         display: block;
         height: 2em;
         padding: 0;
-        vertical-align: middle;
         width: 100%;
     }
 

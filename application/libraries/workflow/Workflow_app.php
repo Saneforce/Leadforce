@@ -108,6 +108,7 @@ class Workflow_app
         $this->ci->load->model('workflow_model');
         $this->ci->load->model('designation_model');
         $this->ci->load->helper('whatsapp_helper');
+        $this->ci->load->model('sms_model');
     }
     
     protected function setModule($name,$title,$description,$icon,$triggers)
@@ -251,6 +252,9 @@ class Workflow_app
                         break;
                     case 'send_whatsapp':
                         $this->run_whatsapp($flow);
+                        break;
+                    case 'send_sms':
+                        $this->run_sms($flow);
                         break;
                     case 'condition':
                         $condition =$this->run_condition($flow);
@@ -402,5 +406,33 @@ class Workflow_app
         // echo '<hr>';
         // return true;
         whatsapp_send_template_message($to,$configure['template'],$whatsappFields,$headers);
+    }
+
+    public function sendSms($to,$flow,$mergeFields)
+    {
+        
+        $configure = $flow->configure;
+        $fields =$configure['variables'];
+        $smsFields =array();
+        if($fields){
+            foreach($fields as $field){
+                foreach ($mergeFields as $key => $val) {
+                    $val =strlen($val)>0?$val:' ';
+                    $field = stripos($field, $key) !== false
+                        ? str_ireplace($key, $val, $field)
+                        : str_ireplace($key, '""', $field);
+                }
+                $smsFields [] =$field;
+            }
+        }
+
+        $smsconfiguration =$this->ci->sms_model->getConfig();
+        if($smsconfiguration ){
+            if($smsconfiguration['provider'] =='daffytel'){
+                $this->ci->load->library('sms/sms_daffytel');
+                $this->ci->sms_daffytel->send($to,$configure['template'],$smsFields);
+            }
+        }
+        
     }
 }

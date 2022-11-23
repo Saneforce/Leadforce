@@ -4214,3 +4214,9 @@ $lang['this_year']			=	'This Year';
 $lang['live_updates']		=	'Live Updates';
 $lang['project_currency']	=	'Currency';
 $lang['task_type']			=	'Activity type';
+
+$lang['no']			        =	'No';
+$lang['dlt_template_id']	=	'DLT template Id';
+$lang['sender']			    =	'Sender';
+$lang['route']			    =	'Route';
+$lang['content']			=	'Content';
