@@ -56,6 +56,7 @@ var workflowl =function(module){
 
     var moudleplacehoders ={};
     var whatsappVariables ={};
+    var smsVariables ={};
     var workflowlnotificationto={
         customer:'Send to customer',
         staff:'Send to staff',
@@ -131,6 +132,14 @@ var workflowl =function(module){
                     }
                     var description =flow.configure.template;
                     workflowl.updateBlockContent(flow.id,title,'Template : <b>'+description+'</b>');
+                }else if(trigger.type =='notification' && trigger.medium =='sms'){
+                    if(flow.configure.sendto =='customer'){
+                        var title ='Send to customer';
+                    }else if(flow.configure.sendto =='staff'){
+                        var title ='Send to staff';
+                    }
+                    var description =$('#SMSConfig #template option[value="'+flow.configure.template+'"]').html();
+                    workflowl.updateBlockContent(flow.id,title,'Template : <b>'+description+'</b>');
                 }else if(flow.action =='approval_level'){
                     if(flow.configure){
                         description =`Assigned to `;
@@ -166,6 +175,7 @@ var workflowl =function(module){
 
         $('#deleteNode').click(function(){
             workflowl.deleteNode();
+            workflowl.selectNode($('.rootnode'));
         })
     }
 
@@ -303,7 +313,8 @@ var workflowl =function(module){
                 $('#sidebarsetupemail').addClass('show');
             }else if(trigger.type =='notification' && trigger.medium =='whatsapp'){
                 if(flow.configure){
-                    workflowl.setWhatsappVariables(flow.configure.variables);
+                    if(typeof flow.configure.variables !='undefined')
+                        workflowl.setWhatsappVariables(flow.configure.variables);
                     $('form#WhatsappConfig [name="sendto"]').val(flow.configure.sendto);
                     $('form#WhatsappConfig [name="template"]').val(flow.configure.template).trigger('change');
 
@@ -319,6 +330,15 @@ var workflowl =function(module){
                 }
                 $('#sidebarSettingsTitle').html("Setup whatsapp template");
                 $('#sidebarsetupwhatsapp').addClass('show');
+            }else if(trigger.type =='notification' && trigger.medium =='sms'){
+                if(flow.configure){
+                    if(typeof flow.configure.variables !='undefined')
+                        workflowl.setSmsVariables(flow.configure.variables);
+                    $('form#SMSConfig [name="sendto"]').val(flow.configure.sendto);
+                    $('form#SMSConfig [name="template"]').val(flow.configure.template).trigger('change');
+                }
+                $('#sidebarSettingsTitle').html("Setup SMS template");
+                $('#sidebarsetupsms').addClass('show');
             }else if(blockname =='approval_level'){
                 $('#ApprovalConfig [name="approver"] option[value="0"]').html(`Reporting Level `);
                 if(flow.configure){
@@ -416,6 +436,15 @@ var workflowl =function(module){
 
     workflowl.getWhatsappVariables= function(){
         return whatsappVariables;
+    }
+
+
+    workflowl.setSmsVariables= function(variables){
+        smsVariables = variables;
+    }
+
+    workflowl.getSmsVariables= function(){
+        return smsVariables;
     }
 
 

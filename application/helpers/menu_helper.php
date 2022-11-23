@@ -590,6 +590,27 @@ function app_init_admin_sidebar_menu_items() {
                 'position' => 20,
             ]);
         }
+
+        if (has_permission('settings')) {
+            $CI->app_menu->add_setup_menu_item('sms', [
+                'collapse' => true,
+                'name' => _l('sms'),
+                'position' => 20,
+            ]);
+            $CI->app_menu->add_setup_children_item('sms', [
+                'slug' => 'sms-templates',
+                'name' => 'Templates',
+                'href' => admin_url('sms'),
+                'position' => 5,
+            ]);
+            $CI->app_menu->add_setup_children_item('sms', [
+                'slug' => 'sms-daffytel',
+                'name' => 'Daffytel',
+                'href' => admin_url('sms/daffytel'),
+                'position' => 5,
+            ]);
+        }
+
         if (has_permission('finance')) {
             $CI->app_menu->add_setup_menu_item('finance', [
                 'collapse' => true,

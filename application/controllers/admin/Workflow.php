@@ -33,13 +33,15 @@ class Workflow extends AdminController
 
     public function module($module)
     {
-        $this->load->model("roles_model");
-        $this->load->model("designation_model");
+       
         // hooks()->do_action('lead_created','138');
         // die;
         if (!has_permission($this->moudle_permission_name, '', 'edit')) {
             access_denied($this->moudle_permission_name);
         }
+        $this->load->model("roles_model");
+        $this->load->model("designation_model");
+        $this->load->model("sms_model");
         $data =['title'=>_l('workflow_automation')];
 
         $moduleDetails =$this->workflow_app->getModuleDetails($module);

@@ -71,15 +71,15 @@ class Lead_workflow extends Workflow_app
             ',
             'triggers'=>[],
         ],
-        // 'send_sms'=>[
-        //     'title'=>'Send SMS',
-        //     'type'=>'notification',
-        //     'medium'=>'sms',
-        //     'description'=>'Send SMS notification.',
-        //     'icon'=>'<i class="fa fa-commenting text-primary" aria-hidden="true"></i>
-        //     ',
-        //     'triggers'=>[],
-        // ],
+        'send_sms'=>[
+            'title'=>'Send SMS',
+            'type'=>'notification',
+            'medium'=>'sms',
+            'description'=>'Send SMS notification.',
+            'icon'=>'<i class="fa fa-commenting text-primary" aria-hidden="true"></i>
+            ',
+            'triggers'=>[],
+        ],
         'true'=>[
             'title'=>'True',
             'description'=>'If condition true.',
@@ -386,6 +386,22 @@ class Lead_workflow extends Workflow_app
                 $sendto =$this->getCountryCallingCode($this->lead->phone_country_code) .$this->lead->phonenumber;
             }
             $this->sendWhatsapp($sendto, $flow, $this->merge_fields);
+        }
+    }
+
+    protected function run_sms($flow)
+    {
+        
+        if($flow->configure){
+            $sendto =$flow->configure['sendto'];
+            if($flow->configure['sendto'] =='staff'){
+                $this->ci->db->where('staffid', $this->lead->assigned);
+                $staff = $this->ci->db->get(db_prefix() . 'staff')->row();
+                $sendto =$this->getCountryCallingCode($staff->phone_country_code) . $staff->phonenumber;
+            }elseif($flow->configure['sendto'] =='customer'){
+                $sendto =$this->getCountryCallingCode($this->lead->phone_country_code) .$this->lead->phonenumber;
+            }
+            $this->sendSMS($sendto, $flow, $this->merge_fields);
         }
     }
 }
