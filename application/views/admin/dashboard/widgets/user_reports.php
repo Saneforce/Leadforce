@@ -9,7 +9,6 @@
 			for($i2;$i2 < $sorts[$i1];$i2++){
 			?>
 				<div class="col-md-3 <?php echo 'check_'.$i2;?>" data-container="<?php echo $i2;?>" style="display:contents"></div>
-				
 			<?php
 			}
 		}
@@ -174,7 +173,18 @@
 											<canvas class="chart"  id="report_bar_chart_<?php echo $i1;?>"></canvas>
 										<?php }else if($tabs1[$i1] == 3 && $tabs2[$i1] == 3){?>
 											<canvas class="chart"  id="report_horizontal_chart_<?php echo $i1;?>"></canvas>
-										<?php }else if($tabs1[$i1] == 1){
+										<?php }else if($tabs1[$i1] == 3 && $tabs2[$i1] == 4){
+										?>
+											<div class="relative text-center bold font-20">
+												<p class="bold"> <?php echo score_report($summary[$i1]);?></p>
+												<p class="bold">
+													<?php 
+													echo ($summary[$i1]['sel_measure'] == 'Number')?$summary[$i1]['sel_measure'].' Of '._l('task'):$summary[$i1]['sel_measure'];
+													?>
+												</p>
+											</div>
+										<?php
+										}else if($tabs1[$i1] == 1){
 											$data['summary'] = $summary[$i1];
 											$this->load->view('admin/reports/summary_view',$data);
 										}?>
@@ -241,6 +251,10 @@ th.cur_thead{
 }
 .rm_width{
 	width:unset !important;
+}
+.font-20{
+	font-size:20px;
+	top:30%
 }
 </style>
 <script>
@@ -361,7 +375,7 @@ function refresh_chart(a,b,c,tab_id,cur_id){
 							options: {
 								responsive:true,
 								legend: {
-									display: false
+									display: true
 								},
 								maintainAspectRatio:false,
 						   }

@@ -4214,3 +4214,6 @@ $lang['this_year']			=	'This Year';
 $lang['live_updates']		=	'Live Updates';
 $lang['project_currency']	=	'Currency';
 $lang['task_type']			=	'Activity type';
+$lang['score_card']			=	'Score Card';
+$lang['dateadded']			=	'Created Date';
+$lang['datefinished']		=	'Finished Date';

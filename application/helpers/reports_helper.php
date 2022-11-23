@@ -617,7 +617,6 @@ function get_task_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_
 			break;
 		case'status':
 			$where_in[db_prefix().'tasks.status']   =  $sum_id;
-			//$where[db_prefix().'tasks.status']   =  $sum_id;
 			break;
 		case'tasktype':
 			$where[db_prefix().'tasks.tasktype']   =  $sum_id;
@@ -1386,7 +1385,7 @@ function deal_performance_summary($filters,$view_by='',$view_type='',$date_range
 		$data['columns']	=	array($view_by,'own','lost','open','total_num_prdts');
 	}
 	if($data['sel_measure'] == 'Product Value'){
-		$data['columns']	=	array($view_by,'open','own','avg_prdt_val','total_val_prdt');
+		$data['columns']	=	array($view_by,'own','lost','open','avg_prdt_val','total_val_prdt');
 	}
 	if($view_by == 'project_status'){
 		$data['columns']	=	array($view_by,'avg_deal','total_val_deal','total_cnt_deal');
@@ -1855,4 +1854,10 @@ function get_week_result($results,$crow,$view_by){
 		}
 	}
 	return $req_results;
+}
+function score_report($summary){
+	$last_key	= $summary['columns'][count($summary['columns'])-1];
+	$cl_las_key = count($summary['summary_cls'])-1;
+	$req_out	= $summary['summary_cls'][$cl_las_key][$last_key];
+	return $req_out;
 }

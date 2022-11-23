@@ -263,7 +263,6 @@ class Reports extends AdminController
 	}
 	public function summary(){
 		if(isset($_POST['submit'])){
-			
 			$filter_data['view_by']		=	$_POST['view_by'];
 			$filter_data['date_range1']	=	'';
 			if(check_activity_date($filter_data['view_by'])){
@@ -514,7 +513,7 @@ class Reports extends AdminController
 				if($data['view_by']		==	'project_deadline'){
 					$data['view_by']	=	'deadline';
 				}
-				if($data['view_by']		==	'won_date' || $data['view_by']		==	'lost_date'){
+				if($data['view_by']		==	'won_date' || $data['view_by']	==	'lost_date'){
 					$data['view_by']	=	'stage_on';
 				}
 				$data['results']		=	get_qry($data['clmn'],$data['crow'],$data['view_by'],$data['measure'],$data['date_range'],$data['view_type'],$data['sum_id'],$deals);
@@ -1814,6 +1813,21 @@ class Reports extends AdminController
 		}
 		if(!empty($upd_report)){
 			$this->db->update(db_prefix() . 'report', $upd_report, $condition);
+		}
+		$fields = 'dashboard_id';
+		$condition = array('report_id'=>$req_id);
+		$this->db->select($fields);
+		$this->db->from(db_prefix().'dashboard');
+		$this->db->where($condition); 
+		$this->db->order_by('sort desc'); 
+		$query = $this->db->get();
+		$res = $query->result_array();
+		if(!empty($res[0]['dashboard_id'])){
+			$condition = array('report_id'=>$req_id);
+			$upd_dashboard = array();
+			$upd_dashboard['tab_1'] = $tab1;
+			$upd_dashboard['tab_2'] = $tab2;
+			$this->db->update(db_prefix() . 'dashboard', $upd_dashboard, $condition);
 		}
 		return true;
 	}

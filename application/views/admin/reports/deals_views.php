@@ -475,7 +475,7 @@ $(function() {
 				responsive:true,
 				showInLegend:true,
 				legend: {
-					display: false
+					display: true
 				},
 				maintainAspectRatio:false,
 		   }
