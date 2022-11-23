@@ -175,6 +175,7 @@ var workflowl =function(module){
 
         $('#deleteNode').click(function(){
             workflowl.deleteNode();
+            workflowl.selectNode($('.rootnode'));
         })
     }
 

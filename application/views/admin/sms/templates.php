@@ -33,7 +33,7 @@
                                         <td data-order="<?php echo $template->sender; ?>"><?php echo $template->sender; ?></td>
                                         <td data-order="<?php echo $template->route; ?>"><?php echo $template->route; ?></td>
                                         <td><?php echo $template->content; ?></td>
-                                        <td><a href="<?= admin_url('call_settings/delete_ivr/'.$template->id) ?>" class="btn text-danger delete_ivr_link"><i class="fa fa-trash" aria-hidden="true"></i> Delete</a></td>
+                                        <td><a href="<?= admin_url('sms/deleteTemplate/'.$template->id) ?>" class="btn text-danger delete_link"><i class="fa fa-trash" aria-hidden="true"></i> Delete</a></td>
                                     </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -95,6 +95,13 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function(event) { 
+
+        $('.delete_link').click(function(e) {
+            if (confirm('Do you want to delete this?') ==false) {
+                e.preventDefault();
+            }
+        });
+
         $('#newTemplateModel').click(function(){
             $('.template_form_errors').remove();
             $('#templateForm').trigger('reset');

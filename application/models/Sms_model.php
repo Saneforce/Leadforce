@@ -70,4 +70,10 @@ class Sms_model extends App_Model
         }
         return array();
     }
+
+    public function deleteTemplate($id)
+    {
+        $this->db->where('id',$id);
+        $this->db->delete(db_prefix().'sms_templates');
+    }
 }

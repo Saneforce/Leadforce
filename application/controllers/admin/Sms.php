@@ -67,4 +67,13 @@ class Sms extends AdminController
         $data =['title'=>_l('daffytel')];
         $this->load->view('admin/sms/daffytel',$data);
     }
+
+    public function deleteTemplate($id)
+    {
+        if (!has_permission($this->moudle_permission_name, '', 'delete')) {
+            access_denied($this->moudle_permission_name);
+        }
+        $this->sms_model->deleteTemplate($id);
+        redirect(admin_url('sms'));
+    }
 }
