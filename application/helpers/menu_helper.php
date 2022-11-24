@@ -600,13 +600,13 @@ function app_init_admin_sidebar_menu_items() {
             $CI->app_menu->add_setup_children_item('sms', [
                 'slug' => 'sms-templates',
                 'name' => 'Templates',
-                'href' => admin_url('sms'),
+                'href' => admin_url('plugins/sms'),
                 'position' => 5,
             ]);
             $CI->app_menu->add_setup_children_item('sms', [
                 'slug' => 'sms-daffytel',
                 'name' => 'Daffytel',
-                'href' => admin_url('sms/daffytel'),
+                'href' => admin_url('plugins/sms/daffytel'),
                 'position' => 5,
             ]);
         }

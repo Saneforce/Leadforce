@@ -43,11 +43,10 @@ class Sms_model extends App_Model
                 'route'=>$this->input->post('route'),
                 'content'=>$this->input->post('content'),
             );
-
             $this->db->insert(db_prefix().'sms_templates',$data);
             return array(
                 'success'=>true,
-                'msg'=>'Flow added successfully'
+                'msg'=>'Template added successfully'
             );
         }
     }
