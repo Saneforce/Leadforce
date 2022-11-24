@@ -207,7 +207,7 @@ foreach($custom_fields as $cfkey=>$cfval){
 												}
 											}
 											else{
-												echo !empty($summary['summary_cls'][$i][$clm1])?$summary['summary_cls'][$i][$clm1]:0;
+												echo !empty($summary['summary_cls'][$i][$clm1])?_l($summary['summary_cls'][$i][$clm1]):0;
 											}	
 											?>
 											<?php if($j != 0 && $j != $k  && $summary['summary_cls'][$i][$summary['columns'][0]] !='Average' && $summary['summary_cls'][$i][$summary['columns'][0]] !='Total'){?>

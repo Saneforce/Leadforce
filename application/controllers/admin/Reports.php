@@ -271,13 +271,12 @@ class Reports extends AdminController
 			$filter_data['view_type']	=	$_POST['view_type'];
 			
 			$filter_data['sel_measure']	=	$_POST['sel_measure'];
-			
 			$type = $_POST['summary_val'];
 			$type = ($type=='deal')?'':'activity_';
 			//$filter_data['report_type']	=	($type=='')?'deal':'activity';
 			$this->session->set_userdata($filter_data);
 			if(!empty($_POST['summary_edit'])){
-				redirect(admin_url($type.'reports/edit/'.$_POST['summary_edit']));
+				redirect(admin_url($type.'reports/edit/'.$_POST['summary_edit'].'?filter_tab=1'));
 				exit;
 			}
 		}

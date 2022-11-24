@@ -2657,7 +2657,7 @@ function get_public($report_id){
 function get_tasks_need_fields(){
 	$fields = get_option('deal_fields');
 	$data =array();
-	$data['need_fields'] = array('project_name','id','tasktype','priority','assignees','task_name','description','tags','company','project_contacts','teamleader','status','project_status','startdate','dateadded','datemodified','datefinished','project_pipeline');
+	$data['need_fields'] = array('project_name','id','tasktype','priority','assignees','task_name','description','tags','company','project_contacts','teamleader','status','project_status','startdate','dateadded','datemodified','datefinished','project_pipeline','rel_type');
 	if(!empty($fields) && $fields != 'null'){
 		$req_fields = json_decode($fields);
 		if(!empty($req_fields)){

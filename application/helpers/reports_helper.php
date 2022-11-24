@@ -259,7 +259,7 @@ function get_activity_filters($req_filters,$check_data=''){
 		foreach($filters as $filter12){
 			if ((!empty($needed['need_fields']) && in_array($filter12, $needed['need_fields'])) || in_array($filter12, $customs)){
 				$check_cond = filter_cond($filters2[$i1]);
-				$activity_vals 	= $CI->db->query("SELECT filter_name,filter_cond,filter_type,date_field,filter FROM ".$table." where filter_name = '".$filter12."' and filter_type= '".$filters1[$i1]."' and filter = 'activity' ")->result_array();
+				/* $activity_vals 	= $CI->db->query("SELECT filter_name,filter_cond,filter_type,date_field,filter FROM ".$table." where filter_name = '".$filter12."' and filter_type= '".$filters1[$i1]."' and filter = 'activity' ")->result_array();
 				if(!empty($activity_vals)){
 					$cur_cond = $activity_vals[0]['filter_cond'];
 					$cur_cond = str_replace('db_prefix()', db_prefix(), $cur_cond);
@@ -295,6 +295,45 @@ function get_activity_filters($req_filters,$check_data=''){
 						$date2 = "'".date('Y-m-d',strtotime($filters4[$i1]))."'";
 						
 						$cur_cond = str_replace('$$date2', $date2, $cur_cond);
+					}
+					$req_cond .= $cur_cond;
+					array_push($where, $cur_cond);
+				} */
+				$cur_cond12 = get_filter_cond($filter12,$filters1[$i1]);
+				if($cur_cond12!=''){
+					$cur_cond = str_replace('db_prefix()', db_prefix(), $cur_cond12);
+					if(($filters1[$i1]=='is' || $filters1[$i1]=='is_more_than' || $filters1[$i1]=='is_less_than' || $filters1[$i1]=='is_not') && $deal_vals[0]['date_field'] ==0){
+						if($check_cond){
+							$cur_cond = str_replace('!!cond1', "'".$filters2[$i1]."'", $cur_cond);
+						}
+						else{
+							$cur_cond = '';
+						}
+					}
+					if($filters1[$i1]=='is_any_of'){
+						if($check_cond){
+							$req_arrs = explode(',',$filters2[$i1]);
+							$req_arr = '';
+							if(!empty($req_arrs)){
+								foreach($req_arrs as $req_arr1){
+									$req_arr .= "'".$req_arr1."',";
+								}
+							}
+							$req_arr = rtrim($req_arr,",");
+							$cur_cond = str_replace('!!in_cond', $req_arr, $cur_cond);
+						}
+						else{
+							$cur_cond = '';
+						}
+					}
+					if (str_contains($cur_cond, '!!date1')) {
+						$date1 = "'".date('Y-m-d',strtotime($filters3[$i1]))."'";
+						$cur_cond = str_replace('!!date1', $date1, $cur_cond);
+					}
+					if (str_contains($cur_cond, '!!date2')) {
+						$date2 = "'".date('Y-m-d',strtotime($filters4[$i1]))."'";
+						
+						$cur_cond = str_replace('!!date2', $date2, $cur_cond);
 					}
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
