@@ -194,6 +194,10 @@ class Reports extends AdminController
 				$filter_data['filters1'][$i]	=	'is';  
 				$filter_data['filters2'][$i]	=	$pipelines[0]['id']; 
 			}
+			$filter_data['view_by']		=	'project_start_date';
+			$filter_data['view_type']	=	'date';
+			$filter_data['date_range1']	=	'Monthly';
+			$filter_data['sel_measure']	=	_l('num_deals');
 			$type = 'deal';
 		}
 		else if($report_12_id == 'duration'){
@@ -215,6 +219,10 @@ class Reports extends AdminController
 				$filter_data['filters1'][2]	=	'is_any_of';  
 				$filter_data['filters2'][2]	=	'WON,LOST'; 
 			}
+			$filter_data['view_by']		=	'project_start_date';
+			$filter_data['view_type']	=	'date';
+			$filter_data['date_range1']	=	'Monthly';
+			$filter_data['sel_measure']	=	_l('num_deals');
 			$type = 'deal';
 		}
 		else if($report_12_id == 'progress'){
@@ -251,6 +259,10 @@ class Reports extends AdminController
 			$filter_data['activity_filters4'][0]	=	date('t').'-'.date('m').'-'.date('Y');  
 			$type = 'activity';
 		}
+		$filter_data['view_by']		=	'project_start_date';
+		$filter_data['view_type']	=	'date';
+		$filter_data['date_range1']	=	'Monthly';
+		$filter_data['sel_measure']	=	_l('num_deals');
 		$filter_data['report_type'] = _l($report_12_id);
 		$summary_filter = set_activity_summary($type);
 		$this->session->set_userdata($filter_data);

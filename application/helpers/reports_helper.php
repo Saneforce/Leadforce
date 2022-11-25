@@ -299,7 +299,7 @@ function get_activity_filters($req_filters,$check_data=''){
 					$req_cond .= $cur_cond;
 					array_push($where, $cur_cond);
 				} */
-				$cur_cond12 = get_filter_cond($filter12,$filters1[$i1]);
+				$cur_cond12 = get_filter_cond($filter12,$filters1[$i1],'activity');
 				if($cur_cond12!=''){
 					$cur_cond = str_replace('db_prefix()', db_prefix(), $cur_cond12);
 					if(($filters1[$i1]=='is' || $filters1[$i1]=='is_more_than' || $filters1[$i1]=='is_less_than' || $filters1[$i1]=='is_not') && $deal_vals[0]['date_field'] ==0){
@@ -1075,6 +1075,14 @@ function set_filter($type='',$all_clmns,$cus_flds){
 	$filters2	=	$CI->session->userdata($type.'filters2'.$cur_id12);
 	$filters3	=	$CI->session->userdata($type.'filters3'.$cur_id12);
 	$filters4	=	$CI->session->userdata($type.'filters4'.$cur_id12);
+	$filters1	=	$CI->session->userdata($type.'filters1'.$cur_id12);
+	if(!empty($filters1)){
+		$i1 = 0;
+		foreach($filters1 as $key12 => $filter1){
+			$filter_data[$type.'filters1'.$cur_id12][$i1]	=	$filter1; 
+			$i1++;
+		}
+	}
 	if(!empty($filters2)){
 		$i1 = 0;
 		foreach($filters2 as $key12 => $filter1){
@@ -1721,10 +1729,10 @@ function get_report_filter($report_id){
 	return $filters;
 	
 }
-function get_dashboard_report($all_reports,$staff_id,$staff_ids=''){
+function get_dashboard_report($all_reports,$staff_id,$staff_ids='',$dashboard_id){
 	$CI   = &get_instance();
 	$i1 = 0;
-	$cond = array('staff_id'=>$staff_id);
+	$cond = array('staff_id'=>$staff_id,'dashboard_id'=>$dashboard_id);
 	$CI->db->select('staff_id,period,date1,date2,member');
 	$CI->db->where($cond); 
 	$CI->db->from(db_prefix() . 'dashboard_filter');
@@ -1899,4 +1907,235 @@ function score_report($summary){
 	$cl_las_key = count($summary['summary_cls'])-1;
 	$req_out	= $summary['summary_cls'][$cl_las_key][$last_key];
 	return $req_out;
+}
+function get_filter_name($filter_1,$type1){
+	$CI   = &get_instance();
+	if($type1 == 'activity'){
+		if($filter_1['filter_1'] == 'company' ){
+			$sql = " select company from ".db_prefix()."clients where userid in(".$filter_1['filter_3'].")";
+			$query = $CI->db->query($sql);
+			$status_results = $query->result_array();
+			if(!empty($status_results)){
+				$filter_1['filter_3'] = '';
+				foreach($status_results as $status_result1){
+					$filter_1['filter_3'] .= $status_result1['company'].',';
+				}
+				$filter_1['filter_3'] =  rtrim($filter_1['filter_3'],',');
+			}
+		}
+		if($filter_1['filter_1'] == 'project_pipeline' ){
+			$sql = " select name from ".db_prefix()."pipeline where id in(".$filter_1['filter_3'].")";
+			$query = $CI->db->query($sql);
+			$status_results = $query->result_array();
+			if(!empty($status_results)){
+				$filter_1['filter_3'] = '';
+				foreach($status_results as $status_result1){
+					$filter_1['filter_3'] .= $status_result1['name'].',';
+				}
+				$filter_1['filter_3'] =  rtrim($filter_1['filter_3'],',');
+			}
+		}
+		if($filter_1['filter_1'] == 'project_status' ){
+			$sql = " select name from ".db_prefix()."projects_status where id in(".$filter_1['filter_3'].")";
+			$query = $CI->db->query($sql);
+			$status_results = $query->result_array();
+			if(!empty($status_results)){
+				$filter_1['filter_3'] = '';
+				foreach($status_results as $status_result1){
+					$filter_1['filter_3'] .= $status_result1['name'].',';
+				}
+				$filter_1['filter_3'] =  rtrim($filter_1['filter_3'],',');
+			}
+		}
+		if($filter_1['filter_1'] == 'project_name'){
+			$sql = " select name from ".db_prefix()."projects where id in(".$filter_1['filter_3'].")";
+			$query = $CI->db->query($sql);
+			$staff_results = $query->result_array();
+			if(!empty($staff_results)){
+				$filter_1['filter_3'] = '';
+				foreach($staff_results as $staff_result){
+					$filter_1['filter_3'] .= $staff_result['name'].',';
+				}
+				$filter_1['filter_3'] =  rtrim($filter_1['filter_3'],',');
+			}
+		}
+		if($filter_1['filter_1'] == 'project_contacts'){
+			$sql = " select firstname,lastname from ".db_prefix()."contacts where id in(".$filter_1['filter_3'].")";
+			$query = $CI->db->query($sql);
+			$staff_results = $query->result_array();
+			if(!empty($staff_results)){
+				$filter_1['filter_3'] = '';
+				foreach($staff_results as $staff_result){
+					$filter_1['filter_3'] .= $staff_result['firstname'].' '.$staff_result['lastname'].',';
+				}
+				$filter_1['filter_3'] =  rtrim($filter_1['filter_3'],',');
+			}
+		}
+		if($filter_1['filter_1'] == 'priority'){
+			if(str_contains($filter_1['filter_3'], ',')){
+				$req_out = '';
+				$check_filter = explode(',',$filter_1['filter_3']);
+				if (in_array("1", $check_filter)){
+					$req_out .=  _l('task_priority_low').',';
+				}
+				if (in_array("2", $check_filter)){
+					$req_out .=  _l('task_priority_medium').',';
+				}
+				if (in_array("3", $check_filter)){
+					$req_out .=    _l('task_priority_high').',';
+				}
+				if (in_array("4", $check_filter)){
+					$req_out .=   _l('task_priority_urgent').',';
+				}
+				$filter_1['filter_3'] = $req_out;
+			}
+			else{
+				if($filter_1['filter_3'] == '1'){
+					$filter_1['filter_3'] =  _l('task_priority_low');
+				}
+				else if($filter_1['filter_3'] == '2'){
+					$filter_1['filter_3'] =  _l('task_priority_medium');
+				}
+				else if($filter_1['filter_3'] == '3'){
+					$filter_1['filter_3'] =    _l('task_priority_high');
+				}
+				else if($filter_1['filter_3'] == '4'){
+					$filter_1['filter_3'] =   _l('task_priority_urgent');
+				}
+			}
+			$filter_1['filter_3'] =  rtrim($filter_1['filter_3'],',');
+		}
+		if($filter_1['filter_1'] == 'assignees' || $filter_1['filter_1'] == 'teamleader'){
+			$sql = " select firstname,lastname from ".db_prefix()."staff where staffid in(".$filter_1['filter_3'].")";
+			$query = $CI->db->query($sql);
+			$staff_results = $query->result_array();
+			if(!empty($staff_results)){
+				$filter_1['filter_3'] = '';
+				foreach($staff_results as $staff_result){
+					$filter_1['filter_3'] .= $staff_result['firstname'].' '.$staff_result['lastname'].',';
+				}
+				$filter_1['filter_3'] =  rtrim($filter_1['filter_3'],',');
+			}
+		}
+		if($filter_1['filter_1'] == 'status'){
+			if(str_contains($filter_1['filter_3'], ',')){
+				$req_out = '';
+				$check_filter = explode(',',$filter_1['filter_3']);
+				if (in_array("1", $check_filter)){
+					$req_out .=  _l('task_status_1').',';
+				}
+				if (in_array("2", $check_filter)){
+					$req_out .=  _l('task_status_2').',';
+				}
+				if (in_array("3", $check_filter)){
+					$req_out .=    _l('task_status_3').',';
+				}
+				if (in_array("4", $check_filter)){
+					$req_out .=   _l('task_status_4').',';
+				}
+				if (in_array("5", $check_filter)){
+					$req_out .=   _l('task_status_5').',';
+				}
+				$filter_1['filter_3'] = $req_out;
+			}
+			else{
+				if($filter_1['filter_3'] == '1'){
+					$filter_1['filter_3'] =  _l('task_status_1');
+				}
+				else if($filter_1['filter_3'] == '2'){
+					$filter_1['filter_3'] =  _l('task_status_2');
+				}
+				else if($filter_1['filter_3'] == '3'){
+					$filter_1['filter_3'] =    _l('task_status_3');
+				}
+				else if($filter_1['filter_3'] == '4'){
+					$filter_1['filter_3'] =   _l('task_status_4');
+				}
+				else if($sum_row == '5'){
+					$filter_1['filter_3'] =   _l('task_status_5');
+				}
+			}
+			$filter_1['filter_3'] =  rtrim($filter_1['filter_3'],',');
+		}
+		
+	}
+	else{
+		if($filter_1['filter_1'] == 'teamleader_name'){
+			$sql = " select firstname,lastname from ".db_prefix()."staff where staffid in(".$filter_1['filter_3'].")";
+			$query = $CI->db->query($sql);
+			$staff_results = $query->result_array();
+			if(!empty($staff_results)){
+				$filter_1['filter_3'] = '';
+				foreach($staff_results as $staff_result){
+					$filter_1['filter_3'] .= $staff_result['firstname'].' '.$staff_result['lastname'].',';
+				}
+				$filter_1['filter_3'] =  rtrim($filter_1['filter_3'],',');
+			}
+		}
+		if($filter_1['filter_1'] == 'loss_reason_name'){
+			$sql = " select name from ".db_prefix()."deallossreasons where id in(".$filter_1['filter_3'].")";
+			$query = $CI->db->query($sql);
+			$status_results = $query->result_array();
+			if(!empty($status_results)){
+				$filter_1['filter_3'] = '';
+				foreach($status_results as $status_result1){
+					$filter_1['filter_3'] .= $status_result1['name'].',';
+				}
+				$filter_1['filter_3'] =  rtrim($filter_1['filter_3'],',');
+			}
+		}
+		if($filter_1['filter_1'] == 'tags'){
+			$sql = " select name from ".db_prefix()."tags where id in(".$filter_1['filter_3'].")";
+			$query = $CI->db->query($sql);
+			$status_results = $query->result_array();
+			if(!empty($status_results)){
+				$filter_1['filter_3'] = '';
+				foreach($status_results as $status_result1){
+					$filter_1['filter_3'] .= $status_result1['name'].',';
+				}
+				$filter_1['filter_3'] =  rtrim($filter_1['filter_3'],',');
+			}
+		}
+		if($filter_1['filter_1'] == 'status' ){
+			$filter_1['filter_1'] = 'project_status';
+			$sql = " select name from ".db_prefix()."projects_status where id in(".$filter_1['filter_3'].")";
+			$query = $CI->db->query($sql);
+			$status_results = $query->result_array();
+			if(!empty($status_results)){
+				$filter_1['filter_3'] = '';
+				foreach($status_results as $status_result1){
+					$filter_1['filter_3'] .= $status_result1['name'].',';
+				}
+				$filter_1['filter_3'] =  rtrim($filter_1['filter_3'],',');
+			}
+		}
+		if($req_filter1 =='project_status'){
+			$filter_1['filter_1'] = 'status';
+		}
+	}
+	if($filter_1['filter_1'] == 'project_currency' ){
+		$sql = " select name from ".db_prefix()."currencies where id in(".$filter_1['filter_3'].")";
+		$query = $CI->db->query($sql);
+		$status_results = $query->result_array();
+		if(!empty($status_results)){
+			$filter_1['filter_3'] = '';
+			foreach($status_results as $status_result1){
+				$filter_1['filter_3'] .= $status_result1['name'].',';
+			}
+			$filter_1['filter_3'] =  rtrim($filter_1['filter_3'],',');
+		}
+	}
+	if($filter_1['filter_1']  == 'pipeline_id'){
+		$sql = " select name from ".db_prefix()."pipeline where id in(".$filter_1['filter_3'].")";
+		$query = $CI->db->query($sql);
+		$status_results = $query->result_array();
+		if(!empty($status_results)){
+			$filter_1['filter_3'] = '';
+			foreach($status_results as $status_result1){
+				$filter_1['filter_3'] .= $status_result1['name'].',';
+			}
+			$filter_1['filter_3'] =  rtrim($filter_1['filter_3'],',');
+		}
+	}
+	return $filter_1['filter_3'];
 }
