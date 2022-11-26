@@ -16,6 +16,9 @@
 
         workflowl.setTriggers(triggers);
 
+        var filters = <?= json_encode($this->workflow_app->getQueryFields($moduleDetails['name']),JSON_PRETTY_PRINT); ?>;
+        workflowl.setQueryBuilderFilters(filters);
+
         $('body').on('click','.placeholder-picker .click-to-copy',function(){
             var targetinput =$(this).closest('.placeholder-picker').attr('data-targer-input');
             cursor =$(targetinput).attr('data-cursor');
@@ -31,7 +34,7 @@
 <div id="wrapper">
     <div class="content">
         <div class="row">
-            <div class="col-md-8">
+            <div class="col-md-8" id="workflowCanvas">
                 <div class="panel_s">
                     <div class="panel-body" id="workflowwrapper" style="overflow-x: auto; overflow-y:auto; height:90vh;">
                         <ul class="tree">
@@ -40,11 +43,11 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4" id="workflowSidebar">
                 <div class="panel_s">
                     <div class="panel-body" style="overflow-y:auto; height:90vh;">
                         <div role="toolbar" aria-label="Node tools" aria-hidden="true" class="toolbar show">
-                            <span id="selectedBlockTitle" class="h5"><?php echo $moduleDetails['title'] ?></span>
+                            <span id="closeWorkflowSidebar" data-toggle="tooltip" data-title="Close Sidebar"><i class="fa fa-arrow-right" style="font-size:18px;margin-right:10px" aria-hidden="true"></i></span><span id="selectedBlockTitle" class="h5"><?php echo $moduleDetails['title'] ?></span>
                             <div class="pull-right">
                                 <button type="button" class="btn btn-default" data-js="deleteNode" data-toggle="tooltip" data-title="Delete Block" id="deleteNode">
                                     <i class="fa fa-trash" aria-hidden="true"></i>
@@ -398,6 +401,33 @@
     .placeholder-picker .click-to-copy{
         cursor: pointer;
     }
+    #closeWorkflowSidebar{
+        cursor: pointer;
+    }
+    .block .condition-group{
+        text-align: center;
+        padding: 10px;
+        margin: 5px 0px;
+        background-color: #fff;
+        border: 1px solid #c5ccd0;
+        box-shadow: 0px 4px 30px rgba(22, 33, 74, 0.08);
+        font-weight: 600;
+    }
+    .block .block-description  > .condition-group:first-child{
+        /* background-color: transparent;
+        border: none;
+        box-shadow: none; */
+        margin-top: 10px;
+    }
+    .block .condition-rule{
+        border: 1px solid #c5ccd0;
+        display: block;
+        padding: 10px 5px;
+        margin: 5px 0px;
+        background-color: #f1f5f7;
+        font-weight: normal;
+    }
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-extendext/1.0.0/jquery-extendext.min.js" integrity="sha512-pAU2x/rE9QHeYHtKS3RJccBEx8v8Lyyo4kVsxg+K3N+w/kbwrj2C9mp02XGQA+cOwlF1FdbEzTxnKg3DrQgWuA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dot/1.1.3/doT.min.js" integrity="sha512-mv9iHAP8cyGYB1TX54qMIFYFbHpFoqo1StdcuIUoAxTXIiFfOu22TjJGrFMpY+iR4QmGkElLlHBVx5C+PiIdvg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>

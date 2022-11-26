@@ -19,39 +19,26 @@
 <br>
 <button type="submit" class="btn btn-primary" id="saveConditionConfig">Save</button>
 <script>
-    var filters = <?= json_encode($this->workflow_app->getQueryFields($moduleDetails['name']),JSON_PRETTY_PRINT); ?>;
-    var config ={
-        allow_groups:1,
-        filters: filters,
-        icons: {
-            add_group: 'fa fa-plus-circle',
-            add_rule: 'fa fa-plus',
-            remove_group: 'fa fa-trash',
-            remove_rule: 'fa fa-trash',
-            error: 'fas fa-exclamation-circle'
-        },
-    }
     document.addEventListener("DOMContentLoaded", function(event) {
-        $('#workflowQuerybuilder').queryBuilder(config);
         $('#saveConditionConfig').on('click', function() {
             var result = $('#workflowQuerybuilder').queryBuilder('getSQL','?');
             var config ={}
+            var ruleswidget =$('#workflowQuerybuilder').queryBuilder('getRules');
             if (result.sql.length) {
                 config ={
                     params:result.params,
                     sql:result.sql,
-                    ruleswidget:$('#workflowQuerybuilder').queryBuilder('getRules')
+                    ruleswidget:ruleswidget
                 }
             }
-
             $.ajax({
                     url: admin_url+'workflow/saveconfig/'+$('.tree .block.selected').attr('data-id'),
                     type: 'post',
                     data: config,
                     success: function(response) {
                         if(config.sql.length){
-                            var description =`Check whether the following condition is true or false <b>`+config.sql+`</b>`;
-                            workflowl.updateBlockContent($('.tree .block.selected').attr('data-id'),'',description);
+                            var description =`Check whether the following condition is true or false `;
+                            workflowl.updateBlockContent($('.tree .block.selected').attr('data-id'),'',description,workflowl.queryBuilderString(ruleswidget));
                         }
                         alert_float('success', 'Setup saved successfully.');
                     }            

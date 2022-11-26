@@ -3,46 +3,46 @@
 document.addEventListener("DOMContentLoaded", function (event) {
     const container = document.querySelector('#workflowwrapper');
 
-    let startY;
-    let startX;
-    let scrollLeft;
-    let scrollTop;
-    let isDown;
+        let startY;
+        let startX;
+        let scrollLeft;
+        let scrollTop;
+        let isDown;
 
-    container.addEventListener('mousedown', e => mouseIsDown(e));
-    container.addEventListener('mouseup', e => mouseUp(e))
-    container.addEventListener('mouseleave', e => mouseLeave(e));
-    container.addEventListener('mousemove', e => mouseMove(e));
+        container.addEventListener('mousedown', e => mouseIsDown(e));
+        container.addEventListener('mouseup', e => mouseUp(e))
+        container.addEventListener('mouseleave', e => mouseLeave(e));
+        container.addEventListener('mousemove', e => mouseMove(e));
 
-    function mouseIsDown(e) {
-        isDown = true;
-        startY = e.pageY - container.offsetTop;
-        startX = e.pageX - container.offsetLeft;
-        scrollLeft = container.scrollLeft;
-        scrollTop = container.scrollTop;
-    }
-    function mouseUp(e) {
-        isDown = false;
-    }
-    function mouseLeave(e) {
-        isDown = false;
-    }
-    function mouseMove(e) {
-        if (isDown) {
-            e.preventDefault();
-            //Move vertcally
-            const y = e.pageY - container.offsetTop;
-            const walkY = y - startY;
-            container.scrollTop = scrollTop - walkY;
-
-            //Move Horizontally
-            const x = e.pageX - container.offsetLeft;
-            const walkX = x - startX;
-            container.scrollLeft = scrollLeft - walkX;
+        function mouseIsDown(e) {
+            isDown = true;
+            startY = e.pageY - container.offsetTop;
+            startX = e.pageX - container.offsetLeft;
+            scrollLeft = container.scrollLeft;
+            scrollTop = container.scrollTop;
         }
-    }
+        function mouseUp(e) {
+            isDown = false;
+        }
+        function mouseLeave(e) {
+            isDown = false;
+        }
+        function mouseMove(e) {
+            if (isDown) {
+                e.preventDefault();
+                //Move vertcally
+                const y = e.pageY - container.offsetTop;
+                const walkY = y - startY;
+                container.scrollTop = scrollTop - walkY;
 
-});
+                //Move Horizontally
+                const x = e.pageX - container.offsetLeft;
+                const walkX = x - startX;
+                container.scrollLeft = scrollLeft - walkX;
+            }
+        }
+
+    });
 
 var workflowl =function(module){
 
@@ -57,6 +57,7 @@ var workflowl =function(module){
     var moudleplacehoders ={};
     var whatsappVariables ={};
     var smsVariables ={};
+    var queryBuilderFilters;
     var workflowlnotificationto={
         customer:'Send to customer',
         staff:'Send to staff',
@@ -86,10 +87,51 @@ var workflowl =function(module){
                         <p class="block-description text-muted">`+trigger.description+`</p>
                     </div>
                 </div>
+                <div class="block-description-dynamic text-muted"></div>
+                </div>
             </div>  `;
         }
         
         return block;
+    }
+
+    workflowl.queryRulesString =function(rules,condition){
+        var str ='<div class="condition-group">';
+
+        $.each(rules, function(key, rule) {
+            if(typeof rule.rules !='undefined'){
+                str +=' '+workflowl.queryRulesString(rule.rules,rule.condition);
+                if(typeof condition !='undefined'){
+                    str +=' '+condition;
+                }
+            }else{
+                var value =rule.value;
+                if(typeof queryBuilderFilters[rule.field]['values'] !='undefined'){
+                    value =queryBuilderFilters[rule.field]['values'][value];
+                }
+                str +=' <span class="condition-rule">'+queryBuilderFilters[rule.field]['label']+' '+rule.operator+' '+value+'</span>';
+                if(typeof condition !='undefined'){
+                    str +=' '+condition;
+                }
+            }
+            key++;
+        });
+        if(typeof condition !='undefined'){
+            var lastIndex = str. lastIndexOf(condition); str = str. substring(0, lastIndex);
+        }
+        
+        return str+"</div>";
+    }
+
+    workflowl.queryBuilderString = function(widgets){
+        var str ='';
+        
+        $.each(widgets, function(name, value) {
+            if(name =='rules'){
+                str +=workflowl.queryRulesString(value,widgets.condition);
+            }
+        });
+        return str;
     }
 
     workflowl.Init =function(flows){
@@ -110,7 +152,7 @@ var workflowl =function(module){
             }
 
             trigger =workflowltriggers[flow.action];
-            
+            workflowl.iniQueryBuilder();
             var block =`<li>`+workflowl.getTriggerBlock(flow.action,flow.id)+`</li>`;
             chosenNode.children().siblings('ul').append(block);
 
@@ -152,8 +194,9 @@ var workflowl =function(module){
                     }
                 }else if(flow.action =='condition'){
                     if(flow.configure){
-                        description =`Check whether the following condition is true or false <b>`+flow.configure.sql+`</b>`;
-                        workflowl.updateBlockContent(flow.id,'',description);
+                        var ruleswidget =flow.configure.ruleswidget;
+                        description =`Check whether the following condition is true or false `;
+                        workflowl.updateBlockContent(flow.id,'',description,workflowl.queryBuilderString(ruleswidget));
                     }
                 }else if(flow.action =='lead_assign_staff'){
                     if(flow.configure){
@@ -176,9 +219,22 @@ var workflowl =function(module){
         $('#deleteNode').click(function(){
             workflowl.deleteNode();
             workflowl.selectNode($('.rootnode'));
-        })
+        });
+        $('#closeWorkflowSidebar').click(function(){
+            workflowl.closeSidebar();
+        });
     }
 
+    workflowl.closeSidebar =function(){
+        $('#workflowSidebar').hide();
+        $('#workflowCanvas').removeClass("col-md-8");
+        $('#workflowCanvas').addClass("col-md-12");
+    }
+    workflowl.openSidebar =function(){
+        $('#workflowSidebar').show();
+        $('#workflowCanvas').addClass("col-md-8");
+        $('#workflowCanvas').removeClass("col-md-12");
+    }
     workflowl.addChild =function(slug) {
         if (document.querySelector('.tree .selected')) {
             var parent_id =$('.tree .selected').attr('data-id');
@@ -278,6 +334,7 @@ var workflowl =function(module){
         $('#selectedBlockTitle').html($('.tree .block.selected').attr('data-title'));
         workflowl.RenderTriggers();
         workflowl.renderSettings();
+        workflowl.openSidebar();
     }
 
     workflowl.renderSettings =function(){
@@ -397,13 +454,15 @@ var workflowl =function(module){
             selectedBtns[i].classList.remove('selected');
         }
     }
-
-    workflowl.updateBlockContent =function (id , title, description){
+    workflowl.updateBlockContent =function (id , title, description,content=''){
         if(title !=''){
             $('.block[data-id="'+id+'"] .block-title').html(title);
         }
         if(description !=''){
             $('.block[data-id="'+id+'"] .block-description').html(description);
+        }
+        if(content !=''){
+            $('.block[data-id="'+id+'"] .block-description-dynamic').html(content);
         }
     }
 
@@ -446,6 +505,38 @@ var workflowl =function(module){
     workflowl.getSmsVariables= function(){
         return smsVariables;
     }
+    workflowl.setQueryBuilderFilters= function(filters){
+        queryBuilderFilters =filters;
+    }
 
+    workflowl.getQueryBuilderFilters= function(){
+        return queryBuilderFilters;
+    }
+
+    workflowl.iniQueryBuilder =function(id=''){
+        var numeric_array = new Array();
+        for (var items in queryBuilderFilters){
+            numeric_array.push( queryBuilderFilters[items] );
+        }
+
+        querybuilderConfig ={
+            allow_groups:1,
+            filters: numeric_array,
+            icons: {
+                add_group: 'fa fa-plus-circle',
+                add_rule: 'fa fa-plus',
+                remove_group: 'fa fa-trash',
+                remove_rule: 'fa fa-trash',
+                error: 'fas fa-exclamation-circle'
+            },
+            max_groups: 2
+        }
+        if(id =='')
+            $('#workflowQuerybuilder').queryBuilder(querybuilderConfig);
+        else{
+            $(id).queryBuilder(querybuilderConfig);
+        }
+
+    }
 
 }
