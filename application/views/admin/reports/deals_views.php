@@ -354,17 +354,10 @@
 								<?php 
 								if($report_page == 'deal'){
 									$this->load->view('admin/reports/deal_list_column');
-								}
-								else if($report_page == 'activity'){
-									$this->load->view('admin/reports/activity_list_column');
-								}
-								?>
-					
-								<?php 
-								if($report_page == 'deal'){
 									$this->load->view('admin/reports/deal_table_html');
 								}
 								else if($report_page == 'activity'){
+									$this->load->view('admin/reports/activity_list_column');
 									$this->load->view('admin/reports/task_table_html');
 								}
 								?>
@@ -475,7 +468,7 @@ $(function() {
 				responsive:true,
 				showInLegend:true,
 				legend: {
-					display: false
+					display: true
 				},
 				maintainAspectRatio:false,
 		   }

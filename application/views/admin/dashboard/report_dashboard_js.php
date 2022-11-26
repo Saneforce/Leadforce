@@ -98,7 +98,7 @@ if(!empty($summary)){
 							options: {
 								responsive:true,
 								legend: {
-									display: false
+									display: true
 								},
 								maintainAspectRatio:false,
 						   }

@@ -975,6 +975,7 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 			}
 			break;
 	}
+	
 	if($measure == 'Product Value'){
 		$i = 0;
 		$projects = array();
@@ -997,6 +998,23 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 		else{
 			//$where[db_prefix().'projects.id']   =  '0';
 		}
+	}
+	$group = '';
+	if($measure == 'Number of Products'){
+		$join[]			= db_prefix().'project_products';
+		$join_cond[]	= db_prefix().'projects.id ='.db_prefix().'project_products.projectid';
+		$ress = $CI->db->query("SELECT id FROM " . db_prefix() . "projects p where p.deleted_status = '0' ".$req_cond)->result_array();	
+		if(!empty($ress)){
+			foreach($ress as $res1){
+				$projects[$i] = $res1['id'];
+				$i++;
+			}
+		}
+		if(!empty($projects)){
+			$where_in[db_prefix().'projects.id']   =  $projects;
+		}
+		$where_in[db_prefix().'project_products.projectid']   =  $projects;
+		$group = db_prefix().'projects.id';
 	}
 	if((check_activity_date($view_by))){
 		if($date_range == 'Monthly'){
@@ -1029,7 +1047,7 @@ function get_qry($clmn,$crow,$view_by,$measure,$date_range,$view_type,$sum_id,$f
 	}
 	
 	if($req_projects == 1){
-		$result = select_join_query($fields,$sTable,$join,$join_cond,'left',$where,$where_in);
+		$result = select_join_query($fields,$sTable,$join,$join_cond,'left',$where,$where_in,'',$group);
 	}else{
 		$result = array();
 	}

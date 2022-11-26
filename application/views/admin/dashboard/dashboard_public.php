@@ -86,7 +86,7 @@ $this->load->view('admin/dashboard/report_dashboard_js',$req_data); ?>
 			text-align:center;
 		}
 		.dropdown1 {
-			top: 6% !important;
+			
 		}
 		hr.hr-panel-heading-dashboard {
 			margin-top: 20px !important;

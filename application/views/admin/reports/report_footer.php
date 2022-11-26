@@ -895,6 +895,7 @@ function tab_summary_1(a){
 	$('.cur_tab_2').val(a);
 }
 function update_report(report_url){
+	set_storage();
 	var tab1 = $('.cur_tab_1').val();
 	var tab2 = $('.cur_tab_2').val();
 	

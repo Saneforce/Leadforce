@@ -214,7 +214,7 @@ class Dashboard extends AdminController
 	}
 	public function refresh_chart(){
 		extract($_REQUEST);
-		$all_reports =  $this->db->query('SELECT d.id,d.staff_id,d.report_id,d.type,d.tab_1,d.tab_2,d.sort,d.width,d.height,r.view_by,r.view_type,r.measure_by,r.report_name,r.date_range,r.report_type FROM '. db_prefix().'dashboard d,'. db_prefix().'report r  WHERE d.id ="'.$dashboard_id.'" and r.id = d.report_id order by d.sort1,d.sort2 asc')->result_array();
+		$all_reports =  $this->db->query('SELECT d.id,d.staff_id,d.report_id,d.type,d.tab_1,d.tab_2,d.sort,d.width,d.height,r.view_by,r.view_type,r.measure_by,r.report_name,r.date_range,r.report_type FROM '. db_prefix().'dashboard d,'. db_prefix().'report r  WHERE d.id ="'.$dashboard_id.'" and r.id = d.report_id order by d.sort asc')->result_array();
 		$i1 = 0;
 		$staff_id = get_staff_user_id();
 		$data = get_dashboard_report($all_reports,$staff_id);

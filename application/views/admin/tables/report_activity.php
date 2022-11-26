@@ -35,6 +35,9 @@ if(empty($req_deals)){
 	$req_deals['filters4']	=	$this->ci->session->userdata('activity_filters4'.$cur_id);
 }
 $req_filters = get_activity_filters($req_deals);
+if(empty($clientid)){
+	$report_name	=	$this->ci->session->userdata('report_type');
+}
 $fiter_type = ' where ';
 if(!empty($req_filters)){
 	$fiter_type = ' and ';
