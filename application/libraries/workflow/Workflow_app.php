@@ -276,6 +276,9 @@ class Workflow_app
                         }
                         $continue =true;
                         break;
+                    case 'add_activity':
+                        $this->run_add_activity($flow);
+                        break;
                     default:
                         $this->check_flow($flow);
                         break;

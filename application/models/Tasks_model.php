@@ -748,7 +748,8 @@ class Tasks_model extends App_Model
         if(isset($data['duedate']))
             $data['duedate']               = to_sql_date($data['duedate']);
         $data['dateadded']             = date('Y-m-d H:i:s');
-        $data['addedfrom']             = 1;
+        if(!isset($data['addedfrom']))
+            $data['addedfrom']             = 1;
         $data['is_added_from_contact'] = $clientRequest == false ? 0 : 1;
 
         $checklistItems = [];

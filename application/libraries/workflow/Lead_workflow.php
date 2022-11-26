@@ -22,7 +22,7 @@ class Lead_workflow extends Workflow_app
             'title'=>'Lead Created',
             'description'=>'Workflow starts when new lead created.',
             'icon'=>'<i class="fa fa-plus text-success" aria-hidden="true"></i>',
-            'triggers'=>['condition','send_email','lead_assign_staff','send_whatsapp','send_sms'],
+            'triggers'=>['condition','send_email','lead_assign_staff','add_activity','send_whatsapp','send_sms'],
         ],
         'lead_updated'=>[
             'title'=>'Lead Updated',
@@ -54,6 +54,12 @@ class Lead_workflow extends Workflow_app
             'icon'=>'<i class="fa fa-user-plus text-success" aria-hidden="true"></i>',
             'triggers'=>['send_email','send_whatsapp','send_sms'],
         ],
+        'add_activity'=>[
+            'title'=>'Add Activity',
+            'description'=>'Add new activity',
+            'icon'=>'<i class="fa fa-tasks text-success" aria-hidden="true"></i>',
+            'triggers'=>[],
+        ],
         'send_email'=>[
             'title'=>'Send Email',
             'type'=>'notification',
@@ -84,13 +90,13 @@ class Lead_workflow extends Workflow_app
             'title'=>'True',
             'description'=>'If condition true.',
             'icon'=>'<i class="fa fa-check text-success" aria-hidden="true"></i>',
-            'triggers'=>['send_email','condition','lead_assign_staff','send_whatsapp','send_sms'],
+            'triggers'=>['send_email','condition','lead_assign_staff','add_activity','send_whatsapp','send_sms'],
         ],
         'false'=>[
             'title'=>'False',
             'description'=>'If condition false.',
             'icon'=>'<i class="fa fa-times text-danger" aria-hidden="true"></i>',
-            'triggers'=>['send_email','condition','lead_assign_staff','send_whatsapp','send_sms'],
+            'triggers'=>['send_email','condition','lead_assign_staff','add_activity','send_whatsapp','send_sms'],
         ],
     );
 
@@ -402,6 +408,30 @@ class Lead_workflow extends Workflow_app
                 $sendto =$this->getCountryCallingCode($this->lead->phone_country_code) .$this->lead->phonenumber;
             }
             $this->sendSMS($sendto, $flow, $this->merge_fields);
+        }
+    }
+
+    protected function run_add_activity($flow)
+    {
+        if($flow->configure){
+            $this->ci->load->model('tasks_model');
+            $startdate =Date('Y-m-d H:i:s', strtotime($flow->configure['startdate']));
+            $data =array(
+                'name'=>$flow->configure['subject'],
+                'tasktype'=>$flow->configure['type'],
+                'description'=>$flow->configure['description'],
+                'priority'=>$flow->configure['priority'],
+                'startdate'=>$startdate,
+                'rel_type'=>'lead',
+                'rel_id'=>$this->lead_id,
+                'addedfrom'=>$this->lead->assigned,
+            );
+            // pr($data);
+            // echo 'Creating new activity';
+            // pre('die');
+            $data['taskid']  = $this->ci->tasks_model->addcrontask($data);
+            $data['assignee'] = $this->lead->assigned;
+            $this->ci->tasks_model->add_crontask_assignees($data);
         }
     }
 }

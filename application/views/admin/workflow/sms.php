@@ -1,7 +1,7 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php $templates =$this->sms_model->getTemplates(); ?>
 <br>
-<?php echo form_open(admin_url('workflow/saveconfig/'), array('id' => 'SMSConfig','onsubmit="this.checkValidity()"')); ?>
+<?php echo form_open(admin_url('workflow/saveconfig/'), array('id' => 'SMSConfig')); ?>
 <div class="form-group">
     <label for="sendto" class="control-label">Send to</label>
     <select name="sendto" id="sendto" class="form-control" required>
@@ -106,7 +106,7 @@ function updateSMSTemplateDetails() {
                         } else {
                             alert_float('warning', response.msg);
                             $.each(response.errors, function(k, v) {
-                                $('#WhatsappConfig [name="' + k + '"]').parent().append(`<p class="text-danger sms_form_errors">` + v + `</p>`)
+                                $('#SMSConfig [name="' + k + '"]').parent().append(`<p class="text-danger sms_form_errors">` + v + `</p>`)
                             });
                         }
                     },

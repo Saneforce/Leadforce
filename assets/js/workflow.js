@@ -413,6 +413,18 @@ var workflowl =function(module){
                 }
                 $('#sidebarSettingsTitle').html("Setup Conditions");
                 $('#sidebarsetupcondition').addClass('show');
+            }else if(blockname =='add_activity'){
+                if(flow.configure){
+                    var description ='Setup Configured';
+                    workflowl.updateBlockContent($('.tree .block.selected').attr('data-id'),'',description);
+                    $('#AddActivityConfig [name="type"]').val(flow.configure.type).selectpicker('refresh');
+                    $('#AddActivityConfig [name="subject"]').val(flow.configure.subject);
+                    $('#AddActivityConfig [name="description"]').val(flow.configure.description);
+                    $('#AddActivityConfig [name="priority"]').val(flow.configure.priority).selectpicker('refresh');
+                    $('#AddActivityConfig [name="startdate"]').val(flow.configure.startdate).selectpicker('refresh');
+                }
+                $('#sidebarSettingsTitle').html("Setup Add Activity");
+                $('#sidebarsetupaddactivity').addClass('show');
             }else if(blockname =='lead_assign_staff'){
 
                 if(flow.configure){

@@ -1,7 +1,7 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
 
-<script src="<?php echo base_url('assets/js/workflow.js') ?>"></script>
+<script src="<?php echo base_url('assets/js/workflow.js?v=1.0') ?>"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function(event) {
         // initiating workflow
@@ -75,7 +75,9 @@
                                     <div class="sidebar-setup" id="sidebarsetupapproval">
                                         <?php $this->load->view('admin/workflow/approval'); ?>
                                     </div>
-
+                                    <div class="sidebar-setup" id="sidebarsetupaddactivity">
+                                        <?php $this->load->view('admin/workflow/add_activity.php'); ?>
+                                    </div>
                                     <div class="sidebar-setup" id="sidebarsetupcondition">
                                         <?php $this->load->view('admin/workflow/condition'); ?>
                                     </div>
