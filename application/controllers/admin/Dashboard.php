@@ -450,9 +450,15 @@ class Dashboard extends AdminController
 	}
 	public function delete_dashboard($dash_id){
 		$cond = array('id'=>$dash_id);
+		$this->db->select('dashboard_id');
+		$this->db->where($cond); 
+		$this->db->from(db_prefix() . 'dashboard');
+		$query = $this->db->get();
+		$dashoard_data = $query->result_array();
+		$cond = array('id'=>$dash_id);
 		$this->db->where($cond);
 		$this->db->delete(db_prefix() . 'dashboard');
 		set_alert('success', _l('deleted_successfully', _l('report')));
-		redirect(admin_url('dashboard/report'));
+		redirect(admin_url('dashboard/view/'.$dashoard_data[0]['dashboard_id']));
 	}
 }

@@ -1,7 +1,13 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <!-- Project Tasks -->
-<?php
-	echo form_hidden('req_task_type');
+<?php 
+	$this->load->model('tasktype_model');
+	$types = $this->tasktype_model->checkTasktypeexist('Call');
+	$value = '';
+	if(!empty($types->id)){
+		$value = $types->id;
+	}
+	echo form_hidden('req_task_type',$value);
 	echo form_hidden('req_task_assign');
 	$form_hidden_var = array();
     $form_hidden_var['id'] =  $form_hidden_var['name'] = 'task_project';

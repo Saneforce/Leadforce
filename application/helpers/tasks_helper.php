@@ -742,12 +742,12 @@ function tasks_summary_data($rel_id = null, $rel_type = null)
         $tasks_where = 'rel_type != "" AND ';
         if($status['id'] == 1) {
             //$tasks_where = $tasks_where.' AND startdate > ' . date('Y-m-d');
-            $tasks_where = ' date(startdate) > CURDATE() AND status != 5 ';
+            $tasks_where = ' date(startdate) > CURDATE() AND status = 1 ';
         } elseif($status['id'] == 3) {
             //$tasks_where = $tasks_where.' AND startdate = ' . date('Y-m-d');
-            $tasks_where = ' date(startdate) = CURDATE() AND status != 5 ';
+            $tasks_where = ' date(startdate) = CURDATE() AND status = 3 ';
         } elseif($status['id'] == 2) {
-            $tasks_where = ' date(startdate) < CURDATE() AND status != 5 ';
+            $tasks_where = ' date(startdate) < CURDATE() AND status = 2 ';
         }  elseif($status['id'] == 5) {
             $tasks_where = 'status = ' . $status['id'];
         }
@@ -761,6 +761,13 @@ function tasks_summary_data($rel_id = null, $rel_type = null)
         if (!has_permission('tasks', '', 'view')) {
             $tasks_where .= ' ' . get_tasks_where_string();
         }
+		if(!empty($_GET['group']) && $_GET['group'] == 'project_tasks_bycall'){
+			if(!empty($tasks_where))
+				$tasks_where .= " and tasktype in(select id from " . db_prefix() . "tasktype where name='Call' and status='Active' ) ";
+			else
+				$tasks_where .= " tasktype in(select id from " . db_prefix() . "tasktype where name='Call' and status='Active') ";
+			
+		}
         $my_staffids = $CI->staff_model->get_my_staffids();
         
         $tasks_my_where = 'id IN(SELECT taskid FROM ' . db_prefix() . 'task_assigned WHERE staffid=' . get_staff_user_id() . ') AND ' . $tasks_where;
@@ -788,7 +795,6 @@ function tasks_summary_data($rel_id = null, $rel_type = null)
 				$tasks_my_where .= $sqlProjectTasksWhere;
 			}
         }
-        
 		$tasks_where =$tasks_where;
         $tasks_my_where = $tasks_my_where;
         $summary                   = [];
@@ -799,6 +805,7 @@ function tasks_summary_data($rel_id = null, $rel_type = null)
         $summary['status_id']      = $status['id'];
         $tasks_summary[]           = $summary;
     }
+	
     $b = array(2, 1, 0, 3); // rule indicating new key order
     $c = array();
     foreach($b as $index) {

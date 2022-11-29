@@ -15,7 +15,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 		 $qry_cond1 = ' AND (p.id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')) OR  p.teamleader in (' . implode(',',$my_staffids) . ') ) ';
 	 }
 	 if(!empty($qry_cond)){
-		 $qry_cond = " where p.deleted_status ='0' ".$conds.$qry_cond1.' And '. $qry_cond;
+		 $qry_cond = " where p.deleted_status ='0' ".$conds.$qry_cond1.' AND '. $qry_cond;
 	 }else{
 		  $qry_cond = " where p.deleted_status ='0' ".$conds.$qry_cond1.$qry_cond;
 	 }
@@ -25,7 +25,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 	  if(!empty($fields1)){
 		 $fields1 = "".$fields1;
 	 }
-	 
+	 $CI->db->error(); 
 	 $CI			= & get_instance();
 	 
 	 $deal_vals 	= $CI->db->query("SELECT ".$fields."COUNT(DISTINCT IF(stage_of = '1',p.id,NULL)) AS own_count,COUNT(DISTINCT IF(stage_of = '2',p.id,NULL)) AS lost_count,COUNT(DISTINCT IF(stage_of = '0',p.id,NULL)) AS open_count ".$fields1." FROM ".$table.$qry_cond)->result_array();

@@ -472,13 +472,13 @@ class Reports extends AdminController
 		$data['need_fields_label']	=	$needed['need_fields_label'];
 		$data['need_fields_edit']	=	$needed['need_fields_edit'];
 		$data['mandatory_fields1']	=	$needed['mandatory_fields1'];
-		$data['report_page'] = 'deal';
-		$data['report_filter'] =  $this->load->view('admin/reports/filter', $data,true);
-		$data['report_footer'] =  $this->load->view('admin/reports/report_footer', $data,true);
-		$data['teamleaders'] = $this->staff_model->get('', [ 'active' => 1]);
-		$data['summary'] = deal_performance_summary($data);
-		$data['cur_tab']  = '1';
-		$data['cur_tab2'] = '';
+		$data['report_page']		=	'deal';
+		$data['report_filter']		=	$this->load->view('admin/reports/filter', $data,true);
+		$data['report_footer']		=	$this->load->view('admin/reports/report_footer', $data,true);
+		$data['teamleaders']		=	$this->staff_model->get('', [ 'active' => 1]);
+		$data['summary']			=	deal_performance_summary($data);
+		$data['cur_tab']			=	'1';
+		$data['cur_tab2']			=	'';
         $this->load->view('admin/reports/deals_views', $data);
 	}
 	public function get_deal_summary($type = ''){

@@ -257,7 +257,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 			break;
 		case 'created_by':
 			if($filter_type == 'is' && $filter == 'deal'){
-				$filter_cond = " AND ( p.created_by  = !!cond1) ";
+				$filter_cond = " AND (p.created_by = !!cond1) ";
 			}
 			else if($filter_type == 'is_empty' && $filter == 'deal'){
 				$filter_cond = " AND ( p.created_by ='' or p.created_by = '0') ";
@@ -274,7 +274,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 			break;
 		case 'modified_by':
 			if($filter_type == 'is' && $filter == 'deal'){
-				$filter_cond = " AND ( p.modified_by  = !!cond1) ";
+				$filter_cond = " AND ( p.modified_by = !!cond1) ";
 			}
 			else if($filter_type == 'is_empty' && $filter == 'deal'){
 				$filter_cond = " AND ( p.modified_by ='' or p.modified_by = '0') ";
@@ -359,7 +359,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 			break;
 		case 'contact_phone1':
 			if($filter_type == 'is' && $filter == 'deal'){
-				$filter_cond = " AND ( p.id in(SELECT project_id FROM db_prefix()project_contacts pc,db_prefix()contacts c where pc.contacts_id in(!!in_cond) and pc.is_primary=1 and c.id = pc.contacts_id and c.deleted_status=0) ) ";
+				$filter_cond = " AND ( p.id in(SELECT project_id FROM db_prefix()project_contacts p,db_prefix()contacts c where p.contacts_id = c.id and c.phonenumber = !!cond1 and p.is_primary=1 and c.deleted_status ='0' and c.active = '1') ) ";
 			}
 			else if($filter_type == 'is_empty' && $filter == 'deal'){
 				$filter_cond = " AND ( p.id in(SELECT p.project_id FROM db_prefix()project_contacts p,db_prefix()contacts c where p.contacts_id = c.id and c.phonenumber = '' and p.is_primary=1 and c.deleted_status ='0' and c.active = '1') ) ";
