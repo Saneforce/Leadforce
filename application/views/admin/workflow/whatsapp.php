@@ -1,10 +1,11 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <br>
-<?php echo form_open(admin_url('workflow/saveconfig/'), array('id' => 'WhatsappConfig','onsubmit="this.checkValidity()"')); ?>
+<?php echo form_open(admin_url('workflow/saveconfig/'), array('id' => 'WhatsappConfig')); ?>
 <div class="form-group">
     <label for="sendto" class="control-label">Send to</label>
-    <select name="sendto" id="sendto" class="form-control" data-live-search="true" required>
-        <option value="customer">Customer</option>
+    <select name="sendto" id="sendto" class="form-control selectpicker" required>
+        <option >Nothing selected</option>
+        <option value="customer" selected>Customer</option>
         <option value="staff">Staff</option>
     </select>
 </div>
@@ -59,7 +60,7 @@
 
     function updatewhatsapptemplates() {
         $.ajax({
-            url: '<?php echo admin_url('whatsapp/gettemplates') ?>',
+            url: '<?php echo admin_url('plugins/whatsapp/gettemplates') ?>',
             type: "get",
             dataType: "json",
             success: function(response) {
@@ -91,7 +92,7 @@
         var templateName = $('#WhatsappConfig #template').val();
         if (templateName) {
             $.ajax({
-                url: '<?php echo admin_url('whatsapp/gettemplate') ?>/' + templateName,
+                url: '<?php echo admin_url('plugins/whatsapp/gettemplate') ?>/' + templateName,
                 type: "get",
                 dataType: "json",
                 success: function(response) {

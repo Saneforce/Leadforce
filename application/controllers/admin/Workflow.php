@@ -42,6 +42,7 @@ class Workflow extends AdminController
         $this->load->model("roles_model");
         $this->load->model("designation_model");
         $this->load->model("sms_model");
+        $this->load->model("tasktype_model");
         $data =['title'=>_l('workflow_automation')];
 
         $moduleDetails =$this->workflow_app->getModuleDetails($module);

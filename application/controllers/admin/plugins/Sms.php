@@ -19,7 +19,7 @@ class Sms extends AdminController
         }
         $data =['title'=>_l('sms')];
         $data ['templates'] =$this->sms_model->getTemplates();
-        $this->load->view('admin/sms/templates',$data);
+        $this->load->view('admin/plugins/sms/templates',$data);
     }
 
     public function saveTemplate()
@@ -56,7 +56,7 @@ class Sms extends AdminController
 
         if($this->input->post('access_token')){
             update_option('sms_configuration',json_encode(array('provider'=>'daffytel','access_token'=>$this->input->post('access_token'))));
-            set_alert('success', _l('updated_successfully'));
+            set_alert('success', _l('updated_successfully',_l('settings')));
         }
         $configuration =$this->sms_model->getConfig();
         if($configuration ){
@@ -65,7 +65,7 @@ class Sms extends AdminController
             }
         }
         $data =['title'=>_l('daffytel')];
-        $this->load->view('admin/sms/daffytel',$data);
+        $this->load->view('admin/plugins/sms/daffytel',$data);
     }
 
     public function deleteTemplate($id)
@@ -74,6 +74,6 @@ class Sms extends AdminController
             access_denied($this->moudle_permission_name);
         }
         $this->sms_model->deleteTemplate($id);
-        redirect(admin_url('sms'));
+        redirect(admin_url('plugins/sms'));
     }
 }

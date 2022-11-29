@@ -33,7 +33,7 @@
                                         <td data-order="<?php echo $template->sender; ?>"><?php echo $template->sender; ?></td>
                                         <td data-order="<?php echo $template->route; ?>"><?php echo $template->route; ?></td>
                                         <td><?php echo $template->content; ?></td>
-                                        <td><a href="<?= admin_url('sms/deleteTemplate/'.$template->id) ?>" class="btn text-danger delete_link"><i class="fa fa-trash" aria-hidden="true"></i> Delete</a></td>
+                                        <td><a href="<?= admin_url('plugins/sms/deleteTemplate/'.$template->id) ?>" class="btn text-danger delete_link"><i class="fa fa-trash" aria-hidden="true"></i> Delete</a></td>
                                     </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -51,7 +51,7 @@
 <div class="modal" id="templateModal" style="display: none;">
     <div class="modal-dialog">
 		<div class="modal-content">
-			<?php echo form_open(admin_url('sms/saveTemplate'),array('id'=>'templateForm'));?>
+			<?php echo form_open(admin_url('plugins/sms/saveTemplate'),array('id'=>'templateForm'));?>
 			<div class="modal-header">
 				<span class="title">Add Template </span>
 			    <button type="button" class="close" data-dismiss="modal">&times;</button>

@@ -28,7 +28,7 @@ class Whatsapp extends AdminController
         }
         $data =array('title'=>'whatsapp_settings');
         $data['settings'] =$this->whatsapp_model->getSettings();
-        $this->load->view('admin/whatsapp/settings',$data);
+        $this->load->view('admin/plugins/whatsapp/settings',$data);
     }
 
     public function gettemplates()

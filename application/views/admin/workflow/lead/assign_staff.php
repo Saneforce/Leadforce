@@ -17,7 +17,7 @@
     <label for="stafftype" class="control-label">Staff Type</label>
     <select name="stafftype" id="stafftype" class="form-control selectpicker"required>
         <option >Nothing selected</option>
-        <option value="staff">Staffs</option>
+        <option value="staff" selected>Staffs</option>
         <option value="roles">Roles</option>
         <option value="designation">Designation</option>
     </select>
@@ -71,45 +71,65 @@
 <script>
     function check_all_val(){
     }
+    function resetRequired(){
+        $('#LeadAssignStaffConfig [name="assignto"]').removeAttr('required');
+        $('#LeadAssignStaffConfig [name="assigntogroup[]"]').removeAttr('required');
+        $('#LeadAssignStaffConfig [name="assigntorole[]"]').removeAttr('required');
+        $('#LeadAssignStaffConfig [name="assigntodesignation[]"]').removeAttr('required');
+    }
+    function reloadByType(type_val){
+        resetRequired();
+        $('.dynamic-form-group').hide();
+        if(type_val =='direct_assign'){
+            $('#LeadAssignStaffConfig #assigntoFormGroup').show();
+            $('#LeadAssignStaffConfig [name="assignto"]').attr('required','true');
+        }else if(type_val =='round_robin_method'){
+            $('#LeadAssignStaffConfig #stafftypeFormGroup').show();
+            $('#LeadAssignStaffConfig #assigntogroupFormGroup').show();
+        }else if(type_val =='having_less_no_of_leads'){
+            $('#LeadAssignStaffConfig #stafftypeFormGroup').show();
+            $('#LeadAssignStaffConfig #assigntogroupFormGroup').show();
+        }else if(type_val =='having_more_conversions'){
+            $('#LeadAssignStaffConfig #stafftypeFormGroup').show();
+            $('#LeadAssignStaffConfig #assigntogroupFormGroup').show();
+        }else{
+            $('#LeadAssignStaffConfig #assigntoFormGroup').hide();
+        }
+    }
+
+    function reloadByStaffType(type_val){
+        resetRequired();
+        $('.dynamic-stafftype-group').hide();
+        if(type_val =='staff'){
+            $('#LeadAssignStaffConfig [name="assigntogroup[]"]').attr('required','true');
+            $('#LeadAssignStaffConfig #assigntogroupFormGroup').show();
+        }else if(type_val =='roles'){
+            $('#LeadAssignStaffConfig [name="assigntorole[]"]').attr('required','true');
+            $('#LeadAssignStaffConfig #assigntoroleFormGroup').show();
+        }else if(type_val =='designation'){
+            $('#LeadAssignStaffConfig [name="assigntodesignation[]"]').attr('required','true');
+            $('#LeadAssignStaffConfig #assigntodesignationFormGroup').show();
+        }
+        $('#LeadAssignStaffConfig #assigntoFormGroup').hide();
+    }
 
     document.addEventListener("DOMContentLoaded", function(event) {
         $('.dynamic-form-group').hide();
         $('#LeadAssignStaffConfig #assigntoFormGroup').show();
         $('#LeadAssignStaffConfig [name="type"]').change(function(){
             var type_val =$(this).val();
-            $('.dynamic-form-group').hide();
-            if(type_val =='direct_assign'){
-                $('#LeadAssignStaffConfig #assigntoFormGroup').show();
-            }else if(type_val =='round_robin_method'){
-                $('#LeadAssignStaffConfig #stafftypeFormGroup').show();
-                $('#LeadAssignStaffConfig #assigntogroupFormGroup').show();
-            }else if(type_val =='having_less_no_of_leads'){
-                $('#LeadAssignStaffConfig #stafftypeFormGroup').show();
-                $('#LeadAssignStaffConfig #assigntogroupFormGroup').show();
-            }else if(type_val =='having_more_conversions'){
-                $('#LeadAssignStaffConfig #stafftypeFormGroup').show();
-                $('#LeadAssignStaffConfig #assigntogroupFormGroup').show();
-            }else{
-                $('#LeadAssignStaffConfig #assigntoFormGroup').hide();
-            }
+            reloadByType(type_val);
+            if(type_val !='direct_assign')
+                $('#LeadAssignStaffConfig [name="stafftype"]').trigger('change');
         });
 
         $('#LeadAssignStaffConfig [name="stafftype"]').change(function(){
             var type_val =$(this).val();
-            $('.dynamic-stafftype-group').hide();
-            if(type_val =='staff'){
-                $('#LeadAssignStaffConfig #assigntogroupFormGroup').show();
-            }else if(type_val =='roles'){
-                $('#LeadAssignStaffConfig #assigntoroleFormGroup').show();
-            }else if(type_val =='designation'){
-                $('#LeadAssignStaffConfig #assigntodesignationFormGroup').show();
-
-            }
-            $('#LeadAssignStaffConfig #assigntoFormGroup').hide();
+            reloadByStaffType(type_val);
         })
         appValidateForm($('#LeadAssignStaffConfig'),
             {
-                type:'required',
+                
             },
             function(form) {
                 $.ajax({

@@ -55,7 +55,7 @@
     var savedVariables = <?php echo isset($configure['variables'])? json_encode($configure['variables']):[];?>;
     function updatetemplates() {
         $.ajax({
-            url: '<?php echo admin_url('whatsapp/gettemplates') ?>',
+            url: '<?php echo admin_url('plugins/whatsapp/gettemplates') ?>',
             type: "get",
             dataType: "json",
             success: function(response) {
@@ -88,7 +88,7 @@
         var templateName = $('#template').val();
         if(templateName){
             $.ajax({
-                url: '<?php echo admin_url('whatsapp/gettemplate') ?>/' + templateName,
+                url: '<?php echo admin_url('plugins/whatsapp/gettemplate') ?>/' + templateName,
                 type: "get",
                 dataType: "json",
                 success: function(response) {

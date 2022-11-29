@@ -180,7 +180,7 @@ class Workflow_app
         if(!isset(self::$queryfields [$name])){
             self::$queryfields [$name] =array();
         }
-        self::$queryfields [$name][] =$queryfields;
+        self::$queryfields [$name][$queryfields['id']] =$queryfields;
         
     }
 
@@ -203,19 +203,19 @@ class Workflow_app
     protected function sendEmail($fromname,$send_to,$subject,$message,$servicename)
     {
 
-        echo 'Fromname : ';
-        pr($fromname);
-        echo '<hr>';
-        echo 'Subject : ';
-        pr($subject);
-        echo '<hr>';
-        echo 'Message : ';
-        pr($message);
-        echo '<hr>';
-        pr('sending email to '.$send_to.'   ...');
-        echo '<hr>';
-        echo '<hr>';
-        return true;
+        // echo 'Fromname : ';
+        // pr($fromname);
+        // echo '<hr>';
+        // echo 'Subject : ';
+        // pr($subject);
+        // echo '<hr>';
+        // echo 'Message : ';
+        // pr($message);
+        // echo '<hr>';
+        // pr('sending email to '.$send_to.'   ...');
+        // echo '<hr>';
+        // echo '<hr>';
+        // return true;
         $this->ci->load->config('email');
 
         $this->ci->email->clear(true);
@@ -275,6 +275,9 @@ class Workflow_app
                             }
                         }
                         $continue =true;
+                        break;
+                    case 'add_activity':
+                        $this->run_add_activity($flow);
                         break;
                     default:
                         $this->check_flow($flow);
