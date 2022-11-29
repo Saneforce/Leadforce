@@ -2060,7 +2060,7 @@ function get_filter_name($filter_1,$type1){
 		
 	}
 	else{
-		if($filter_1['filter_1'] == 'teamleader_name'){
+		if($filter_1['filter_1'] == 'teamleader_name' || $filter_1['filter_1'] == 'created_by' || $filter_1['filter_1'] == 'modified_by'){
 			$sql = " select firstname,lastname from ".db_prefix()."staff where staffid in(".$filter_1['filter_3'].")";
 			$query = $CI->db->query($sql);
 			$staff_results = $query->result_array();

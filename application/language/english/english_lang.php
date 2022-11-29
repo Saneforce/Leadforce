@@ -4229,4 +4229,5 @@ $lang['loss_reason_name']	=	'Lost Reason';
 $lang['assignees']			=	'Assigned To';
 $lang['project_pipeline']	=	'Pipeline';
 $lang['company']			=	'Organization';
+$lang['is_more_than']		=	'Is More Than';
 

@@ -24,12 +24,11 @@ $where = $join = [];
 if(!empty($all_members)){
 	$all_staff = array();
 	foreach($all_members as $all_member1){
-		$all_staff[] = $all_member1['staffid'];
+		$all_staff[] = $all_member1['staff_id'];
 	}
 	$req_staff = implode(',',$all_staff);
 	$where = array('where staff_id in('.$req_staff.')');
 }
-
 $result  = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where);
 $output  = $result['output'];
 $rResult = $result['rResult'];
