@@ -415,9 +415,11 @@ p#rel_id-error {
                      <input type="text" class="tagsinput" id="tags" name="tags" value="<?php echo (isset($task) ? prep_tags_input(get_tags_in($task->id,'task')) : ''); ?>" data-role="tagsinput">
                   </div>
                </div>
-			   <div class="checkbox checkbox-info" id="type_reminder" style="">
-					<input type="checkbox" name="send_reminder" value="yes" id="act_rem_type" <?php  if(isset($task) && $task->send_reminder == 'yes'){echo 'checked';}?>><label class="check_label" >Send Reminder</label>
-				</div>
+			   <?php if(empty($reminder_settings->customer_reminder) || (  !str_contains($reminder_settings->reminder_type, 'customer')  || $reminder_settings->customer_reminder!='all_activities')){?>
+				   <div class="checkbox checkbox-info" id="type_reminder" style="">
+						<input type="checkbox" name="send_reminder" value="yes" id="act_rem_type" <?php  if(isset($task) && $task->send_reminder == 'yes'){echo 'checked';}?>><label class="check_label" ><?php echo _l('send_reminder_customer');?></label>
+					</div>
+			   <?php }?>
                <?php $rel_id_custom_field = (isset($task) ? $task->id : false); ?>
                <?php echo render_custom_fields('tasks',$rel_id_custom_field); ?>
                

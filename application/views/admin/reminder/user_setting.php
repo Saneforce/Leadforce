@@ -351,78 +351,41 @@
 .m_left2{
 	margin-left:2%;
 }
-label#customer_d-error {
+label#customer_d-error,label#activity_alert_d-error  {
     position: absolute;
     float: left;
     left: 3%;
 	 margin-top: 3%;
 }
-label#customer_h-error {
+label#customer_h-error,label#activity_alert_h-error, {
     position: absolute;
     float: left;
     left: 33%;
 	 margin-top: 3%;
 }
-label#customer_m-error {
+label#customer_m-error,label#activity_alert_m-error {
     position: absolute;
     float: left;
     left: 63%;
 	 margin-top: 3%;
 }
-label#activity_alert_d-error {
+label#activity_week_d-error,label#activity_monthy_t-error,label#proposal_week_d-error,label#target_weekly_d-error {
     position: absolute;
-    float: left;
-    left: 3%;
-	 margin-top: 3%;
-}
-label#activity_alert_h-error {
-    position: absolute;
-    float: left;
-    left: 33%;
-	 margin-top: 3%;
-}
-label#activity_alert_m-error {
-    position: absolute;
-    float: left;
-    left: 63%;
-	 margin-top: 3%;
-}
-label#activity_week_d-error {
-    position: absolute;
-}
-label#activity_week_t-error {
-    position: absolute;
+	position: absolute;
     float: left;
     left: 48%;
+	 margin-top: 3%;
+}
+label#activity_week_t12-error,label#proposal_week_t-error,label#target_weekly_t-error  {
+    position: absolute;
+    float: left;
+    left: 70%;
 	 margin-top: 3%;
 }
 label#reminder_settings-error {
     position: absolute;
     margin-top: 3%;
     padding-top: 5px;
-}
-label#proposal_week_d-error {
-    position: absolute;
-    float: left;
-    margin-top: 3%;
-    left: 48%;
-}
-label#proposal_week_t-error {
-    position: absolute;
-    margin-top: 3%;
-    float: left;
-    left: 70%;
-}
-label#target_weekly_d-error {
-    position: absolute;
-    float: left;
-    left: 48%;
-    margin-top: 3%;
-}
-label#target_weekly_t-error {
-    position: absolute;
-    left: 70%;
-    margin-top: 3%;
 }
 #activity_reminder{
 	margin-top:30px !important;
@@ -439,6 +402,7 @@ label#target_weekly_t-error {
 $( "#reminder_form" ).validate({});
 function ch_rem_seting(a){
 	if(a.value=='disable'){
+		$('#customer_reminder').hide();
 		$('#ch_company').hide();
 		$('#type_reminder').hide();
 		$('#activity_reminder').hide();
@@ -769,10 +733,6 @@ function check_prop_tar(a,b,c){
 		return true;
 	}
 <?php //}?>
-
-	/*$('#activity_monthy_t').datepicker( { changeYear: false, dateFormat: 'dd-mm' } );
-	$('#proposal_monthy_t').datepicker( { changeYear: false, dateFormat: 'dd-mm' } );
-	$('#target_monthy_t').datepicker( { changeYear: false, dateFormat: 'dd-mm' } );*/
 </script>
 <style>
 span.ui-datepicker-year { display:none }

@@ -231,9 +231,10 @@ function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = [], $where 
         $_additionalSelect = ',' . implode(',', $additionalSelect);
     }
     $where = implode(' ', $where);
+	
     if ($sWhere == '') {
         $where = trim($where);
-        if (startsWith($where, 'AND') || startsWith($where, 'OR')) {
+        if (startsWith($where, 'AND') || startsWith($where, 'and') || startsWith($where, 'OR')) {
             if (startsWith($where, 'OR')) {
                 $where = substr($where, 2);
             } else {
@@ -366,8 +367,8 @@ function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = [], $where 
 		}
 		else
 		{
-			$sQuery = '
-			SELECT COUNT(' . $sTable . '.' . $sIndexColumn . ') from (SELECT COUNT(' . $sTable . '.' . $sIndexColumn . ') as '.$sIndexColumn.' FROM '.$sTable . $join . ' ' . $where.$sGroupBy.') as '.$sTable;
+			/* $sQuery = '
+			SELECT COUNT(' . $sTable . '.' . $sIndexColumn . ') from (SELECT COUNT(' . $sTable . '.' . $sIndexColumn . ') as '.$sIndexColumn.' FROM '.$sTable . $join . ' ' . $where.$sGroupBy.') as '.$sTable; */
 		}
     }
     $_query = $CI->db->query($sQuery)->result_array();

@@ -135,9 +135,12 @@ $(document).ready(function(){
     startTime: '10:00',
     dynamic: false,
     dropdown: true,
-    scrollbar: true
+    scrollbar: true,
+	change: function(time) {
+		var req_id = $(this).attr("id");
+		$('#'+req_id+"-error").hide();
+    }
     });
-
     $("#smtp_host").change(function(){
       var smtp = $("#smtp_host").val();
       if(smtp == 'smtp.gmail.com') {

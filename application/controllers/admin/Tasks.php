@@ -726,7 +726,13 @@ class Tasks extends AdminController
 		}
 		$this->load->model('payment_modes_model');
 		$this->load->model('settings_model');
-		$data['reminder_settings']   = $this->settings_model->get_reminder_settings(null);
+		if(get_option('reminder_settings') == 'company'){
+			$data['reminder_settings']   = $this->settings_model->get_reminder_settings(null);
+		}
+		else{
+			$staffid = get_staff_user_id();
+			$data['reminder_settings']   = $this->settings_model->get_reminder_settings($staffid);
+		}
         $this->load->view('admin/tasks/task', $data);
     }
 	
