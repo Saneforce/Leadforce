@@ -38,7 +38,7 @@ function updateSMSTemplateDetails() {
         var templateId = $('#SMSConfig #template').val();
         if (templateId) {
             $.ajax({
-                url: '<?php echo admin_url('plugins/sms/getTemplate') ?>/' + templateId,
+                url: '<?php echo admin_url('plugin/sms/getTemplate') ?>/' + templateId,
                 type: "get",
                 dataType: "json",
                 success: function(response) {

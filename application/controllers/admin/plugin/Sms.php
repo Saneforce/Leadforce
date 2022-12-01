@@ -74,6 +74,6 @@ class Sms extends AdminController
             access_denied($this->moudle_permission_name);
         }
         $this->sms_model->deleteTemplate($id);
-        redirect(admin_url('plugins/sms'));
+        redirect(admin_url('plugin/sms'));
     }
 }

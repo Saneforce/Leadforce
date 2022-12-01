@@ -22,7 +22,7 @@ class Lead_workflow extends Workflow_app
             'title'=>'Lead Created',
             'description'=>'Workflow starts when new lead created.',
             'icon'=>'<i class="fa fa-plus text-success" aria-hidden="true"></i>',
-            'triggers'=>['condition','send_email','lead_assign_staff','add_activity','send_whatsapp','send_sms'],
+            'triggers'=>['condition','lead_assign_staff','add_activity','send_email','send_whatsapp','send_sms'],
         ],
         'lead_updated'=>[
             'title'=>'Lead Updated',
@@ -90,13 +90,13 @@ class Lead_workflow extends Workflow_app
             'title'=>'True',
             'description'=>'If condition true.',
             'icon'=>'<i class="fa fa-check text-success" aria-hidden="true"></i>',
-            'triggers'=>['send_email','condition','lead_assign_staff','add_activity','send_whatsapp','send_sms'],
+            'triggers'=>['condition','lead_assign_staff','add_activity','send_email','send_whatsapp','send_sms'],
         ],
         'false'=>[
             'title'=>'False',
             'description'=>'If condition false.',
             'icon'=>'<i class="fa fa-times text-danger" aria-hidden="true"></i>',
-            'triggers'=>['send_email','condition','lead_assign_staff','add_activity','send_whatsapp','send_sms'],
+            'triggers'=>['condition','lead_assign_staff','add_activity','send_email','send_whatsapp','send_sms'],
         ],
     );
 

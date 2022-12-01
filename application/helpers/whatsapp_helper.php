@@ -62,17 +62,17 @@ function whatsapp_send_template_message($to,$template,$variables,$header=array()
     $whatsapp_account =$CI->whatsapp_model->getSettings();
 
     if($header){
-        if($header['header_format'] =='TEXT'){
+        if($header['header_format'] =='TEXT' && $header['header_variable']){
             $headerstring ='{
                 "type": "header",
                 "parameters": [
                     {
                         "type": "text",
-                        "text": '.$header['header_variable'].'
+                        "text": "'.$header['header_variable'].'"
                     }
                 ]
             },';
-        }elseif($header['header_format'] =='DOCUMENT'){
+        }elseif($header['header_format'] =='DOCUMENT' && $header['header_media_link']){
             $headerstring ='{
                 "type": "header",
                 "parameters": [
@@ -85,7 +85,7 @@ function whatsapp_send_template_message($to,$template,$variables,$header=array()
                     }
                 ]
             },';
-        }elseif($header['header_format'] =='VIDEO'){
+        }elseif($header['header_format'] =='VIDEO' && $header['header_media_link']){
             $headerstring ='{
                 "type": "header",
                 "parameters": [
@@ -114,8 +114,6 @@ function whatsapp_send_template_message($to,$template,$variables,$header=array()
     }else{
         $headerstring ='';
     }
-    // pr($headerstring);
-    // pre('sending whatsapp message to '.$to.'  ......');
 
     if($whatsapp_account){
         curl_setopt_array($curl, array(

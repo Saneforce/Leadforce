@@ -8,7 +8,7 @@
                     <div class="panel-body">
                         <h4>Daffytel Configuration</h4>
                         <hr class="hr-panel-heading" />
-                        <?php echo form_open(admin_url('plugins/sms/daffytel'),array('id'=>'daffytelForm'));?>
+                        <?php echo form_open(admin_url('plugin/sms/daffytel'),array('id'=>'daffytelForm'));?>
                         <div class="form-group" >
                             <label for="access_token" class="control-label ">Access Token</label>
                             <input type="text" id="access_token" name="access_token" class="form-control" required value="<?php echo set_value('access_token') ?>" >

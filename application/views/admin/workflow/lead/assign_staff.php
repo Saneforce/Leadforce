@@ -69,8 +69,6 @@
 
 
 <script>
-    function check_all_val(){
-    }
     function resetRequired(){
         $('#LeadAssignStaffConfig [name="assignto"]').removeAttr('required');
         $('#LeadAssignStaffConfig [name="assigntogroup[]"]').removeAttr('required');
