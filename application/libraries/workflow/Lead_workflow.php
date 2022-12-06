@@ -120,6 +120,17 @@ class Lead_workflow extends Workflow_app
 
     protected function setLeadQueryFields(){
 
+        $text_operators =array('equal',
+        'not_equal',
+        'begins_with',
+        'not_begins_with',
+        'contains',
+        'not_contains',
+        'ends_with',
+        'not_ends_with',
+        'is_empty',
+        'is_not_empty');
+
         $this->setQueryFields(
             self::$module['name'],
             array(
@@ -127,6 +138,7 @@ class Lead_workflow extends Workflow_app
                 'label'=>'Name',
                 'type'=>'string',
                 'input'=>'text',
+                'operators'=>$text_operators,
             )
         );
 
@@ -137,6 +149,7 @@ class Lead_workflow extends Workflow_app
                 'label'=>'Organization',
                 'type'=>'string',
                 'input'=>'text',
+                'operators'=>$text_operators,
             )
         );
 
@@ -147,6 +160,7 @@ class Lead_workflow extends Workflow_app
                 'label'=>'Email',
                 'type'=>'string',
                 'input'=>'text',
+                'operators'=>$text_operators,
             )
         );
         
@@ -157,6 +171,7 @@ class Lead_workflow extends Workflow_app
                 'label'=>'Phone number',
                 'type'=>'string',
                 'input'=>'text',
+                'operators'=>$text_operators,
             )
         );
 
@@ -167,6 +182,7 @@ class Lead_workflow extends Workflow_app
                 'label'=>'Address',
                 'type'=>'string',
                 'input'=>'text',
+                'operators'=>$text_operators,
             )
         );
 
@@ -177,8 +193,11 @@ class Lead_workflow extends Workflow_app
                 'label'=>'City',
                 'type'=>'string',
                 'input'=>'text',
+                'operators'=>$text_operators,
             )
         );
+
+        
 
         $countries =get_all_countries();
         if($countries){
@@ -194,7 +213,7 @@ class Lead_workflow extends Workflow_app
                     'type'=>'string',
                     'input'=>'select',
                     'values'=>$sources,
-                    'operators'=> array('equal', 'not_equal', 'is_null', 'is_not_null')
+                    'operators'=> array('equal', 'not_equal')
                 )
             );
         }
@@ -225,7 +244,7 @@ class Lead_workflow extends Workflow_app
                     'type'=>'string',
                     'input'=>'select',
                     'values'=>$sources,
-                    'operators'=> array('equal', 'not_equal', 'is_null', 'is_not_null')
+                    'operators'=> array('equal', 'not_equal')
                 )
             );
         }

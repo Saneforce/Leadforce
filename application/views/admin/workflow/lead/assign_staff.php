@@ -26,7 +26,7 @@
 
 <div class="form-group dynamic-form-group" id="assigntoFormGroup">
     <label for="assignto" class="control-label">Select Staff</label>
-    <select name="assignto" id="assignto" class="form-control selectpicker" data-live-search="true" >
+    <select name="assignto" id="assignto" class="form-control selectpicker" data-live-search="true" required>
     <option value="">Select Staff</option>
     <?php foreach($staffs as $staffid => $staffname): ?>
         <option value="<?php echo $staffid ?>"><?php echo $staffname ?></option>
@@ -37,8 +37,7 @@
 
 <div class="form-group dynamic-form-group dynamic-stafftype-group" id="assigntogroupFormGroup">
     <label for="assigntogroup" class="control-label">Select Staffs</label>
-    <select name="assigntogroup[]" id="assigntogroup" class="form-control selectpicker" data-live-search="true" multiple>
-    <option value="">Select Staff</option>
+    <select name="assigntogroup[]" id="assigntogroup" class="form-control selectpicker" data-live-search="true" multiple required>
     <?php foreach($staffs as $staffid => $staffname): ?>
         <option value="<?php echo $staffid ?>"><?php echo $staffname ?></option>
     <?php endforeach; ?>
@@ -47,7 +46,7 @@
 
 <div class="form-group dynamic-form-group dynamic-stafftype-group" id="assigntoroleFormGroup">
     <label for="assigntorole" class="control-label">Select Role</label>
-    <select name="assigntorole[]" id="assigntorole" class="form-control selectpicker" multiple>
+    <select name="assigntorole[]" id="assigntorole" class="form-control selectpicker" multiple required>
     <?php foreach($staff_role as $role): ?>
         <option value="<?php echo $role['roleid'] ?>"><?php echo $role['name'] ?></option>
     <?php endforeach; ?>
@@ -56,7 +55,7 @@
 
 <div class="form-group dynamic-form-group dynamic-stafftype-group" id="assigntodesignationFormGroup">
     <label for="assigntodesignation" class="control-label">Select Designation</label>
-    <select name="assigntodesignation[]" id="assigntodesignation" class="form-control selectpicker" multiple>
+    <select name="assigntodesignation[]" id="assigntodesignation" class="form-control selectpicker" multiple required>
     <?php foreach($staff_designation as $designation): ?>
         <option value="<?php echo $designation['designationid'] ?>"><?php echo $designation['name'] ?></option>
     <?php endforeach; ?>
@@ -135,7 +134,7 @@
                     type: form.method,
                     data: $(form).serialize(),
                     success: function(response) {
-                        description =`Assign staff to lead. <b>`+$('[name="type"] option[value="'+$('[name="type"]').val()+'"]').html()+`</b>`;
+                        description =`Assign staff to lead. <b>`+$('#LeadAssignStaffConfig [name="type"] option[value="'+$('#LeadAssignStaffConfig [name="type"]').val()+'"]').html()+`</b>`;
                         workflowl.updateBlockContent($('.tree .block.selected').attr('data-id'),'',description);
                         alert_float('success', 'Setup saved successfully.');
                     }            

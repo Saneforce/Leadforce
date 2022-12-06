@@ -38,6 +38,7 @@ $priorities =get_tasks_priorities();
 
 <div class="form-group">
     <label for="startdate" class="control-label">Activity Startdate</label>
+    <p class="text-muted">Activity Start time considered as current time.</p>
     <select name="startdate" id="startdate" class="form-control selectpicker" required>
         <option name="">Nothing Selected</option>
         <option value="+0 days" selected>Today</option>

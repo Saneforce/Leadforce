@@ -107,9 +107,15 @@ var workflowl =function(module){
             }else{
                 var value =rule.value;
                 if(typeof queryBuilderFilters[rule.field]['values'] !='undefined'){
-                    value =queryBuilderFilters[rule.field]['values'][value];
+                    valueText =queryBuilderFilters[rule.field]['values'][value];
+                }else if(value !="" && value !=null){
+                    valueText=value;
+                }else{
+                    valueText="";
                 }
-                str +=' <span class="condition-rule">'+queryBuilderFilters[rule.field]['label']+' '+rule.operator+' '+value+'</span>';
+
+                var operator =rule.operator.split("_").join(" ");
+                str +=' <span class="condition-rule">'+queryBuilderFilters[rule.field]['label']+' '+operator+' '+valueText+'</span>';
                 if(typeof condition !='undefined'){
                     str +=' '+condition;
                 }
@@ -365,6 +371,8 @@ var workflowl =function(module){
                         $('form#EmailConfig [name="plaintext"]').attr('checked','checked')
                     }
                     tinymce.get('message').setContent(flow.configure.message);
+                }else{
+                    $('form#EmailConfig')[0].reset();
                 }
                 $('#sidebarSettingsTitle').html("Setup email template");
                 $('#sidebarsetupemail').addClass('show');
@@ -384,6 +392,8 @@ var workflowl =function(module){
                     if(typeof flow.configure.header_media_caption != 'undefined'){
                         $('form#WhatsappConfig [name="header_media_caption"]').val(flow.configure.header_media_caption);
                     }
+                }else{
+                    $('form#WhatsappConfig')[0].reset();
                 }
                 $('#sidebarSettingsTitle').html("Setup whatsapp template");
                 $('#sidebarsetupwhatsapp').addClass('show');
@@ -393,6 +403,8 @@ var workflowl =function(module){
                         workflowl.setSmsVariables(flow.configure.variables);
                     $('form#SMSConfig [name="sendto"]').val(flow.configure.sendto);
                     $('form#SMSConfig [name="template"]').val(flow.configure.template).trigger('change');
+                }else{
+                    $('form#SMSConfig')[0].reset();
                 }
                 $('#sidebarSettingsTitle').html("Setup SMS template");
                 $('#sidebarsetupsms').addClass('show');
@@ -400,6 +412,8 @@ var workflowl =function(module){
                 $('#ApprovalConfig [name="approver"] option[value="0"]').html(`Reporting Level `);
                 if(flow.configure){
                     $('#ApprovalConfig [name="approver"] option[value="'+flow.configure.approver+'"]').attr('selected','selected');
+                }else{
+                    $('form#ApprovalConfig')[0].reset();
                 }
                 $('#ApprovalConfig [name="approver"]').selectpicker('refresh');
                 $('#sidebarSettingsTitle').html("Setup approval settings");
@@ -422,6 +436,8 @@ var workflowl =function(module){
                     $('#AddActivityConfig [name="description"]').val(flow.configure.description);
                     $('#AddActivityConfig [name="priority"]').val(flow.configure.priority).selectpicker('refresh');
                     $('#AddActivityConfig [name="startdate"]').val(flow.configure.startdate).selectpicker('refresh');
+                }else{
+                    $('form#AddActivityConfig')[0].reset();
                 }
                 $('#sidebarSettingsTitle').html("Setup Add Activity");
                 $('#sidebarsetupaddactivity').addClass('show');
@@ -432,19 +448,23 @@ var workflowl =function(module){
                     if(flow.configure.type=='direct_assign'){
                         $('#LeadAssignStaffConfig [name="assignto"]').val(flow.configure.assignto)
                         $('#LeadAssignStaffConfig [name="assignto"]').selectpicker('refresh');
-                    }else if(flow.configure.type=='round_robin_method'){
+                    }else if(flow.configure.type=='round_robin_method' || flow.configure.type=='having_less_no_of_leads' || flow.configure.type=='having_more_conversions'){
                         $('#LeadAssignStaffConfig [name="stafftype"]').val(flow.configure.stafftype).trigger('change');
 
                         if(flow.configure.stafftype =='staff'){
                             $('#LeadAssignStaffConfig [name="assigntogroup[]"]').val(flow.configure.assigntogroup);
                             $('#LeadAssignStaffConfig [name="assigntogroup[]"]').selectpicker('refresh');
                         }else if(flow.configure.stafftype =='roles'){
-                            $('#LeadAssignStaffConfig [name="assigntorole"]').val(flow.configure.assigntorole);
+                            $('#LeadAssignStaffConfig [name="assigntorole[]"]').val(flow.configure.assigntorole);
+                            $('#LeadAssignStaffConfig [name="assigntorole[]"]').selectpicker('refresh');
                         }else if(flow.configure.stafftype =='designation'){
-                            $('#LeadAssignStaffConfig [name="assigntodesignation"]').val(flow.configure.assigntodesignation);
+                            $('#LeadAssignStaffConfig [name="assigntodesignation[]"]').val(flow.configure.assigntodesignation);
+                            $('#LeadAssignStaffConfig [name="assigntodesignation[]"]').selectpicker('refresh');
                         }
                         
                     }
+                }else{
+                    $('form#LeadAssignStaffConfig')[0].reset();
                 }
 
                 $('#sidebarSettingsTitle').html("Assign User");

@@ -430,6 +430,10 @@
         font-weight: normal;
     }
 
+    #workflowQuerybuilder .form-control{
+        width: 100%;
+    }
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-extendext/1.0.0/jquery-extendext.min.js" integrity="sha512-pAU2x/rE9QHeYHtKS3RJccBEx8v8Lyyo4kVsxg+K3N+w/kbwrj2C9mp02XGQA+cOwlF1FdbEzTxnKg3DrQgWuA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dot/1.1.3/doT.min.js" integrity="sha512-mv9iHAP8cyGYB1TX54qMIFYFbHpFoqo1StdcuIUoAxTXIiFfOu22TjJGrFMpY+iR4QmGkElLlHBVx5C+PiIdvg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
