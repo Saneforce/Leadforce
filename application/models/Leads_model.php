@@ -160,7 +160,7 @@ class Leads_model extends App_Model {
                 handle_custom_fields_post($insert_id, $custom_fields);
             }
 
-            $this->lead_assigned_member_notification($insert_id, $data['assigned']);
+            // $this->lead_assigned_member_notification($insert_id, $data['assigned']);
             hooks()->do_action('lead_created', $insert_id);
 
             return $insert_id;

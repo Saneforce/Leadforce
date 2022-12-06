@@ -24,8 +24,28 @@ class Plugins_model extends App_Model
         $this->db->where('id',$id);
         $config =$this->db->get(db_prefix().'plugin_configs')->row();
         if($config && $config->config){
-            $config->config =json_decode($config->config);
+            $config->config =json_decode($config->config,true);
         }
         return $config;
+    }
+
+    public function get_leadads()
+    {
+        $this->db->where('plugin','facebook_leadads');
+        $leadads =$this->db->get(db_prefix().'plugin_configs')->result_object();
+        if($leadads){
+            foreach($leadads as $key => $value){
+                if($leadads[$key]->config){
+                    $leadads[$key]->config =json_decode($leadads[$key]->config,true);
+                }
+            }
+        }
+        return $leadads;
+    }
+
+    public function delete($id)
+    {
+        $this->db->where('id',$id);
+        $this->db->delete(db_prefix().'plugin_configs');
     }
 }
