@@ -28,7 +28,7 @@
             $(targetinput).val(textBefore + $(this).attr('data-placeholder') + textAfter);
         });
 
-        
+        $('#sidebarSettings [required]').parent().children('label').prepend('<small class="req text-danger">* </small>');
     })
 </script>
 <div id="wrapper">
