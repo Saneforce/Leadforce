@@ -22,7 +22,7 @@ if(!empty($summary)){
 							$req_label .= '"'._l('task_priority_urgent').'",';
 						}
 						else{
-							$req_label .= '"'.$sum_row.'",';
+							$req_label .= '"'._l($sum_row).'",';
 						}
 					}
 					else if($sum1['view_by'] == 'project_status'){
@@ -36,7 +36,7 @@ if(!empty($summary)){
 							$req_label .= '"'. _l('project-status-loss').'",';
 						}
 						else{
-							$req_label .= '"'.$sum_row.'",';
+							$req_label .= '"'._l($sum_row).'",';
 						}
 					}
 					else if($report_page == 'activity' && $sum1['view_by'] == 'status'){
@@ -57,7 +57,7 @@ if(!empty($summary)){
 						}
 					}
 					else{
-						$req_label .= '"'.$sum_row.'",';
+						$req_label .= '"'._l($sum_row).'",';
 					}
 					if($report_page == 'deal'){
 						if(!empty($sum1['summary_cls'][$i]['total_cnt_deal']))

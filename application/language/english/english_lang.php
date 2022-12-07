@@ -4218,9 +4218,15 @@ $lang['task_type']			=	'Activity type';
 $lang['score_card']			=	'Score Card';
 $lang['dateadded']			=	'Created Date';
 $lang['datefinished']		=	'Finished Date';
+$lang['contact']			=	'Person';
 
 $lang['no']			        =	'No';
 $lang['dlt_template_id']	=	'DLT template Id';
 $lang['sender']			    =	'Sender';
 $lang['route']			    =	'Route';
-$lang['content']			=	'Content';
+$lang['startdate']			=	'Scheduled date';
+$lang['loss_reason_name']	=	'Lost Reason';
+$lang['assignees']			=	'Assigned To';
+$lang['project_pipeline']	=	'Pipeline';
+$lang['company']			=	'Organization';
+

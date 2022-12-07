@@ -435,7 +435,7 @@ if(!empty($summary['rows'])){
 					$sum_row =  _l('task_status_5');
 				}
 			}
-			$req_label .= '"'.$sum_row.'",';
+			$req_label .= '"'._l($sum_row).'",';
 			if($report_page == 'deal')
 				$req_data .= '"'.$summary['summary_cls'][$i]['total_cnt_deal'].'",';
 			else	

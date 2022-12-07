@@ -4,7 +4,6 @@
 	foreach($types as $type1){ 
 		$report_id	=	$req_data[$i1]['id'];
 		$filters	=	get_report_filter($report_id);
-		//if(!isset($sorts1[$i1-1]) || $sorts1[$i1-1] != $sorts1[$i1]){
 		if($i2 != $sorts[$i1]){
 			for($i2;$i2 < $sorts[$i1];$i2++){
 			?>
@@ -13,7 +12,7 @@
 			}
 		}
 ?>	
-		<div class="col-md-3   <?php echo 'check_'.$i2;?> <?php /* if(!empty($width[$i1])){ echo 'rm_width';} */?>" data-container="<?php echo $i2;?>" style="<?php if(!empty($width[$i1])){ echo 'width:'.$width[$i1].'px;';} /* if(!empty($height[$i1])){  echo 'height:'.$height[$i1].'px;'; } */?>">
+		<div class="col-md-3   <?php echo 'check_'.$i2;?> " data-container="<?php echo $i2;?>" style="<?php if(!empty($width[$i1])){ echo 'width:'.$width[$i1].'px;';} ?>">
 			<div data-ids="<?php echo 'check_'.$i2;?>" class=" widget padding-10 check_widget <?php if(!is_staff_member() && empty($public)){echo ' hide';} ?>" id="<?php echo $dashboard_ids[$i1];?>" data-name="<?php echo _l('s_chart',_l('leads')); ?>" style="<?php if(!empty($height[$i1])){ echo 'height:'.$height[$i1].'px;';}?>">
 			   <?php if(is_staff_member() || !empty($public)){ ?>
 					<div class="row">
@@ -26,8 +25,8 @@
 									<p class="padding-5">
 										<span title="<?php echo $names[$i1].' ('.$report_types[$i1].')'; ?>" class="font_wieght_bold">
 											<?php 
-											if(strlen($names[$i1].' ('.$report_types[$i1].')')>22)
-												echo substr($names[$i1].' ('.$report_types[$i1].')',0,22).'...';
+											if(strlen($names[$i1].' ('.$report_types[$i1].')')>18)
+												echo substr($names[$i1].' ('.$report_types[$i1].')',0,18).'...';
 											else
 												echo $names[$i1].' ('.$report_types[$i1].')';
 											?>
@@ -62,59 +61,8 @@
 									if(!empty($filters)){
 										echo '<p class="all_filters1">';
 										foreach($filters as $filter_1){
-											if($type1 == 'activity'){
-												if($filter_1['filter_1'] == 'project_status' ){
-													$sql = " select name from ".db_prefix()."projects_status where id in(".$filter_1['filter_3'].")";
-													$query = $this->db->query($sql);
-													$status_results = $query->result_array();
-													if(!empty($status_results)){
-														$filter_1['filter_3'] = '';
-														foreach($status_results as $status_result1){
-															$filter_1['filter_3'] .= $status_result1['name'].',';
-														}
-														$filter_1['filter_3'] =  rtrim($filter_1['filter_3'],',');
-													}
-												}
-											}
-											else{
-												if($filter_1['filter_1'] == 'status' ){
-													$filter_1['filter_1'] = 'project_status';
-													$sql = " select name from ".db_prefix()."projects_status where id in(".$filter_1['filter_3'].")";
-													$query = $this->db->query($sql);
-													$status_results = $query->result_array();
-													if(!empty($status_results)){
-														$filter_1['filter_3'] = '';
-														foreach($status_results as $status_result1){
-															$filter_1['filter_3'] .= $status_result1['name'].',';
-														}
-														$filter_1['filter_3'] =  rtrim($filter_1['filter_3'],',');
-													}
-												}
-											}
-											if($filter_1['filter_1'] == 'project_currency' ){
-												$sql = " select name from ".db_prefix()."currencies where id in(".$filter_1['filter_3'].")";
-												$query = $this->db->query($sql);
-												$status_results = $query->result_array();
-												if(!empty($status_results)){
-													$filter_1['filter_3'] = '';
-													foreach($status_results as $status_result1){
-														$filter_1['filter_3'] .= $status_result1['name'].',';
-													}
-													$filter_1['filter_3'] =  rtrim($filter_1['filter_3'],',');
-												}
-											}
-											if($filter_1['filter_1']  == 'pipeline_id'){
-												$sql = " select name from ".db_prefix()."pipeline where id in(".$filter_1['filter_3'].")";
-												$query = $this->db->query($sql);
-												$status_results = $query->result_array();
-												if(!empty($status_results)){
-													$filter_1['filter_3'] = '';
-													foreach($status_results as $status_result1){
-														$filter_1['filter_3'] .= $status_result1['name'].',';
-													}
-													$filter_1['filter_3'] =  rtrim($filter_1['filter_3'],',');
-												}
-											}
+											$req_filter1 = $filter_1['filter_1'];
+											$filter_1['filter_3'] = get_filter_name($filter_1,$type1);
 									?>
 											<?php 
 											if($cur_cnt<=1){

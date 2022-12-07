@@ -12,7 +12,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 	 switch($filter_name){
 		case 'won_date':
 			if($filter_type == 'is' && $filter == 'deal'){
-				$filter_cond = " AND p.stage_on >= !!date1 AND p.stage_on <= !!date2 and p.stage_of = '1' ";
+				$filter_cond = " AND date(p.stage_on) >= !!date1 AND date(p.stage_on) <= !!date2 and p.stage_of = '1' ";
 			}
 			else if($filter_type == 'is_empty' && $filter == 'deal'){
 				$filter_cond = " AND (p.stage_on IS NULL and p.stage_of = '1' )  ";
@@ -23,7 +23,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 			break;
 		case 'lost_date':
 			if($filter_type == 'is' && $filter == 'deal'){
-				$filter_cond = " AND p.stage_on >= !!date1 AND p.stage_on <= !!date2 and p.stage_of = '2'  ";
+				$filter_cond = " AND date(p.stage_on) >= !!date1 AND date(p.stage_on) <= !!date2 and p.stage_of = '2'  ";
 			}
 			else if($filter_type == 'is_empty' && $filter == 'deal'){
 				$filter_cond = " AND (p.stage_on IS NULL and p.stage_of = '2')  ";
@@ -34,7 +34,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 			break;
 		case 'project_created':
 			if($filter_type == 'is' && $filter == 'deal'){
-				$filter_cond = " AND p.project_created >= !!date1 AND p.project_created <= !!dat2 ";
+				$filter_cond = " AND date(p.project_created) >= !!date1 AND date(p.project_created) <= !!dat2 ";
 			}
 			else if($filter_type == 'is_empty' && $filter == 'deal'){
 				$filter_cond = " AND (p.project_created IS NULL ) ";
@@ -45,7 +45,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 			break;
 		case 'project_modified':
 			if($filter_type == 'is' && $filter == 'deal'){
-				$filter_cond = " AND p.project_modified >= !!date1 AND p.project_modified <= !!date2 ";
+				$filter_cond = " AND date(p.project_modified) >= !!date1 AND date(p.project_modified) <= !!date2 ";
 			}
 			else if($filter_type == 'is_empty' && $filter == 'deal'){
 				$filter_cond = " AND (p.project_modified IS NULL) ";
@@ -67,7 +67,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 			break;
 		case 'project_deadline':
 			if($filter_type == 'is' && $filter == 'deal'){
-				$filter_cond = " AND p.deadline>= !!date1 AND p.deadline <= !!date2 ";
+				$filter_cond = " AND date(p.deadline)>= !!date1 AND date(p.deadline) <= !!date2 ";
 			}
 			else if($filter_type == 'is_empty' && $filter == 'deal'){
 				$filter_cond = " AND (p.deadline IS NULL ) ";
@@ -393,7 +393,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 			break;
 		case 'dateadded':
 			if($filter_type == 'is' && $filter == 'activity'){
-				$filter_cond = " AND db_prefix()tasks.dateadded >= !!date1 AND db_prefix()tasks.dateadded <= !!date2 ";
+				$filter_cond = " AND date(db_prefix()tasks.dateadded) >= !!date1 AND date(db_prefix()tasks.dateadded) <= !!date2 ";
 			}
 			else if($filter_type == 'is_empty' && $filter == 'activity'){
 				$filter_cond = " AND db_prefix()tasks.dateadded IS NULL ";
@@ -404,7 +404,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 			break;
 		case 'datefinished':
 			if($filter_type == 'is' && $filter == 'activity'){
-				$filter_cond = " AND db_prefix()tasks.datefinished >= !!date1 AND db_prefix()tasks.datefinished <= !!date2 ";
+				$filter_cond = " AND date(db_prefix()tasks.datefinished) >= !!date1 AND date(db_prefix()tasks.datefinished) <= !!date2 ";
 			}
 			else if($filter_type == 'is_empty' && $filter == 'activity'){
 				$filter_cond = " AND db_prefix()tasks.datefinished IS NULL ";
@@ -415,7 +415,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 			break;
 		case 'datemodified':
 			if($filter_type == 'is' && $filter == 'activity'){
-				$filter_cond = " AND db_prefix()tasks.datemodified >= !!date1 AND db_prefix()tasks.datemodified <= !!date2 ";
+				$filter_cond = " AND date(db_prefix()tasks.datemodified) >= !!date1 AND date(db_prefix()tasks.datemodified) <= !!date2 ";
 			}
 			else if($filter_type == 'is_empty' && $filter == 'activity'){
 				$filter_cond = " AND db_prefix()tasks.datemodified IS NULL ";
@@ -596,7 +596,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 			break;
 		case 'startdate':
 			if($filter_type == 'is' && $filter == 'activity'){
-				$filter_cond = " AND db_prefix()tasks.startdate >= !!date1 AND db_prefix()tasks.startdate <= !!date2 ";
+				$filter_cond = " AND date(db_prefix()tasks.startdate) >= !!date1 AND date(db_prefix()tasks.startdate) <= !!date2 ";
 			}
 			else if($filter_type == 'is_empty' && $filter == 'activity'){
 				$filter_cond = " AND db_prefix()tasks.startdate IS NULL ";
