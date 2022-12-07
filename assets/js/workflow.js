@@ -220,6 +220,7 @@ var workflowl =function(module){
         });
         $('body').on('click', '.trigger', function(e) {
             workflowl.addChild($(this).attr('data-name'));
+            $('#accordionsidebar .collapsible.collapsed').trigger('click');
         });
 
         $('#deleteNode').click(function(){
