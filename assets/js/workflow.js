@@ -343,7 +343,10 @@ var workflowl =function(module){
         workflowl.renderSettings();
         workflowl.openSidebar();
     }
-
+    workflowl.resetForm = function(id){
+        $('form#'+id)[0].reset();
+        $('.selectpicker').selectpicker('refresh');
+    }
     workflowl.renderSettings =function(){
         var blockname =$('.tree .block.selected').attr('data-name');
         var flow_id =$('.tree .block.selected').attr('data-id');
@@ -373,7 +376,7 @@ var workflowl =function(module){
                     }
                     tinymce.get('message').setContent(flow.configure.message);
                 }else{
-                    $('form#EmailConfig')[0].reset();
+                    workflowl.resetForm('EmailConfig');
                 }
                 $('#sidebarSettingsTitle').html("Setup email template");
                 $('#sidebarsetupemail').addClass('show');
@@ -394,7 +397,7 @@ var workflowl =function(module){
                         $('form#WhatsappConfig [name="header_media_caption"]').val(flow.configure.header_media_caption);
                     }
                 }else{
-                    $('form#WhatsappConfig')[0].reset();
+                    workflowl.resetForm('WhatsappConfig');
                 }
                 $('#sidebarSettingsTitle').html("Setup whatsapp template");
                 $('#sidebarsetupwhatsapp').addClass('show');
@@ -405,7 +408,7 @@ var workflowl =function(module){
                     $('form#SMSConfig [name="sendto"]').val(flow.configure.sendto);
                     $('form#SMSConfig [name="template"]').val(flow.configure.template).trigger('change');
                 }else{
-                    $('form#SMSConfig')[0].reset();
+                    workflowl.resetForm('SMSConfig');
                 }
                 $('#sidebarSettingsTitle').html("Setup SMS template");
                 $('#sidebarsetupsms').addClass('show');
@@ -414,7 +417,7 @@ var workflowl =function(module){
                 if(flow.configure){
                     $('#ApprovalConfig [name="approver"] option[value="'+flow.configure.approver+'"]').attr('selected','selected');
                 }else{
-                    $('form#ApprovalConfig')[0].reset();
+                    workflowl.resetForm('ApprovalConfig');
                 }
                 $('#ApprovalConfig [name="approver"]').selectpicker('refresh');
                 $('#sidebarSettingsTitle').html("Setup approval settings");
@@ -422,9 +425,6 @@ var workflowl =function(module){
             }else if(blockname =='condition'){
                 if(flow.configure){
                     $('#workflowQuerybuilder').queryBuilder('setRules', flow.configure.ruleswidget);
-                }else{
-                    $('#workflowQuerybuilder').queryBuilder('reset');
-
                 }
                 $('#sidebarSettingsTitle').html("Setup Conditions");
                 $('#sidebarsetupcondition').addClass('show');
@@ -438,7 +438,7 @@ var workflowl =function(module){
                     $('#AddActivityConfig [name="priority"]').val(flow.configure.priority).selectpicker('refresh');
                     $('#AddActivityConfig [name="startdate"]').val(flow.configure.startdate).selectpicker('refresh');
                 }else{
-                    $('form#AddActivityConfig')[0].reset();
+                    workflowl.resetForm('AddActivityConfig');
                 }
                 $('#sidebarSettingsTitle').html("Setup Add Activity");
                 $('#sidebarsetupaddactivity').addClass('show');
@@ -465,7 +465,7 @@ var workflowl =function(module){
                         
                     }
                 }else{
-                    $('form#LeadAssignStaffConfig')[0].reset();
+                    workflowl.resetForm('LeadAssignStaffConfig');
                 }
 
                 $('#sidebarSettingsTitle').html("Assign User");

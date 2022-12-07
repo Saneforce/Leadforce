@@ -1,7 +1,7 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
 
-<script src="<?php echo base_url('assets/js/workflow.js?v=1.1') ?>"></script>
+<script src="<?php echo base_url('assets/js/workflow.js?v=1.2') ?>"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function(event) {
         // initiating workflow

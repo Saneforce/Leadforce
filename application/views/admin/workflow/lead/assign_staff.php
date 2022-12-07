@@ -15,7 +15,7 @@
 
 <div class="form-group dynamic-form-group" id="stafftypeFormGroup">
     <label for="stafftype" class="control-label">Staff Type</label>
-    <select name="stafftype" id="stafftype" class="form-control selectpicker"required>
+    <select name="stafftype" id="stafftype" class="form-control selectpicker" required>
         <option >Nothing selected</option>
         <option value="staff" selected>Staffs</option>
         <option value="roles">Roles</option>
@@ -37,7 +37,7 @@
 
 <div class="form-group dynamic-form-group dynamic-stafftype-group" id="assigntogroupFormGroup">
     <label for="assigntogroup" class="control-label">Select Staffs</label>
-    <select name="assigntogroup[]" id="assigntogroup" class="form-control selectpicker" data-live-search="true" multiple required>
+    <select name="assigntogroup[]" id="assigntogroup" class="form-control selectpicker" data-live-search="true" multiple>
     <?php foreach($staffs as $staffid => $staffname): ?>
         <option value="<?php echo $staffid ?>"><?php echo $staffname ?></option>
     <?php endforeach; ?>
@@ -46,7 +46,7 @@
 
 <div class="form-group dynamic-form-group dynamic-stafftype-group" id="assigntoroleFormGroup">
     <label for="assigntorole" class="control-label">Select Role</label>
-    <select name="assigntorole[]" id="assigntorole" class="form-control selectpicker" multiple required>
+    <select name="assigntorole[]" id="assigntorole" class="form-control selectpicker" multiple>
     <?php foreach($staff_role as $role): ?>
         <option value="<?php echo $role['roleid'] ?>"><?php echo $role['name'] ?></option>
     <?php endforeach; ?>
@@ -55,7 +55,7 @@
 
 <div class="form-group dynamic-form-group dynamic-stafftype-group" id="assigntodesignationFormGroup">
     <label for="assigntodesignation" class="control-label">Select Designation</label>
-    <select name="assigntodesignation[]" id="assigntodesignation" class="form-control selectpicker" multiple required>
+    <select name="assigntodesignation[]" id="assigntodesignation" class="form-control selectpicker" multiple>
     <?php foreach($staff_designation as $designation): ?>
         <option value="<?php echo $designation['designationid'] ?>"><?php echo $designation['name'] ?></option>
     <?php endforeach; ?>
@@ -68,25 +68,30 @@
 
 
 <script>
-    function resetRequired(){
+    function reloadByType(type_val){
         $('#LeadAssignStaffConfig [name="assignto"]').removeAttr('required');
+        $('#LeadAssignStaffConfig [name="stafftype"]').removeAttr('required');
         $('#LeadAssignStaffConfig [name="assigntogroup[]"]').removeAttr('required');
         $('#LeadAssignStaffConfig [name="assigntorole[]"]').removeAttr('required');
         $('#LeadAssignStaffConfig [name="assigntodesignation[]"]').removeAttr('required');
-    }
-    function reloadByType(type_val){
-        resetRequired();
-        $('.dynamic-form-group').hide();
+        $('#LeadAssignStaffConfig  .dynamic-form-group').hide();
+
+        workflowl.resetForm('LeadAssignStaffConfig');
+        $('#LeadAssignStaffConfig [name="type"]').val(type_val);
         if(type_val =='direct_assign'){
+            $('[name="assignto"]').attr('required',true);
             $('#LeadAssignStaffConfig #assigntoFormGroup').show();
             $('#LeadAssignStaffConfig [name="assignto"]').attr('required','true');
         }else if(type_val =='round_robin_method'){
+            $('[name="stafftype"]').attr('required',true);
             $('#LeadAssignStaffConfig #stafftypeFormGroup').show();
             $('#LeadAssignStaffConfig #assigntogroupFormGroup').show();
         }else if(type_val =='having_less_no_of_leads'){
+            $('[name="stafftype"]').attr('required',true);
             $('#LeadAssignStaffConfig #stafftypeFormGroup').show();
             $('#LeadAssignStaffConfig #assigntogroupFormGroup').show();
         }else if(type_val =='having_more_conversions'){
+            $('[name="stafftype"]').attr('required',true);
             $('#LeadAssignStaffConfig #stafftypeFormGroup').show();
             $('#LeadAssignStaffConfig #assigntogroupFormGroup').show();
         }else{
@@ -95,15 +100,20 @@
     }
 
     function reloadByStaffType(type_val){
-        resetRequired();
-        $('.dynamic-stafftype-group').hide();
+        $('#LeadAssignStaffConfig [name="assigntogroup[]"]').removeAttr('required');
+        $('#LeadAssignStaffConfig [name="assigntorole[]"]').removeAttr('required');
+        $('#LeadAssignStaffConfig [name="assigntodesignation[]"]').removeAttr('required');
+        $('#LeadAssignStaffConfig .dynamic-stafftype-group').hide();
         if(type_val =='staff'){
+            $('[name="assigntogroup[]"]').attr('required',true);
             $('#LeadAssignStaffConfig [name="assigntogroup[]"]').attr('required','true');
             $('#LeadAssignStaffConfig #assigntogroupFormGroup').show();
         }else if(type_val =='roles'){
+            $('[name="assigntorole[]"]').attr('required',true);
             $('#LeadAssignStaffConfig [name="assigntorole[]"]').attr('required','true');
             $('#LeadAssignStaffConfig #assigntoroleFormGroup').show();
         }else if(type_val =='designation'){
+            $('[name="assigntodesignation[]"]').attr('required',true);
             $('#LeadAssignStaffConfig [name="assigntodesignation[]"]').attr('required','true');
             $('#LeadAssignStaffConfig #assigntodesignationFormGroup').show();
         }
@@ -111,7 +121,7 @@
     }
 
     document.addEventListener("DOMContentLoaded", function(event) {
-        $('.dynamic-form-group').hide();
+        $('#LeadAssignStaffConfig .dynamic-form-group').hide();
         $('#LeadAssignStaffConfig #assigntoFormGroup').show();
         $('#LeadAssignStaffConfig [name="type"]').change(function(){
             var type_val =$(this).val();
