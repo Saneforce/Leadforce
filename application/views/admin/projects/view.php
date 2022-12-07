@@ -2599,7 +2599,14 @@ $(document).ready(function(){
 	}
 	$('.data_edit_btn_custom').click(function(e) {
 			var f = $(this).attr("data-val");
-			var f_val = $('#'+f).val();
+            if(typeof $(this).attr("data-val-type") !='undefined' && $(this).attr("data-val-type") =='multi-checkbox'){
+                var f_val =$('input[name="'+f+'[]"]:checked').map(function(_, el) {
+                    return $(el).val();
+                }).get();
+
+            }else{
+                var f_val = $('#'+f).val();
+            }
             var data = {project_id:<?php echo ($project->id); ?>,slug:f,f_val:f_val,custom_field:'2'};
 			field_update(data,f);
     });

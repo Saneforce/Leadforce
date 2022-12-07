@@ -490,6 +490,49 @@ $hasApprovalFlow = $this->workflow_model->getflows('deal_approval',0,['service'=
 									<a class=" data_edit_btn_custom" data-val="<?php echo $field['slug'];?>"><i class="fa fa-check"></i></a>
 								</div>
 							</div>
+               <?php
+                     break;
+						case 'checkbox':
+					?>
+							<div class="input-group">
+                        <div class="form-group chk">
+									<?php 
+									$all_vals = explode(',',$field['options']);
+									foreach($all_vals as $all_val1){
+										$all_val1 = trim($all_val1);
+									   $selected = '';
+									   if($all_val1 == $value){
+										  $selected = 'checked="checked"';
+									   }
+									   else{
+										   $cur_vals = explode(',',$value);
+										   if(!empty($cur_vals)){
+											   if(in_array(trim($all_val1),$cur_vals)){
+												   $selected = 'checked="checked"';
+											   }
+										   }
+									   }
+                              $input_id = 'cfc_' . $field['id'] . '_' . slug_it($all_val1) . '_' . app_generate_hash();
+
+                              $fields_html = '<div class="checkbox' . ($field['display_inline'] == 1 ? ' checkbox-inline': '') . '">';
+                              $fields_html .= '<input class="custom_field_checkbox"  '. $selected . ' value="' . $all_val1 . '" id="' . $input_id . '" type="checkbox" name="' . $field['slug'] . '[]">';
+                              if ($field['required'] == 1) {
+                                 $fields_html .= '<label for="' . $input_id . '" class="cf-chk-label"> <small class="req text-danger">* </small>' . $all_val1 . '</label>';
+                              }else{
+                                 $fields_html .= '<label for="' . $input_id . '" class="cf-chk-label">' . $all_val1 . '</label>';
+                              }
+                                 // $fields_html .= '<input type="hidden" name="' . $field['slug'] . '[]" value="cfk_hidden">';
+                              $fields_html .= '</div>';
+
+                              echo $fields_html;
+									   // echo '<input type="checkbox" value="'.$all_val1.'" '.$selected.'>'.$all_val1.'</option>';
+									}
+									?>
+								</div>
+								<div class="input-group-addon" style="opacity: 1;">
+									<a class=" data_edit_btn_custom" data-val="<?php echo $field['slug'];?>" data-val-type="multi-checkbox"><i class="fa fa-check"></i></a>
+								</div>
+							</div>
 					<?php
 							break;
 						case 'link':

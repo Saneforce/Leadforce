@@ -225,6 +225,7 @@ class Lead_workflow extends Workflow_app
                 'label'=>'State',
                 'type'=>'string',
                 'input'=>'text',
+                'operators'=>$text_operators,
             )
         );
         

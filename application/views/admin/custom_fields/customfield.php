@@ -80,9 +80,9 @@
                                 <option value="input" <?php if(isset($custom_field) && $custom_field->type == 'input'){echo 'selected';} ?>>Single Line Input</option>
                                 <option value="number" <?php if(isset($custom_field) && $custom_field->type == 'number'){echo 'selected';} ?>>Number</option>
                                 <option value="textarea" <?php if(isset($custom_field) && $custom_field->type == 'textarea'){echo 'selected';} ?>>Multi Line Input</option>
-                                <option value="select" <?php if(isset($custom_field) && $custom_field->type == 'select'){echo 'selected';} ?>>Select</option>
-                                <option value="multiselect" <?php if(isset($custom_field) && $custom_field->type == 'multiselect'){echo 'selected';} ?>>Multi Select Horizontal</option>
-                                <option value="checkbox" <?php if(isset($custom_field) && $custom_field->type == 'checkbox'){echo 'selected';} ?>>Multi Select Vertical</option>
+                                <option value="select" <?php if(isset($custom_field) && $custom_field->type == 'select'){echo 'selected';} ?>>Single Select Dropdown</option>
+                                <option value="multiselect" <?php if(isset($custom_field) && $custom_field->type == 'multiselect'){echo 'selected';} ?>>Multi Select Dropdown</option>
+                                <option value="checkbox" <?php if(isset($custom_field) && $custom_field->type == 'checkbox'){echo 'selected';} ?>>Multi Select Checkbox</option>
                                 <option value="date_picker" <?php if(isset($custom_field) && $custom_field->type == 'date_picker'){echo 'selected';} ?>>Date Picker</option>
                                 <option value="date_picker_time" <?php if(isset($custom_field) && $custom_field->type == 'date_picker_time'){echo 'selected';} ?>>Datetime Picker</option>
                                 <option value="time_picker" <?php if(isset($custom_field) && $custom_field->type == 'time_picker'){echo 'selected';} ?>>Time Picker</option>
@@ -95,9 +95,11 @@
                            </div>
                             <div class="clearfix"></div>
                             <div id="options_wrapper" class="<?php if(!isset($custom_field) || isset($custom_field) && $custom_field->type != 'select' && $custom_field->type != 'checkbox' && $custom_field->type != 'multiselect'){echo 'hide';} ?>">
-                                <span class="pull-left fa fa-question-circle" data-toggle="tooltip" title="<?php echo _l('custom_field_add_edit_options_tooltip'); ?>"></span>
                                 <?php $value = (isset($custom_field) ? $custom_field->options : ''); ?>
-                                <?php echo render_textarea('options','custom_field_add_edit_options',$value,array('rows'=>3)); ?>
+                                <div class="input-group date">
+                                    <label for="options">Options</label>
+                                    <input type="text" class=" tagit-hidden-field" id="options" name="options" value="<?php echo $value ?>" data-role="tagsinput" placeholder="Option" placeholderText="Option" required> 
+                                </div>
                             </div>
                             <?php $value = (isset($custom_field) ? $custom_field->field_order : ''); ?>
                             <?php echo render_input('field_order','custom_field_add_edit_order',$value,'number'); ?>
@@ -178,6 +180,7 @@ var pdf_fields = <?php echo json_encode($pdf_fields); ?>;
 var client_portal_fields = <?php echo json_encode($client_portal_fields); ?>;
 var client_editable_fields = <?php echo json_encode($client_editable_fields); ?>;
 $(function () {
+    $("#options").tagit({placeholderText: 'Option',showAutocompleteOnFocus: true,})
     appValidateForm($('form'), {
         fieldto: 'required',
         name: 'required',
