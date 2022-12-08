@@ -3189,8 +3189,8 @@ class Tasks_model extends App_Model
         array_push($join, 'LEFT JOIN '.db_prefix().'clients  as '.db_prefix().'clients ON '.db_prefix().'clients.userid = ' .db_prefix() . 'projects.clientid');
        array_push($join, 'LEFT JOIN '.db_prefix().'contacts  as '.db_prefix().'contacts ON ('.db_prefix().'contacts.id = ' .db_prefix() . 'tasks.contacts_id  OR (' .db_prefix() . 'tasks.rel_type ="contact" AND '.db_prefix().'contacts.id = ' .db_prefix() . 'tasks.rel_id) )');
          
-       include_once(APPPATH . 'views/admin/tables/includes/tasks_filter.php');
-        include_once(APPPATH . 'views/admin/tables/includes/tasks_wo_status_filter.php');
+        // include_once(APPPATH . 'views/admin/tables/includes/tasks_filter.php');
+        // include_once(APPPATH . 'views/admin/tables/includes/tasks_wo_status_filter.php');
 
         // ROle based records
         $my_staffids = $this->staff_model->get_my_staffids();

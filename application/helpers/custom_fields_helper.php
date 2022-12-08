@@ -452,7 +452,6 @@ function render_custom_fields($belongs_to, $rel_id = false, $where = [], $items_
             }
 
             $_input_attrs = [];
-
             if ($field['required'] == 1) {
                 $_input_attrs['data-custom-field-required'] = true;
                 $_input_attrs['required'] = true;

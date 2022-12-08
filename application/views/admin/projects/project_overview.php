@@ -349,7 +349,7 @@ $hasApprovalFlow = $this->workflow_model->getflows('deal_approval',0,['service'=
             <td class="<?php echo $field['slug'];?>">
 				<div class="data_display" >
 					<?php echo $value; ?>
-					<?php if($field['type']!='link'){?>
+					<?php if(true){?>
                   <?php if($can_user_edit ==true){ ?>
 						<button class="btn btn-link pull-right no-padding data_display_btn"
 					data-val="<?php echo $field['slug'];?>" >
@@ -414,7 +414,7 @@ $hasApprovalFlow = $this->workflow_model->getflows('deal_approval',0,['service'=
 						case 'time_picker':
 					?>
 							<div class="input-group date">
-								<input type="text" id="<?php echo $field['slug'];?>" name="<?php echo $field['slug'];?>" class="form-control daterangepicker"  value="<?php echo (!empty($value) ? date('d-m-Y',strtotime($value)) : ' '); ?>" autocomplete="off" readonly>
+								<input type="text" id="<?php echo $field['slug'];?>" name="<?php echo $field['slug'];?>" class="form-control timepicker"  value="<?php echo $value; ?>" autocomplete="off" readonly>
 								<div class="input-group-addon" style="opacity: 1;">
 									<a class=" data_edit_btn_custom" data-val="<?php echo $field['slug'];?>"><i class="fa fa-check"></i></a>
 								</div>
@@ -538,8 +538,57 @@ $hasApprovalFlow = $this->workflow_model->getflows('deal_approval',0,['service'=
 						case 'link':
 					?>
 							<div class="input-group">
-								<a id="custom_fields_<?php echo $field['fieldto'] .'_'.$field['id'] . '_popover'?>" type="button" href="javascript:void(0)"><?php echo _l('cf_translate_input_link_tip');?></a>
+                        <?php 
+                        $fields_html = '<div class="form-group cf-hyperlink" data-fieldto="' . $field['fieldto'] . '" data-field-id="' . $field['id'] . '" data-value="' . html_escape($value) . '" data-field-name="' . html_escape($field['name']) . '">';
+                        $fields_html .= '<label class="control-label" for="' . $field['slug'].'">' . $field_name . '</label></br>';
+
+                        $fields_html .= '<a id="custom_fields_' . $field['fieldto'] . '_' . $field['id'] . '_popover" type="button" href="javascript:">' . _l('cf_translate_input_link_tip') . '</a>';
+
+                        $fields_html .= '<input type="hidden" ' . ($field['required'] == 1 ? 'data-custom-field-required="1"' : '') . ' value="" id="custom_fields[' . $field['fieldto'] . '][' . $field['id'] . ']" name="'.$field['slug'].'">';
+
+                        $field_template = '';
+                        $field_template .= '<div id="custom_fields_' . $field['fieldto'] . '_' . $field['id'] . '_popover-content" class="hide cfh-field-popover-template"><div class="form-group">';
+                        $field_template .= '<div class="row"><div class="col-md-12"><label class="control-label" for="custom_fields_' . $field['fieldto'] . '_' . $field['id'] . '_title">' . _l('cf_translate_input_link_title') . '</label>';
+                        $field_template .= '<input type="text"' . ($field['disalow_client_to_edit'] == 1 && is_client_logged_in() ? ' disabled="true" ' : ' ') . 'id="custom_fields_' . $field['fieldto'] . '_' . $field['id'] . '_title" value="" class="form-control">';
+                        $field_template .= '</div>';
+                        $field_template .= '</div>';
+                        $field_template .= '</div>';
+                        $field_template .= '<div class="form-group">';
+                        $field_template .= '<div class="row">';
+                        $field_template .= '<div class="col-md-12">';
+                        $field_template .= '<label class="control-label" for="custom_fields_' . $field['fieldto'] . '_' . $field['id'] . '_link">' . _l('cf_translate_input_link_url') . '</label>';
+                        $field_template .= '<div class="input-group"><input type="text"' . ($field['disalow_client_to_edit'] == 1 && is_client_logged_in() ? ' disabled="true" ' : ' ') . 'id="custom_fields_' . $field['fieldto'] . '_' . $field['id'] . '_link" value="" class="form-control"><span class="input-group-addon"><a href="#" id="cf_hyperlink_open_' . $field['id'] . '" target="_blank"><i class="fa fa-globe"></i></a></span></div>';
+                        $field_template .= '</div>';
+                        $field_template .= '</div>';
+                        $field_template .= '</div>';
+                        $field_template .= '<div class="row">';
+                        $field_template .= '<div class="col-md-6">';
+                        $field_template .= '<button type="button" id="custom_fields_' . $field['fieldto'] . '_' . $field['id'] . '_btn-cancel" class="btn btn-default btn-md pull-left" value="">' . _l('cancel') . '</button>';
+                        $field_template .= '</div>';
+                        $field_template .= '<div class="col-md-6">';
+                        $field_template .= '<button type="button" id="custom_fields_' . $field['fieldto'] . '_' . $field['id'] . '_btn-save" class="btn btn-info btn-md pull-right" value="">' . _l('apply') . '</button>';
+                        $field_template .= '</div>';
+                        $field_template .= '</div>';
+                        $fields_html .= '<script>';
+                        $fields_html .= 'cfh_popover_templates[\'' . $field['id'] . '\'] = \'' . $field_template . '\';';
+                        $fields_html .= '</script>';
+                        $fields_html .= '</div>';
+                        echo $fields_html;
+                        ?>
+                        <div class="input-group-addon" style="opacity: 1;">
+                           <a class=" data_edit_btn_custom" data-val="<?php echo $field['slug'];?>"><i class="fa fa-check"></i></a>
+                        </div>
 							</div>
+                     <?php
+							break;
+						case 'location':
+					?>
+                  <div class="input-group">
+							<?php echo render_location_picker($field['slug'], $field['name'], get_custom_field_value($project->id,$field['id'],'projects')) ?>
+                     <div class="input-group-addon" style="opacity: 1;">
+                        <a class=" data_edit_btn_custom" data-val="<?php echo $field['slug'];?>"><i class="fa fa-check"></i></a>
+                     </div>
+                  </div>
 					<?php
 							break;
 					} 

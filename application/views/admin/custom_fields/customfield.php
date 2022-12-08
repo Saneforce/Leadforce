@@ -57,11 +57,11 @@
                                 <option value="staff" <?php if(isset($custom_field) && $custom_field->fieldto == 'staff'){echo 'selected';} ?>><?php echo _l('custom_field_staff'); ?></option>
                                 <!-- <option value="contracts" <?php if(isset($custom_field) && $custom_field->fieldto == 'contracts'){echo 'selected';} ?>><?php echo _l('custom_field_contracts'); ?></option> -->
                                 <option value="tasks" <?php if(isset($custom_field) && $custom_field->fieldto == 'tasks'){echo 'selected';} ?>><?php echo _l('custom_field_tasks'); ?></option>
-                                <option value="expenses" <?php if(isset($custom_field) && $custom_field->fieldto == 'expenses'){echo 'selected';} ?>><?php echo _l('custom_field_expenses'); ?></option>
+                                <!-- <option value="expenses" <?php if(isset($custom_field) && $custom_field->fieldto == 'expenses'){echo 'selected';} ?>><?php echo _l('custom_field_expenses'); ?></option> -->
                                 <option value="invoice" <?php if(isset($custom_field) && $custom_field->fieldto == 'invoice'){echo 'selected';} ?>><?php echo _l('custom_field_invoice'); ?></option>
                                 <option value="items" <?php if(isset($custom_field) && $custom_field->fieldto == 'items'){echo 'selected';} ?>><?php echo _l('items'); ?></option>
-                                <option value="credit_note" <?php if(isset($custom_field) && $custom_field->fieldto == 'credit_note'){echo 'selected';} ?>><?php echo _l('credit_note'); ?></option>
-                                <option value="estimate" <?php if(isset($custom_field) && $custom_field->fieldto == 'estimate'){echo 'selected';} ?>><?php echo _l('custom_field_estimate'); ?></option>
+                                <!-- <option value="credit_note" <?php if(isset($custom_field) && $custom_field->fieldto == 'credit_note'){echo 'selected';} ?>><?php echo _l('credit_note'); ?></option> -->
+                                <!-- <option value="estimate" <?php if(isset($custom_field) && $custom_field->fieldto == 'estimate'){echo 'selected';} ?>><?php echo _l('custom_field_estimate'); ?></option> -->
                                 <option value="proposal" <?php if(isset($custom_field) && $custom_field->fieldto == 'proposal'){echo 'selected';} ?>><?php echo _l('proposal'); ?></option>
                                 <option value="target" <?php if(isset($custom_field) && $custom_field->fieldto == 'target'){echo 'selected';} ?>><?php echo _l('target'); ?></option>
                                 <!-- <option value="tickets" <?php if(isset($custom_field) && $custom_field->fieldto == 'tickets'){echo 'selected';} ?>><?php echo _l('tickets'); ?></option> -->

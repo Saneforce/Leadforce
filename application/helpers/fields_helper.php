@@ -1077,7 +1077,7 @@ function render_location_picker($name, $label = '', $value = '', $input_attrs = 
 
     $input .='<input id="cgmapsearchInput" class="controls mapsearchInput" type="text" placeholder="Search location">';
     $input .='<div id="cgmap" style="height: 400px; width: 100%; position: relative; overflow: hidden;"></div>';
-    $input .= '<input type="hidden" id="' . $name . '" name="' . $name . '" value="' . set_value($name, $value) . '" />';
+    $input .= '<input type="hidden" '.(($cur_req==2)?'required="true"':"").' id="' . $name . '" name="' . $name . '" value="' . set_value($name, $value) . '"  />';
     $input .= '</div>';
     $input .= '</div>';
     return $input;

@@ -2606,6 +2606,9 @@ $(document).ready(function(){
 
             }else{
                 var f_val = $('#'+f).val();
+                if(typeof f_val =='undefined'){
+                    var f_val =$('[name="'+f+'"]').val();
+                }
             }
             var data = {project_id:<?php echo ($project->id); ?>,slug:f,f_val:f_val,custom_field:'2'};
 			field_update(data,f);
