@@ -336,7 +336,9 @@ $hasApprovalFlow = $this->workflow_model->getflows('deal_approval',0,['service'=
             </td>
          </tr>
 		   <?php }?>
-         <?php $custom_fields = get_custom_fields('projects');
+         <?php $custom_fields1 = get_custom_fields('projects');
+         $custom_fields2 = get_custom_fields('leads');
+         $custom_fields =array_merge($custom_fields1,$custom_fields2);
          if(count($custom_fields) > 0){ ?>
          <?php foreach($custom_fields as $field){ ?>
          <?php $value = get_custom_field_value($project->id,$field['id'],'projects');

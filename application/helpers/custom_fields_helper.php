@@ -381,6 +381,9 @@ function render_custom_fields($belongs_to, $rel_id = false, $where = [], $items_
     $CI = & get_instance();
     $CI->db->where('active', 1);
     $CI->db->where('fieldto', $belongs_to);
+    if($belongs_to =='projects'){
+        $CI->db->or_where('fieldto', 'leads');
+    }
 
     if (is_array($where) && count($where) > 0 || is_string($where) && $where != '') {
         $CI->db->where($where);
@@ -461,10 +464,10 @@ function render_custom_fields($belongs_to, $rel_id = false, $where = [], $items_
                 $_input_attrs['disabled'] = true;
             }
 
-            $_input_attrs['data-fieldto'] = $field['fieldto'];
+            $_input_attrs['data-fieldto'] = $belongs_to;
             $_input_attrs['data-fieldid'] = $field['id'];
 
-            $cf_name = 'custom_fields[' . $field['fieldto'] . '][' . $field['id'] . ']';
+            $cf_name = 'custom_fields[' . $belongs_to . '][' . $field['id'] . ']';
 
             if ($part_item_name != '') {
                 $cf_name = $part_item_name . '[custom_fields][items][' . $field['id'] . ']';
@@ -509,7 +512,7 @@ function render_custom_fields($belongs_to, $rel_id = false, $where = [], $items_
                     $_select_attrs['disabled'] = true;
                 }
 
-                $_select_attrs['data-fieldto'] = $field['fieldto'];
+                $_select_attrs['data-fieldto'] = $belongs_to;
                 $_select_attrs['data-fieldid'] = $field['id'];
 
                 if ($field['type'] == 'multiselect') {
@@ -583,7 +586,7 @@ function render_custom_fields($belongs_to, $rel_id = false, $where = [], $items_
 
                     $_chk_attrs                 = [];
                     $chk_attrs                  = '';
-                    $_chk_attrs['data-fieldto'] = $field['fieldto'];
+                    $_chk_attrs['data-fieldto'] = $belongs_to;
                     $_chk_attrs['data-fieldid'] = $field['id'];
 
                     if ($field['required'] == 1) {
@@ -612,15 +615,15 @@ function render_custom_fields($belongs_to, $rel_id = false, $where = [], $items_
                 }
                 $fields_html .= '</div>';
             } elseif ($field['type'] == 'link') {
-                $fields_html .= '<div class="form-group cf-hyperlink" data-fieldto="' . $field['fieldto'] . '" data-field-id="' . $field['id'] . '" data-value="' . html_escape($value) . '" data-field-name="' . html_escape($field_name) . '">';
-                $fields_html .= '<label class="control-label" for="custom_fields[' . $field['fieldto'] . '][' . $field['id'] . ']">' . $field_name . '</label></br>';
+                $fields_html .= '<div class="form-group cf-hyperlink" data-fieldto="' . $belongs_to . '" data-field-id="' . $field['id'] . '" data-value="' . html_escape($value) . '" data-field-name="' . html_escape($field_name) . '">';
+                $fields_html .= '<label class="control-label" for="custom_fields[' . $belongs_to . '][' . $field['id'] . ']">' . $field_name . '</label></br>';
 
-                $fields_html .= '<a id="custom_fields_' . $field['fieldto'] . '_' . $field['id'] . '_popover" type="button" href="javascript:">' . _l('cf_translate_input_link_tip') . '</a>';
+                $fields_html .= '<a id="custom_fields_' . $belongs_to . '_' . $field['id'] . '_popover" type="button" href="javascript:">' . _l('cf_translate_input_link_tip') . '</a>';
 
                 $fields_html .= '<input type="hidden" ' . ($field['required'] == 1 ? 'data-custom-field-required="1"' : '') . ' value="" id="custom_fields[' . $field['fieldto'] . '][' . $field['id'] . ']" name="custom_fields[' . $field['fieldto'] . '][' . $field['id'] . ']">';
 
                 $field_template = '';
-                $field_template .= '<div id="custom_fields_' . $field['fieldto'] . '_' . $field['id'] . '_popover-content" class="hide cfh-field-popover-template"><div class="form-group">';
+                $field_template .= '<div id="custom_fields_' . $belongs_to . '_' . $field['id'] . '_popover-content" class="hide cfh-field-popover-template"><div class="form-group">';
                 $field_template .= '<div class="row"><div class="col-md-12"><label class="control-label" for="custom_fields_' . $field['fieldto'] . '_' . $field['id'] . '_title">' . _l('cf_translate_input_link_title') . '</label>';
                 $field_template .= '<input type="text"' . ($field['disalow_client_to_edit'] == 1 && is_client_logged_in() ? ' disabled="true" ' : ' ') . 'id="custom_fields_' . $field['fieldto'] . '_' . $field['id'] . '_title" value="" class="form-control">';
                 $field_template .= '</div>';
@@ -629,17 +632,17 @@ function render_custom_fields($belongs_to, $rel_id = false, $where = [], $items_
                 $field_template .= '<div class="form-group">';
                 $field_template .= '<div class="row">';
                 $field_template .= '<div class="col-md-12">';
-                $field_template .= '<label class="control-label" for="custom_fields_' . $field['fieldto'] . '_' . $field['id'] . '_link">' . _l('cf_translate_input_link_url') . '</label>';
+                $field_template .= '<label class="control-label" for="custom_fields_' . $belongs_to . '_' . $field['id'] . '_link">' . _l('cf_translate_input_link_url') . '</label>';
                 $field_template .= '<div class="input-group"><input type="text"' . ($field['disalow_client_to_edit'] == 1 && is_client_logged_in() ? ' disabled="true" ' : ' ') . 'id="custom_fields_' . $field['fieldto'] . '_' . $field['id'] . '_link" value="" class="form-control"><span class="input-group-addon"><a href="#" id="cf_hyperlink_open_' . $field['id'] . '" target="_blank"><i class="fa fa-globe"></i></a></span></div>';
                 $field_template .= '</div>';
                 $field_template .= '</div>';
                 $field_template .= '</div>';
                 $field_template .= '<div class="row">';
                 $field_template .= '<div class="col-md-6">';
-                $field_template .= '<button type="button" id="custom_fields_' . $field['fieldto'] . '_' . $field['id'] . '_btn-cancel" class="btn btn-default btn-md pull-left" value="">' . _l('cancel') . '</button>';
+                $field_template .= '<button type="button" id="custom_fields_' . $belongs_to . '_' . $field['id'] . '_btn-cancel" class="btn btn-default btn-md pull-left" value="">' . _l('cancel') . '</button>';
                 $field_template .= '</div>';
                 $field_template .= '<div class="col-md-6">';
-                $field_template .= '<button type="button" id="custom_fields_' . $field['fieldto'] . '_' . $field['id'] . '_btn-save" class="btn btn-info btn-md pull-right" value="">' . _l('apply') . '</button>';
+                $field_template .= '<button type="button" id="custom_fields_' . $belongs_to . '_' . $field['id'] . '_btn-save" class="btn btn-info btn-md pull-right" value="">' . _l('apply') . '</button>';
                 $field_template .= '</div>';
                 $field_template .= '</div>';
                 $fields_html .= '<script>';
