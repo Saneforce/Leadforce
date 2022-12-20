@@ -81,8 +81,8 @@ class Dashboard extends AdminController
 		if(isset($_POST['apply_sumbit'])){
 			$cur_data['dash_form_data'] = $_POST;
 			$this->session->set_userdata($cur_data);
-			redirect(admin_url());
-			exit;
+			// redirect(admin_url());
+			// exit;
 		}
 		if(isset($_GET['clear'])){
 			$this->session->unset_userdata('dash_form_data');
