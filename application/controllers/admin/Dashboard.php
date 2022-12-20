@@ -90,6 +90,9 @@ class Dashboard extends AdminController
 		if(!empty($this->session->userdata('dash_form_data'))){
 			$data['dash_form_data'] = $this->session->userdata('dash_form_data');
 		}
+		if($this->session->userdata('dash_form_data')){
+			$_POST =$this->session->userdata('dash_form_data');
+		}
         
         if(!is_admin(get_staff_user_id())) {
             
