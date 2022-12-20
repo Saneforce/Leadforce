@@ -848,7 +848,7 @@ function get_sql_select_task_total_finished_checklist_items()
  */
 function get_tasks_where_string($table = true)
 {
-    $_tasks_where = '('.db_prefix().'tasks.id IN (SELECT taskid FROM '.db_prefix().'task_assigned WHERE staffid = ' . get_staff_user_id() . ') OR '.db_prefix().'tasks.id IN (SELECT taskid FROM '.db_prefix().'task_followers WHERE staffid = ' . get_staff_user_id() . ') OR (addedfrom=' . get_staff_user_id() . ' AND is_added_from_contact=0)';
+    $_tasks_where = '('.db_prefix().'tasks.id IN (SELECT taskid FROM '.db_prefix().'task_assigned WHERE staffid = ' . get_staff_user_id() . ') OR '.db_prefix().'tasks.id IN (SELECT taskid FROM '.db_prefix().'task_followers WHERE staffid = ' . get_staff_user_id() . ') OR ('.db_prefix().'tasks.addedfrom=' . get_staff_user_id() . ' AND is_added_from_contact=0)';
     if (get_option('show_all_tasks_for_project_member') == 1) {
         $_tasks_where .= ' OR ('.db_prefix().'tasks.rel_type="project" AND '.db_prefix().'tasks.rel_id IN (SELECT project_id FROM '.db_prefix().'project_members WHERE staff_id=' . get_staff_user_id() . '))';
     }
@@ -856,7 +856,6 @@ function get_tasks_where_string($table = true)
     if ($table == true) {
         $_tasks_where = 'AND ' . $_tasks_where;
     }
-
     return $_tasks_where;
 }
 function get_or_update_setting($staffid,$table){
