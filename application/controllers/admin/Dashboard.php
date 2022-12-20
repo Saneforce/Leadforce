@@ -101,8 +101,8 @@ class Dashboard extends AdminController
             $staffdetails =  $this->db->query('SELECT *, staffid as staff_id FROM ' . db_prefix() . 'staff WHERE staffid = "'.get_staff_user_id().'"'.$low_hie)->result_array();
             $data['project_members'] =  $staffdetails;
         } else {
-            if(isset($_GET['pipelines']) && $_GET['pipelines'] != '')
-                $data['project_members'] = $this->pipeline_model->getPipelineFilterTeammembers($_GET['pipelines']);
+            if(isset($_POST['pipelines']) && $_POST['pipelines'] != '')
+                $data['project_members'] = $this->pipeline_model->getPipelineFilterTeammembers($_POST['pipelines']);
             else
                 $data['project_members'] = $this->projects_model->get_distinct_projects_members();
         }
