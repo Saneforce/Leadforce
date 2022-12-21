@@ -148,33 +148,24 @@ $emails =$this->leads_model->get_emails($lead->id);
 <!-- BEGIN INBOX CONTENT -->
 <div class="col-md-12">
 <div id="overlay" style="display: none;"><div class="spinner"></div></div>
-	<div class="col-md-12">
-		<div class="col-md-2">
+	<div class="">
 			<?php if(empty($url1)){?>
-				<a class="btn btn-block btn-primary composebtn" data-toggle="modal" data-target="#compose-modal" onclick="tab_opon_popup()"><i class="fa fa-pencil" ></i>&nbsp;&nbsp;<?php echo _l('compose_email');?></a>
+				<a class="btn btn-primary composebtn" data-toggle="modal" data-target="#compose-modal" onclick="tab_opon_popup()"><i class="fa fa-pencil" ></i>&nbsp;&nbsp;<?php echo _l('compose_email');?></a>
 			<?php }else{?>
-				<a class="btn btn-block btn-primary composebtn" href="<?php echo $url1;?>"><i class="fa fa-pencil" ></i>&nbsp;&nbsp;<?php echo _l('compose_email');?></a>
+				<a class="btn btn-primary composebtn" href="<?php echo $url1;?>"><i class="fa fa-pencil" ></i>&nbsp;&nbsp;<?php echo _l('compose_email');?></a>
 			<?php }?>
-		</div>
-		<div class="col-md-10" >
-			<div class="col-md-2" style="float:right">
-				<a class="btn btn-block btn-primary composebtn" href="javascript:void(0)" onclick="sync_mail()" title="<?php echo _l('sync_mail_help_text');?>"><i class="fa fa-pencil" ></i>&nbsp;&nbsp;<?php echo _l('sync_mail');?></a>
-			</div>
+
+			<a class="btn btn-primary pull-right composebtn" href="javascript:void(0)" onclick="sync_mail()" title="<?php echo _l('sync_mail_help_text');?>"><i class="fa fa-pencil" ></i>&nbsp;&nbsp;<?php echo _l('sync_mail');?></a>
+
 			<div  class="header" id="myHeader" style="display:none;">
 				<div class="col-md-12" style="background: #fff;">
 					<div class="col-md-2" style="width:auto">
 						<a href="javascript:void(0);" id="del_mail"><i class="fa fa-trash fa-2x"  style="color:red"></i></a>
 					</div>
-					<?php /*<div class="col-md-2" style="width:auto;padding-top:6px">
-						<a href="javascript:void(0);" style="color:#666" id="read_mail">Mark as Read </a>
-					</div>
-					<div class="col-md-2" style="width:auto;padding-top:6px">
-						<a href="javascript:void(0);" style="color:#666" id="unread_mail">Mark as Unread </a>
-					</div>*/?>
 				</div>
 			</div>
-		</div>
 	</div>
+
 	<div class="col-md-12 email">
 		<div class="table-responsive">
 			<form id="formId" >

@@ -12,6 +12,7 @@ class Leads extends AdminController
         $this->load->model('leads_model');
 		$this->load->model('pipeline_model');
 		$this->load->library('user_agent');
+		$this->load->model('callsettings_model');
 		if (strpos($this->agent->referrer(), '/leads') !== false) {
 		}
 		else {
@@ -99,7 +100,6 @@ class Leads extends AdminController
         if (!is_staff_member() || ($id != '' && !$this->leads_model->staff_can_access_lead($id))) {
             ajax_access_denied();
         }
-
         if ($this->input->post()) {
             if ($id == '') {
                 $id      = $this->leads_model->add($this->input->post());
@@ -204,7 +204,17 @@ class Leads extends AdminController
                 echo _l('lead_not_found');
                 die;
             }
-
+            $data['lead_person_details'] =[];
+            $data['lead_clients_details'] =[];
+            $lead_contact_id =$this->leads_model->get_lead_contact($lead->id);
+            if($lead->client_id){
+                $data['lead_clients_details'] =$this->clients_model->get($lead->client_id);
+            }
+            if($lead_contact_id){
+                $this->db->where('id',$lead_contact_id->contacts_id);
+                $person_details =$this->db->get(db_prefix().'contacts')->row();
+                $data['lead_person_details']= $person_details;
+            }
             if (total_rows(db_prefix() . 'clients', ['leadid' => $id ]) > 0) {
                 $data['lead_locked'] = ((!is_admin() && get_option('lead_lock_after_convert_to_customer') == 1) ? true : false);
             }

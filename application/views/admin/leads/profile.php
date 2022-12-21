@@ -216,37 +216,65 @@ if (!isset($lead)) {
                 <div class="row">
                     <div class="col-md-6">
                         <p class="lead-field-heading"><?php echo _l('lead_company'); ?></p>
-                        <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->company != '' ? $lead->company : '-') ?></p>
+                        <?php if($lead_clients_details): ?>
+                            <p class="bold font-medium-xs"><a href="<?php echo admin_url('clients/client/'.$lead_clients_details->userid) ?>"><?php echo (isset($lead_clients_details) && $lead_clients_details->company != '' ? $lead_clients_details->company : '-') ?></a></p>
+                        <?php else: ?>
+                            <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->company != '' ? $lead->company : '-') ?></p>
+                        <?php endif; ?>
                     </div>
                     <div class="col-md-6">
                         <p class="lead-field-heading"><?php echo _l('lead_website'); ?></p>
-                        <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->website != '' ? '<a href="' . maybe_add_http($lead->website) . '" target="_blank">' . $lead->website . '</a>' : '-') ?></p>
+                        <?php if($lead_clients_details): ?>
+                            <p class="bold font-medium-xs"><?php echo (isset($lead_clients_details) && $lead_clients_details->website != '' ? '<a href="' . maybe_add_http($lead_clients_details->website) . '" target="_blank">' . $lead_clients_details->website . '</a>' : '-') ?></p>
+                        <?php else: ?>
+                            <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->website != '' ? '<a href="' . maybe_add_http($lead->website) . '" target="_blank">' . $lead->website . '</a>' : '-') ?></p>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6">
                         <p class="lead-field-heading"><?php echo _l('lead_address'); ?></p>
-                        <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->address != '' ? $lead->address : '-') ?></p>
+                        <?php if($lead_clients_details): ?>
+                            <p class="bold font-medium-xs"><?php echo (isset($lead_clients_details) && $lead_clients_details->address != '' ? $lead_clients_details->address : '-') ?></p>
+                        <?php else: ?>
+                            <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->address != '' ? $lead->address : '-') ?></p>
+                        <?php endif; ?>
                     </div>
                     <div class="col-md-6">
                         <p class="lead-field-heading"><?php echo _l('lead_city'); ?></p>
-                        <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->city != '' ? $lead->city : '-') ?></p>
+                        <?php if($lead_clients_details): ?>
+                            <p class="bold font-medium-xs"><?php echo (isset($lead_clients_details) && $lead_clients_details->city != '' ? $lead_clients_details->city : '-') ?></p>
+                        <?php else: ?>
+                            <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->city != '' ? $lead->city : '-') ?></p>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6">
                         <p class="lead-field-heading"><?php echo _l('lead_state'); ?></p>
-                        <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->state != '' ? $lead->state : '-') ?></p>
+                        <?php if($lead_clients_details): ?>
+                            <p class="bold font-medium-xs"><?php echo (isset($lead_clients_details) && $lead_clients_details->state != '' ? $lead_clients_details->state : '-') ?></p>
+                        <?php else: ?>
+                            <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->state != '' ? $lead->state : '-') ?></p>
+                        <?php endif; ?>
                     </div>
                     <div class="col-md-6">
                         <p class="lead-field-heading"><?php echo _l('lead_country'); ?></p>
-                        <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->country != 0 ? get_country($lead->country)->short_name : '-') ?></p>
+                        <?php if($lead_clients_details): ?>
+                            <p class="bold font-medium-xs"><?php echo (isset($lead_clients_details) && $lead_clients_details->country != 0 ? get_country($lead_clients_details->country)->short_name : '-') ?></p>
+                        <?php else: ?>
+                            <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->country != 0 ? get_country($lead->country)->short_name : '-') ?></p>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6">
                         <p class="lead-field-heading"><?php echo _l('lead_zip'); ?></p>
-                        <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->zip != '' ? $lead->zip : '-') ?></p>
+                        <?php if($lead_clients_details): ?>
+                            <p class="bold font-medium-xs"><?php echo (isset($lead_clients_details) && $lead_clients_details->zip != '' ? $lead_clients_details->zip : '-') ?></p>
+                        <?php else: ?>
+                            <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->zip != '' ? $lead->zip : '-') ?></p>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -258,18 +286,45 @@ if (!isset($lead)) {
                 </div>
                 <div class="row">
                     <div class="col-md-6">
-                        <p class="lead-field-heading"><?php echo _l('lead_title'); ?></p>
-                        <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->title != '' ? $lead->title : '-') ?></p>
+                        <p class="lead-field-heading"><?php echo _l('name'); ?></p>
+                        
+                        <?php if($lead_person_details): ?>
+                            <div class="media">
+                                <div class="media-left">
+                                    <img src="<?php echo contact_profile_image_url($lead_person_details->id,array('staff-profile-image-small','media-object')); ?>" id="contact-img" class="staff-profile-image-small">
+                                </div>
+                                <div class="media-body">
+                                    <h5 class="media-heading mtop5" style="width:auto; float:left;"><a href="<?php echo admin_url('clients/view_contact/'.$lead_person_details->id); ?>"><?php echo $lead_person_details->firstname.' '.$lead_person_details->lastname; ?></a>
+                                </div>
+                            </div>
+                        <?php else: ?>
+                            <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->title != '' ? $lead->title : '-') ?></p>
+                        <?php endif; ?>
                     </div>
                     <div class="col-md-6">
-                        <p class="lead-field-heading"><?php echo _l('lead_add_edit_email'); ?></p>
-                        <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->email != '' ? '<a href="mailto:' . $lead->email . '">' . $lead->email . '</a>' : '-') ?></p>
+                        <p class="lead-field-heading"><?php echo _l('lead_title'); ?></p>
+                        <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->title != '' ? $lead->title : '-') ?></p>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6">
+                        <p class="lead-field-heading"><?php echo _l('lead_add_edit_email'); ?></p>
+                        <?php if($lead_person_details): ?>
+                            <p class="bold font-medium-xs"><?php echo (isset($lead_person_details) && $lead_person_details->email != '' ? '<a href="mailto:' . $lead_person_details->email . '">' . $lead_person_details->email . '</a>' : '-') ?></p>
+                        <?php else: ?>
+                            <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->email != '' ? '<a href="mailto:' . $lead->email . '">' . $lead->email . '</a>' : '-') ?></p>
+                        <?php endif; ?>
+                    </div>
+                    <div class="col-md-6">
                         <p class="lead-field-heading"><?php echo _l('lead_add_edit_phonenumber'); ?></p>
-                        <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->phonenumber != '' ? '<a href="tel:' . $lead->phonenumber . '">' . $lead->phonenumber . '</a>' : '-') ?></p>
+                        <?php $allow_to_call = $this->callsettings_model->accessToCall(); ?>
+                        <?php if($lead_person_details && $allow_to_call && $lead_person_details->phonenumber): 
+                            $calling_code =$this->callsettings_model->getCallingCode($lead_person_details->phone_country_code);
+                            $contact .= '<div><a href="#" onclick="callfromdeal('.$lead_person_details->id.','.$lead->id.','.$lead_person_details->phonenumber.',\'task\',\''.$calling_code.'\');" title="Call Now"><img src="'.APP_BASE_URL.'/assets/images/call.png" style="width:25px;"> ' . $lead->phonenumber . '</a></div>';?>
+                            <p class="bold font-medium-xs"><?php echo $contact ?></p>
+                        <?php else: ?>
+                            <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->phonenumber != '' ? '<a href="tel:' . $lead->phonenumber . '">' . $lead->phonenumber . '</a>' : '-') ?></p>
+                        <?php endif; ?>
                     </div>
                 </div>
                 
@@ -960,6 +1015,7 @@ $hascoustomfields =$this->db->get(db_prefix() . 'customfields')->row();
                     $('[name="title"]').val(response.data.title);
                     $('[name="email"]').val(response.data.email);
                     $('[name="phonenumber"]').val(response.data.phonenumber);
+                    $('[name="phone_country_code"]').val(response.data.phone_country_code);
                 }
             }
         });
@@ -979,6 +1035,7 @@ $hascoustomfields =$this->db->get(db_prefix() . 'customfields')->row();
                     $('[name="state"]').val(response.data.state);
                     $('[name="country"]').val(response.data.country);
                     $('[name="zip"]').val(response.data.zip);
+                    $('[name="clientphonenumber"]').val(response.data.phonenumber);
                 }
             }
         });

@@ -79,7 +79,9 @@ if($rel_type == 'lead' || $rel_type == 'invoice' || $rel_type == 'estimate' || $
 	
 	$where_cond = task_count_cond();
 	if(!empty($where_cond)){
-		$where_cond = str_replace("where","and",$where_cond);
+        if(substr_count($where_cond,"where")==1){
+            $where_cond = str_replace("where","and",$where_cond);
+        }
 		array_push($where, $where_cond);
 	}
     
