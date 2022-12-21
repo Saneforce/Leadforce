@@ -89,7 +89,6 @@
 			            if(has_permission('projects','','view') /* && !empty($need_fields) && in_array("members", $need_fields)*/){ ?>
 			            	<div class="col-md-2">
 			            		<select class="selectpicker" data-live-search="true" data-title="<?php echo _l('project_member'); ?>" name="member" data-width="100%">
-								<option value=""></option>
 									<?php if(is_admin(get_staff_user_id()) || count($project_members) > 1) { ?> 
 										<option value="" <?php if($selectedMember == ''){echo ' selected'; } ?>>All Members</option>
 									<?php } ?>
