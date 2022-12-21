@@ -330,8 +330,11 @@
         $('#particularsrowfooter').prepend(`<div class="footer-empty-cells"></div>`);
         }
     }
+    <?php if(isset($lead) && $lead->id): ?>
     document.addEventListener("DOMContentLoaded", () => {
         addFooterEmptyCell();
+        
+        
         $('#LeadProdcutForm').submit(function(e){
             e.preventDefault();
             $.ajax({
@@ -350,8 +353,12 @@
                     }
                 }
             })
-        })
+        });
+        
     });
+    <?php else: ?>
+        addFooterEmptyCell();
+    <?php endif; ?>
 
     
 </script>
