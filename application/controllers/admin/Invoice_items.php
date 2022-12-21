@@ -475,20 +475,20 @@ $this->import->setDatabaseFields($dbFields)->setCustomFields(get_custom_fields('
         }
         $data = $this->invoice_items_model->get_items($cur);
         $html = '';
-            $html .= '<div style="height:40px; clear:both;" class="productdiv" id="'.$_POST['length'].'"><div class="col-md-4">
+            $html .= '<div style="height:40px; clear:both;" class="productdiv css-table-row" id="'.$_POST['length'].'"><div class="">
             <select name="product[]" class="form-control" onchange="getprice1(this,'.$_POST['length'].')"><option value="">--Select Item--</option>';
             foreach($data as $val) {
                     $html .= '<option value="'.$val["id"].'">'.$val["name"].'</option>';
             } 
             $html .= '</select>';
             $html .= '</div>
-            <div class="col-md-2">
+            <div class="">
             <input type="text" name="price[]" placeholder="Price" value="" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="price_update(this,'.$_POST['length'].')" class="form-control" />';
                 $html .= '</div>';
-                $html .= '<div class="col-md-2">
+                $html .= '<div class="">
                 <input type="number" name="qty[]" placeholder="Qty" min="1" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="qty_total(this,'.$_POST['length'].')" value=""  class="form-control" />';
                 $html .= '</div>';
-                $html .= '<div class="col-md-3">
+                $html .= '<div class="">
                 <input type="text" name="total[]" placeholder="Total" value="" readonly class="form-control" />';
                 $html .= '</div>';
                 $html .= '<a href="javascript:void(0);" class="removeproduct_button" title="Remove field" style="position:relative; top:8px; left:15px"><i class="fa fa-trash"></i></a>

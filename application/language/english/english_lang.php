@@ -1280,6 +1280,7 @@ $lang['calendar_task']              = 'Activity';
 # Leads
 $lang['lead_edit_delete_tooltip'] = 'Delete Lead';
 $lang['lead_attachments']         = 'Attachments';
+$lang['lead_files']         = 'Files';
 
 # Admin Customizer Sidebar
 $lang['acs_finance'] = 'Finance';
@@ -2968,6 +2969,8 @@ $lang['lead_is_public_yes']                      = 'Yes';
 $lang['lead_is_public_no']                       = 'No';
 $lang['lead_info']                               = 'Lead Information';
 $lang['lead_general_info']                       = 'General Information';
+$lang['lead_client_info']                       = 'Organization Information';
+$lang['lead_person_info']                       = 'Person Information';
 $lang['lead_latest_activity']                    = 'Latest Activity Log';
 $lang['item_description_new_lines_notice']       = 'New lines are not supported for item description. Use the item long description instead.';
 $lang['estimates_report']                        = 'Estimates Report';
@@ -3079,6 +3082,7 @@ $lang['search_ajax_placeholder']                            = 'Type to search...
 $lang['search_ajax_searching']                              = 'Searching...';
 $lang['search_ajax_initialized']                            = 'Start typing to search';
 $lang['lead_description']                                   = 'Description';
+$lang['lead_cost']                                          = 'Lead Cost';
 $lang['lead_website']                                       = 'Website';
 $lang['project_website']                                       = $lang['lead_website']   ;
 $lang['invoice_activity_auto_converted_from_estimate']      = 'Invoice auto created from estimate with number %s';
@@ -4229,4 +4233,4 @@ $lang['loss_reason_name']	=	'Lost Reason';
 $lang['assignees']			=	'Assigned To';
 $lang['project_pipeline']	=	'Pipeline';
 $lang['company']			=	'Organization';
-
+$lang['email']              =   'Email';

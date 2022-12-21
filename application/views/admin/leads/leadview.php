@@ -1,5 +1,13 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
+<?php init_head(); ?>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/css/intlTelInput.css">
+<div id="wrapper">
+   <div class="content">
+<?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <style>
+    #wrapper{
+        font-size: 14px;
+    }
    .nav-tabs-horizontal li a .badge{
       margin-left: 5px;
    }
@@ -7,25 +15,6 @@
       background-color: #02a9f4;
    }
 </style>
-<div class="modal-header">
-   <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-   <h4 class="modal-title">
-      <?php if(isset($lead)){
-         if(!empty($lead->name)){
-           $name = $lead->name;
-         } else if(!empty($lead->company)){
-           $name = $lead->company;
-         } else {
-           $name = _l('lead');
-         }
-         echo $name;
-         } else {
-         echo _l('add_new',_l('lead_lowercase'));
-         }
-         ?>
-   </h4>
-</div>
-<div class="modal-body">
    <?php
       if(isset($lead)){
            if($lead->lost == 1){
@@ -40,55 +29,79 @@
           }
       }
    ?>
+
+                                    <style>
+.horizontal-tabs {
+    width:100%;
+}
+.project-tabs {
+    float:left;
+}
+.pipechange {
+    float:right;
+    padding-top:8px;
+}
+.formnewpipeline .dropdown-menu {
+    width:100%;
+}
+</style>
   <div class="row">
-     <div class="col-md-12">
+     <div class="col-md-4">
+         <div class="panel_s">
+            <div class="panel-body" style="height: 90vh; overflow-y:auto;">
+               <?php $this->load->view('admin/leads/profile'); ?>
+            </div>
+         </div>
+     </div>
+     <div class="col-md-8">
          <?php if(isset($lead)){
              echo form_hidden('leadid',$lead->id);
          } ?>
-   <div class="top-lead-menu">
+    <div class="panel_s">
+    <div class="panel-body">
       <div class="horizontal-scrollable-tabs preview-tabs-top">
          <div class="scroller arrow-left"><i class="fa fa-angle-left"></i></div>
          <div class="scroller arrow-right"><i class="fa fa-angle-right"></i></div>
          <div class="horizontal-tabs">
 
       <ul class="nav-tabs-horizontal nav nav-tabs<?php if(!isset($lead)){echo ' lead-new';} ?>" role="tablist">
-         <li role="presentation" class="active" >
+         <!-- <li role="presentation" class="active" >
             <a href="#tab_lead_profile" aria-controls="tab_lead_profile" role="tab" data-toggle="tab">
             <?php echo _l('lead_profile'); ?>
             </a>
+         </li> -->
+         <?php if(isset($lead)){?>
+         <li role="presentation" class="<?php echo ($group=='tab_tasks_leads')?"active": "" ?>">
+            <a href="#tab_tasks_leads" onclick="init_rel_tasks_table(<?php echo $lead->id; ?>,'lead','.table-rel-tasks-leads');" aria-controls="tab_tasks_leads" role="tab" data-toggle="tab">
+            <?php echo _l('tasks'); ?>
+            </a>
          </li>
-         <?php if(isset($lead)){ ?>
-         <li role="presentation">
+         <li role="presentation" class="<?php echo ($group=='tab_items')?"active": "" ?>">
             <a href="#tab_items" aria-controls="tab_items" role="tab" data-toggle="tab">
                 <?php echo _l('items') ?><span class="badge badge-light ml-3" id="leaditemcount"><?php echo $productscnt?></span>
             </a>
          </li>
-         <li role="presentation">
+         <li role="presentation" class="<?php echo ($group=='tab_email')?"active": "" ?>">
             <a href="#tab_email" aria-controls="tab_email" role="tab" data-toggle="tab">
-                <?php echo _l('email') ?>
+                <?php echo _l('email') ?><span class="badge badge-light ml-3" id="leademailcount"><?php echo $emails_count?></span>
             </a>
          </li>
 
          <?php if(count($mail_activity) > 0 || isset($show_email_activity) && $show_email_activity){ ?>
-         <li role="presentation">
+         <li role="presentation" class="<?php echo ($group=='tab_email_activity')?"active": "" ?>">
             <a href="#tab_email_activity" aria-controls="tab_email_activity" role="tab" data-toggle="tab">
                 <?php echo hooks()->apply_filters('lead_email_activity_subject', _l('lead_email_activity')); ?>
             </a>
          </li>
          <?php } ?>
-         <li role="presentation">
+         <li role="presentation" class="<?php echo ($group=='tab_proposals_leads')?"active": "" ?>">
             <a href="#tab_proposals_leads" onclick="initDataTable('.table-proposals-lead', admin_url + 'proposals/proposal_relations/' + <?php echo $lead->id; ?> + '/lead','undefined', 'undefined','undefined',[6,'desc']);" aria-controls="tab_proposals_leads" role="tab" data-toggle="tab">
             <?php echo _l('proposals'); ?>
             </a>
          </li>
-         <li role="presentation">
-            <a href="#tab_tasks_leads" onclick="init_rel_tasks_table(<?php echo $lead->id; ?>,'lead','.table-rel-tasks-leads');" aria-controls="tab_tasks_leads" role="tab" data-toggle="tab">
-            <?php echo _l('tasks'); ?>
-            </a>
-         </li>
-         <li role="presentation">
+         <li role="presentation" class="<?php echo ($group=='attachments')?"active": "" ?>">
             <a href="#attachments" aria-controls="attachments" role="tab" data-toggle="tab">
-            <?php echo _l('lead_attachments'); ?>
+            <?php echo _l('lead_files'); ?>
             </a>
          </li>
          <?php /* <li role="presentation">
@@ -109,18 +122,18 @@
                ?>
             </a>
          </li> */ ?>
-         <li role="presentation">
+         <li role="presentation" class="<?php echo ($group=='lead_notes')?"active": "" ?>">
             <a href="#lead_notes" aria-controls="lead_notes" role="tab" data-toggle="tab">
             <?php echo _l('lead_add_edit_notes'); ?>
             </a>
          </li>
-         <li role="presentation">
+         <li role="presentation" class="<?php echo ($group=='lead_activity')?"active": "" ?>">
             <a href="#lead_activity" aria-controls="lead_activity" role="tab" data-toggle="tab">
             <?php echo _l('lead_add_edit_activity'); ?>
             </a>
          </li>
          <?php if(is_gdpr() && (get_option('gdpr_enable_lead_public_form') == '1' || get_option('gdpr_enable_consent_for_leads') == '1')) { ?>
-            <li role="presentation">
+            <li role="presentation" class="<?php echo ($group=='gdpr')?"active": "" ?>">
               <a href="#gdpr" aria-controls="gdpr" role="tab" data-toggle="tab">
                 <?php echo _l('gdpr_short'); ?>
               </a>
@@ -129,16 +142,16 @@
          <?php } ?>
       </ul>
     </div>
-  </div>
+    </div>
    </div>
+   </div>
+   <div class="panel_s">
+    <div class="panel-body">
    <!-- Tab panes -->
    <div class="tab-content" style="margin-top:25px;">
       <!-- from leads modal -->
-      <div role="tabpanel" class="tab-pane active" id="tab_lead_profile">
-         <?php $this->load->view('admin/leads/profile'); ?>
-      </div>
       <?php if(isset($lead)){ ?>
-      <div role="tabpanel" class="tab-pane" id="tab_items">
+      <div role="tabpanel" class="tab-pane <?php echo ($group=='tab_items')?"active": "" ?>" id="tab_items" >
          <form id="LeadProdcutForm" method='post' name="LeadProdcutForm" action="<?php echo admin_url('leads/saveleadproducts/'.$lead->id); ?>">
          <?php $this->load->view('admin/leads/items'); ?>
          <div class="modal-footer">
@@ -147,11 +160,11 @@
          </div>
          <?php echo form_close(); ?>
       </div>
-      <div role="tabpanel" class="tab-pane" id="tab_email">
-         <!-- <?php $this->load->view('admin/leads/lead_email') ?> -->
+      <div role="tabpanel" class="tab-pane <?php echo ($group=='tab_email')?"active": "" ?>" id="tab_email">
+         <?php $this->load->view('admin/leads/lead_email') ?>
       </div>
       <?php if(count($mail_activity) > 0 || isset($show_email_activity) && $show_email_activity){ ?>
-      <div role="tabpanel" class="tab-pane" id="tab_email_activity">
+      <div role="tabpanel" class="tab-pane <?php echo ($group=='tab_email_activity')?"active": "" ?>" id="tab_email_activity">
          <?php hooks()->do_action('before_lead_email_activity', array('lead'=>$lead, 'email_activity'=>$mail_activity)); ?>
          <?php foreach($mail_activity as $_mail_activity){ ?>
          <div class="lead-email-activity">
@@ -177,7 +190,7 @@
       </div>
       <?php } ?>
       <?php if(is_gdpr() && (get_option('gdpr_enable_lead_public_form') == '1' || get_option('gdpr_enable_consent_for_leads') == '1' || (get_option('gdpr_data_portability_leads') == '1') && is_admin())) { ?>
-      <div role="tabpanel" class="tab-pane" id="gdpr">
+      <div role="tabpanel" class="tab-pane <?php echo ($group=='gdpr')?"active": "" ?>" id="gdpr">
 
           <?php if(get_option('gdpr_enable_lead_public_form') == '1') { ?>
             <a href="<?php echo $lead->public_url; ?>" target="_blank" class="mtop5">
@@ -206,7 +219,7 @@
           <?php } ?>
       </div>
       <?php } ?>
-      <div role="tabpanel" class="tab-pane" id="lead_activity">
+      <div role="tabpanel" class="tab-pane <?php echo ($group=='lead_activity')?"active": "" ?>" id="lead_activity">
          <div class="panel_s no-shadow">
             <div class="activity-feed">
                <?php foreach($activity_log as $log){ ?>
@@ -250,7 +263,7 @@
             <div class="clearfix"></div>
          </div>
       </div>
-      <div role="tabpanel" class="tab-pane" id="tab_proposals_leads">
+      <div role="tabpanel" class="tab-pane <?php echo ($group=='tab_proposals_leads')?"active": "" ?>" id="tab_proposals_leads">
          <?php if(has_permission('proposals','','create')){ ?>
          <a href="<?php echo admin_url('proposals/proposal?rel_type=lead&rel_id='.$lead->id); ?>" class="btn btn-info mbot25"><?php echo _l('new_proposal'); ?></a>
          <?php } ?>
@@ -279,15 +292,15 @@
             ]);
             ?>
       </div>
-      <div role="tabpanel" class="tab-pane" id="tab_tasks_leads">
+      <div role="tabpanel" class="tab-pane <?php echo ($group=='tab_tasks_leads')?"active": "" ?>" id="tab_tasks_leads">
          <?php init_relation_tasks_table1(array('data-new-rel-id'=>$lead->id,'data-new-rel-type'=>'lead')); ?>
       </div>
-      <div role="tabpanel" class="tab-pane" id="lead_reminders">
+      <div role="tabpanel" class="tab-pane <?php echo ($group=='lead_reminders')?"active": "" ?>" id="lead_reminders">
          <a href="#" data-toggle="modal" class="btn btn-info" data-target=".reminder-modal-lead-<?php echo $lead->id; ?>"><i class="fa fa-bell-o"></i> <?php echo _l('lead_set_reminder_title'); ?></a>
          <hr />
          <?php render_datatable(array( _l( 'reminder_description'), _l( 'reminder_date'), _l( 'reminder_staff'), _l( 'reminder_is_notified')), 'reminders-leads'); ?>
       </div>
-      <div role="tabpanel" class="tab-pane" id="attachments">
+      <div role="tabpanel" class="tab-pane <?php echo ($group=='attachments')?"active": "" ?>" id="attachments">
          <?php echo form_open('admin/leads/add_lead_attachment',array('class'=>'dropzone mtop15 mbot15','id'=>'lead-attachment-upload')); ?>
          <?php echo form_close(); ?>
          <?php if(get_option('dropbox_app_key') != ''){ ?>
@@ -306,10 +319,10 @@
          </div>
          <?php } ?>
       </div>
-      <div role="tabpanel" class="tab-pane" id="lead_notes">
+      <div role="tabpanel" class="tab-pane <?php echo ($group=='lead_notes')?"active": "" ?>" id="lead_notes">
          <?php echo form_open(admin_url('leads/add_note/'.$lead->id),array('id'=>'lead-notes')); ?>
          <div class="form-group">
-                <textarea id="lead_note_description" name="lead_note_description" class="form-control" rows="4" required></textarea>
+                <textarea id="lead_note_description" name="lead_note_description" placeholder="Take a note" class="form-control" rows="4" required></textarea>
          </div>
          <div class="lead-select-date-contacted hide">
             <?php echo render_datetime_input('custom_contact_date','lead_add_edit_datecontacted','',array('data-date-end-date'=>date('Y-m-d'))); ?>
@@ -369,8 +382,21 @@
          </div>
       </div>
       <?php } ?>
+    </div>
+
+    </div>
+    </div>
+    
    </div>
-     </div>
-  </div>
-</div>
+   </div>
 <?php hooks()->do_action('lead_modal_profile_bottom',(isset($lead) ? $lead->id : '')); ?>
+
+<?php init_tail(); ?>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/intlTelInput-jquery.min.js"></script>
+<script>
+   $(document).ready(function () {
+      init_rel_tasks_table(<?php echo $lead->id; ?>,'lead','.table-rel-tasks-leads');
+   });
+</script>
+</body>
+</html>

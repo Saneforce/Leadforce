@@ -141,11 +141,11 @@ $hasApprovalFlow = $this->workflow_model->getflows('deal_approval',0,['service'=
                                  </a>
                               </li>
                               <?php if(has_permission('projects','','edit') && $project->lead_id > 0 && $project->deleted_status == 0){ ?>
-                              <li>
+                              <!-- <li>
                                  <a href="<?php echo admin_url('leads/convert_to_lead/'.$project->id); ?>">
                                     Convert to Lead
                                  </a>
-                              </li>
+                              </li> -->
                               <?php } ?>
                               <?php if(has_permission('projects','','create')){ ?>
                               <li>

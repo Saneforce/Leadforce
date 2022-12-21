@@ -7,15 +7,15 @@ function createActivityForivr(data){
         success: function(result1){
             if(result1.status == 'success') {
                 alert_float('success', 'Call Connecting...');
-                setTimeout(function(){
-                    window.location.reload();
-                },1000);
+                // setTimeout(function(){
+                //     window.location.reload();
+                // },1000);
                 document.getElementById('overlay_12').style.display = 'none'; 
             } else {
                 alert_float('warning', result1.message);
-                setTimeout(function(){
-                    window.location.reload();
-                },1000);
+                // setTimeout(function(){
+                //     window.location.reload();
+                // },1000);
                 document.getElementById('overlay_12').style.display = 'none'; 
             }
         }

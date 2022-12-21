@@ -1,4 +1,18 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
+<style>
+    .addproducts,.removeproducts{
+        float: none;
+    }
+</style>
+<?php $selectedcontactid='';
+    if(isset($lead) && $lead->id){
+        $contact_details =$this->leads_model->get_lead_contact($lead->id);
+        if($contact_details){
+            $selectedcontactid =$contact_details->contacts_id;
+        }
+    }
+    
+?>
 <div class="<?php
 if ($openEdit == true) {
     echo 'open-edit ';
@@ -9,7 +23,7 @@ if ($openEdit == true) {
          }
          ?>>
            <?php if (isset($lead)) { ?>
-        <div class="btn-group pull-left lead-actions-left">
+        <div class="btn-group pull-left lead-actions-left mtop8">
             <a href="#" lead-edit class="mright10 font-medium-xs pull-left<?php
            if ($lead_locked == true) {
                echo ' hide';
@@ -93,7 +107,7 @@ if ($openEdit == true) {
             echo ' hide';
         }
         ?>">
-                <button type="button" class="btn btn-info pull-right mleft5 lead-top-btn lead-save-btn" onclick="document.getElementById('lead-form-submit').click();">
+                <button type="button" class="btn btn-info pull-right mleft5 lead-top-btn mbot10 lead-save-btn" onclick="document.getElementById('lead-form-submit').click();">
             <?php echo _l('submit'); ?>
                 </button>
             </div>
@@ -104,12 +118,12 @@ if ($openEdit == true) {
             </a>
         <?php } ?> -->
     <?php if($lead->project_id > 0){ ?>
-      <a href="<?php echo admin_url('leads/convert_lead_to_existing_deal/' . $lead->id); ?>" class="btn btn-success pull-right lead-convert-to-customer lead-top-btn lead-view" >
+      <a href="<?php echo admin_url('leads/convert_lead_to_existing_deal/' . $lead->id); ?>" class="btn btn-success pull-right lead-convert-to-customer lead-top-btn lead-view mbot10" >
       <!-- <i class="fa fa-user-o"></i> -->
       <?php echo  _l('lead_convert_to_client'); ?>
       </a>
       <?php } else { ?>
-        <a href="#" class="btn btn-success pull-right lead-convert-to-customer lead-top-btn lead-view" onclick="convert_lead_to_customer(<?php echo $lead->id; ?>); return false;">
+        <a href="<?php echo admin_url('projects/project?lead_id='.$lead->id) ?>" class="btn btn-success pull-right lead-convert-to-customer lead-top-btn lead-view mbot10">
         <!-- <i class="fa fa-user-o"></i> -->
         <?php echo  _l('lead_convert_to_client'); ?>
         </a>
@@ -142,70 +156,135 @@ if (!isset($lead)) {
     echo ' hide';
 }
 ?>" id="leadViewWrapper">
-            <div class="col-md-4 col-xs-12 lead-information-col">
-                <div class="lead-info-heading">
-                    <h4 class="no-margin font-medium-xs bold">
-<?php echo _l('lead_info'); ?>
-                    </h4>
-                </div>
-                <p class="text-muted lead-field-heading no-mtop"><?php echo _l('lead_add_edit_name'); ?></p>
-                <p class="bold font-medium-xs lead-name"><?php echo (isset($lead) && $lead->name != '' ? $lead->name : '-') ?></p>
-                <p class="text-muted lead-field-heading"><?php echo _l('lead_title'); ?></p>
-                <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->title != '' ? $lead->title : '-') ?></p>
-                <p class="text-muted lead-field-heading"><?php echo _l('lead_add_edit_email'); ?></p>
-                <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->email != '' ? '<a href="mailto:' . $lead->email . '">' . $lead->email . '</a>' : '-') ?></p>
-                <p class="text-muted lead-field-heading"><?php echo _l('lead_website'); ?></p>
-                <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->website != '' ? '<a href="' . maybe_add_http($lead->website) . '" target="_blank">' . $lead->website . '</a>' : '-') ?></p>
-                <p class="text-muted lead-field-heading"><?php echo _l('lead_add_edit_phonenumber'); ?></p>
-                <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->phonenumber != '' ? '<a href="tel:' . $lead->phonenumber . '">' . $lead->phonenumber . '</a>' : '-') ?></p>
-                <p class="text-muted lead-field-heading"><?php echo _l('lead_company'); ?></p>
-                <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->company != '' ? $lead->company : '-') ?></p>
-                <p class="text-muted lead-field-heading"><?php echo _l('lead_address'); ?></p>
-                <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->address != '' ? $lead->address : '-') ?></p>
-                <p class="text-muted lead-field-heading"><?php echo _l('lead_city'); ?></p>
-                <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->city != '' ? $lead->city : '-') ?></p>
-                <p class="text-muted lead-field-heading"><?php echo _l('lead_state'); ?></p>
-                <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->state != '' ? $lead->state : '-') ?></p>
-                <p class="text-muted lead-field-heading"><?php echo _l('lead_country'); ?></p>
-                <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->country != 0 ? get_country($lead->country)->short_name : '-') ?></p>
-                <p class="text-muted lead-field-heading"><?php echo _l('lead_zip'); ?></p>
-                <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->zip != '' ? $lead->zip : '-') ?></p>
+            <div class="col-md-12 col-xs-12 lead-information-col">
+                    <div class="">
+                        <div class="lead-info-heading">
+                            <h4 class="no-margin font-medium-xs bold">
+                                <?php echo _l('lead_info'); ?>
+                            </h4>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="lead-field-heading no-mtop"><?php echo _l('lead_add_edit_name'); ?></p>
+                            <p class="bold font-medium-xs lead-name"><?php echo (isset($lead) && $lead->name != '' ? $lead->name : '-') ?></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="lead-field-heading no-mtop">Source</p>
+                            <p class="bold font-medium-xs"><?php echo (isset($source) && $source != '' ? $source : '-') ?></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="lead-field-heading">Lead Owner</p>
+                            <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->assigned != 0 ? get_staff_full_name($lead->assigned) : '-') ?></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="lead-field-heading"><?php echo _l('tags'); ?></p>
+                            <p class="bold font-medium-xs ">
+                            <?php
+                            if (isset($lead)) {
+                                $tags = get_tags_in($lead->id, 'lead');
+                                if (count($tags) > 0) {
+                                    echo render_tags($tags);
+                                    echo '<div class="clearfix"></div>';
+                                } else {
+                                    echo '-';
+                                }
+                            }
+                            ?>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="lead-field-heading"><?php echo _l('lead_description'); ?></p>
+                            <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->description != '' ? $lead->description : '-') ?></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="lead-field-heading"><?php echo _l('lead_cost'); ?></p>
+                            <p class="bold font-medium-xs"><?php echo (isset($lead) ? app_format_money($lead->lead_cost, $lead_currency) : '-') ?></p>
+                        </div>
+                    </div>
             </div>
-            <div class="col-md-4 col-xs-12 lead-information-col">
+            <div class="col-md-12 col-xs-12 lead-information-col">
                 <div class="lead-info-heading">
                     <h4 class="no-margin font-medium-xs bold">
-<?php echo _l('lead_general_info'); ?>
+                        <?php echo _l('lead_client_info'); ?>
                     </h4>
                 </div>
-                <p class="text-muted lead-field-heading no-mtop">Source</p>
-                <p class="bold font-medium-xs mbot15"><?php echo (isset($source) && $source != '' ? $source : '-') ?></p>
-                <p class="text-muted lead-field-heading">Lead Owner</p>
-                <p class="bold font-medium-xs mbot15"><?php echo (isset($lead) && $lead->assigned != 0 ? get_staff_full_name($lead->assigned) : '-') ?></p>
-                <!-- <p class="text-muted lead-field-heading"><?php echo _l('pipeline'); ?></p>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="lead-field-heading"><?php echo _l('lead_company'); ?></p>
+                        <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->company != '' ? $lead->company : '-') ?></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="lead-field-heading"><?php echo _l('lead_website'); ?></p>
+                        <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->website != '' ? '<a href="' . maybe_add_http($lead->website) . '" target="_blank">' . $lead->website . '</a>' : '-') ?></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="lead-field-heading"><?php echo _l('lead_address'); ?></p>
+                        <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->address != '' ? $lead->address : '-') ?></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="lead-field-heading"><?php echo _l('lead_city'); ?></p>
+                        <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->city != '' ? $lead->city : '-') ?></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="lead-field-heading"><?php echo _l('lead_state'); ?></p>
+                        <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->state != '' ? $lead->state : '-') ?></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="lead-field-heading"><?php echo _l('lead_country'); ?></p>
+                        <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->country != 0 ? get_country($lead->country)->short_name : '-') ?></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="lead-field-heading"><?php echo _l('lead_zip'); ?></p>
+                        <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->zip != '' ? $lead->zip : '-') ?></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-xs-12 lead-information-col">
+                <div class="lead-info-heading">
+                    <h4 class="no-margin font-medium-xs bold">
+                        <?php echo _l('lead_person_info'); ?>
+                    </h4>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="lead-field-heading"><?php echo _l('lead_title'); ?></p>
+                        <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->title != '' ? $lead->title : '-') ?></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="lead-field-heading"><?php echo _l('lead_add_edit_email'); ?></p>
+                        <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->email != '' ? '<a href="mailto:' . $lead->email . '">' . $lead->email . '</a>' : '-') ?></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="lead-field-heading"><?php echo _l('lead_add_edit_phonenumber'); ?></p>
+                        <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->phonenumber != '' ? '<a href="tel:' . $lead->phonenumber . '">' . $lead->phonenumber . '</a>' : '-') ?></p>
+                    </div>
+                </div>
+                
+                <!-- <p class="lead-field-heading"><?php echo _l('pipeline'); ?></p>
                 <p class="bold font-medium-xs mbot15"><?php echo (isset($lead) && $lead->pipeline_name != '' ? $lead->pipeline_name : '-') ?></p> -->
                     <?php //if (get_option('disable_language') == 0) { ?>
-                    <!-- <p class="text-muted lead-field-heading"><?php echo _l('localization_default_language'); ?></p>
+                    <!-- <p class="lead-field-heading"><?php echo _l('localization_default_language'); ?></p>
                     <p class="bold font-medium-xs mbot15"><?php echo (isset($lead) && $lead->default_language != '' ? ucfirst($lead->default_language) : _l('system_default_string')) ?></p> -->
                     <?php //} ?>
-                <p class="text-muted lead-field-heading"><?php echo _l('tags'); ?></p>
-                <p class="bold font-medium-xs mbot10">
-                <?php
-                if (isset($lead)) {
-                    $tags = get_tags_in($lead->id, 'lead');
-                    if (count($tags) > 0) {
-                        echo render_tags($tags);
-                        echo '<div class="clearfix"></div>';
-                    } else {
-                        echo '-';
-                    }
-                }
-                ?>
-                </p>
-                <?php /* <p class="text-muted lead-field-heading"><?php echo _l('leads_dt_datecreated'); ?></p>
+                
+                <?php /* <p class="lead-field-heading"><?php echo _l('leads_dt_datecreated'); ?></p>
                   <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->dateadded != '' ? '<span class="text-has-action" data-toggle="tooltip" data-title="'._dt($lead->dateadded).'">' . time_ago($lead->dateadded) .'</span>' : '-') ?></p>
-                  <p class="text-muted lead-field-heading"><?php echo _l('leads_dt_last_contact'); ?></p>
+                  <p class="lead-field-heading"><?php echo _l('leads_dt_last_contact'); ?></p>
                   <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->lastcontact != '' ? '<span class="text-has-action" data-toggle="tooltip" data-title="'._dt($lead->lastcontact).'">' . time_ago($lead->lastcontact) .'</span>' : '-') ?></p>
-                  <p class="text-muted lead-field-heading"><?php echo _l('lead_public'); ?></p>
+                  <p class="lead-field-heading"><?php echo _l('lead_public'); ?></p>
                   <p class="bold font-medium-xs mbot15">
                   <?php if(isset($lead)){
                   if($lead->is_public == 1){
@@ -219,11 +298,11 @@ if (!isset($lead)) {
                   ?>
                   </p> */ ?>
                 <?php if (isset($lead) && $lead->from_form_id != 0) { ?>
-                    <p class="text-muted lead-field-heading"><?php echo _l('web_to_lead_form'); ?></p>
+                    <p class="lead-field-heading"><?php echo _l('web_to_lead_form'); ?></p>
                     <p class="bold font-medium-xs mbot15"><?php echo $lead->form_data->name; ?></p>
                 <?php } ?>
             </div>
-            <div class="col-md-4 col-xs-12 lead-information-col">
+            <div class="col-md-12 col-xs-12 lead-information-col">
                 <?php if (total_rows(db_prefix() . 'customfields', array('fieldto' => 'leads', 'active' => 1)) > 0 && isset($lead)) { ?>
                     <div class="lead-info-heading">
                         <h4 class="no-margin font-medium-xs bold">
@@ -235,7 +314,7 @@ if (!isset($lead)) {
     foreach ($custom_fields as $field) {
         $value = get_custom_field_value($lead->id, $field['id'], 'leads');
         ?>
-                        <p class="text-muted lead-field-heading no-mtop"><?php echo $field['name']; ?></p>
+                        <p class="lead-field-heading no-mtop"><?php echo $field['name']; ?></p>
                         <?php if($value != '' && $field['type'] =='location'){ ?>
                             <iframe src = "https://maps.google.com/maps?q=<?php echo $value; ?>&hl=es;z=14&output=embed"></iframe>
                         <?php }else{ ?>
@@ -248,7 +327,7 @@ if (!isset($lead)) {
                      <div class="col-md-12">
                          <div class="row">
                              <div class="col-md-3">
-                                 <p class="text-muted lead-field-heading"><?php echo _l('clients_contracts_dt_start_date'); ?></p>
+                                 <p class="lead-field-heading"><?php echo _l('clients_contracts_dt_start_date'); ?></p>
                         <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->startdate != '' ? $lead->startdate : '-') ?></p>
                              </div>
                              <div class="col-md-3">
@@ -279,10 +358,7 @@ if (isset($lead) && $lead->currency != '') {
                         
                      </div>-->
             <div class="clearfix"></div>
-            <div class="col-md-12">
-                <p class="text-muted lead-field-heading"><?php echo _l('lead_description'); ?></p>
-                <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->description != '' ? $lead->description : '-') ?></p>
-            </div>
+            
         </div>
         <div class="clearfix"></div>
         
@@ -332,23 +408,139 @@ echo render_select('teamleader', $teamleaders, array('staffid', array('firstname
 ?>" style="margin-top:-70px; margin-right:15px;" onclick="document.getElementById('lead-form-submit').click();">
             Save                </button>
 
-            <div class="col-md-6">
-<?php $value = (isset($lead) ? $lead->name : ''); ?>
-<?php echo render_input('name', 'lead_add_edit_name', $value,'text',['onblur'=>'validate_lead_profile_text_input(this.value,\'name\')','maxlength'=>'150']); ?>
-<?php $value = (isset($lead) ? $lead->title : ''); ?>
-<?php echo render_input('title', 'lead_title', $value,'text',['onblur'=>'validate_lead_profile_text_input(this.value,\'title\')','maxlength'=>'100']); ?>
-<?php $value = (isset($lead) ? $lead->email : ''); ?>
-<div class="form-group" app-field-wrapper="email">
-    <label for="email" class="control-label">Email Address</label>
-    <input type="email" id="email" name="email" class="form-control" value="<?php echo $value; ?>" autocomplete="new-text">
-</div>
-<?php //echo render_input('email', 'lead_add_edit_email', $value); ?>
-<?php
-if ((isset($lead) && empty($lead->website)) || !isset($lead)) {
-    $value = (isset($lead) ? $lead->website : '');
-    echo render_input('website', 'lead_website', $value,'text',['onblur'=>'validate_lead_profile_text_input(this.value,\'website\')','maxlength'=>'100']);
-} else {
-    ?>
+<div class="col-md-12">
+    <h5>Lead Details</h5>
+    <p class="text-muted">Enter Lead details.</p>
+    <div class="row">
+        <div class="col-md-6">
+            <?php $value = (isset($lead) ? $lead->name : ''); ?>
+            <?php echo render_input('name', 'lead_add_edit_name', $value,'text',['onblur'=>'validate_lead_profile_text_input(this.value,\'name\')','maxlength'=>'150']); ?>
+        </div>
+        <div class="col-md-6">
+            <div class="form_assigned">
+            <?php
+                $assigned_attrs = array();
+                $selected = (isset($lead) ? $lead->assigned : get_staff_user_id());
+                if(isset($lead)
+                    && $lead->assigned == get_staff_user_id()
+                    && $lead->addedfrom != get_staff_user_id()
+                    && !is_admin($lead->assigned)
+                    && !has_permission('leads','','view')
+                ){
+                    $assigned_attrs['disabled'] = true;
+                }
+                echo render_select('assigned',$members,array('staffid',array('firstname','lastname')),'lead_add_edit_assigned',$selected,$assigned_attrs); 
+            ?>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group" app-field-wrapper="company" id="source_addlead">
+                <label for="company" class="control-label">Source</label>
+                <?php
+                    foreach($sources as $val) {
+                        if($val['slug'] == 'manual') {
+                            $selected = $val['id'];
+                        }
+                    }
+                    $selected = (isset($lead) ? $lead->source : $selected);
+                    echo render_select('view_source',$sources,array('id','name'),'',$selected,array('data-width'=>'100%','data-none-selected-text'=>'Manually'),array(),'no-mbot');
+                ?>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group no-mbot" id="inputTagsWrapper">
+                <label for="tags" class="control-label"><i class="fa fa-tag" aria-hidden="true"></i> <?php echo _l('tags'); ?></label>
+                <input type="text" class="tagsinput" id="tags" name="tags" value="<?php echo (isset($lead) ? prep_tags_input(get_tags_in($lead->id, 'lead')) : ''); ?>" data-role="tagsinput">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <?php $value = (isset($lead) ? $lead->description : ''); ?>
+            <?php echo render_textarea('description', 'lead_description', $value); ?>
+        </div>
+    </div>
+    
+    <hr class="hr-panel-heading" style="margin-right: 0;margin-left:0">
+    <h5>Person Details</h5>
+    <p class="text-muted">Select or enter person details.</p>
+    <div class="row">
+        <div class="col-md-6">
+            <?php 
+            $selected = (isset($lead) ? $lead->client_id : '');
+            echo render_select('contactid',$client_contacts,array('id',array('firstname','lastname')),false,$selected,array('data-actions-box'=>true,'aria-describedby'=>'project_contacts-error'),array(),'','',false);
+            ?>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <?php $value = (isset($lead) ? $lead->name : ''); ?>
+            <?php echo render_input('personname', 'Person Name', $value,'text',['onblur'=>'validate_lead_profile_text_input(this.value,\'name\')','maxlength'=>'150']); ?>
+        </div>
+        <div class="col-md-6">
+            <?php $value = (isset($lead) ? $lead->title : ''); ?>
+            <?php echo render_input('title', 'lead_title', $value,'text',['onblur'=>'validate_lead_profile_text_input(this.value,\'title\')','maxlength'=>'100']); ?>
+        </div>
+    </div>
+                    
+
+    <div class="row">
+        <div class="col-md-6">
+            <?php $value = (isset($lead) ? $lead->email : ''); ?>
+            <div class="form-group" app-field-wrapper="email">
+                <label for="email" class="control-label">Email Address</label>
+                <input type="email" id="email" name="email" class="form-control" value="<?php echo $value; ?>" autocomplete="new-text">
+            </div>
+            <?php //echo render_input('email', 'lead_add_edit_email', $value); ?>
+            <?php $value = (isset($lead) ? $lead->phonenumber : '');?>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group" app-field-wrapper="phonenumber" id="phonenumber_iti_wrapper">
+                <label for="phonenumber" class="control-label"><?php echo _l('lead_add_edit_phonenumber') ?></label>
+                <div class="input-group" style="width:100%">
+                    <input type="text" id="phonenumber" name="phonenumber" class="form-control" onblur="validate_lead_profile_phonenumber(this.value,'phonenumber')" maxlength=100 autocomplete="off" value="<?php echo $value; ?>">
+                </div>
+            </div>
+            <input type="hidden" name="phone_country_code" id="phone_country_code" value="<?php echo ( isset($lead) ? $lead->phone_country_code : 'IN'); ?>">
+        </div>
+    </div>
+
+    <hr class="hr-panel-heading" style="margin-right: 0;margin-left:0">
+    <h5>Organization Details</h5>
+    <p class="text-muted">Select or enter organization details.</p>
+    <div class="row">
+        <div class="col-md-6">
+            <?php
+                $selectedclientid = (isset($lead) ? $lead->client_id : '');
+                echo render_select('client_id',$all_clients,array('userid','company'),false,$selectedclientid,array('data-actions-box'=>true,'aria-describedby'=>'project_contacts-error'),array(),'','',false);
+            ?>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <?php $value = (isset($lead) ? $lead->company : ''); ?>
+            <?php echo render_input('company', 'Company Name', $value,'text',['onblur'=>'validate_lead_profile_text_input(this.value,\'company\')','maxlength'=>'148']); ?>  
+        </div>
+        <?php $value = ''; ?>
+        <div class="col-md-6">
+            <div class="form-group" app-field-wrapper="phonenumber" id="clientphonenumber_iti_wrapper">
+                <label for="clientphonenumber" class="control-label"><?php echo _l('lead_add_edit_phonenumber') ?></label>
+                <div class="input-group" style="width:100%">
+                    <input type="text" id="clientphonenumber" name="clientphonenumber" class="form-control" onblur="validate_lead_profile_phonenumber(this.value,'clientphonenumber')" maxlength=100 autocomplete="off" value="<?php echo $value; ?>">
+                </div>
+            </div>
+            <input type="hidden" name="clientphone_country_code" id="phone_country_code" value="<?php echo ( isset($lead) ? $lead->phone_country_code : 'IN'); ?>">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <?php
+                if ((isset($lead) && empty($lead->website)) || !isset($lead)) {
+                    $value = (isset($lead) ? $lead->website : '');
+                    echo render_input('website', 'lead_website', $value,'text',['onblur'=>'validate_lead_profile_text_input(this.value,\'website\')','maxlength'=>'100']);
+                } else { ?>
                     <div class="form-group">
                         <label for="website"><?php echo _l('lead_website'); ?></label>
                         <div class="input-group">
@@ -362,65 +554,42 @@ if ((isset($lead) && empty($lead->website)) || !isset($lead)) {
                             </div>
                         </div>
                     </div>
-                <?php
-                }
-                $value = (isset($lead) ? $lead->phonenumber : '');
-                ?>
-
-                <div class="form-group" app-field-wrapper="phonenumber" id="phonenumber_iti_wrapper">
-                    <label for="phonenumber" class="control-label"><?php echo _l('lead_add_edit_phonenumber') ?></label>
-                    <div class="input-group" style="width:100%">
-                        <input type="text" id="phonenumber" name="phonenumber" class="form-control" onblur="validate_lead_profile_phonenumber(this.value,'phonenumber')" maxlength=100 autocomplete="off" value="<?php echo $value; ?>">
-                    </div>
-                </div>
-                <input type="hidden" name="phone_country_code" id="phone_country_code" value="<?php echo ( isset($lead) ? $lead->phone_country_code : 'IN'); ?>">
-
-
-                <?php $value = (isset($lead) ? $lead->company : ''); ?>
-<?php echo render_input('company', 'lead_company', $value,'text',['onblur'=>'validate_lead_profile_text_input(this.value,\'company\')','maxlength'=>'148']); ?>
-<div class="form-group" app-field-wrapper="company" id="source_addlead">
-                <label for="company" class="control-label">Source</label>
-                <?php
-                   foreach($sources as $val) {
-                        if($val['slug'] == 'manual') {
-                            $selected = $val['id'];
-                        }
-                   }
-                   $selected = (isset($lead) ? $lead->source : $selected);
-                    echo render_select('view_source',$sources,array('id','name'),'',$selected,array('data-width'=>'100%','data-none-selected-text'=>'Manually'),array(),'no-mbot');
-                ?>
-            </div>
-            </div>
-            <div class="col-md-6">
-                        <?php $value = (isset($lead) ? $lead->address : ''); ?>
-                        <?php echo render_textarea('address', 'lead_address', $value, array('onblur'=>'validate_lead_profile_text_input(this.value,\'address\')','maxlength'=>'148','rows' => 1, 'style' => 'height:36px;font-size:100%;')); ?>
-                        <?php $value = (isset($lead) ? $lead->city : ''); ?>
-                        <?php echo render_input('city', 'lead_city', $value,'text',['onblur'=>'validate_lead_profile_text_input(this.value,\'city\')','maxlength'=>'148']); ?>
-                        <?php $value = (isset($lead) ? $lead->state : ''); ?>
-                        <?php echo render_input('state', 'lead_state', $value,'text',['onblur'=>'validate_lead_profile_text_input(this.value,\'state\')','maxlength'=>'148']); ?>
-                        <?php
-                        $countries = get_all_countries();
-                        $customer_default_country = get_option('customer_default_country');
-                        $selected = ( isset($lead) ? $lead->country : $customer_default_country);
-                        echo render_select('country', $countries, array('country_id', array('short_name')), 'lead_country', $selected, array('data-none-selected-text' => _l('dropdown_non_selected_tex')));
-                        ?>
-<?php $value = (isset($lead) ? $lead->zip : ''); ?>
-                    <?php echo render_input('zip', 'lead_zip', $value,'text',['onblur'=>'validate_lead_profile_no_space(this.value,\'zip\')','maxlength'=>'148']); ?>
-                    <div class="form_assigned">
-                    <?php
-                        $assigned_attrs = array();
-                        $selected = (isset($lead) ? $lead->assigned : get_staff_user_id());
-                        if(isset($lead)
-                            && $lead->assigned == get_staff_user_id()
-                            && $lead->addedfrom != get_staff_user_id()
-                            && !is_admin($lead->assigned)
-                            && !has_permission('leads','','view')
-                        ){
-                            $assigned_attrs['disabled'] = true;
-                        }
-                        echo render_select('assigned',$members,array('staffid',array('firstname','lastname')),'lead_add_edit_assigned',$selected,$assigned_attrs); 
-                    ?>
-                    </div>
+            <?php } ?>
+        </div>
+        <div class="col-md-6">
+            <?php $value = (isset($lead) ? $lead->address : ''); ?>
+            <?php echo render_textarea('address', 'lead_address', $value, array('onblur'=>'validate_lead_profile_text_input(this.value,\'address\')','maxlength'=>'148','rows' => 1, 'style' => 'height:36px;font-size:100%;')); ?>
+                        
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <?php $value = (isset($lead) ? $lead->city : ''); ?>
+            <?php echo render_input('city', 'lead_city', $value,'text',['onblur'=>'validate_lead_profile_text_input(this.value,\'city\')','maxlength'=>'148']); ?>
+                        
+        </div>
+        <div class="col-md-6">
+            <?php $value = (isset($lead) ? $lead->state : ''); ?>
+            <?php echo render_input('state', 'lead_state', $value,'text',['onblur'=>'validate_lead_profile_text_input(this.value,\'state\')','maxlength'=>'148']); ?>
+                             
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <?php $value = (isset($lead) ? $lead->zip : ''); ?>
+            <?php echo render_input('zip', 'lead_zip', $value,'text',['onblur'=>'validate_lead_profile_no_space(this.value,\'zip\')','maxlength'=>'148']); ?>        
+        </div>
+        <div class="col-md-6">
+            <?php
+            $countries = get_all_countries();
+            $customer_default_country = get_option('customer_default_country');
+            $selected = ( isset($lead) ? $lead->country : $customer_default_country);
+            echo render_select('country', $countries, array('country_id', array('short_name')), 'lead_country', $selected, array('data-none-selected-text' => _l('dropdown_non_selected_tex')));
+            ?>
+        </div>
+    </div>
+</div>
+            <div class="col-md-12">
                 <?php //if (get_option('disable_language') == 0) { ?>
                     <!-- <div class="form-group">
                         <label for="default_language" class="control-label"><?php echo _l('localization_default_language'); ?></label>
@@ -496,16 +665,9 @@ if ((isset($lead) && empty($lead->website)) || !isset($lead)) {
             
                         
                          <hr class="mtop5 mbot10" />
-            <div class="col-md-12">
-                <div class="form-group no-mbot" id="inputTagsWrapper">
-                    <label for="tags" class="control-label"><i class="fa fa-tag" aria-hidden="true"></i> <?php echo _l('tags'); ?></label>
-                    <input type="text" class="tagsinput" id="tags" name="tags" value="<?php echo (isset($lead) ? prep_tags_input(get_tags_in($lead->id, 'lead')) : ''); ?>" data-role="tagsinput">
-                </div>
-            </div>
+            
             <div class="clearfix"></div>             
             <div class="col-md-12">
-                <?php $value = (isset($lead) ? $lead->description : ''); ?>
-                <?php echo render_textarea('description', 'lead_description', $value); ?>
                 <?php /* <div class="row">
                   <div class="col-md-12">
                   <?php if(!isset($lead)){ ?>
@@ -528,21 +690,48 @@ if ((isset($lead) && empty($lead->website)) || !isset($lead)) {
                   </div>
                   </div> */ ?>
             </div>
-            <div class="col-md-12 mtop15">
-<?php $rel_id = (isset($lead) ? $lead->id : false); ?>
-<?php echo render_custom_fields('leads', $rel_id); ?>
-            </div>
-            <div class="clearfix"></div>
-        </div>
+<?php if(!isset($lead) || !$lead->id): ?>
+<hr class="hr-panel-heading" style="margin-right: 0;margin-left:0">
+<div class="col-md-12">
+    <h5>Item Details</h5>
+    <?php $this->load->view('admin/leads/items'); ?>
+</div>
+<div id="project_cost" style="clear:both;" class="">
+    <div class="col-md-6">
+        <?php $value = (isset($lead) ? $lead->lead_cost : ''); 
+        if($productscnt > 0) {
+            $readonly = array('readonly' => 'readonly','min'=>0);
+        } else {
+            $readonly = array('min'=>0);
+        }
+        if(isset($lead) && $lead->lead_currency) {
+            $cur = $lead->lead_currency;
+        } else {
+            $cur = $basecurrency;
+        }
+        ?>
+        <?php echo render_input('project_cost','lead_cost',$value,'number',$readonly,array('currency'=>$cur,'min'=>0)); ?>
     </div>
-    <?php if (isset($lead)) { ?>
-        <div class="lead-latest-activity lead-view">
-            <div class="lead-info-heading">
-                <h4 class="no-margin bold font-medium-xs"><?php echo _l('lead_latest_activity'); ?></h4>
-            </div>
-            <div id="lead-latest-activity" class="pleft5"></div>
-        </div>
-<?php } ?>
+</div>
+<?php endif;?>
+<?php $rel_id = (isset($lead) ? $lead->id : false); ?>
+<?php 
+ $this->db->where('active', 1);
+ $this->db->where('fieldto', 'leads');
+$hascoustomfields =$this->db->get(db_prefix() . 'customfields')->row();
+?>
+<?php if($hascoustomfields): ?>
+    <div class="col-md-12 mtop15">
+        <hr class="hr-panel-heading" style="margin-right: 0;margin-left:0">
+        <h5>Custom fields</h5>
+        <p class="text-muted">Following fields are custom fields against lead.</p>
+            <?php echo render_custom_fields('leads', $rel_id); ?>
+    </div>
+            <div class="clearfix"></div>
+        
+<?php endif; ?>
+    </div>
+</div>
 <?php if ($lead_locked == false) { ?>
         <div class="lead-edit<?php
     if (isset($lead)) {
@@ -595,7 +784,7 @@ if ((isset($lead) && empty($lead->website)) || !isset($lead)) {
             $('#lead_form  #phonenumber').removeAttr('readonly');
         }
     }
-    $(function () {
+    document.addEventListener("DOMContentLoaded", () => {
 
         if ($('#status').length > 0) {
             $('.form_status .selectpicker').addClass("formstatus");
@@ -742,7 +931,57 @@ if ((isset($lead) && empty($lead->website)) || !isset($lead)) {
 </script>
 
 <script>
-    $( function() {
+    function disabled_orgaization_fields(status=true){
+        $('[name="company"]').val('').attr('disabled',status);
+        $('[name="website"]').val('').attr('disabled',status);
+        $('[name="address"]').val('').attr('disabled',status);
+        $('[name="city"]').val('').attr('disabled',status);
+        $('[name="state"]').val('').attr('disabled',status);
+        $('[name="country"]').val('').attr('disabled',status);
+        $('[name="zip"]').val('').attr('disabled',status);
+    }
+    function disabled_person_fields(status=true){
+        $('[name="personname"]').val('').attr('disabled',status);
+        $('[name="title"]').val('').attr('disabled',status);
+        $('[name="email"]').val('').attr('disabled',status);
+        $('[name="phonenumber"]').val('').attr('disabled',status);
+    }
+
+    function set_person_detials(personid){
+        $.ajax({
+            type: 'Get',
+            url: admin_url + 'leads/getpersondetails/'+personid,
+            dataType: 'json',
+            success: function(response) {
+                if(response.success ==true) {
+                    $('[name="personname"]').val(response.data.firstname+' '+response.data.lastname);
+                    $('[name="title"]').val(response.data.title);
+                    $('[name="email"]').val(response.data.email);
+                    $('[name="phonenumber"]').val(response.data.phonenumber);
+                }
+            }
+        });
+    }
+
+    function set_client_details(clientid){
+        $.ajax({
+            type: 'Get',
+            url: admin_url + 'leads/getclientdetails/'+clientid,
+            dataType: 'json',
+            success: function(response) {
+                if(response.success ==true) {
+                    $('[name="company"]').val(response.data.company);
+                    $('[name="website"]').val(response.data.website);
+                    $('[name="address"]').val(response.data.address);
+                    $('[name="city"]').val(response.data.city);
+                    $('[name="state"]').val(response.data.state);
+                    $('[name="country"]').val(response.data.country);
+                    $('[name="zip"]').val(response.data.zip);
+                }
+            }
+        });
+    }
+    document.addEventListener("DOMContentLoaded", () => {
         // -----Country Code Selection
         $("#phonenumber").intlTelInput({
             initialCountry: "<?php echo ( isset($lead) ? $lead->phone_country_code : 'IN'); ?>",
@@ -754,6 +993,53 @@ if ((isset($lead) && empty($lead->website)) || !isset($lead)) {
             var country_code =$(this).attr('data-country-code').toUpperCase();
             $("#phone_country_code").val(country_code);
         });
-    });
 
+        $("#clientphonenumber").intlTelInput({
+            initialCountry: "<?php echo ( isset($lead) ? $lead->phone_country_code : 'IN'); ?>",
+            separateDialCode: true,
+            // utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/11.0.4/js/utils.js"
+        });
+        $("#clientphonenumber_iti_wrapper .iti__flag-container ul li").click(function(){
+
+            var country_code =$(this).attr('data-country-code').toUpperCase();
+            $("#clientphone_country_code").val(country_code);
+        });
+
+        $("#contactid").prepend('<option value="" selected="">New Person</option>');
+        $("#client_id").prepend('<option value="" selected="">New Organization</option>');
+        <?php if($selectedcontactid): ?>
+            $('#contactid').val('<?php echo $selectedcontactid?>');
+            set_person_detials('<?php echo $selectedcontactid?>');
+        <?php endif; ?>
+
+        <?php if($selectedclientid): ?>
+            $('#client_id').val('<?php echo $selectedclientid?>');
+            set_client_details('<?php echo $selectedclientid?>');
+        <?php endif; ?>
+
+        $("#client_id").selectpicker("refresh");
+        $("#contactid").selectpicker("refresh");
+        $('#contactid').change(function(){;
+            var selectedcontact =$(this).val();
+            if(selectedcontact ==''){
+                disabled_person_fields(false);
+            }else{
+                $('[name="personname"]').parent().removeClass("has-error");
+                $('.not-valid-personname').remove();
+                disabled_person_fields(true);
+                set_person_detials(selectedcontact);
+            }
+        });
+        $('#client_id').change(function(){
+            var selectedclientid =$(this).val();
+            if(selectedclientid ==''){
+                disabled_orgaization_fields(false);
+            }else{
+                $('[name="company"]').parent().removeClass("has-error");
+                $('.not-valid-company').remove();
+                disabled_orgaization_fields(true);
+                set_client_details(selectedclientid);
+            }
+        });
+    });
 </script>

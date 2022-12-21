@@ -85,14 +85,14 @@ function app_init_admin_sidebar_menu_items() {
             'position' => 4,
         ]);
     }
-	if (has_permission('target', '', 'view')) {
-        $CI->app_menu->add_sidebar_children_item('sales', [
-            'slug' => 'target',
-            'name' => _l('target'),
-            'href' => admin_url('target/deal'),
-            'position' => 35,
-        ]);
-    }
+	// if (has_permission('target', '', 'view')) {
+    //     $CI->app_menu->add_sidebar_children_item('sales', [
+    //         'slug' => 'target',
+    //         'name' => _l('target'),
+    //         'href' => admin_url('target/deal'),
+    //         'position' => 35,
+    //     ]);
+    // }
 	/*if (has_permission('target', '', 'view')) {
         $CI->app_menu->add_sidebar_children_item('sales', [
             'slug' => 'taxes',

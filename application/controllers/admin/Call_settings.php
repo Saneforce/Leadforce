@@ -510,9 +510,13 @@ class Call_settings extends AdminController
             $data['rel_type'] = $task->rel_type;
             $data['contact_id'] = $task->contacts_id;
             //pre($data);
-        }elseif($_POST['deal_id']>0 || $_POST['type'] =='deal'){
+        }elseif($_POST['deal_id']>0 && $_POST['type'] =='deal'){
             $data['rel_id'] = $_POST['deal_id'];
             $data['rel_type'] = 'project';
+            $data['contact_id'] = $_POST['contact_id'];
+        }elseif($_POST['deal_id']>0 && $_POST['type'] =='lead'){
+            $data['rel_id'] = $_POST['deal_id'];
+            $data['rel_type'] = 'lead';
             $data['contact_id'] = $_POST['contact_id'];
         }else{
             $data['rel_id'] = $_POST['contact_id'];

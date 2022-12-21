@@ -380,10 +380,12 @@ function render_custom_fields($belongs_to, $rel_id = false, $where = [], $items_
 
     $CI = & get_instance();
     $CI->db->where('active', 1);
+    $CI->db->group_start();
     $CI->db->where('fieldto', $belongs_to);
     if($belongs_to =='projects'){
         $CI->db->or_where('fieldto', 'leads');
     }
+    $CI->db->group_end();
 
     if (is_array($where) && count($where) > 0 || is_string($where) && $where != '') {
         $CI->db->where($where);
@@ -391,7 +393,6 @@ function render_custom_fields($belongs_to, $rel_id = false, $where = [], $items_
 
     $CI->db->order_by('field_order', 'asc');
     $fields = $CI->db->get(db_prefix() . 'customfields')->result_array();
-
     $fields_html = '';
 
     if (count($fields)) {
@@ -428,6 +429,15 @@ function render_custom_fields($belongs_to, $rel_id = false, $where = [], $items_
             if ($rel_id !== false) {
                 if (!is_array($rel_id)) {
                     $value = get_custom_field_value($rel_id, $field['id'], ($items_pr ? 'items_pr' : $belongs_to), false);
+                }elseif(is_array($rel_id)){
+                    if($belongs_to =='projects'){
+                        if($field['fieldto']=='projects' && isset($rel_id['project_id']) && $rel_id['proejct_id']){
+                            $value = get_custom_field_value($rel_id['project_id'], $field['id'], ($items_pr ? 'items_pr' : 'projects'), false);
+                        }
+                        if($field['fieldto']=='leads' && $rel_id['lead_id'] && isset($rel_id['lead_id']) && $rel_id['lead_id']){
+                            $value = get_custom_field_value($rel_id['lead_id'], $field['id'], ($items_pr ? 'items_pr' : 'leads'), false);
+                        }
+                    }
                 } else {
                     if (is_custom_fields_smart_transfer_enabled()) {
                         // Used only in:
@@ -1429,21 +1439,21 @@ $(document).ready(function(){
         var currency = $('#currency').val();
         length = parseInt(length)+parseInt(1);
             var url =  admin_url+'products/getaddproductfields';
-            
             $.ajax({
                 type: "POST",
                 url: url,
                 data: {product:product,length:length,currency:currency},
                 success: function(msg){
                     $('#product_index').val(length);
-                    $(wrapperproduct).append(msg);
+                    
+                    $('.field_product_wrapper').append(msg);
                     $('.addproduts_btn').css("pointer-events", "auto");
                     $('.addproduts_btn').css("cursor", "pointer");
                 }
             });
     });
 	
-	$(addproduts_btn1).click(function(){
+	$('body').on('click','.addproduts_btn1',function(){
         var product= $("select[name=\'product[]\']").map(function() {
             return $(this).val();
         }).toArray();
@@ -1461,7 +1471,7 @@ $(document).ready(function(){
                 data: {product:product,length:length,currency:currency},
                 success: function(msg){
                     $('#product_index').val(length);
-                    $(wrapperproduct).append(msg);
+                    $('.field_product_wrapper').append(msg);
                     $('.addproduts_btn').css("pointer-events", "auto");
                     $('.addproduts_btn').css("cursor", "pointer");
                 }
@@ -1488,8 +1498,7 @@ $(document).ready(function(){
     });
 
     var editproduts_notax_btn = $('.editproduts_notax_btn'); //Add button selector
-    $(editproduts_notax_btn).click(function(){
-        
+    $('body').on('click','.editproduts_notax_btn',function(){
         var product= $("select[name=\'product[]\']").map(function() {
             return $(this).val();
         }).toArray();
@@ -1512,7 +1521,7 @@ $(document).ready(function(){
                 data: {projectnew:project,product:product,length:length,currency:currency},
                 success: function(msg){
                     $('#product_index').val(length);
-                    $(wrapperproduct).append(msg);
+                    $('.field_product_wrapper').append(msg);
                     $('.editproduts_notax_btn').css("pointer-events", "auto");
                     $('.editproduts_notax_btn').css("cursor", "pointer");
                 }
@@ -1528,7 +1537,7 @@ $(document).ready(function(){
                 success: function(msg){
                     $('#method').val(2);
                     $('#product_index').val(length);
-                    $(wrapperproduct).append(msg);
+                    $('.field_product_wrapper').append(msg);
                     $('.editproduts_notax_btn').css("pointer-events", "auto");
                     $('.editproduts_notax_btn').css("cursor", "pointer");
                 }
@@ -1545,7 +1554,7 @@ $(document).ready(function(){
                 success: function(msg){
                     $('#method').val(3);
                     $('#product_index').val(length);
-                    $(wrapperproduct).append(msg);
+                    $('.field_product_wrapper').append(msg);
                     $('.editproduts_notax_btn').css("pointer-events", "auto");
                     $('.editproduts_notax_btn').css("cursor", "pointer");
                 }
@@ -1553,7 +1562,7 @@ $(document).ready(function(){
         }
     });
 
-    $('#intax').click(function(){
+    $('body').on('click','#intax',function(){
         $("#suptotaltxt").html('');
         $("#suptotal").html('');
         var discount_value = $('#discount_value').val();
@@ -1570,7 +1579,7 @@ $(document).ready(function(){
                 success: function(msg){
                     $('#product_index').val(length);
                     $('#method').val(2);
-                    $(wrapperproduct).html(msg);
+                    $('.field_product_wrapper').html(msg);
                     var sum = 0;
                     var inps = document.getElementsByName('total[]');
                     for (var i = 0; i <inps.length; i++) {
@@ -1642,7 +1651,7 @@ $(document).ready(function(){
             });
     });
 
-    $('#extax').click(function(){
+    $('body').on('click','#extax',function(){
         $("#suptotaltxt").html('');
         $("#suptotal").html('');
         var discount_value = $('#discount_value').val();
@@ -1660,7 +1669,7 @@ $(document).ready(function(){
                 success: function(msg){
                     $('#product_index').val(length);
                     $('#method').val(3);
-                    $(wrapperproduct).html(msg);
+                    $('.field_product_wrapper').html(msg);
                     var sum = 0;
                     var inps = document.getElementsByName('total[]');
                     for (var i = 0; i <inps.length; i++) {
@@ -1744,7 +1753,7 @@ $(document).ready(function(){
             });
     });
 
-    $('#notax').click(function(){
+    $('body').on('click','#notax',function(){
         $("#suptotaltxt").html('');
         $("#suptotal").html('');
         var discount_value = $('#discount_value').val();
@@ -1767,7 +1776,7 @@ $(document).ready(function(){
                     addFooterEmptyCell();
                     $('#product_index').val(length);
                     $('#method').val(1);
-                    $(wrapperproduct).html(msg);
+                    $('.field_product_wrapper').html(msg);
                     var sum = 0;
                     var inps = document.getElementsByName('total[]');
                     for (var i = 0; i <inps.length; i++) {
@@ -1833,7 +1842,7 @@ $(document).ready(function(){
                 success: function(msg){
                     $('#product_index').val(length);
                     $('#method').val(2);
-                    $(wrapperproduct).html(msg);
+                    $('.field_product_wrapper').html(msg);
                     var sum = 0;
                     var inps = document.getElementsByName('total[]');
                     for (var i = 0; i <inps.length; i++) {
@@ -1932,7 +1941,7 @@ $(document).ready(function(){
                 success: function(msg){
                     $('#product_index').val(length);
                     $('#method').val(3);
-                    $(wrapperproduct).html(msg);
+                    $('.field_product_wrapper').html(msg);
                     var sum = 0;
                     var inps = document.getElementsByName('total[]');
                     for (var i = 0; i <inps.length; i++) {
@@ -2049,7 +2058,7 @@ $(document).ready(function(){
                     addFooterEmptyCell();
                     $('#product_index').val(length);
                     $('#method').val(1);
-                    $(wrapperproduct).html(msg);
+                    $('.field_product_wrapper').html(msg);
                     var sum = 0;
                     var inps = document.getElementsByName('total[]');
                     for (var i = 0; i <inps.length; i++) {
@@ -2617,13 +2626,13 @@ $(document).ready(function(){
         }
     });
 
-    $(".addproducts").click(function(){
+    $("body").on('click','.addproducts',function(){
         $(".showproducts").show();
         $(".removeproducts").show();
         $(".addproducts").hide();
     });
 
-    $(".removeproducts").click(function(){
+    $("body").on('click','.removeproducts',function(){
         var url =  admin_url+'products/removefields';
         var currency = $('#currency').val();
         $.ajax({
@@ -2631,7 +2640,7 @@ $(document).ready(function(){
             url: url,
             data: {currency:currency},
             success: function(msg){
-                $(wrapperproduct).html(msg);
+                $('.field_product_wrapper').html(msg);
                 $('#grandtotal').html('0.00');
                 $('input[name="project_cost"]').attr('readonly', false);
                 $('input[name="project_cost"]').val('');
@@ -2678,7 +2687,7 @@ $(document).ready(function(){
         x--; //Decrement field counter
     });
 
-    $(wrapperproduct).on('click', '.removeproduct_button', function(e){
+    $('body').on('click', '.removeproduct_button', function(e){
         e.preventDefault();
         var divid = $(this).parent('div').attr('id');
         //alert(divid);

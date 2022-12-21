@@ -1,11 +1,41 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head();?>
+<style>
+    .css-table {
+        display: table;
+        width: 100%;
+    }
+
+    .css-table-header {
+        display: table-header-group;
+    }
+
+    .css-table-body {
+        display: table-row-group;
+    }
+
+    .css-table-row {
+        display: table-row;
+    }
+
+    .css-table-header div,
+    .css-table-row div {
+        display: table-cell;
+        padding: 0 6px;
+    }
+
+    .css-table-header div {
+        text-align: left;
+        border: 1px solid rgb(255, 255, 255);
+    }
+</style>
 <div id="wrapper">
     <div class="content">
         <div class="row">
             <?php echo form_open($this->uri->uri_string(),array('id'=>'project_form')); ?>
             <input type="hidden" id="projectid" value="<?php echo $project->id; ?>">
-            <div class="col-md-7">
+            <input type="hidden" name="lead_id" id="lead_id" value="<?php echo $lead_id; ?>">
+            <div class="col-md-8 col-md-offset-2">
                 <div class="panel_s">
                     <div class="panel-body">
                         <h4 class="no-margin">
@@ -59,6 +89,10 @@
 								 if($selected == ''){
 									 $selected = (isset($customer_id) ? $customer_id: '');
 								 }
+                                 
+                                 if($lead_id){
+                                    $selected =$_POST['clientid'];
+                                 }
 								 if($selected != ''){
 									$rel_data = get_relation_data('customer',$selected);
 									$rel_val = get_relation_values($rel_data,'customer');
@@ -83,6 +117,9 @@
 
                                 <?php 
 						   $selected = array();
+                        if($lead_id){
+                            $selected =$_POST['project_contacts'];
+                        }
             foreach($contacts as $contact){
               array_push($selected,$contact['contacts_id']);
            }
@@ -291,7 +328,7 @@
                         <?php } ?>
                         <!--  
                          -->
-                         <?php if(!isset($project->id)) { ?>
+                         <?php if(!isset($project->id)  && (!$lead_id || !$lead_products)) { ?>
                             <div style="display:inline-block; float:right;">
                             <select class="currency1" id="currency" name="currency">
                                 <?php
@@ -310,34 +347,38 @@
                          <?php } else { ?>
                                 <input type="hidden" name="currency" value="<?php echo $project->project_currency; ?>">
                          <?php } ?>
-<div class="form-group showproducts">
-          <label for="unit_price" class="control-label"><h4>Items</h4></label>
-          <a href="javascript:void(0);" class="addproduts_btn1 row" title="Add field" style="position:relative; top:10px; left:15px; clear:both; float:left; height:40px;"><i class="fa fa-plus"></i> Add More</a>  
-          <input type="hidden" id="product_index" value="0">
-          <div class="field_product_wrapper row">
+
+        <div class="form-group showproducts">
+            <label for="unit_price" class="control-label"><h4>Items</h4></label>
+            <div class="css-table">
                 
-                <div style="height:40px;clear:both;" class="productdiv" id="0">
-                <div class="col-md-4">
-                    <select name="product[]" class="form-control" onchange="getprice1(this,0)">
-                        <option value="">--Select Item--</option>
-                    <?php
-                        foreach($products as $prod) {
-                    ?>
-                      <option value="<?php echo $prod['id']; ?>"><?php echo $prod['name']; ?></option>
-                    <?php  } ?>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <input type="text" name="price[]" value="" placeholder="Price" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="price_update(this,0)" class="form-control" /> 
-                </div>
-                <div class="col-md-2">
-                <input type="number" name="qty[]" value="" min="1" placeholder="Qty" value="" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="qty_total(this,0)" class="form-control" /> 
-                </div>
-                <div class="col-md-3">
-                <input type="number" name="total[]" value="" placeholder="Total" readonly class="form-control" /> 
-                </div>
-                <div class="col-md-1">
-                </div>
+                <a href="javascript:void(0);" class="addproduts_btn1 row" title="Add field" style="position:relative; top:10px; left:15px; clear:both; float:left; height:40px;"><i class="fa fa-plus"></i> Add More</a>  
+                <input type="hidden" id="product_index" value="0">
+                <div class="field_product_wrapper row css-table-body">
+                        
+                    <div style="height:40px;clear:both;" class="productdiv css-table-row" id="0">
+                    <div class="">
+                        <select name="product[]" class="form-control" onchange="getprice1(this,0)">
+                            <option value="">--Select Item--</option>
+                        <?php
+                            foreach($products as $prod) {
+                        ?>
+                        <option value="<?php echo $prod['id']; ?>"><?php echo $prod['name']; ?></option>
+                        <?php  } ?>
+                        </select>
+                    </div>
+                    <div class="">
+                        <input type="text" name="price[]" value="" placeholder="Price" step="any" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="price_update(this,0)" class="form-control" /> 
+                    </div>
+                    <div class="">
+                    <input type="number" name="qty[]" value="" min="1" placeholder="Qty" value="" onkeypress="return event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)" onchange="qty_total(this,0)" class="form-control" /> 
+                    </div>
+                    <div class="">
+                    <input type="number" name="total[]" value="" placeholder="Total" readonly class="form-control" /> 
+                    </div>
+                    <div class="">
+                    </div>
+            </div>
        </div>
        
 </div>
@@ -352,10 +393,13 @@
                     } else if(isset($project) && $project->billing_type != 1){
                         $input_field_hide_class_total_cost = 'hide';
                     }*/
-					if(!empty($need_fields) && in_array("project_cost", $need_fields)){
+					if(!empty($need_fields) && in_array("project_cost", $need_fields) && (!$lead_id || !$lead_products)){
                     ?>
                         <div id="project_cost" style="clear:both;" class="<?php echo $input_field_hide_class_total_cost; ?>">
-                            <?php $value = (isset($project) ? $project->project_cost : ''); 
+                            <?php $value = (isset($project) ? $project->project_cost : '');
+                            if($lead_id){
+                                $value = $lead_details->lead_cost;
+                            }
                             if($productscnt > 0) {
                                 $readonly = array('readonly' => 'readonly','min'=>0);
                             } else {
@@ -443,7 +487,7 @@
                         </div>
 						<?php } //if(!empty($need_fields) && in_array("tags", $need_fields)){?>
                         <?php $rel_id_custom_field = (isset($project) ? $project->id : false); ?>
-                        <?php echo render_custom_fields('projects',$rel_id_custom_field); ?>
+                        <?php echo render_custom_fields('projects',['project_id'=>$rel_id_custom_field,'lead_id'=>$lead_id]); ?>
 						<?php if(!empty($need_fields) && in_array("description", $need_fields)){?>
                         <p class="bold"><?php if(!empty($need_fields) && in_array("description", $need_fields) && !empty($mandatory_fields) && in_array("description", $mandatory_fields)){ ?> <small class="req text-danger">* </small><?php } ?><?php echo _l('project_description'); ?>
 						<?php if(!empty($important_fields) && in_array("description", $important_fields)){?>
@@ -459,7 +503,8 @@
                             <label for="send_created_email"><?php echo _l('project_send_created_email'); ?></label>
                         </div> -->
                         <?php } ?>
-                        <div class="btn-bottom-toolbar text-left">
+                        <div class="text-right">
+                            <a href="<?php echo admin_url('projects') ?>" class="btn btn-default">Cancel</a>
                             <button type="submit" data-form="#project_form" class="btn btn-info" autocomplete="off"
                                 data-loading-text="<?php echo _l('wait_text'); ?>"><?php echo _l('submit'); ?></button>
                         </div>
@@ -926,7 +971,11 @@ if (isset($project)) {
     <?php
 } ?>
 $(function() {
-
+    <?php if($lead_id):?>
+    <?php if(isset($_POST['clientid']) && $_POST['clientid']): ?>
+        $("select[id^=project_contacts]").trigger('change');
+    <?php endif; ?>
+    <?php endif; ?>
 
     $("#start_date").on("change", function(e) {
         var obj = $("#deadline");

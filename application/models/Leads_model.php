@@ -6,6 +6,7 @@ class Leads_model extends App_Model {
 
     public function __construct() {
         parent::__construct();
+        $this->load->model('products_model');
     }
 
     /**
@@ -99,6 +100,8 @@ class Leads_model extends App_Model {
      * @return mixed false || leadid
      */
     public function add($data) {
+
+        $this->load->model('clients_model');
         if (isset($data['custom_contact_date']) || isset($data['custom_contact_date'])) {
             if (isset($data['contacted_today'])) {
                 $data['lastcontact'] = date('Y-m-d H:i:s');
@@ -148,9 +151,88 @@ class Leads_model extends App_Model {
             $data['source'] = $data['view_source'];
             unset($data['view_source']);
         }
+        
+        if(isset($data['client_id']) && $data['client_id']=='' && strlen(trim($data['company'])) >0){
+            $companyData =array(
+                'company'=>$data['company'],
+                'phonenumber'=>$data['clientphonenumber'],
+                'phone_country_code'=>$data['clientphone_country_code'],
+                'country'=>$data['country'],
+                'city'=>$data['city'],
+                'state'=>$data['state'],
+                'address'=>$data['address'],
+                'website'=>$data['website'],
+            );
+            
+            $data['client_id']=$this->clients_model->add($companyData);
+        }
+        unset($data['clientphonenumber']);
+        unset($data['clientphone_country_code']);
+
+        $contactid =$data['contactid'];
+        if(isset($data['contactid']) && $data['contactid'] ==''  && strlen(trim($data['personname'])) >0){
+            $contact_data =array(
+                'is_primary'=>0,
+                'userid'=>0,
+                'firstname'=>$data['personname'],
+                'lastname'=>'',
+                'email'=>$data['email'],
+                'phonenumber'=>$data['phonenumber'],
+                'title'=>$data['title'],
+                'phone_country_code'=>$data['phone_country_code'],
+                'alternative_emails'=>'',
+                'alternative_phonenumber'=>'',
+                'addedfrom'=>$data['addedfrom'],
+
+            );
+            $contactid =$this->clients_model->add_contact($contact_data,0);
+        }
+        unset($data['personname']);
+        unset($data['phone_country_code']);
+        unset($data['contactid']);
+        
+        $products = array();
+        if(isset($data['product']) && !empty($data['product'])) {
+            $products['product'] = $data['product'];
+            $products['price'] = $data['price'];
+            $products['qty'] = $data['qty'];
+            $products['total'] = $data['total'];
+            
+            unset($data['product']);
+            unset($data['price']);
+            unset($data['qty']);
+            unset($data['total']);
+        }
+        $products['grandtotal'] = $data['grandtotal'];
+        $products['method'] = $data['method'];
+        $products['tax'] = $data['tax'];
+        $products['discount'] = $data['discount'];
+        $products['status'] = $data['status'];
+        $products['variation'] = $data['variation'];
+        
+        unset($data['method']);
+        unset($data['tax']);
+        unset($data['discount']);
+        unset($data['status']);
+        unset($data['variation']);
+        unset($data['grandtotal']);
+        $data['lead_cost'] =$data['project_cost'];
+        unset($data['project_cost']);
+
+        $currency = $data['currency'];
+        $data['lead_currency'] =$currency;
+        unset($data['currency']);
+        unset($data['no']);
         $this->db->insert(db_prefix() . 'leads', $data);
         $insert_id = $this->db->insert_id();
+        if($contactid>0){
+            $this->db->insert(db_prefix().'lead_contacts',array('lead_id'=>$insert_id,'contacts_id'=>$contactid,'is_primary'=>1));
+        }
         if ($insert_id) {
+            
+            if($products) {
+                $this->products_model->save_lead_products($products, $insert_id, $currency);   
+            }
             log_activity('New Lead Added [ID: ' . $insert_id . ']');
             $this->log_lead_activity($insert_id, 'not_lead_activity_created');
 
@@ -304,8 +386,55 @@ class Leads_model extends App_Model {
             unset($data['view_source']);
         }
 
+        if(isset($data['client_id']) && $data['client_id']=='' && strlen(trim($data['company'])) >0){
+            $companyData =array(
+                'company'=>$data['company'],
+                'phonenumber'=>$data['clientphonenumber'],
+                'phone_country_code'=>$data['clientphone_country_code'],
+                'country'=>$data['country'],
+                'city'=>$data['city'],
+                'state'=>$data['state'],
+                'address'=>$data['address'],
+                'website'=>$data['website'],
+            );
+            
+            $data['client_id']=$this->clients_model->add($companyData);
+        }
+        unset($data['clientphonenumber']);
+        unset($data['clientphone_country_code']);
+
+        $contactid =$data['contactid'];
+        if(isset($data['contactid']) && $data['contactid'] ==''  && strlen(trim($data['personname'])) >0){
+            $contact_data =array(
+                'is_primary'=>0,
+                'userid'=>0,
+                'firstname'=>$data['personname'],
+                'lastname'=>'',
+                'email'=>$data['email'],
+                'phonenumber'=>$data['phonenumber'],
+                'title'=>$data['title'],
+                'phone_country_code'=>$data['phone_country_code'],
+                'alternative_emails'=>'',
+                'alternative_phonenumber'=>'',
+                'addedfrom'=>$data['addedfrom'],
+
+            );
+            $contactid =$this->clients_model->add_contact($contact_data,0);
+        }
+        unset($data['personname']);
+        unset($data['phone_country_code']);
+        unset($data['contactid']);
+        
+
         $this->db->where('id', $id);
         $this->db->update(db_prefix() . 'leads', $data);
+
+        if($contactid>0){
+            $this->db->where('lead_id',$id);
+            $this->db->delete(db_prefix().'lead_contacts');
+            $this->db->insert(db_prefix().'lead_contacts',array('lead_id'=>$id,'contacts_id'=>$contactid,'is_primary'=>1));
+        }
+
         if ($this->db->affected_rows() > 0) {
             $affectedRows++;
             if (isset($data['status']) && $current_status_id != $data['status']) {
@@ -1276,4 +1405,105 @@ class Leads_model extends App_Model {
         return $return;
     }
 
+    public function get_lead_contact($leadid)
+    {
+        $this->db->where('lead_id',$leadid);
+        return $this->db->get(db_prefix().'lead_contacts')->row();
+    }
+
+    function convert_to_deal($lead_id,$deal_id,$primary_contact_id=false){
+        $this->db->where('id',$lead_id);
+
+        $lead =$this->db->get(db_prefix().'leads')->row();
+
+        //add lead item to deals
+        $lead_items = $this->products_model->getleads_products($lead_id);
+        if($lead_items){
+            foreach($lead_items as $item){
+                unset($item['id']);
+                $item['projectid'] =$deal_id;
+                unset($item['leadid']);
+                unset($item['created_date']);
+                $this->db->insert(db_prefix().'project_products',$item);
+            }
+
+            $this->db->where('id', $deal_id);
+            $this->db->update(db_prefix() . 'projects', ['project_cost' => $lead->lead_cost]);
+        }
+        
+        $notes = $this->misc_model->get_notes($lead_id, 'lead');
+        if ($notes) {
+            foreach ($notes as $note) {
+                $this->db->insert(db_prefix() . 'project_notes', [
+                    'project_id'         => $deal_id,
+                    'content'         => $note['description'],
+                    'staff_id'       => $note['staffid'],
+                    'dateadded'      => $note['dateadded']
+                ]);
+            }
+        }
+
+        $files = $this->misc_model->get_files($lead_id, 'lead');
+        if ($files) {
+            foreach ($files as $file) {
+                $this->db->insert(db_prefix() . 'project_files', [
+                    'project_id'         => $deal_id,
+                    'file_name'         => $file['file_name'],
+                    'subject'       => $file['file_name'],
+                    'filetype'      => $file['filetype'],
+                    'dateadded'      => $file['dateadded'],
+                    'staffid'      => $file['staffid']
+                ]);
+            }
+        }
+
+        $this->db->where('id', $deal_id);
+        $this->db->update(db_prefix() . 'projects', ['lead_id' => $lead_id, 'project_currency' => $lead->lead_currency]);
+
+        if($primary_contact_id) {
+            $this->db->where('rel_id', $lead_id);
+            $this->db->where('rel_type', 'lead');
+            $this->db->update(db_prefix() . 'tasks', ['rel_type' => 'project', 'rel_id' => $deal_id, 'contacts_id' => $primary_contact_id]);
+        } else {
+            $this->db->where('rel_id', $lead_id);
+            $this->db->where('rel_type', 'lead');
+            $this->db->update(db_prefix() . 'tasks', ['rel_type' => 'project', 'rel_id' => $deal_id]);
+        }
+
+        
+
+        $this->db->where('rel_id', $lead_id);
+        $this->db->where('rel_type', 'lead');
+        $this->db->update(db_prefix() . 'proposals', ['rel_type' => 'project', 'rel_id' => $deal_id]);
+
+        $this->db->where('id', $lead_id);
+        $this->db->update(db_prefix() . 'leads', ['project_id' => $deal_id, 'deleted_status' => 1]);
+    }
+
+    public function get_emails($lead_id)
+    {
+
+        $this->db->where('lead_id', $lead_id);
+
+		$this->db->where('staff_id !=', 0);
+        $this->db->order_by('udate', 'desc');
+		//$this->db->group_by('uid'); 
+        $emails = $this->db->get(db_prefix() . 'localmailstorage')->result_array();
+        return $emails;
+    }
+    public function get_emails_count($lead_id)
+    {
+
+        $this->db->where('lead_id', $lead_id);
+
+		$this->db->where('staff_id !=', 0);
+        $this->db->select('count(id) AS count');
+		//$this->db->group_by('uid'); 
+        $emails = $this->db->get(db_prefix() . 'localmailstorage')->row();
+        if($emails){
+            return $emails->count;
+        }
+        return 0;
+    }
+    
 }

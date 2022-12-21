@@ -74,6 +74,60 @@ class Products_model extends App_Model {
         return $userid;
     }
 
+    public function save_lead_products($data, $id, $currency) {
+        $this->db->where('leadid',$id);
+        $this->db->delete(db_prefix() . 'lead_products');
+        $i = 0;
+        $insertdate = array();
+        $insertdate['leadid'] = $id;
+        foreach($data['product'] as $val) {
+            if($val) {
+                $insertdate['productid'] = $val;
+                $insertdate['currency'] = $currency;
+                $insertdate['price'] = $data['price'][$i];
+                $insertdate['quantity'] = $data['qty'][$i];
+                $insertdate['total_price'] = $data['total'][$i];
+                if(isset($data['method'])){
+                    $insertdate['method'] = $data['method'];
+                }
+                if(isset($data['tax'][$i])){
+                    if($data['tax'][$i]) {
+                        $insertdate['tax'] = $data['tax'][$i];
+                    }
+                }
+                if(isset($data['discount'][$i])){
+                    if($data['discount'][$i]) {
+                        $insertdate['discount'] = $data['discount'][$i];
+                    }
+                }
+
+                if(isset($data['status'][$i])){
+                    if($data['status'][$i]) {
+                        $insertdate['status'] = 1;
+                    }else{
+                        $insertdate['status'] = 0;
+                    }
+                }else {
+                    $insertdate['status'] = 0;
+                }
+                
+                if(isset($data['variation'][$i])){
+                    if($data['variation'][$i] && $data['variation'][$i] > 0) {
+                        $insertdate['variation'] = $data['variation'][$i];
+                    }
+                }
+                
+                $this->db->insert(db_prefix() . 'lead_products', $insertdate);
+                $userid = $this->db->insert_id();
+            }
+            $i++;
+        }
+
+        $this->db->where('id',$id);
+        $this->db->update(db_prefix().'leads',array('lead_currency'=>$currency,'lead_cost'=>$data['grandtotal']));
+        return $i;
+    }
+
     public function save_deals_products($data, $id, $currency) {
         $this->db->where('projectid',$id);
         $this->db->delete(db_prefix() . 'project_products');
@@ -132,6 +186,14 @@ class Products_model extends App_Model {
         $products = $this->db->get(db_prefix() . 'project_products')->result_array();
          //echo $this->db->last_query();
          //exit;
+        return $products;
+    }
+
+    public function getleads_products($leadid, $currency=null) {
+        $this->db->where('leadid', $leadid);
+        if($currency != null)
+            $this->db->where('currency', $currency);
+        $products = $this->db->get(db_prefix() . 'lead_products')->result_array();
         return $products;
     }
 

@@ -217,7 +217,6 @@ class Projects extends AdminController
 		}
 
         if ($this->input->post()) {
-           
             $data = $project_contacts = $this->input->post();
 			$curr_date1 = date('d-m-Y');
 			$sdate = strtotime($curr_date1);
@@ -313,6 +312,10 @@ class Projects extends AdminController
 				$data['progress'] = $this->projects_model->getprogressstatus($data['status']);
                 $data['created_by'] =get_staff_user_id();
                 $id = $this->projects_model->add($data,$products,$project_contacts,$primary_contact);
+
+                if($this->input->post('lead_id')){
+                    $this->leads_model->convert_to_deal($this->input->post('lead_id'),$id,$primary_contact);
+                }
                 if ($id) {
                     set_alert('success', _l('added_successfully', _l('project')));
                     redirect(admin_url('projects/view/' . $id));
@@ -411,6 +414,26 @@ class Projects extends AdminController
         $data['viewIds'] = $this->staff_model->getFollowersViewList();
 		$data['cur_id']	 = $id;
 		$data['cur_staff_id'] = get_staff_user_id();
+        $data['lead_id'] ='';
+        $data['lead_products'] =false;
+        if($this->input->get('lead_id')){
+            // $this->load->model('leads_model');
+            $lead_details =$this->leads_model->get($this->input->get('lead_id'),['project_id'=>0]);
+            if($lead_details){
+                $_POST['name']=$lead_details->name;
+                $_POST['teamleader']=$lead_details->assigned;
+                $_POST['clientid']=$lead_details->client_id;
+                $lead_contact =$this->leads_model->get_lead_contact($lead_details->id);
+                if($lead_contact){
+                    $_POST['project_contacts']=[$lead_contact->contacts_id];
+                }
+                $data['title'] ='Convert lead to deal';
+                $data['lead_id'] =$this->input->get('lead_id');
+                $data['lead_details'] =$lead_details;
+                $data['lead_products'] =$this->products_model->getleads_products($lead_details->id);
+            }
+            
+        }
         $this->load->view('admin/projects/project', $data);
     }
 

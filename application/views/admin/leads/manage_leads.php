@@ -12,8 +12,6 @@
 }
 
 </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/css/intlTelInput.css">
-
 <div id="wrapper">
    <div class="content">
       <div class="row">
@@ -446,6 +444,5 @@
    
   }
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/intlTelInput-jquery.min.js"></script>
 </body>
 </html>

@@ -3997,7 +3997,7 @@ function lead_profile_form_handler(form) {
                 scrollTop: 0
             }, 800);
         } else {
-            _lead_init_data(response, response.id);
+            window.location.href = admin_url+'leads/lead/'+e.id
         }
         // If is from kanban reload the list tables
         if ($.fn.DataTable.isDataTable('.table-leads')) {

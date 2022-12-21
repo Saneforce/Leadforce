@@ -3,6 +3,9 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 $this->ci->load->model('gdpr_model');
+$this->ci->load->model('callsettings_model');
+$allow_to_call = $this->ci->callsettings_model->accessToCall();
+
 $lockAfterConvert      = get_option('lead_lock_after_convert_to_customer');
 $has_permission_delete = has_permission('leads', '', 'delete');
 $custom_fields         = get_table_custom_fields('leads');
@@ -16,6 +19,7 @@ $targets_list_column_order = array_keys($targets_list_column_order);
 //echo '<pre>';print_r($aColumns);exit;
 $aColumns = [
     db_prefix() . 'leads.id as id',
+    db_prefix() . 'leads.client_id as client_id',
 ];
 $aColumns = array_merge($aColumns,$targets_list_column_order);
 //pr($aColumns);
@@ -196,10 +200,21 @@ $rResult = $result['rResult'];
 //pre($rResult);
 foreach ($rResult as $aRow) {
     $row = [];
+    $client_details =false;
 
+    if($aRow['client_id'] >0){
+        $this->ci->db->where('userid',$aRow['client_id']);
+        $client_details =$this->ci->db->get(db_prefix().'clients')->row();
+    }
+    $person_details =false;
+    $contact =$this->ci->leads_model->get_lead_contact($aRow['id']);
+    if($contact){
+        $this->ci->db->where('id',$contact->contacts_id);
+        $person_details =$this->ci->db->get(db_prefix().'contacts')->row();
+    }
     $checkbox = '<div class="checkbox"><input type="checkbox" value="' . $aRow['id'] . '"><label></label></div>';
 
-    $hrefAttr = 'href="' . admin_url('leads/index/' . $aRow['id']) . '" onclick="init_lead(' . $aRow['id'] . ');return false;"';
+    $hrefAttr = 'href="' . admin_url('leads/lead/' . $aRow['id']) . '"';
     // $row[]    = '<a ' . $hrefAttr . '>' . $aRow['id'] . '</a>';
 
     $nameRow = '<a ' . $hrefAttr . '>' . $aRow['name'] . '</a>';
@@ -214,7 +229,7 @@ foreach ($rResult as $aRow) {
     }
 
     if (!$locked) {
-        $nameRow .= ' | <a href="' . admin_url('leads/index/' . $aRow['id'] . '?edit=true') . '" onclick="init_lead(' . $aRow['id'] . ', true);return false;">' . _l('edit') . '</a>';
+        $nameRow .= ' | <a href="' . admin_url('leads/lead/' . $aRow['id'] . '?edit=true') . '" >' . _l('edit') . '</a>';
     }
 
     if ($aRow['addedfrom'] == get_staff_user_id() || $has_permission_delete) {
@@ -235,14 +250,36 @@ foreach ($rResult as $aRow) {
         $row[] = $consentHTML;
     }
     if (isset($aRow['company'])) {
-        $row['company'] = $aRow['company'];
+        if($client_details){
+            $row['company'] = $client_details->company;
+        }else{
+            $row['company'] = $aRow['company'];
+        }
+        
     }
-
     if (isset($aRow['email'])) {
+        if($person_details){
+            $aRow['email'] = $person_details->email;
+        }
+
         $row['email'] = ($aRow['email'] != '' ? '<a href="mailto:' . $aRow['email'] . '">' . $aRow['email'] . '</a>' : '');
     }
     if (isset($aRow['phonenumber'])) {
+        if($person_details){
+            $row['phonenumber'] =$person_details->phonenumber;
+        }
         $row['phonenumber'] = ($aRow['phonenumber'] != '' ? '<a href="tel:' . $aRow['phonenumber'] . '">' . $aRow['phonenumber'] . '</a>' : '');
+        
+        if($person_details){
+            if($person_details->phonenumber && $allow_to_call == 1) {
+                $calling_code =$this->ci->callsettings_model->getCallingCode($person_details->phone_country_code);
+                $contact = '<div><a href="#" onclick="callfromdeal('.$person_details->id.','.$aRow['id'].','.$person_details->phonenumber.',\'lead\',\''.$calling_code.'\');" title="Call Now"><img src="'.APP_BASE_URL.'/assets/images/call.png" style="width:25px;"></a></div>';
+                $row['phonenumber'] .=$contact;
+            }
+        }
+
+        
+
     }
     //$row[] .= render_tags($aRow['tags']);
     
@@ -293,13 +330,25 @@ foreach ($rResult as $aRow) {
 
     //$row[] = $outputStatus;
     if (isset($aRow['state'])) {
-        $row['state'] = $aRow['state'];
+        if($client_details){
+            $row['state'] = $client_details->state;
+        }else{
+            $row['state'] = $aRow['state'];
+        }
     }
     if (isset($aRow['city'])) {
-        $row['city'] = $aRow['city'];
+        if($client_details){
+            $row['city'] = $client_details->city;
+        }else{
+            $row['city'] = $aRow['city'];
+        }
     }
     if (isset($aRow['country'])) {
-        $row['country'] = $aRow['country'];
+        if($client_details){
+            $row['country'] = $client_details->country;
+        }else{
+            $row['country'] = $aRow['country'];
+        }
     }
     if (isset($aRow['source_name'])) {
         $row['source_name'] = $aRow['source_name'];

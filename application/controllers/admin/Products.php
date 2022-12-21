@@ -1279,9 +1279,9 @@ class Products extends AdminController
                     $checked = 'checked';
                 }
                 $html .= '<div style="height:40px; clear:both" class=" css-table-row" id="'.$i.'"><div class="wcb">
-                <input type="hidden" name="no[]" value="'.$i.'">
-                            <input type="hidden" name="status_'.$i.'" value="1" class="form-control cbox" '.$checked.' >
-                <select name="product[]" class="form-control" onchange="getdealprodprice(this,'.$i.')"><option value="">--Select Item--</option>';
+                <input type="hidden" name="no[]" value="'.$i.'">';
+                            // <input type="hidden" name="status_'.$i.'" value="1" class="form-control cbox" '.$checked.' >
+                $html .='<select name="product[]" class="form-control" onchange="getdealprodprice(this,'.$i.')"><option value="">--Select Item--</option>';
                 foreach($data as $val) {
                     $selected = '';
                     if($val["id"] == $prod['productid']) {
@@ -1353,9 +1353,9 @@ class Products extends AdminController
             }
             $discount_option = get_option('product_discount_option');
             $html .= '<div style="height:40px; clear:both;" class="productdiv css-table-row" id="'.$_POST['length'].'"><div class="wcb">
-            <input type="hidden" name="no[]" value="'.$_POST['length'].'">
-                            <input type="hidden" name="status_'.$_POST['length'].'" value="1" class="form-control cbox">
-            <select name="product[]" class="form-control" onchange="getdealprodprice(this,'.$_POST['length'].')"><option value="">--Select Item--</option>';
+            <input type="hidden" name="no[]" value="'.$_POST['length'].'">';
+                            // <input type="hidden" name="status_'.$_POST['length'].'" value="1" class="form-control cbox">
+            $html .='<select name="product[]" class="form-control" onchange="getdealprodprice(this,'.$_POST['length'].')"><option value="">--Select Item--</option>';
             foreach($data as $val) {
                     $html .= '<option value="'.$val["id"].'">'.$val["name"].'</option>';
             } 
@@ -2133,7 +2133,7 @@ class Products extends AdminController
         $data = $this->products_model->getitem_price($cur);
         
         $html = '';
-        $html .= '<div style="height:40px;clear:both;" class="productdiv" id="0"><div class="">
+        $html .= '<div style="height:40px;clear:both;" class="productdiv css-table-row" id="0"><div class="">
             <select name="product[]" class="form-control" onchange="getprice1(this,0)"><option value="">--Select Item--</option>';
             foreach($data as $val) {
                     $html .= '<option value="'.$val["id"].'">'.$val["name"].'</option>';
