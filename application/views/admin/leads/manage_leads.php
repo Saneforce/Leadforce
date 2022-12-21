@@ -12,6 +12,8 @@
 }
 
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/css/intlTelInput.css">
+
 <div id="wrapper">
    <div class="content">
       <div class="row">
@@ -395,6 +397,8 @@
 <?php include_once(APPPATH.'views/admin/leads/status.php'); ?>
 
 <?php init_tail(); ?>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/intlTelInput-jquery.min.js"></script>
+
 <script>
    var openLeadID = '<?php echo $leadid; ?>';
    $(function(){

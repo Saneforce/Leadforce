@@ -27,7 +27,6 @@ class Leads extends AdminController
     public function index($id = '')
     {
         close_setup_menu();
-
         if (!is_staff_member()) {
             access_denied('Leads');
         }
@@ -128,14 +127,12 @@ class Leads extends AdminController
                     $message = _l('updated_successfully', _l('lead'));
                 }
                 echo json_encode([
-                    'success'          => $success,
-                    'message'          => $message,
-                    'id'               => $id,
-                    'proposal_warning' => $proposalWarning,
-                    'leadView'         => $this->_get_lead_data($id),
+                    'success'  => $success,
+                    'id'       => $id,
+                    'message'  => $message,
                 ]);
+                die;
             }
-            die;
         }
         if($id){
             echo $this->_get_lead_data($id);

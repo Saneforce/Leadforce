@@ -932,19 +932,21 @@ $hascoustomfields =$this->db->get(db_prefix() . 'customfields')->row();
 
 <script>
     function disabled_orgaization_fields(status=true){
-        $('[name="company"]').val('').attr('disabled',status);
-        $('[name="website"]').val('').attr('disabled',status);
-        $('[name="address"]').val('').attr('disabled',status);
-        $('[name="city"]').val('').attr('disabled',status);
-        $('[name="state"]').val('').attr('disabled',status);
-        $('[name="country"]').val('').attr('disabled',status);
-        $('[name="zip"]').val('').attr('disabled',status);
+        $('[name="company"]').val('').attr('readonly',status);
+        $('[name="website"]').val('').attr('readonly',status);
+        $('[name="address"]').val('').attr('readonly',status);
+        $('[name="city"]').val('').attr('readonly',status);
+        $('[name="state"]').val('').attr('readonly',status);
+        $('[name="country"]').val('').attr('readonly',status).selectpicker('refresh');
+        $('[name="zip"]').val('').attr('readonly',status);
+        $('[name="clientphonenumber"]').val('').attr('readonly',status);
     }
     function disabled_person_fields(status=true){
-        $('[name="personname"]').val('').attr('disabled',status);
-        $('[name="title"]').val('').attr('disabled',status);
-        $('[name="email"]').val('').attr('disabled',status);
-        $('[name="phonenumber"]').val('').attr('disabled',status);
+        $('[name="personname"]').val('').attr('readonly',status);
+        $('[name="title"]').val('').attr('readonly',status);
+        $('[name="email"]').val('').attr('readonly',status);
+        $('[name="phonenumber"]').val('').attr('readonly',status);
+        
     }
 
     function set_person_detials(personid){
@@ -981,7 +983,10 @@ $hascoustomfields =$this->db->get(db_prefix() . 'customfields')->row();
             }
         });
     }
+    <?php if(isset($lead) && $lead->id): ?>
     document.addEventListener("DOMContentLoaded", () => {
+    validate_lead_form();
+    <?php endif; ?>
         // -----Country Code Selection
         $("#phonenumber").intlTelInput({
             initialCountry: "<?php echo ( isset($lead) ? $lead->phone_country_code : 'IN'); ?>",
@@ -1004,17 +1009,18 @@ $hascoustomfields =$this->db->get(db_prefix() . 'customfields')->row();
             var country_code =$(this).attr('data-country-code').toUpperCase();
             $("#clientphone_country_code").val(country_code);
         });
-
         $("#contactid").prepend('<option value="" selected="">New Person</option>');
         $("#client_id").prepend('<option value="" selected="">New Organization</option>');
         <?php if($selectedcontactid): ?>
             $('#contactid').val('<?php echo $selectedcontactid?>');
             set_person_detials('<?php echo $selectedcontactid?>');
+            disabled_person_fields(true);
         <?php endif; ?>
 
         <?php if($selectedclientid): ?>
             $('#client_id').val('<?php echo $selectedclientid?>');
             set_client_details('<?php echo $selectedclientid?>');
+            disabled_orgaization_fields(true);
         <?php endif; ?>
 
         $("#client_id").selectpicker("refresh");
@@ -1041,5 +1047,7 @@ $hascoustomfields =$this->db->get(db_prefix() . 'customfields')->row();
                 set_client_details(selectedclientid);
             }
         });
+    <?php if(isset($lead) && $lead->id): ?>
     });
+    <?php endif; ?>
 </script>
