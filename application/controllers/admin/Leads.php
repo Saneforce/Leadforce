@@ -1959,25 +1959,26 @@ class Leads extends AdminController
         }
         $data_assignee = $data['assignees'];
         unset($data['assignees']);
-        $id   = $data['taskid']  = $this->tasks_model->add($data);
+        // $id   = $data['taskid']  = $this->tasks_model->add($data);
         
-        foreach($data_assignee as $taskey => $tasvalue ){
-            $data['assignee'] = $tasvalue;
-            $this->tasks_model->add_task_assignees($data);
-        }
+        // foreach($data_assignee as $taskey => $tasvalue ){
+        //     $data['assignee'] = $tasvalue;
+        //     $this->tasks_model->add_task_assignees($data);
+        // }
+        $id =0;
         $_id     = false;
         $success = false;
         $message = '';
-        if ($id) {
+        if (true || $id) {
             $success       = true;
-            $_id           = $id;
-            $message       = _l('added_successfully', _l('task'));
-            $uploadedFiles = handle_task_attachments_array($id);
-            if ($uploadedFiles && is_array($uploadedFiles)) {
-                foreach ($uploadedFiles as $file) {
-                    $this->misc_model->add_attachment_to_database($id, 'task', [$file]);
-                }
-            }
+            // $_id           = $id;
+            // $message       = _l('added_successfully', _l('task'));
+            // $uploadedFiles = handle_task_attachments_array($id);
+            // if ($uploadedFiles && is_array($uploadedFiles)) {
+            //     foreach ($uploadedFiles as $file) {
+            //         $this->misc_model->add_attachment_to_database($id, 'task', [$file]);
+            //     }
+            // }
             if ($success) {
                 if($uid != 'Cannot Read') {
                     $source_from1 = array_column($messages['attachments'], 'name'); 
@@ -2019,8 +2020,8 @@ class Leads extends AdminController
                 $req_msg[$i]['body_plain']	= $messages['body']['plain'];
                 $req_msg[$i]['folder']	= 'Sent_mail';
                 $table = db_prefix() . 'localmailstorage';
-                $emailid =$this->db->insert_batch($table, $req_msg);
-
+                $this->db->insert_batch($table, $req_msg);
+                $emailid =$this->db->insert_id();
                 $this->leads_model->log_activity($ch_lead_id,'email','added',$emailid);
 
                 echo $message       = _l('added_successfully', _l('task'));
