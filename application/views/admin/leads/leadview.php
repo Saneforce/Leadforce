@@ -293,7 +293,7 @@
             ?>
       </div>
       <div role="tabpanel" class="tab-pane <?php echo ($group=='tab_tasks_leads')?"active": "" ?>" id="tab_tasks_leads">
-         <?php init_relation_tasks_table1(array('data-new-rel-id'=>$lead->id,'data-new-rel-type'=>'lead')); ?>
+         <?php init_relation_tasks_table1(array('data-new-rel-id'=>$lead->id,'data-new-rel-type'=>'lead','no-filters'=>true)); ?>
       </div>
       <div role="tabpanel" class="tab-pane <?php echo ($group=='lead_reminders')?"active": "" ?>" id="lead_reminders">
          <a href="#" data-toggle="modal" class="btn btn-info" data-target=".reminder-modal-lead-<?php echo $lead->id; ?>"><i class="fa fa-bell-o"></i> <?php echo _l('lead_set_reminder_title'); ?></a>

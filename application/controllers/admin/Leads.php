@@ -257,9 +257,9 @@ class Leads extends AdminController
         $data['currencies'] = $this->currencies_model->get();	
         $data['base_currency'] = $this->currencies_model->get_base_currency();
         $data = hooks()->apply_filters('lead_view_data', $data);
+        
         $data['client_contacts']     = $this->clients_model->getAllContacts_active();
-        $data['all_clients']     = $this->clients_model->get();
-       
+
         $data['allcurrency'] = $this->projects_model->get_allcurrency();
         $currency = $this->currencies_model->get_base_currency();
         $this->load->model('invoice_items_model');
@@ -2031,5 +2031,20 @@ class Leads extends AdminController
                 set_alert('success', 'Mail Send Successfully');
                 redirect($redirect_url);
         }
+    }
+
+    public function get_org_person($id='')
+    {
+        $this->db->select(db_prefix() . 'contacts.firstname,'.db_prefix() . 'contacts.lastname,'.db_prefix() . 'contacts.id,'.db_prefix() . 'contacts.phonenumber,'.db_prefix() . 'contacts.email');
+        $this->db->where(db_prefix().'contacts.deleted_status',0);
+        $this->db->where(db_prefix().'contacts.active',1);
+        if($id){
+            $this->db->join(db_prefix() . 'contacts', db_prefix() . 'contacts.id = ' . db_prefix() . 'contacts_clients.contactid', 'left');
+            $this->db->where(db_prefix().'contacts_clients.userid',$id);
+            echo json_encode( $this->db->get(db_prefix().'contacts_clients')->result_object());
+        }else{
+            echo json_encode( $this->db->get(db_prefix().'contacts')->result_object());
+        }
+        
     }
 }

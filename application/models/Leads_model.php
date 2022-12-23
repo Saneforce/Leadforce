@@ -173,7 +173,7 @@ class Leads_model extends App_Model {
         if(isset($data['contactid']) && $data['contactid'] ==''  && strlen(trim($data['personname'])) >0){
             $contact_data =array(
                 'is_primary'=>0,
-                'userid'=>0,
+                'userid'=>isset($data['client_id']) && $data['client_id']?$data['client_id']:0,
                 'firstname'=>$data['personname'],
                 'lastname'=>'',
                 'email'=>$data['email'],
@@ -186,6 +186,9 @@ class Leads_model extends App_Model {
 
             );
             $contactid =$this->clients_model->add_contact($contact_data,0);
+            if($contactid && isset($data['client_id']) && $data['client_id']){
+                $this->db->insert(db_prefix() . 'contacts_clients',array('userid'=>$data['client_id'],'contactid'=>$contactid,'is_primary'=>1));
+            }
         }
         unset($data['personname']);
         unset($data['phone_country_code']);

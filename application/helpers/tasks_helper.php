@@ -373,9 +373,15 @@ function init_relation_tasks_table1($table_attributes = [])
     $table      = '';
     $CI         = & get_instance();
     $table_name = '.table-' . $name;
-    $CI->load->view('admin/tasks/tasks_filter_by', [
-        'view_table_name' => $table_name,
-    ]);
+	if(!isset($table_attributes['no-filters'])){
+		$CI->load->view('admin/tasks/tasks_filter_by', [
+			'view_table_name' => $table_name,
+		]);
+		
+	}else{
+		unset($table_attributes['no-filters']);
+	}
+    
     if (has_permission('tasks', '', 'create')) {
         $disabled   = '';
         $table_name = addslashes($table_name);

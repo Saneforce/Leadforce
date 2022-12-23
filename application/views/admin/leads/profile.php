@@ -517,60 +517,25 @@ echo render_select('teamleader', $teamleaders, array('staffid', array('firstname
             <?php echo render_textarea('description', 'lead_description', $value); ?>
         </div>
     </div>
-    
-    <hr class="hr-panel-heading" style="margin-right: 0;margin-left:0">
-    <h5>Person Details</h5>
-    <p class="text-muted">Select or enter person details.</p>
-    <div class="row">
-        <div class="col-md-6">
-            <?php 
-            $selected = (isset($lead) ? $lead->client_id : '');
-            echo render_select('contactid',$client_contacts,array('id',array('firstname','lastname')),false,$selected,array('data-actions-box'=>true,'aria-describedby'=>'project_contacts-error'),array(),'','',false);
-            ?>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-6">
-            <?php $value = (isset($lead) ? $lead->name : ''); ?>
-            <?php echo render_input('personname', 'Person Name', $value,'text',['onblur'=>'validate_lead_profile_text_input(this.value,\'name\')','maxlength'=>'150']); ?>
-        </div>
-        <div class="col-md-6">
-            <?php $value = (isset($lead) ? $lead->title : ''); ?>
-            <?php echo render_input('title', 'lead_title', $value,'text',['onblur'=>'validate_lead_profile_text_input(this.value,\'title\')','maxlength'=>'100']); ?>
-        </div>
-    </div>
-                    
-
-    <div class="row">
-        <div class="col-md-6">
-            <?php $value = (isset($lead) ? $lead->email : ''); ?>
-            <div class="form-group" app-field-wrapper="email">
-                <label for="email" class="control-label">Email Address</label>
-                <input type="email" id="email" name="email" class="form-control" value="<?php echo $value; ?>" autocomplete="new-text">
-            </div>
-            <?php //echo render_input('email', 'lead_add_edit_email', $value); ?>
-            <?php $value = (isset($lead) ? $lead->phonenumber : '');?>
-        </div>
-        <div class="col-md-6">
-            <div class="form-group" app-field-wrapper="phonenumber" id="phonenumber_iti_wrapper">
-                <label for="phonenumber" class="control-label"><?php echo _l('lead_add_edit_phonenumber') ?></label>
-                <div class="input-group" style="width:100%">
-                    <input type="text" id="phonenumber" name="phonenumber" class="form-control" onblur="validate_lead_profile_phonenumber(this.value,'phonenumber')" maxlength=100 autocomplete="off" value="<?php echo $value; ?>">
-                </div>
-            </div>
-            <input type="hidden" name="phone_country_code" id="phone_country_code" value="<?php echo ( isset($lead) ? $lead->phone_country_code : 'IN'); ?>">
-        </div>
-    </div>
 
     <hr class="hr-panel-heading" style="margin-right: 0;margin-left:0">
     <h5>Organization Details</h5>
     <p class="text-muted">Select or enter organization details.</p>
     <div class="row">
         <div class="col-md-6">
-            <?php
-                $selectedclientid = (isset($lead) ? $lead->client_id : '');
-                echo render_select('client_id',$all_clients,array('userid','company'),false,$selectedclientid,array('data-actions-box'=>true,'aria-describedby'=>'project_contacts-error'),array(),'','',false);
-            ?>
+            <div class="form-group" app-field-wrapper="client_id">
+                <label for="client_id" class="control-label"><?php echo _l('client') ?></label>
+                <select id="client_id" name="client_id" data-live-search="true" data-width="100%" class="ajax-search" data-empty-title="New Organization">
+                    <?php 
+                        $selectedclientid = (isset($lead) ? $lead->client_id : '');
+                        if($selectedclientid){
+                            $rel_data = get_relation_data('customer',$selectedclientid);
+                            $rel_val = get_relation_values($rel_data,'customer');
+                            echo '<option value="'.$rel_val['id'].'" >'.$rel_val['name'].'</option>';
+                        }
+                    ?>
+                </select>
+            </div>
         </div>
     </div>
     <div class="row">
@@ -643,6 +608,66 @@ echo render_select('teamleader', $teamleaders, array('staffid', array('firstname
             ?>
         </div>
     </div>
+
+    <hr class="hr-panel-heading" style="margin-right: 0;margin-left:0">
+    <h5>Person Details</h5>
+    <p class="text-muted">Select or enter person details.</p>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group" app-field-wrapper="contactid">
+                <select id="contactid" name="contactid" data-live-search="true" data-width="100%" class="selectpicker" >
+                    <?php 
+                        if($selectedcontactid){
+                            $rel_data = get_relation_data('contact',$selectedcontactid);
+                            $rel_val = get_relation_values($rel_data,'contact');
+                            echo '<option value="'.$rel_val['id'].'" >'.$rel_val['name'].'</option>';
+                        }
+                    ?>
+                </select>
+            </div>
+
+            <?php 
+                if(false){
+                    $selected = (isset($lead) ? $lead->client_id : '');
+                    echo render_select('contactid',$client_contacts,array('id',array('firstname','lastname')),false,$selected,array('data-actions-box'=>true,'aria-describedby'=>'project_contacts-error'),array(),'','',false);
+                }
+            ?>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <?php $value = (isset($lead) ? $lead->name : ''); ?>
+            <?php echo render_input('personname', 'Person Name', $value,'text',['onblur'=>'validate_lead_profile_text_input(this.value,\'name\')','maxlength'=>'150']); ?>
+        </div>
+        <div class="col-md-6">
+            <?php $value = (isset($lead) ? $lead->title : ''); ?>
+            <?php echo render_input('title', 'lead_title', $value,'text',['onblur'=>'validate_lead_profile_text_input(this.value,\'title\')','maxlength'=>'100']); ?>
+        </div>
+    </div>
+                    
+
+    <div class="row">
+        <div class="col-md-6">
+            <?php $value = (isset($lead) ? $lead->email : ''); ?>
+            <div class="form-group" app-field-wrapper="email">
+                <label for="email" class="control-label">Email Address</label>
+                <input type="email" id="email" name="email" class="form-control" value="<?php echo $value; ?>" autocomplete="new-text">
+            </div>
+            <?php //echo render_input('email', 'lead_add_edit_email', $value); ?>
+            <?php $value = (isset($lead) ? $lead->phonenumber : '');?>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group" app-field-wrapper="phonenumber" id="phonenumber_iti_wrapper">
+                <label for="phonenumber" class="control-label"><?php echo _l('lead_add_edit_phonenumber') ?></label>
+                <div class="input-group" style="width:100%">
+                    <input type="text" id="phonenumber" name="phonenumber" class="form-control" onblur="validate_lead_profile_phonenumber(this.value,'phonenumber')" maxlength=100 autocomplete="off" value="<?php echo $value; ?>">
+                </div>
+            </div>
+            <input type="hidden" name="phone_country_code" id="phone_country_code" value="<?php echo ( isset($lead) ? $lead->phone_country_code : 'IN'); ?>">
+        </div>
+    </div>
+
+    
 </div>
             <div class="col-md-12">
                 <?php //if (get_option('disable_language') == 0) { ?>
@@ -1020,7 +1045,37 @@ $hascoustomfields =$this->db->get(db_prefix() . 'customfields')->row();
             }
         });
     }
+    function check_all_val(){
 
+    }
+    function check_all_val1(){
+        
+    }
+    function get_person(org){
+        if(org.length >0){
+            var url ="<?php echo admin_url('leads/get_org_person/');?>"+org;
+        }else{
+            var url ="<?php echo admin_url('leads/get_org_person');?>";
+        }
+		$.ajax({url: url, success: function(result){
+			var myArr = JSON.parse(result);
+            $('#contactid').empty();
+            $("#contactid").prepend('<option value="" selected="">New Person</option>');
+            $.each(myArr, function (key, val) {
+                var label =val.firstname+' '+val.lastname;
+                if(val.email.length >0){
+                    label +=' - '+val.email;
+                }
+                if(val.phonenumber.length >0){
+                    label +=' - '+val.phonenumber;
+                }
+                $("#contactid").append('<option value="'+val.id+'">'+label+'</option>');
+                
+            });
+            $('#contactid').selectpicker('refresh');
+        }});
+       
+	}
     function set_client_details(clientid){
         $.ajax({
             type: 'Get',
@@ -1044,6 +1099,8 @@ $hascoustomfields =$this->db->get(db_prefix() . 'customfields')->row();
     document.addEventListener("DOMContentLoaded", () => {
     validate_lead_form();
     <?php endif; ?>
+
+        init_ajax_search('customer', '#client_id.ajax-search');
         // -----Country Code Selection
         $("#phonenumber").intlTelInput({
             initialCountry: "<?php echo ( isset($lead) ? $lead->phone_country_code : 'IN'); ?>",
@@ -1081,6 +1138,7 @@ $hascoustomfields =$this->db->get(db_prefix() . 'customfields')->row();
         <?php endif; ?>
 
         $("#client_id").selectpicker("refresh");
+        get_person($('#client_id').val());
         $("#contactid").selectpicker("refresh");
         $('#contactid').change(function(){;
             var selectedcontact =$(this).val();
@@ -1095,9 +1153,11 @@ $hascoustomfields =$this->db->get(db_prefix() . 'customfields')->row();
         });
         $('#client_id').change(function(){
             var selectedclientid =$(this).val();
+            get_person(selectedclientid);
             if(selectedclientid ==''){
                 disabled_orgaization_fields(false);
             }else{
+                
                 $('[name="company"]').parent().removeClass("has-error");
                 $('.not-valid-company').remove();
                 disabled_orgaization_fields(true);

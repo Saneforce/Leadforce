@@ -3879,6 +3879,7 @@ class Projects extends AdminController
 		$req_project = $_REQUEST['org'];
 		$req_out = array();
 		$persons = $this->projects_model->get_org_contact($req_project);
+        $person_option ='';
 		if(!empty($persons)){
 			foreach($persons as $person12){
 				$person_option .= "<option value='".$person12['id']."'>".$person12['firstname'].' '.$person12['lastname']."</option>";

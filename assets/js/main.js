@@ -6958,7 +6958,10 @@ function init_ajax_search(type, selector, server_data, url) {
             requestDelay: 500,
             cache: false,
             preprocessData: function(processData) {
-                var bs_data = [];
+                var bs_data = [{
+                    'value': "",
+                    'text': options.locale.emptyTitle,
+                }];
                 var len = processData.length;
                 for (var i = 0; i < len; i++) {
                     var tmp_data = {
