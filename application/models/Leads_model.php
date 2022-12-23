@@ -237,8 +237,7 @@ class Leads_model extends App_Model {
                 $this->products_model->save_lead_products($products, $insert_id, $currency);   
             }
             log_activity('New Lead Added [ID: ' . $insert_id . ']');
-            $this->log_lead_activity($insert_id, 'not_lead_activity_created');
-
+            $this->leads_model->log_activity($insert_id,'lead','added',$insert_id);
             handle_tags_save($tags, $insert_id, 'lead');
 
             if (isset($custom_fields)) {
@@ -698,7 +697,9 @@ class Leads_model extends App_Model {
     }
 
     public function add_attachment_to_database($lead_id, $attachment, $external = false, $form_activity = false) {
-        $this->misc_model->add_attachment_to_database($lead_id, 'lead', $attachment, $external);
+        $attachment_id =$this->misc_model->add_attachment_to_database($lead_id, 'lead', $attachment, $external);
+        
+        $this->leads_model->log_activity($lead_id,'attachment','added',$attachment_id);
 
         if ($form_activity == false) {
             $this->leads_model->log_lead_activity($lead_id, 'not_lead_activity_added_attachment');
@@ -1507,6 +1508,31 @@ class Leads_model extends App_Model {
             return $emails->count;
         }
         return 0;
+    }
+
+    /**
+     * @type : activity
+     * @action: added,updated,deleted
+     */
+    public function log_activity($lead_id, $type, $action,$type_id) {
+        $log = [
+            'lead_id' => $lead_id,
+            'type'=>$type,
+            'action'=>$action,
+            'type_id'=>$type_id,
+            'staff_id' => get_staff_user_id()
+        ];
+        $this->db->insert(db_prefix() . 'lead_log', $log);
+        return $this->db->insert_id();
+    }
+
+    public function get_log_activities($lead_id,$page=0)
+    {
+        $this->db->where('lead_id',$lead_id);
+        $this->db->order_by('id', 'DESC');
+        $limit =10;
+        $this->db->limit($limit, $limit*$page);
+        return $this->db->get(db_prefix().'lead_log')->result_object();
     }
     
 }

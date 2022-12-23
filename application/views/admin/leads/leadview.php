@@ -30,7 +30,7 @@
       }
    ?>
 
-                                    <style>
+<style>
 .horizontal-tabs {
     width:100%;
 }
@@ -43,6 +43,204 @@
 }
 .formnewpipeline .dropdown-menu {
     width:100%;
+}
+
+/* End basic CSS override */
+.timeline {
+  width: 85%;
+  max-width: 700px;
+  margin-left: 50px;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 0 0 0 32px;
+  border-left: 2px solid #e3e3e3;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 24px;
+}
+.timeline-item + * {
+  margin-top: 24px;
+}
+.timeline-item + .extra-space {
+  margin-top: 48px;
+}
+
+.timeline .new-comment {
+  width: 100%;
+}
+.timeline .new-comment input {
+  border: 1px solid #e3e3e3;
+  border-radius: 6px;
+  height: 48px;
+  padding: 0 16px;
+  width: 100%;
+}
+.timeline .new-comment input::-moz-placeholder {
+  color: #b2b2b2;
+}
+.timeline .new-comment input:-ms-input-placeholder {
+  color: #b2b2b2;
+}
+.timeline .new-comment input::placeholder {
+  color: #b2b2b2;
+}
+.timeline .new-comment input:focus {
+  border-color: #b2b2b2;
+  outline: 0;
+  box-shadow: 0 0 0 4px #f4f6f8;
+}
+
+.timeline-item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-left: -52px;
+  flex-shrink: 0;
+  overflow: hidden;
+  box-shadow: 0 0 0 6px #fff;
+}
+.timeline-item-icon svg {
+  width: 20px;
+  height: 20px;
+}
+.timeline-item-icon.faded-icon {
+  background-color: #f4f6f8;
+  color: #7b7b7b;
+}
+.timeline-item-icon.filled-icon {
+  background-color: #688afd;
+  color: #fff;
+}
+
+.timeline-item-description {
+  display: flex;
+  padding-top: 6px;
+  gap: 8px;
+  color: #7b7b7b;
+}
+.timeline-item-description img {
+  flex-shrink: 0;
+}
+.timeline-item-description a {
+  color: #3d3d3d;
+  font-weight: 500;
+  text-decoration: none;
+}
+.timeline-item-description a:hover, .timeline-item-description a:focus {
+  outline: 0;
+  color: #688afd;
+}
+
+.timeline .avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  overflow: hidden;
+  aspect-ratio: 1/1;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+}
+.timeline .avatar.small {
+  width: 28px;
+  height: 28px;
+}
+.timeline .avatar img {
+  -o-object-fit: cover;
+     object-fit: cover;
+     max-width: 100%;
+}
+
+.timeline .comment {
+  margin-top: 12px;
+  color: #3d3d3d;
+  border: 1px solid #e3e3e3;
+  box-shadow: 0 4px 4px 0 #f4f6f8;
+  border-radius: 6px;
+  padding: 16px;
+}
+
+.timeline .button {
+  border: 0;
+  padding: 0;
+  display: inline-flex;
+  vertical-align: middle;
+  margin-right: 4px;
+  margin-top: 12px;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 8px;
+  background-color: #f4f6f8;
+  flex-shrink: 0;
+  cursor: pointer;
+  border-radius: 99em;
+}
+.timeline .button:hover {
+  background-color: #e3e3e3;
+}
+.timeline .button.square {
+  border-radius: 50%;
+  color: #7b7b7b;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+}
+.timeline .button.square svg {
+  width: 24px;
+  height: 24px;
+}
+.timeline .button.square:hover {
+  background-color: #e3e3e3;
+  color: #3d3d3d;
+}
+
+.timeline .show-replies {
+  color: #b2b2b2;
+  background-color: transparent;
+  border: 0;
+  padding: 0;
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.timeline .show-replies svg {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+}
+.timeline .show-replies:hover, .show-replies:focus {
+  color: #3d3d3d;
+}
+
+.timeline .avatar-list {
+  display: flex;
+  align-items: center;
+}
+.timeline .avatar-list > * {
+  position: relative;
+  box-shadow: 0 0 0 2px #fff;
+  margin-right: -8px;
+}
+
+.timeline .note-bg{
+   background-color: #fff6d6;
+}
+.timeline .note-color{
+   color: #fff6d6;
+}
+
+.timeline .comment .document-icon-wrapper{
+   font-size: 20px;
 }
 </style>
   <div class="row">
@@ -71,6 +269,11 @@
             </a>
          </li> -->
          <?php if(isset($lead)){?>
+         <li role="presentation" class="<?php echo ($group=='lead_activity')?"active": "" ?>">
+            <a href="#lead_activity" aria-controls="lead_activity" role="tab" data-toggle="tab">
+            <?php echo _l('lead_add_edit_activity'); ?>
+            </a>
+         </li>
          <li role="presentation" class="<?php echo ($group=='tab_tasks_leads')?"active": "" ?>">
             <a href="#tab_tasks_leads" onclick="init_rel_tasks_table(<?php echo $lead->id; ?>,'lead','.table-rel-tasks-leads');" aria-controls="tab_tasks_leads" role="tab" data-toggle="tab">
             <?php echo _l('tasks'); ?>
@@ -104,32 +307,9 @@
             <?php echo _l('lead_files'); ?>
             </a>
          </li>
-         <?php /* <li role="presentation">
-            <a href="#lead_reminders" onclick="initDataTable('.table-reminders-leads', admin_url + 'misc/get_reminders/' + <?php echo $lead->id; ?> + '/' + 'lead', undefined, undefined,undefined,[1, 'asc']);" aria-controls="lead_reminders" role="tab" data-toggle="tab">
-            <?php echo _l('leads_reminders_tab'); ?>
-            <?php
-               $total_reminders = total_rows(db_prefix().'reminders',
-                  array(
-                     'isnotified'=>0,
-                     'staff'=>get_staff_user_id(),
-                     'rel_type'=>'lead',
-                     'rel_id'=>$lead->id
-                     )
-                  );
-               if($total_reminders > 0){
-                  echo '<span class="badge">'.$total_reminders.'</span>';
-               }
-               ?>
-            </a>
-         </li> */ ?>
          <li role="presentation" class="<?php echo ($group=='lead_notes')?"active": "" ?>">
             <a href="#lead_notes" aria-controls="lead_notes" role="tab" data-toggle="tab">
             <?php echo _l('lead_add_edit_notes'); ?>
-            </a>
-         </li>
-         <li role="presentation" class="<?php echo ($group=='lead_activity')?"active": "" ?>">
-            <a href="#lead_activity" aria-controls="lead_activity" role="tab" data-toggle="tab">
-            <?php echo _l('lead_add_edit_activity'); ?>
             </a>
          </li>
          <?php if(is_gdpr() && (get_option('gdpr_enable_lead_public_form') == '1' || get_option('gdpr_enable_consent_for_leads') == '1')) { ?>
@@ -221,45 +401,15 @@
       <?php } ?>
       <div role="tabpanel" class="tab-pane <?php echo ($group=='lead_activity')?"active": "" ?>" id="lead_activity">
          <div class="panel_s no-shadow">
-            <div class="activity-feed">
-               <?php foreach($activity_log as $log){ ?>
-               <div class="feed-item">
-                  <div class="date">
-                    <span class="text-has-action" data-toggle="tooltip" data-title="<?php echo _dt($log['date']); ?>">
-                    <?php echo time_ago($log['date']); ?>
-                  </span>
-                  </div>
-                  <div class="text">
-                     <?php if($log['staffid'] != 0){ ?>
-                     <a href="<?php echo admin_url('profile/'.$log["staffid"]); ?>">
-                     <?php echo staff_profile_image($log['staffid'],array('staff-profile-xs-image pull-left mright5'));
-                        ?>
-                     </a>
-                     <?php
-                        }
-                        $additional_data = '';
-                        if(!empty($log['additional_data'])){
-                         $additional_data = unserialize($log['additional_data']);
-                         echo ($log['staffid'] == 0) ? _l($log['description'],$additional_data) : $log['full_name'] .' - '._l($log['description'],$additional_data);
-                        } else {
-                            echo $log['full_name'] . ' - ';
-                           if($log['custom_activity'] == 0){
-                              echo _l($log['description']);
-                           } else {
-                              echo _l($log['description'],'',false);
-                           }
-                        }
-                        ?>
-                  </div>
-               </div>
-               <?php } ?>
-            </div>
-            <!-- <div class="col-md-12">
-               <?php echo render_textarea('lead_activity_textarea','','',array('placeholder'=>_l('enter_activity')),array(),'mtop15'); ?>
-               <div class="text-right">
-                  <button id="lead_enter_activity" class="btn btn-info"><?php echo _l('submit'); ?></button>
-               </div>
-            </div> -->
+            <?php 
+               $activities =render_lead_activities($lead->id,0);
+               if($activities){
+                  echo $activities;
+                  echo '<button id="loadMoreActivities" class="btn btn-primary" data-page="1">Load More</button>';
+               }else{
+                  echo '<p>No activities recorded</p>';
+               }
+            ?>
             <div class="clearfix"></div>
          </div>
       </div>
@@ -397,6 +547,28 @@
 <script>
    $(document).ready(function () {
       init_rel_tasks_table(<?php echo $lead->id; ?>,'lead','.table-rel-tasks-leads');
+
+      $('#loadMoreActivities').click(function(){
+         var page =$(this).attr('data-page');
+         $.ajax({
+            type: 'GET',
+            url: admin_url+'leads/load_more_activities/'+<?php echo $lead->id ?>,
+            data: {page:page},
+            dataType: "json",
+            success: function(resultData) { 
+               if(resultData.success==true){
+                  if(resultData.content){
+                     $('#lead_activities_wrapper').append(resultData.content);
+                     $('#loadMoreActivities').attr('data-page',parseInt(page)+1);
+                  }else{
+                     $('#loadMoreActivities').remove();
+                  }
+               }else{
+                  $('#loadMoreActivities').remove();
+               }
+            }
+         });
+      })
    });
 </script>
 </body>

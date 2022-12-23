@@ -278,7 +278,7 @@ class Leads extends AdminController
 
         $data ['group'] =$this->input->get('group');
         if(!$data['group']){
-            $data['group'] ='tab_tasks_leads';
+            $data['group'] ='lead_activity';
         }
         if($id){
             echo $this->load->view('admin/leads/leadview', $data, true);
@@ -1392,7 +1392,7 @@ class Leads extends AdminController
             }
 
             $note_id = $this->misc_model->add_note($data, 'lead', $rel_id);
-
+            $this->leads_model->log_activity($rel_id,'note','added',$note_id);
             if ($note_id) {
                 if (isset($contacted_date)) {
                     $this->db->where('id', $rel_id);
@@ -2019,7 +2019,10 @@ class Leads extends AdminController
                 $req_msg[$i]['body_plain']	= $messages['body']['plain'];
                 $req_msg[$i]['folder']	= 'Sent_mail';
                 $table = db_prefix() . 'localmailstorage';
-                $this->db->insert_batch($table, $req_msg);
+                $emailid =$this->db->insert_batch($table, $req_msg);
+
+                $this->leads_model->log_activity($ch_lead_id,'email','added',$emailid);
+
                 echo $message       = _l('added_successfully', _l('task'));
                 set_alert('success', $message);
                 redirect($redirect_url);
@@ -2045,6 +2048,19 @@ class Leads extends AdminController
         }else{
             echo json_encode( $this->db->get(db_prefix().'contacts')->result_object());
         }
+        
+    }
+
+    public function load_more_activities($lead_id)
+    {
+        if($_GET['page']){
+            $activities =render_lead_activities($lead_id,$_GET['page']);
+            if($activities){
+                echo json_encode(array('success'=>true,'content'=>$activities));
+                die;
+            }
+        }
+        echo json_encode(array('success'=>true,'content'=>false));
         
     }
 }

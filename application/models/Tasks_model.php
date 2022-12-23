@@ -665,9 +665,7 @@ class Tasks_model extends App_Model
 
             if (isset($data['rel_type']) && $data['rel_type'] == 'lead') {
                 $this->load->model('leads_model');
-                $this->leads_model->log_lead_activity($data['rel_id'], 'not_activity_new_task_created', false, serialize([
-                    '<a href="' . admin_url('tasks/view/' . $insert_id) . '" onclick="init_task_modal(' . $insert_id . ');return false;">' . $data['name'] . '</a>',
-                    ]));
+                $this->leads_model->log_activity($data['rel_id'],'activity','added',$insert_id);
             }
             
             if ($clientRequest == false) {

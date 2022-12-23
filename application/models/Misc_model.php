@@ -325,6 +325,12 @@ class Misc_model extends App_Model
         return hooks()->apply_filters('get_notes', $notes, ['rel_id' => $rel_id, 'rel_type' => $rel_type]);
     }
 
+    public function get_note($id)
+    {
+        $this->db->where('id', $id);
+        return $this->db->get(db_prefix() . 'notes')->row();
+    }
+
     public function add_note($data, $rel_type, $rel_id)
     {
         $data['dateadded']   = date('Y-m-d H:i:s');
