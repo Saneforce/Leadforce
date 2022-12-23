@@ -302,6 +302,7 @@
       </div>
       <div role="tabpanel" class="tab-pane <?php echo ($group=='attachments')?"active": "" ?>" id="attachments">
          <?php echo form_open('admin/leads/add_lead_attachment',array('class'=>'dropzone mtop15 mbot15','id'=>'lead-attachment-upload')); ?>
+         <input type="hidden" name="id" value="<?php echo $lead->id ?>">
          <?php echo form_close(); ?>
          <?php if(get_option('dropbox_app_key') != ''){ ?>
          <hr />
