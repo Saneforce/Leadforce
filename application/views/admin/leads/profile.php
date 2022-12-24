@@ -23,21 +23,18 @@ if ($openEdit == true) {
              echo 'lead-is-junk-or-lost';
          }
          ?>>
+    <div class="lead-preview-header mbot15">
+        <div>
         <?php if (isset($lead)) { ?>
-        <div class="btn-group pull-left lead-actions-left mtop8">
-            <a href="#" lead-edit class="mright10 font-medium-xs pull-left<?php
-           if ($lead_locked == true) {
-               echo ' hide';
-           }
-        ?>">
-            <?php echo _l('edit'); ?>
-                <i class="fa fa-pencil-square-o"></i>
+        <h4><?php echo $lead->name ?><a href="#" lead-edit class="mright10 font-medium<?php echo ($lead_locked)?' hide':'';?>">
+            <i class="fa fa-pencil-square-o"></i>
+        </a></h4>
+        </div>
+        <div>
+            <a href="#" class="btn btn-default pull-right dropdown-toggle mleft10" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="lead-more-btn">
+            <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
             </a>
-            <a href="#" class="font-medium-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="lead-more-btn">
-                <?php echo _l('more'); ?>
-                <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-left" id="lead-more-dropdown">
+            <ul class="dropdown-menu dropdown-menu-right" id="lead-more-dropdown">
             <li></li>
                         <?php
                         if ($lead->junk == 0) {
@@ -45,7 +42,7 @@ if ($openEdit == true) {
                                 ?>
                         <li>
                             <a href="#" onclick="lead_mark_as_lost(<?php echo $lead->id; ?>); return false;">
-                                <i class="fa fa-mars"></i>
+                                <i class="fa fa fa-times"></i>
                                 <?php echo _l('lead_mark_as_lost'); ?>
                             </a>
                         </li>
@@ -66,7 +63,7 @@ if ($openEdit == true) {
             ?>
                         <li>
                             <a href="#" onclick="lead_mark_as_junk(<?php echo $lead->id; ?>); return false;">
-                                <i class="fa fa fa-times"></i>
+                            <i class="fa fa-ban" aria-hidden="true"></i>
             <?php echo _l('lead_mark_as_junk'); ?>
                             </a>
                         </li>
@@ -88,7 +85,6 @@ if ($openEdit == true) {
                     </li>
         <?php } ?>
             </ul>
-        </div>
         <?php
         $client = false;
         $convert_to_client_tooltip_email_exists = '';
@@ -102,7 +98,7 @@ if ($openEdit == true) {
         }
         ?>
         <?php if ($lead_locked == false) { ?>
-            <div class="lead-edit<?php
+            <div class="lead-edit pull-right<?php
         if (isset($lead)) {
             echo ' hide';
         }
@@ -129,14 +125,14 @@ if ($openEdit == true) {
         </a>
             <?php } ?>
         <?php } ?>
-    <div class="clearfix no-margin"></div>
+    
+    <div class="clearfix no-margin">
 
+    </div>
+    
+    </div>
+    </div>
             <?php if (isset($lead)) { ?>
-
-        <div class="row mbot15">
-            <hr class="no-margin" />
-        </div>
-
         <div class="alert alert-warning hide mtop20" role="alert" id="lead_proposal_warning">
         <?php echo _l('proposal_warning_email_change', array(_l('lead_lowercase'), _l('lead_lowercase'), _l('lead_lowercase'))); ?>
             <hr />
@@ -813,14 +809,8 @@ $hascoustomfields =$this->db->get(db_prefix() . 'customfields')->row();
     </div>
 </div>
 <?php if ($lead_locked == false) { ?>
-        <div class="lead-edit<?php
-    if (isset($lead)) {
-        echo ' hide';
-    }
-    ?>">
-            <hr />
+        <div class="lead- hide">
             <button type="submit" class="btn btn-info pull-right lead-save-btn" id="lead-form-submit"><?php echo _l('submit'); ?></button>
-            <button type="button" class="btn btn-default pull-right mright5" data-dismiss="modal"><?php echo _l('close'); ?></button>
         </div>
 <?php } ?>
     <div class="clearfix"></div>

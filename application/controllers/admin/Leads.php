@@ -241,6 +241,7 @@ class Leads extends AdminController
 
         $products = $this->products_model->getleads_products($id, $lead->lead_currency);
         $data['productscnt'] = count($products);
+        $data['logs_count'] = $this->leads_model->get_logs_count($lead->id);
         $data['emails_count'] = $this->leads_model->get_emails_count($lead->id);
         $data['activity_count'] = $this->leads_model->get_activities_count($lead->id);
         $data['proposal_count'] = $this->leads_model->get_proposal_count($lead->id);

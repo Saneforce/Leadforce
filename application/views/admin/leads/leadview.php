@@ -15,21 +15,6 @@
       background-color: #02a9f4;
    }
 </style>
-   <?php
-      if(isset($lead)){
-           if($lead->lost == 1){
-              echo '<div class="ribbon danger"><span>'._l('lead_lost').'</span></div>';
-           } else if($lead->junk == 1){
-              echo '<div class="ribbon warning"><span>'._l('lead_junk').'</span></div>';
-           } else {
-              if (total_rows(db_prefix().'clients', array(
-                'leadid' => $lead->id))) {
-                echo '<div class="ribbon success"><span>Deal</span></div>';
-             }
-          }
-      }
-   ?>
-
 <style>
 .horizontal-tabs {
     width:100%;
@@ -238,15 +223,28 @@
 .timeline .note-color{
    color: #fff6d6;
 }
-
 .timeline .comment .document-icon-wrapper{
    font-size: 20px;
+}
+.lead-preview-header{
+   position: sticky;
+   top: 0px;
+   background-color: white;
+   z-index: 100;
+   padding-top: 20px;
+   display: flex;
+   justify-content: space-between;
+   border-bottom: 1px solid #eee;
+}
+
+.lead-field-heading{
+   color: #777;
 }
 </style>
   <div class="row">
      <div class="col-md-4">
          <div class="panel_s">
-            <div class="panel-body" style="height: 90vh; overflow-y:auto;">
+            <div class="panel-body" style="height: 90vh; overflow-y:auto; padding-top:0px">
                <?php $this->load->view('admin/leads/profile'); ?>
             </div>
          </div>
@@ -257,6 +255,20 @@
          } ?>
     <div class="panel_s">
     <div class="panel-body">
+      <?php
+      if(isset($lead)){
+         if($lead->lost == 1){
+         echo '<div class="ribbon danger"><span>'._l('lead_lost').'</span></div>';
+         } else if($lead->junk == 1){
+         echo '<div class="ribbon warning"><span>'._l('lead_junk').'</span></div>';
+         } else {
+         if (total_rows(db_prefix().'clients', array(
+            'leadid' => $lead->id))) {
+            echo '<div class="ribbon success"><span>Deal</span></div>';
+         }
+         }
+      }
+      ?>
       <div class="horizontal-scrollable-tabs preview-tabs-top">
          <div class="scroller arrow-left"><i class="fa fa-angle-left"></i></div>
          <div class="scroller arrow-right"><i class="fa fa-angle-right"></i></div>
@@ -271,22 +283,22 @@
          <?php if(isset($lead)){?>
          <li role="presentation" class="<?php echo ($group=='lead_activity')?"active": "" ?>">
             <a href="#lead_activity" aria-controls="lead_activity" role="tab" data-toggle="tab">
-            <?php echo _l('lead_add_edit_activity'); ?>
+            <?php echo _l('lead_add_edit_activity'); ?><?php if($logs_count): ?><span class="badge badge-light ml-3" id="lead_logs_count"><?php echo $logs_count?></span><?php endif; ?>
             </a>
          </li>
          <li role="presentation" class="<?php echo ($group=='tab_tasks_leads')?"active": "" ?>">
             <a href="#tab_tasks_leads" onclick="init_rel_tasks_table(<?php echo $lead->id; ?>,'lead','.table-rel-tasks-leads');" aria-controls="tab_tasks_leads" role="tab" data-toggle="tab">
-            <?php echo _l('tasks'); ?><span class="badge badge-light ml-3" id="leadactivitycount"><?php echo $activity_count?></span>
+            <?php echo _l('tasks'); ?><?php if($activity_count): ?><span class="badge badge-light ml-3" id="leadactivitycount"><?php echo $activity_count ?></span><?php endif; ?>
             </a>
          </li>
          <li role="presentation" class="<?php echo ($group=='tab_items')?"active": "" ?>">
             <a href="#tab_items" aria-controls="tab_items" role="tab" data-toggle="tab">
-                <?php echo _l('items') ?><span class="badge badge-light ml-3" id="leaditemcount"><?php echo $productscnt?></span>
+                <?php echo _l('items') ?><?php if($productscnt): ?><span class="badge badge-light ml-3" id="leaditemcount"><?php echo $productscnt?></span><?php endif; ?>
             </a>
          </li>
          <li role="presentation" class="<?php echo ($group=='tab_email')?"active": "" ?>">
             <a href="#tab_email" aria-controls="tab_email" role="tab" data-toggle="tab">
-                <?php echo _l('email') ?><span class="badge badge-light ml-3" id="leademailcount"><?php echo $emails_count?></span>
+                <?php echo _l('email') ?><?php if($emails_count): ?><span class="badge badge-light ml-3" id="leademailcount"><?php echo $emails_count?></span><?php endif; ?>
             </a>
          </li>
 
@@ -299,17 +311,17 @@
          <?php } ?>
          <li role="presentation" class="<?php echo ($group=='tab_proposals_leads')?"active": "" ?>">
             <a href="#tab_proposals_leads" onclick="initDataTable('.table-proposals-lead', admin_url + 'proposals/proposal_relations/' + <?php echo $lead->id; ?> + '/lead','undefined', 'undefined','undefined',[6,'desc']);" aria-controls="tab_proposals_leads" role="tab" data-toggle="tab">
-            <?php echo _l('proposals'); ?><span class="badge badge-light ml-3" id="leadproposalcount"><?php echo $proposal_count?></span>
+            <?php echo _l('proposals'); ?><?php if($proposal_count): ?><span class="badge badge-light ml-3" id="leadproposalcount"><?php echo $proposal_count?></span><?php endif; ?>
             </a>
          </li>
          <li role="presentation" class="<?php echo ($group=='attachments')?"active": "" ?>">
             <a href="#attachments" aria-controls="attachments" role="tab" data-toggle="tab">
-            <?php echo _l('lead_files'); ?><span class="badge badge-light ml-3" id="leadfilescount"><?php echo $files_count?></span>
+            <?php echo _l('lead_files'); ?><?php if($files_count): ?><span class="badge badge-light ml-3" id="leadfilescount"><?php echo $files_count?></span><?php endif; ?>
             </a>
          </li>
          <li role="presentation" class="<?php echo ($group=='lead_notes')?"active": "" ?>">
             <a href="#lead_notes" aria-controls="lead_notes" role="tab" data-toggle="tab">
-            <?php echo _l('lead_add_edit_notes'); ?><span class="badge badge-light ml-3" id="leadnotescount"><?php echo $notes_count?></span>
+            <?php echo _l('lead_add_edit_notes'); ?><?php if($notes_count): ?><span class="badge badge-light ml-3" id="leadnotescount"><?php echo $notes_count?></span><?php endif; ?>
             </a>
          </li>
          <?php if(is_gdpr() && (get_option('gdpr_enable_lead_public_form') == '1' || get_option('gdpr_enable_consent_for_leads') == '1')) { ?>
@@ -400,12 +412,11 @@
       </div>
       <?php } ?>
       <div role="tabpanel" class="tab-pane <?php echo ($group=='lead_activity')?"active": "" ?>" id="lead_activity">
-         <div class="panel_s no-shadow">
+         <div class="panel_s no-shadow" data-page="1" id="lead_activities_wrapper_scroller" style="max-height: 63vh;overflow-y: auto;">
             <?php 
                $activities =render_lead_activities($lead->id,0);
                if($activities){
                   echo $activities;
-                  echo '<button id="loadMoreActivities" class="btn btn-primary" data-page="1">Load More</button>';
                }else{
                   echo '<p>No activities recorded</p>';
                }
@@ -547,28 +558,35 @@
 <script>
    $(document).ready(function () {
       init_rel_tasks_table(<?php echo $lead->id; ?>,'lead','.table-rel-tasks-leads');
-
-      $('#loadMoreActivities').click(function(){
-         var page =$(this).attr('data-page');
-         $.ajax({
-            type: 'GET',
-            url: admin_url+'leads/load_more_activities/'+<?php echo $lead->id ?>,
-            data: {page:page},
-            dataType: "json",
-            success: function(resultData) { 
-               if(resultData.success==true){
-                  if(resultData.content){
-                     $('#lead_activities_wrapper').append(resultData.content);
-                     $('#loadMoreActivities').attr('data-page',parseInt(page)+1);
-                  }else{
-                     $('#loadMoreActivities').remove();
-                  }
-               }else{
-                  $('#loadMoreActivities').remove();
-               }
+      var hasMoreLogs =true;
+      $('#lead_activities_wrapper_scroller').on('scroll', function() {
+         
+         if(hasMoreLogs ==true){
+            if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+              var page =$(this).attr('data-page');
+              $.ajax({
+                 type: 'GET',
+                 url: admin_url+'leads/load_more_activities/'+<?php echo $lead->id ?>,
+                 data: {page:page},
+                 dataType: "json",
+                 success: function(resultData) { 
+                    console.log(resultData);
+                    if(resultData.success==true){
+                       if(resultData.content){
+                          $('#lead_activities_wrapper').append(resultData.content);
+                          $('#lead_activities_wrapper_scroller').attr('data-page',parseInt(page)+1);
+                       }else{
+                           hasMoreLogs =false;
+                       }
+                    }else{
+                        hasMoreLogs =false;
+                    }
+                 }
+              });
             }
-         });
+         }
       })
+      
    });
 </script>
 </body>
