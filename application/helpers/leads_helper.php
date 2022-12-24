@@ -282,6 +282,9 @@ function render_lead_activities($lead_id,$page=0)
                     $icon ='<i class="fa fa-tasks"></i>';
                     $CI->db->where('id',$log->type_id);
                     $activity =$CI->db->get(db_prefix().'tasks')->row();
+                    if(!$activity){
+                        continue;
+                    }
                     $subject ='has created  <i class="fa fa-tasks"></i> activity';
                     $message ='<div class="comment">
                     <p class="text-muted no-mbot" style="padding:0;padding-bottom:5px">Title : <a herf="#" onclick="edit_task('.$activity->id.'); return false;" style="cursor:pointer">'.$activity->name.'</a></p>';
@@ -291,12 +294,18 @@ function render_lead_activities($lead_id,$page=0)
                     $message .='</div>';
                 }elseif($log->type =='note'){
                     $note =$CI->misc_model->get_note($log->type_id);
+                    if(!$note){
+                        continue;
+                    }
                     $icon ='<i class="fa fa-sticky-note"></i>';
                     $subject ='has added new  <i class="fa fa-sticky-note"></i> note';
                     $message ='<div class="comment note-bg">'.$note->description.'</div>';
                 }elseif($log->type =='email'){
                     $CI->db->where('id',$log->type_id);
                     $email =$CI->db->get(db_prefix().'localmailstorage')->row();
+                    if(!$email){
+                        continue;
+                    }
                     $mailid = json_decode($email->mail_to,true);
                     $icon ='<i class="fa fa-envelope" aria-hidden="true"></i>';
                     $subject ='has sent  <i class="fa fa-envelope" aria-hidden="true"></i> email';
@@ -307,7 +316,9 @@ function render_lead_activities($lead_id,$page=0)
                 }elseif($log->type =='attachment'){
                     $CI->db->where('id',$log->type_id);
                     $file = $CI->db->get('files')->row();
-
+                    if(!$file){
+                        continue;
+                    }
                     $attachment_url = site_url('download/file/lead_attachment/'.$file->id);
                     if(!empty($file->external)){
                         $attachment_url = $file->external_link;
@@ -337,6 +348,7 @@ function render_lead_activities($lead_id,$page=0)
                         </div>
                     </div>';
                 }else{
+                    continue;
                     $icon ='<i class="fa fa-tasks"></i>';
                     $subject ='';
                 }

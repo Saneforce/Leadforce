@@ -102,7 +102,7 @@ if($rel_type == 'lead' || $rel_type == 'invoice' || $rel_type == 'estimate' || $
     
         $row[] = '<div class="checkbox"><input type="checkbox" value="' . $aRow['id'] . '"><label></label></div>';
     
-        $row[] = '<a href="#" onclick="edit_task(' . $aRow['id'] . '); return false;">' . $aRow['id'] . '</a>';
+        $row[] = '<a href="#" onclick="edit_task_relation(' . $aRow['id'] . ',\''.$rel_type.'\','.$rel_id.'); return false;">' . $aRow['id'] . '</a>';
     
         $outputName = '';
     
@@ -110,7 +110,7 @@ if($rel_type == 'lead' || $rel_type == 'invoice' || $rel_type == 'estimate' || $
             $outputName .= '<span class="pull-left text-danger"><i class="fa fa-clock-o fa-fw"></i></span>';
         }
     
-        $outputName .= '<a href="#" class="display-block main-tasks-table-href-name" onclick="edit_task(' . $aRow['id'] . '); return false;">' . $aRow['task_name'] . '</a>';
+        $outputName .= '<a href="#" class="display-block main-tasks-table-href-name" onclick="edit_task_relation(' . $aRow['id'] . ',\''.$rel_type.'\','.$rel_id.'); return false;">' . $aRow['task_name'] . '</a>';
     
         if ($aRow['recurring'] == 1) {
             $outputName .= '<span class="label label-primary inline-block mtop4"> ' . _l('recurring_task') . '</span>';
@@ -143,7 +143,7 @@ if($rel_type == 'lead' || $rel_type == 'invoice' || $rel_type == 'estimate' || $
         // }
     
         if ($hasPermissionEdit) {
-            $outputName .= '<a href="#" onclick="edit_task(' . $aRow['id'] . '); return false">' . _l('edit') . '</a>';
+            $outputName .= '<a href="#" onclick="edit_task_relation(' . $aRow['id'] . ',\''.$rel_type.'\','.$rel_id.'); return false">' . _l('edit') . '</a>';
         }
     
         if ($hasPermissionDelete) {
@@ -425,7 +425,7 @@ else {
         }
         */
         // $outputName .= '<a href="' . admin_url('tasks/view/' . $aRow['id']) . '" class="display-block main-tasks-table-href-name' . (!empty($aRow['rel_id']) ? ' mbot5' : '') . '" onclick="init_task_modal(' . $aRow['id'] . '); return false;">' . $aRow['task_name'] . '</a>';
-        $outputName .= '<a href="#" class="single_linet display-block main-tasks-table-href-name' . (!empty($aRow['rel_id']) ? ' mbot5' : '') . '" onclick="edit_task(' . $aRow['id'] . '); return false;">' . $aRow['task_name'] . '</a>';
+        $outputName .= '<a href="#" class="single_linet display-block main-tasks-table-href-name' . (!empty($aRow['rel_id']) ? ' mbot5' : '') . '" onclick="edit_task_relation(' . $aRow['id'] . ',\''.$rel_type.'\','.$rel_id.'); return false;">' . $aRow['task_name'] . '</a>';
         $row_temp['project_name']  = ' ';
         
         if(isset($aRow['project_name']) && !empty($aRow['project_name'])){
@@ -521,7 +521,7 @@ else {
         // }
     
         if ($hasPermissionEdit) {
-            $outputName .= '<span class="text-dark"></span><a href="#" onclick="edit_task(' . $aRow['id'] . '); return false">' . _l('edit') . '</a>';
+            $outputName .= '<span class="text-dark"></span><a href="#" onclick="edit_task_relation(' . $aRow['id'] . ',\''.$rel_type.'\','.$rel_id.'); return false">' . _l('edit') . '</a>';
         }
     
         if (($hasPermissionDelete && (!empty($my_staffids) && in_array($aRow['p_teamleader'],$my_staffids) && !in_array($aRow['p_teamleader'],$view_ids))) || is_admin(get_staff_user_id()) || $aRow['p_teamleader'] == get_staff_user_id() || $aRow['is_assigned'] == get_staff_user_id()) {
@@ -531,7 +531,7 @@ else {
         $outputName .= '</div>';
         $row_temp['task_name'] = '<span class="single_linet">'.$outputName.'</span>';
     
-        $row_temp['description'] = strlen($aRow['description']) > 20 ? '<a href="#" class="display-block main-tasks-table-href-name ' . (!empty($aRow['rel_id']) ? ' mbot5' : '') . '" onclick="edit_task(' . $aRow['id'] . '); return false;">' .substr(strip_tags($aRow['description']),0,100)."..."."</a>" : '<a href="#" class="display-block  main-tasks-table-href-name' . (!empty($aRow['rel_id']) ? ' mbot5' : '') . '" onclick="edit_task(' . $aRow['id'] . '); return false;">' .$aRow['description'] . '</a>';
+        $row_temp['description'] = strlen($aRow['description']) > 20 ? '<a href="#" class="display-block main-tasks-table-href-name ' . (!empty($aRow['rel_id']) ? ' mbot5' : '') . '" onclick="edit_task_relation(' . $aRow['id'] . ',\''.$rel_type.'\','.$rel_id.'); return false;">' .substr(strip_tags($aRow['description']),0,100)."..."."</a>" : '<a href="#" class="display-block  main-tasks-table-href-name' . (!empty($aRow['rel_id']) ? ' mbot5' : '') . '" onclick="edit_task_relation(' . $aRow['id'] . ',\''.$rel_type.'\','.$rel_id.'); return false;">' .$aRow['description'] . '</a>';
     
         $canChangeStatus = ($aRow['current_user_is_creator'] != '0' || $aRow['current_user_is_assigned'] || has_permission('tasks', '', 'edit'));
         if($aRow['status'] == 2) {

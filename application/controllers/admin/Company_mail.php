@@ -481,7 +481,7 @@ class Company_mail extends AdminController
 			/*$output['table'] .= "</select><div class='btn-group' style='margin-left:10px;'><button type='button' class='btn btn-primary' id='default_submit' onclick='submit_default()' style='letter-spacing: 2px;
     font-weight: 700;'>Save</button></div></div>";*/
 			//$output['table'] .= "</div>";
-			$output['table'] .= "<table class='table  table-bordered table-tasks dataTable no-footer' ><thead><th style='background: #1e95b1;color: #fff;font-size: 15px;font-weight: 600;letter-spacing:2px;width:85%'>Name</th><th style='background: #1e95b1;color: #fff;font-size: 15px;font-weight: 600;letter-spacing:2px;width:15%'>Action</th></thead>";
+			$output['table'] .= "<table class='table  table-bordered no-footer' ><thead><th style='background: #1e95b1;color: #fff;font-size: 15px;font-weight: 600;letter-spacing:2px;width:85%'>Name</th><th style='background: #1e95b1;color: #fff;font-size: 15px;font-weight: 600;letter-spacing:2px;width:15%'>Action</th></thead>";
 			foreach($templates as $template2){
 				$req_class = "list_1".$template2['id'];
 				$req_id    = "'".$template2['id']."'";

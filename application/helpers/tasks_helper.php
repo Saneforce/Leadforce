@@ -660,6 +660,7 @@ $table_data = array();
         }
         // projects have button on top
         if ($table_attributes['data-new-rel-type'] != 'project' && $table_attributes['data-new-rel-type'] != 'customer' && $table_attributes['data-new-rel-type'] != 'contact') {
+			
             echo "<a href='#' class='btn btn-info pull-left mbot25 mright5 new-task-relation" . $disabled . "' onclick=\"new_task_from_relation('$table_name'); return false;\" data-rel-id='" . $table_attributes['data-new-rel-id'] . "' data-rel-type='" . $table_attributes['data-new-rel-type'] . "'>" . _l('new_task') . '</a>';
         }
     }

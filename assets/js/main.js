@@ -4294,10 +4294,17 @@ function lead_mark_as_lost(id) {
     requestGetJSON('leads/mark_as_lost/' + id).done(function(response) {
         if (response.success === true || response.success == 'true') {
             alert_float('success', response.message);
-            $("body").find('tr#lead_' + id).remove();
-            $("body").find('#kan-ban li[data-lead-id="' + id + '"]').remove();
+            if(typeof response.redirect !='undefined'){
+                setTimeout(function() {
+                    window.location =response.redirect
+                }, 500);
+            }else{
+                $("body").find('tr#lead_' + id).remove();
+                $("body").find('#kan-ban li[data-lead-id="' + id + '"]').remove();
+                _lead_init_data(response, response.id);
+            }
         }
-        _lead_init_data(response, response.id);
+        
     }).fail(function(error) {
         alert_float('danger', error.responseText);
     });
@@ -4306,8 +4313,16 @@ function lead_mark_as_lost(id) {
 // Unmark lead as lost function
 function lead_unmark_as_lost(id) {
     requestGetJSON('leads/unmark_as_lost/' + id).done(function(response) {
-        if (response.success === true || response.success == 'true') { alert_float('success', response.message); }
-        _lead_init_data(response, response.id);
+        if (response.success === true || response.success == 'true') { 
+            alert_float('success', response.message);
+            if(typeof response.redirect !='undefined'){
+                setTimeout(function() {
+                    window.location =response.redirect
+                }, 500);
+            }else{
+                _lead_init_data(response, response.id);
+            }
+        }
     }).fail(function(error) {
         alert_float('danger', error.responseText);
     });
@@ -4318,8 +4333,15 @@ function lead_mark_as_junk(id) {
     requestGetJSON('leads/mark_as_junk/' + id).done(function(response) {
         if (response.success === true || response.success == 'true') {
             alert_float('success', response.message);
-            $("body").find('tr#lead_' + id).remove();
-            $("body").find('#kan-ban li[data-lead-id="' + id + '"]').remove();
+            if(typeof response.redirect !='undefined'){
+                setTimeout(function() {
+                    window.location =response.redirect
+                }, 500);
+            }else{
+                $("body").find('tr#lead_' + id).remove();
+                $("body").find('#kan-ban li[data-lead-id="' + id + '"]').remove();
+            }
+            
         }
         _lead_init_data(response, response.id);
     }).fail(function(error) {
@@ -4339,8 +4361,17 @@ function lead_mark_as(status_id, lead_id) {
 // Unmark lead as junk function
 function lead_unmark_as_junk(id) {
     requestGetJSON('leads/unmark_as_junk/' + id).done(function(response) {
-        if (response.success === true || response.success == 'true') { alert_float('success', response.message); }
-        _lead_init_data(response, response.id);
+        if (response.success === true || response.success == 'true') {
+            alert_float('success', response.message); 
+            if(typeof response.redirect !='undefined'){
+                setTimeout(function() {
+                    window.location =response.redirect
+                }, 500);
+            }else{
+                _lead_init_data(response, response.id);
+            }
+        }
+        
     }).fail(function(error) {
         alert_float('danger', error.responseText);
     });
@@ -5078,6 +5109,14 @@ function new_task_from_relation(table, rel_type, rel_id) {
 // Go to edit view
 function edit_task(task_id) {
     requestGet('tasks/task/' + task_id).done(function(response) {
+        $('#_task').html(response);
+        $('#task-modal').modal('hide');
+        $("body").find('#_task_modal').modal({ show: true, backdrop: 'static' });
+    });
+}
+
+function edit_task_relation(task_id,rel_type,rel_id) {
+    requestGet('tasks/task/' + task_id+'?rel_id=' + rel_id + '&rel_type=' + rel_type).done(function(response) {
         $('#_task').html(response);
         $('#task-modal').modal('hide');
         $("body").find('#_task_modal').modal({ show: true, backdrop: 'static' });

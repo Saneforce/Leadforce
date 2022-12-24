@@ -17,19 +17,20 @@
 if ($openEdit == true) {
     echo 'open-edit ';
 }
-?>lead-wrapper" <?php
+?>lead-wrapper" 
+        <?php
          if (isset($lead) && ($lead->junk == 1 || $lead->lost == 1)) {
              echo 'lead-is-junk-or-lost';
          }
          ?>>
-           <?php if (isset($lead)) { ?>
+        <?php if (isset($lead)) { ?>
         <div class="btn-group pull-left lead-actions-left mtop8">
             <a href="#" lead-edit class="mright10 font-medium-xs pull-left<?php
            if ($lead_locked == true) {
                echo ' hide';
            }
-               ?>">
-    <?php echo _l('edit'); ?>
+        ?>">
+            <?php echo _l('edit'); ?>
                 <i class="fa fa-pencil-square-o"></i>
             </a>
             <a href="#" class="font-medium-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="lead-more-btn">
@@ -37,6 +38,7 @@ if ($openEdit == true) {
                 <span class="caret"></span>
             </a>
             <ul class="dropdown-menu dropdown-menu-left" id="lead-more-dropdown">
+            <li></li>
                         <?php
                         if ($lead->junk == 0) {
                             if ($lead->lost == 0 && (total_rows(db_prefix() . 'clients', array('leadid' => $lead->id)) == 0)) {
@@ -58,6 +60,7 @@ if ($openEdit == true) {
                         <?php } ?>
                 <!-- mark as junk -->
     <?php
+    
     if ($lead->lost == 0) {
         if ($lead->junk == 0 && (total_rows(db_prefix() . 'clients', array('leadid' => $lead->id)) == 0)) {
             ?>
@@ -86,9 +89,6 @@ if ($openEdit == true) {
         <?php } ?>
             </ul>
         </div>
-        <a data-toggle="tooltip" class="btn btn-default pull-right lead-print-btn lead-top-btn lead-view mleft5" onclick="print_lead_information(); return false;" data-placement="top" title="<?php echo _l('print'); ?>" href="#">
-            <i class="fa fa-print"></i>
-        </a>
         <?php
         $client = false;
         $convert_to_client_tooltip_email_exists = '';
@@ -1088,7 +1088,7 @@ $hascoustomfields =$this->db->get(db_prefix() . 'customfields')->row();
                     $('[name="address"]').val(response.data.address);
                     $('[name="city"]').val(response.data.city);
                     $('[name="state"]').val(response.data.state);
-                    $('[name="country"]').val(response.data.country);
+                    $('[name="country"]').val(response.data.country).selectpicker('refresh');
                     $('[name="zip"]').val(response.data.zip);
                     $('[name="clientphonenumber"]').val(response.data.phonenumber);
                 }

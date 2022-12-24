@@ -421,6 +421,7 @@ class Projects extends AdminController
             $lead_details =$this->leads_model->get($this->input->get('lead_id'),['project_id'=>0]);
             if($lead_details){
                 $_POST['name']=$lead_details->name;
+                $_POST['description']=$lead_details->description;
                 $_POST['teamleader']=$lead_details->assigned;
                 $_POST['clientid']=$lead_details->client_id;
                 $lead_contact =$this->leads_model->get_lead_contact($lead_details->id);

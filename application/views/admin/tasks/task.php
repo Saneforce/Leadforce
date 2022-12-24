@@ -345,7 +345,7 @@ p#rel_id-error {
                         </select>
                      </div>
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-md-6" style="<?php echo $style; ?>">
                      <div class="form-group" id="rel_id_wrapper">
                         <label for="rel_id" class="control-label"><small class="req text-danger">* </small><span class="rel_id_label"><?php echo _l('project'); ?></span></label>
                         <div id="rel_id_select">

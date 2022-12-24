@@ -387,7 +387,7 @@ class Leads_model extends App_Model {
             $data['source'] = $data['view_source'];
             unset($data['view_source']);
         }
-
+       
         if(isset($data['client_id']) && $data['client_id']=='' && strlen(trim($data['company'])) >0){
             $companyData =array(
                 'company'=>$data['company'],
@@ -398,10 +398,12 @@ class Leads_model extends App_Model {
                 'state'=>$data['state'],
                 'address'=>$data['address'],
                 'website'=>$data['website'],
+                'zip'=>$data['zip']
             );
             
             $data['client_id']=$this->clients_model->add($companyData);
         }
+        
         unset($data['clientphonenumber']);
         unset($data['clientphone_country_code']);
 
@@ -409,7 +411,7 @@ class Leads_model extends App_Model {
         if(isset($data['contactid']) && $data['contactid'] ==''  && strlen(trim($data['personname'])) >0){
             $contact_data =array(
                 'is_primary'=>0,
-                'userid'=>0,
+                'userid'=>isset($data['client_id']) && $data['client_id']?$data['client_id']:0,
                 'firstname'=>$data['personname'],
                 'lastname'=>'',
                 'email'=>$data['email'],
@@ -418,10 +420,13 @@ class Leads_model extends App_Model {
                 'phone_country_code'=>$data['phone_country_code'],
                 'alternative_emails'=>'',
                 'alternative_phonenumber'=>'',
-                'addedfrom'=>$data['addedfrom'],
+                'addedfrom'=>get_staff_user_id(),
 
             );
             $contactid =$this->clients_model->add_contact($contact_data,0);
+            if($contactid && isset($data['client_id']) && $data['client_id']){
+                $this->db->insert(db_prefix() . 'contacts_clients',array('userid'=>$data['client_id'],'contactid'=>$contactid,'is_primary'=>1));
+            }
         }
         unset($data['personname']);
         unset($data['phone_country_code']);
@@ -1534,5 +1539,31 @@ class Leads_model extends App_Model {
         $this->db->limit($limit, $limit*$page);
         return $this->db->get(db_prefix().'lead_log')->result_object();
     }
+
+    public function get_tabs_count($lead_id,$table)
+    {
+        $this->db->where('rel_type','lead');
+        $this->db->where('rel_id',$lead_id);
+        $this->db->select('COUNT(id) as count');
+        $count =$this->db->get(db_prefix().$table)->row();
+        return $count->count;
+    }
+    public function get_activities_count($lead_id)
+    {
+        return $this->get_tabs_count($lead_id,'tasks');
+    }
+
+    public function get_proposal_count($lead_id)
+    {
+        return $this->get_tabs_count($lead_id,'proposals');
+    }
     
+    public function get_files_count($lead_id)
+    {
+        return $this->get_tabs_count($lead_id,'files');
+    }
+    public function get_notes_count($lead_id)
+    {
+        return $this->get_tabs_count($lead_id,'notes');
+    }
 }

@@ -266,6 +266,13 @@ p#rel_id-error {
                } else {
                   $style="display:none;";
                } ?>
+               <?php
+               if(!$this->input->get('rel_type')||($this->input->get('rel_type') && $this->input->get('rel_type') != 'project' && $this->input->get('rel_type') != 'customer' && $this->input->get('rel_type') != 'lead' && $rel_type != 'contact')) {
+                  $style="display:block;";
+               } else {
+                  $style="display:none;";
+               } ?>
+               
                   <div class="col-md-6" style="<?php echo $style; ?>">
                      <div class="form-group reltype">
                         <label for="rel_type" class="control-label"><?php echo _l('task_related_to'); ?></label>

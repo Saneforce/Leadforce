@@ -276,7 +276,7 @@
          </li>
          <li role="presentation" class="<?php echo ($group=='tab_tasks_leads')?"active": "" ?>">
             <a href="#tab_tasks_leads" onclick="init_rel_tasks_table(<?php echo $lead->id; ?>,'lead','.table-rel-tasks-leads');" aria-controls="tab_tasks_leads" role="tab" data-toggle="tab">
-            <?php echo _l('tasks'); ?>
+            <?php echo _l('tasks'); ?><span class="badge badge-light ml-3" id="leadactivitycount"><?php echo $activity_count?></span>
             </a>
          </li>
          <li role="presentation" class="<?php echo ($group=='tab_items')?"active": "" ?>">
@@ -299,17 +299,17 @@
          <?php } ?>
          <li role="presentation" class="<?php echo ($group=='tab_proposals_leads')?"active": "" ?>">
             <a href="#tab_proposals_leads" onclick="initDataTable('.table-proposals-lead', admin_url + 'proposals/proposal_relations/' + <?php echo $lead->id; ?> + '/lead','undefined', 'undefined','undefined',[6,'desc']);" aria-controls="tab_proposals_leads" role="tab" data-toggle="tab">
-            <?php echo _l('proposals'); ?>
+            <?php echo _l('proposals'); ?><span class="badge badge-light ml-3" id="leadproposalcount"><?php echo $proposal_count?></span>
             </a>
          </li>
          <li role="presentation" class="<?php echo ($group=='attachments')?"active": "" ?>">
             <a href="#attachments" aria-controls="attachments" role="tab" data-toggle="tab">
-            <?php echo _l('lead_files'); ?>
+            <?php echo _l('lead_files'); ?><span class="badge badge-light ml-3" id="leadfilescount"><?php echo $files_count?></span>
             </a>
          </li>
          <li role="presentation" class="<?php echo ($group=='lead_notes')?"active": "" ?>">
             <a href="#lead_notes" aria-controls="lead_notes" role="tab" data-toggle="tab">
-            <?php echo _l('lead_add_edit_notes'); ?>
+            <?php echo _l('lead_add_edit_notes'); ?><span class="badge badge-light ml-3" id="leadnotescount"><?php echo $notes_count?></span>
             </a>
          </li>
          <?php if(is_gdpr() && (get_option('gdpr_enable_lead_public_form') == '1' || get_option('gdpr_enable_consent_for_leads') == '1')) { ?>

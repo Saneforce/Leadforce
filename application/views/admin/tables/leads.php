@@ -345,7 +345,7 @@ foreach ($rResult as $aRow) {
     }
     if (isset($aRow['country'])) {
         if($client_details){
-            $row['country'] = $client_details->country;
+            $row['country'] = get_country($client_details->country)->short_name;
         }else{
             $row['country'] = $aRow['country'];
         }

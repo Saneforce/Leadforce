@@ -242,6 +242,10 @@ class Leads extends AdminController
         $products = $this->products_model->getleads_products($id, $lead->lead_currency);
         $data['productscnt'] = count($products);
         $data['emails_count'] = $this->leads_model->get_emails_count($lead->id);
+        $data['activity_count'] = $this->leads_model->get_activities_count($lead->id);
+        $data['proposal_count'] = $this->leads_model->get_proposal_count($lead->id);
+        $data['files_count'] = $this->leads_model->get_files_count($lead->id);
+        $data['notes_count'] = $this->leads_model->get_notes_count($lead->id);
         $data['leadproducts'] = $products;
         $data['lead_currency'] = $lead->lead_currency;
         $discount_value = 0;
@@ -256,6 +260,9 @@ class Leads extends AdminController
 		$this->load->model('currencies_model');	
         $data['currencies'] = $this->currencies_model->get();	
         $data['base_currency'] = $this->currencies_model->get_base_currency();
+        if(!$data['lead_currency']){
+            $data['lead_currency'] = $data['base_currency']->name;
+        }
         $data = hooks()->apply_filters('lead_view_data', $data);
         
         $data['client_contacts']     = $this->clients_model->getAllContacts_active();
@@ -389,7 +396,7 @@ class Leads extends AdminController
             set_alert('warning', _l('problem_deleting', _l('lead_lowercase')));
         }
         $ref = $_SERVER['HTTP_REFERER'];
-
+        $ref =admin_url('leads');
         // if user access leads/inded/ID to prevent redirecting on the same url because will throw 404
         if (!$ref || strpos($ref, 'index/' . $id) !== false) {
             redirect(admin_url('leads'));
@@ -411,8 +418,8 @@ class Leads extends AdminController
         echo json_encode([
             'success'  => $success,
             'message'  => $message,
-            'leadView' => $this->_get_lead_data($id),
             'id'       => $id,
+            'redirect'=>admin_url('leads/lead/'.$id)
         ]);
     }
 
@@ -429,8 +436,8 @@ class Leads extends AdminController
         echo json_encode([
             'success'  => $success,
             'message'  => $message,
-            'leadView' => $this->_get_lead_data($id),
             'id'       => $id,
+            'redirect'=>admin_url('leads/lead/'.$id)
         ]);
     }
 
@@ -447,8 +454,8 @@ class Leads extends AdminController
         echo json_encode([
             'success'  => $success,
             'message'  => $message,
-            'leadView' => $this->_get_lead_data($id),
             'id'       => $id,
+            'redirect'=>admin_url('leads/lead/'.$id)
         ]);
     }
 
@@ -465,8 +472,8 @@ class Leads extends AdminController
         echo json_encode([
             'success'  => $success,
             'message'  => $message,
-            'leadView' => $this->_get_lead_data($id),
             'id'       => $id,
+            'redirect'=>admin_url('leads/lead/'.$id)
         ]);
     }
 
