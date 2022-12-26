@@ -452,12 +452,6 @@ echo render_select('teamleader', $teamleaders, array('staffid', array('firstname
             </div>
            
             <div class="clearfix"></div>
-            <button type="button" class="btn btn-info pull-right mleft5 lead-top-btn lead-save-btn <?php
-                        if (isset($lead)) {
-                            echo ' hide';
-                        }
-?>" style="margin-top:-70px; margin-right:15px;" onclick="document.getElementById('lead-form-submit').click();">
-            Save                </button>
 
 <div class="col-md-12">
     <h5>Lead Details</h5>
@@ -808,8 +802,8 @@ $hascoustomfields =$this->db->get(db_prefix() . 'customfields')->row();
 <?php endif; ?>
     </div>
 </div>
-<?php if ($lead_locked == false) { ?>
-        <div class="lead- hide">
+<?php if ($lead_locked == false && !isset($lead->id)) { ?>
+        <div class="lead- <?php isset($lead->id)?'hide':'' ?>">
             <button type="submit" class="btn btn-info pull-right lead-save-btn" id="lead-form-submit"><?php echo _l('submit'); ?></button>
         </div>
 <?php } ?>
