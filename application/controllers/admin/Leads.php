@@ -2063,7 +2063,8 @@ class Leads extends AdminController
 
     public function load_more_activities($lead_id)
     {
-        if($_GET['page']){
+        
+        if(isset($_GET['page'])){
             $activities =render_lead_activities($lead_id,$_GET['page']);
             if($activities){
                 echo json_encode(array('success'=>true,'content'=>$activities));

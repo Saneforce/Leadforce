@@ -332,7 +332,7 @@
          
          <?php } ?>
          <li role="presentation" class="<?php echo ($group=='lead_activity')?"active": "" ?>">
-            <a href="#lead_activity" aria-controls="lead_activity" role="tab" data-toggle="tab">
+            <a href="#lead_activity" onclick="init_lead_activities_log()" aria-controls="lead_activity" role="tab" data-toggle="tab">
             <?php echo _l('timeline'); ?><?php if($logs_count): ?><span class="badge badge-light ml-3" id="lead_logs_count"><?php echo $logs_count?></span><?php endif; ?>
             </a>
          </li>
@@ -417,14 +417,14 @@
       </div>
       <?php } ?>
       <div role="tabpanel" class="tab-pane <?php echo ($group=='lead_activity')?"active": "" ?>" id="lead_activity">
-         <div class="panel_s no-shadow" data-page="1" id="lead_activities_wrapper_scroller" style="max-height: 63vh;overflow-y: auto;">
+         <div class="panel_s no-shadow" data-page="0" id="lead_activities_wrapper_scroller" style="max-height: 63vh;overflow-y: auto;">
             <?php 
-               $activities =render_lead_activities($lead->id,0);
-               if($activities){
-                  echo $activities;
-               }else{
-                  echo '<p>No activities recorded</p>';
-               }
+               // $activities =render_lead_activities($lead->id,0);
+               // if($activities){
+               //    echo $activities;
+               // }else{
+               //    echo '<p>No activities recorded</p>';
+               // }
             ?>
             <div class="clearfix"></div>
          </div>
@@ -561,33 +561,50 @@
 <?php init_tail(); ?>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/intlTelInput-jquery.min.js"></script>
 <script>
+   function load_lead_activity_log(page){
+         $.ajax({
+            type: 'GET',
+            url: admin_url+'leads/load_more_activities/'+<?php echo $lead->id ?>,
+            data: {page:page},
+            dataType: "json",
+            success: function(resultData) { 
+               if(resultData.success==true){
+                  if(resultData.content){
+                     console.log(page);
+                     if(page ==0){
+                        $('#lead_activities_wrapper_scroller').html(resultData.content);
+                     }else{
+                        $('#lead_activities_wrapper').append(resultData.content);
+                     }
+                    
+                     $('#lead_activities_wrapper_scroller').attr('data-page',parseInt(page)+1);
+                  }else{
+                     if(page ==0){
+                        $('#lead_activities_wrapper_scroller').html('No records found');
+                     }
+                     hasMoreLogs =false;
+                  }
+               }else{
+                  hasMoreLogs =false;
+               }
+            }
+         });
+      }
+   function init_lead_activities_log(){
+      $('#lead_activities_wrapper_scroller').attr('data-page',0);
+      load_lead_activity_log(0);
+   }
    $(document).ready(function () {
       init_rel_tasks_table(<?php echo $lead->id; ?>,'lead','.table-rel-tasks-leads');
+
+      init_lead_activities_log();
       var hasMoreLogs =true;
       $('#lead_activities_wrapper_scroller').on('scroll', function() {
          
          if(hasMoreLogs ==true){
             if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
-              var page =$(this).attr('data-page');
-              $.ajax({
-                 type: 'GET',
-                 url: admin_url+'leads/load_more_activities/'+<?php echo $lead->id ?>,
-                 data: {page:page},
-                 dataType: "json",
-                 success: function(resultData) { 
-                    console.log(resultData);
-                    if(resultData.success==true){
-                       if(resultData.content){
-                          $('#lead_activities_wrapper').append(resultData.content);
-                          $('#lead_activities_wrapper_scroller').attr('data-page',parseInt(page)+1);
-                       }else{
-                           hasMoreLogs =false;
-                       }
-                    }else{
-                        hasMoreLogs =false;
-                    }
-                 }
-              });
+               var page =$(this).attr('data-page');
+               load_lead_activity_log(page);
             }
          }
       })
