@@ -102,24 +102,28 @@
   background-color: #688afd;
   color: #fff;
 }
-
-.timeline-item-description {
-  display: flex;
-  padding-top: 6px;
-  gap: 8px;
-  color: #7b7b7b;
+.timeline-item-wrapper{
+   width: 100%;
+   border: 1px solid #e3e3e3;
+   border-radius: 5px;
+   padding: 10px;
+}
+.timeline-item-title h4{
+   font-size: 16px;
+}
+.timeline-item-description span{
+  color: #777;
 }
 .timeline-item-description img {
   flex-shrink: 0;
 }
 .timeline-item-description a {
-  color: #3d3d3d;
+   color: #777;
   font-weight: 500;
   text-decoration: none;
 }
 .timeline-item-description a:hover, .timeline-item-description a:focus {
   outline: 0;
-  color: #688afd;
 }
 
 .timeline .avatar {
@@ -281,11 +285,6 @@
             </a>
          </li> -->
          <?php if(isset($lead)){?>
-         <li role="presentation" class="<?php echo ($group=='lead_activity')?"active": "" ?>">
-            <a href="#lead_activity" aria-controls="lead_activity" role="tab" data-toggle="tab">
-            <?php echo _l('lead_add_edit_activity'); ?><?php if($logs_count): ?><span class="badge badge-light ml-3" id="lead_logs_count"><?php echo $logs_count?></span><?php endif; ?>
-            </a>
-         </li>
          <li role="presentation" class="<?php echo ($group=='tab_tasks_leads')?"active": "" ?>">
             <a href="#tab_tasks_leads" onclick="init_rel_tasks_table(<?php echo $lead->id; ?>,'lead','.table-rel-tasks-leads');" aria-controls="tab_tasks_leads" role="tab" data-toggle="tab">
             <?php echo _l('tasks'); ?><?php if($activity_count): ?><span class="badge badge-light ml-3" id="leadactivitycount"><?php echo $activity_count ?></span><?php endif; ?>
@@ -330,7 +329,13 @@
                 <?php echo _l('gdpr_short'); ?>
               </a>
            </li>
+         
          <?php } ?>
+         <li role="presentation" class="<?php echo ($group=='lead_activity')?"active": "" ?>">
+            <a href="#lead_activity" aria-controls="lead_activity" role="tab" data-toggle="tab">
+            <?php echo _l('timeline'); ?><?php if($logs_count): ?><span class="badge badge-light ml-3" id="lead_logs_count"><?php echo $logs_count?></span><?php endif; ?>
+            </a>
+         </li>
          <?php } ?>
       </ul>
     </div>

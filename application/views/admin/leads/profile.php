@@ -802,8 +802,8 @@ $hascoustomfields =$this->db->get(db_prefix() . 'customfields')->row();
 <?php endif; ?>
     </div>
 </div>
-<?php if ($lead_locked == false && !isset($lead->id)) { ?>
-        <div class="lead- <?php isset($lead->id)?'hide':'' ?>">
+<?php if ($lead_locked == false) { ?>
+        <div class="lead- hide">
             <button type="submit" class="btn btn-info pull-right lead-save-btn" id="lead-form-submit"><?php echo _l('submit'); ?></button>
         </div>
 <?php } ?>

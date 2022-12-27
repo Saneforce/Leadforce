@@ -4234,3 +4234,4 @@ $lang['assignees']			=	'Assigned To';
 $lang['project_pipeline']	=	'Pipeline';
 $lang['company']			=	'Organization';
 $lang['email']              =   'Email';
+$lang['timeline']           = 'Timeline';

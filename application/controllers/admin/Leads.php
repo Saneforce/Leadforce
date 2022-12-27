@@ -13,6 +13,7 @@ class Leads extends AdminController
 		$this->load->model('pipeline_model');
 		$this->load->library('user_agent');
 		$this->load->model('callsettings_model');
+		$this->load->helper('timeline_helper');
 		if (strpos($this->agent->referrer(), '/leads') !== false) {
 		}
 		else {
