@@ -1301,7 +1301,25 @@ class Imap
 					if(!isset($rResult[0]['name'])){
 						$rResult[0]['name'] = '';
 					}
-					
+
+					// check lead connncted
+					$this->CI->db->where('uid',$inboxEmails['uid']);
+					$this->CI->db->where('message_id',$inboxEmails['message_id']);
+					$local_mail =$this->CI->db->get(db_prefix().'localmailstorage')->row();
+					$connect_rel_data ='';
+					if($local_mail){
+						if($local_mail->deal_id){
+							$this->CI->db->where('deleted_status',0);
+							$this->CI->db->where('id',$local_mail->deal_id);
+							$deal =$this->CI->db->get(db_prefix().'projects')->row();
+							$connect_rel_data ='<a href="#" onClick="updatedeal('.$inboxEmails['uid'].');">'.htmlentities($deal->name).' (Deal)</a>';
+						}elseif($local_mail->lead_id){
+							$this->CI->db->where('deleted_status',0);
+							$this->CI->db->where('id',$local_mail->lead_id);
+							$lead =$this->CI->db->get(db_prefix().'leads')->row();
+							$connect_rel_data ='<a target="_blank" href="'.admin_url('leads/lead/'.$lead->id).'">'.htmlentities($lead->name).' (Lead)</a>';
+						}
+					}
 					if($inboxEmails['read'] !=1){
 						$output .= '<tr class="'.$uid.'_mail_row unread_col_col"><td><input type="checkbox" name="mails[]" class="check_mail" onclick="check_header()" value="'.$uid.'"></td>';
 						//$output .= '<td class="name"><i class="fa fa-circle"></i></td>';
@@ -1317,7 +1335,7 @@ class Imap
 					}
 					$output .= '<td class="subject"><a href="#" onClick="getMessage('.$inboxEmails['uid'].');">'.substr($inboxEmails['subject'],0,30).'</a></td>';
 					//$output .= '<td class="subject"><a href="#" onClick="getMessage('.$inboxEmails['uid'].');">'.substr(strip_tags(str_replace('[image: Google]','',$inboxEmails['body']['plain'])),0,30).'...</a></td>';
-					$output .= '<td class="subject"><a href="#" onClick="updatedeal('.$inboxEmails['uid'].');">'.htmlentities($rResult[0]['name']).'</a></td>';
+					$output .= '<td class="subject">'.$connect_rel_data.'</td>';
 					
 					if(!empty($inboxEmails['attachments'])){
 						$output .= '<td><a href="'.admin_url('company_mail/download_attachment/'.$inboxEmails['uid']).'?folder='.$_REQUEST['folder'].'" onclick="download_attachment('.$inboxEmails['uid'].')"><i class="fa fa-paperclip" aria-hidden="true"></i></a></td>';
@@ -1922,29 +1940,104 @@ class Imap
 		$output = '';		
 		$this->select_folder($current_folder);
 		$inboxEmails = $this->get_message($_REQUEST['uid']);
-		$add_content = "'".$_REQUEST['uid']."'";
-				
+		$add_content = "'".$_REQUEST['uid']."'";	
 		$output .= '<div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button><h4 class="modal-title"><i class="fa fa-envelope"></i> '.$inboxEmails['subject'].'</h4></div>';
-		$output .= '<div class="modal-body"><div class="email-app"><main class="message"><div class="details">';
-		//$output .= '<div class="title">'.$inboxEmails['subject'].'</div>';
-		$output .= '<div class="header"><div class="from"><span>'.$inboxEmails['from']['email'].'</span>'.$inboxEmails['from']['email'].'</div><div class="date">'.date("d-M-Y H:i A",$inboxEmails['udate']).'</div></div>';
-		$output .= '<div class="content" style="margin-bottom:110px;overflow-wrap:break-word">'.$inboxEmails['body']['html'].'</div><div class="col-md-12" style="margin-top:-100px"><div class="col-md-12"><div style="padding:0px 0px 33px 0px"><button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#forward-modal" onclick="add_content('.$add_content.')"><i class="fa fa-forward" ></i> Forward</button><button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#reply-modal" onclick="add_to('.$add_content.')" style="margin-right:10px;"><i class="fa fa-reply" ></i> Reply</button><button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#reply-modal" onclick="add_reply_all('.$add_content.')" style="margin-right:10px;"><i class="fa fa-reply" ></i> Reply All</button></div><div class="col-md-12" style="margin-top:20px;">';
-		$j1 = 0;
-		if(!empty($inboxEmails['attachments'])){
-			foreach($inboxEmails['attachments'] as $attachement12){
-				$downoad_url = admin_url('company_mail/download_attachment_single/'.$inboxEmails['uid']).'?folder='.$_REQUEST['folder'].'&attach_id='.$j1;
-				$output .= '<div class="btn btn-default pull-left" style="margin-right:10px;"><a href="'.$downoad_url.'">'.$attachement12['name'].'</a></div>';
-				$j1++;
-			}
-		}
-		if($j1>1){
-			$downoad_url = admin_url('company_mail/download_attachment/'.$inboxEmails['uid']).'?folder='.$_REQUEST['folder'];
-				
-			$output .= '<div class="btn btn-default pull-left" style="margin-right:10px;"><a href="'.$downoad_url.'">Download All</a></div>';
-		}
-		$output .= '</div></div></div>';
-		$output .= '</div></main></div></div>';
+		$output .= '<div class="modal-body">';
 		
+		$this->CI->db->where('uid',$inboxEmails['uid']);
+		$this->CI->db->where('message_id',$inboxEmails['message_id']);
+		if(!$this->CI->db->get(db_prefix().'localmailstorage')->row()){
+			$output .='
+				<div class="row" id="linktowrapper">
+					<div class="col-md-12">
+						<h5>Link to Deal or Lead</h5>
+						<div class="form-inline">
+							<input type="hidden" id="linktouid" value="'.$inboxEmails['uid'].'" >
+							<div class="form-group mb-2" style="width:40%">
+								<select class="selectpicker" data-none-selected-text="Select Deal or Lead"  name="linkto_rel_id" id="linkto_rel_id" data-width="100%" data-live-search="true">'.render_deal_lead_list_by_email($inboxEmails['from']['email']).'</select>
+							</div>
+							<button class="btn btn-info" id="linkto_rel_id_submit" type="button">Link with existing</button>
+							OR  
+							<a href="#" onclick="init_lead(0,false,'.$add_content.'); return false;" class="btn btn-info">New Lead</a>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="text-right">
+						</div>
+					</div>
+				</div>
+				<hr>
+			';
+		}
+		$output .='<div id="emailViewer">
+			<div class="emailViewerSubject">
+				<h3>'.$inboxEmails['subject'].'</h3>
+			</div>
+			<div class="emailViewerMeta">
+				<div class="row">
+					<div class="col-md-6">
+						<p class="no-margin" style="font-size: 13px;">From : <a>'.$inboxEmails['from']['email'].'</a></p>
+						<p class="no-margin" style="font-size: 13px;">To : <a>'.$inboxEmails['to'][0]['email'].'</a></p>
+						<p class="no-margin" style="font-size: 13px;">'.date("d-M-Y H:i A",$inboxEmails['udate']).'</p>
+					</div>
+					<div class="col-md-6">
+						<div class="button-group">
+							<button type="button" data-toggle="tooltip" data-original-title="Forward" class="btn btn-default pull-right" data-toggle="modal" data-target="#forward-modal" onclick="add_content('.$add_content.')"><i class="fa fa-share" aria-hidden="true"></i></button>
+							<button type="button" data-toggle="tooltip" data-original-title="Reply" class="btn btn-default pull-right" data-toggle="modal" data-target="#reply-modal" onclick="add_to('.$add_content.')" style="margin-right:5px;"><i class="fa fa-reply" ></i></button>
+							<button type="button" data-toggle="tooltip" data-original-title="Reply All" class="btn btn-default pull-right" data-toggle="modal" data-target="#reply-modal" onclick="add_reply_all('.$add_content.')" style="margin-right:5px;"><i class="fa fa-reply-all" aria-hidden="true"></i></button>
+						</div>
+					</div>
+				</div>
+			</div>';
+			
+			
+
+			$output .='<div style="margin-top:10px">';
+			$j1 = 0;
+			if(!empty($inboxEmails['attachments'])){
+				foreach($inboxEmails['attachments'] as $attachement12){
+					$downoad_url = admin_url('company_mail/download_attachment_single/'.$inboxEmails['uid']).'?folder='.$_REQUEST['folder'].'&attach_id='.$j1;
+					$output .= '<a class="btn btn-default mright5"  href="'.$downoad_url.'"><i class="fa fa-download" aria-hidden="true"></i> '.$attachement12['name'].'</a>';
+					$j1++;
+				}
+			}
+			if($j1>1){
+				$downoad_url = admin_url('company_mail/download_attachment/'.$inboxEmails['uid']).'?folder='.$_REQUEST['folder'];
+					
+				$output .= '<a class="btn btn-default"  href="'.$downoad_url.'"><i class="fa fa-download" aria-hidden="true"></i> Download All</a>';
+			}
+			$output .='</div>';
+			$output .='<div class="emailViewerBody" style="margin-top:20px">'.$inboxEmails['body']['html'].'</div>';
+
+		$output .='</div>';
+		
+
+		
+		$output .= '</div>';
+		$output .='
+		<script>
+			$("#linkto_rel_id").selectpicker();
+			$("#linkto_rel_id_submit").click(function(){
+				var linkto =$("#linkto_rel_id").val();
+				var linktouid =$("#linktouid").val();
+				$.ajax({
+					url: admin_url+"company_mail/linkemail",
+					type: "POST",
+					data: {linkto:linkto,linktouid:linktouid},
+					dataType: "json",
+					success: function(data) {
+						if(data.success){
+							$("#linktowrapper").remove();
+							alert_float("success", data.msg);
+						}else{
+							alert_float("danger", data.msg);
+						}
+						
+					}               
+				});
+			})
+		</script>
+		';
 		$mailList['body'] = $output;
 		return $mailList; 
 		exit;

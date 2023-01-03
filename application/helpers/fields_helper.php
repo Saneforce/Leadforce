@@ -1082,3 +1082,48 @@ function render_location_picker($name, $label = '', $value = '', $input_attrs = 
     $input .= '</div>';
     return $input;
 }
+function render_deal_lead_list_by_email($email){
+    $CI = &get_instance();
+    $staff_id = get_staff_user_id();
+    $cur_mail = $email;
+    $req_val = '';
+    if(!empty($cur_mail)){
+    $req_mail = explode(',',$cur_mail);
+    if(!empty($req_mail)){
+        $cur_mail = $req_mail[0];
+    }
+    $all_vals = $CI->projects_model->deal_values($cur_mail,$staff_id);
+    $req_val = '';
+    if(get_option('link_deal')== 'yes' && get_option('deal_map') != 'if more than one open deal – allow to map manually'){
+        
+        $all_vals = get_deal_name($cur_mail,get_option('deal_map'));
+        //echo '<pre>';print_r($all_vals);exit;
+        if(!empty($all_vals)){
+            $req_val .= '<option value="'.$all_vals['project_id'].'">'.$all_vals['project_name'].'</option>';
+        }
+        else{
+            $req_val .= '<option value="">None</option>';
+        }
+    }
+    else{
+        
+        if(!empty($all_vals)){
+            $req_val .='<optgroup label="Deals">';
+            foreach($all_vals as $all_val1){
+                $req_val .= '<option value="project_'.$all_val1['id'].'">'.$all_val1['name'].'</option>';
+            }
+            $req_val .='</optgroup>';
+        }
+    }
+    
+    $leads =$CI->leads_model->get_leads_by_contact_email($cur_mail,$staff_id);
+    if($leads){
+        $req_val .='<optgroup label="Leads">';
+        foreach($leads as $lead){
+            $req_val .= '<option value="lead_'.$lead->id.'">'.$lead->name.'</option>';
+        }
+        $req_val .='</optgroup>';
+    }
+    }
+    return $req_val ;
+}

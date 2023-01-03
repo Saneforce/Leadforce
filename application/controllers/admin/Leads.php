@@ -190,6 +190,10 @@ class Leads extends AdminController
             $data['sources']  = $this->leads_model->get_source();
 		}
 		else {
+            if(isset($_GET['emailuid']) && $_GET['emailuid']){
+                $this->load->library('mails/imap_mailer');
+                $data['email_data'] =$this->imap_mailer->getMessage($_GET['emailuid']);
+            }
 			$data['teamleaders'] = $this->staff_model->get('', ['role' => 2, 'active' => 1]);
 			$data['teammembers'] = $this->staff_model->get('', ['role' => 1, 'active' => 1]);
             $data['statuses'] = $this->leads_model->get_status();

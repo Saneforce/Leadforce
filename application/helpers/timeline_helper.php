@@ -13,7 +13,6 @@ function render_lead_activities($lead_id,$page=0)
         <?php endif; ?>
         <?php foreach($logs as $log): ?>
             <?php 
-                $message ='';
                 $title ='';
                 $date=date_create($log->added_at);
                 $logged_at =date_format($date,"M d , Y h:i a");
@@ -24,7 +23,12 @@ function render_lead_activities($lead_id,$page=0)
                 $profile_icon =staff_profile_image($log->staff_id);
                 if($log->type =='lead'){
                     $icon ='<i class="fa fa-tty"></i>';
-                    $subject ='has created Lead';
+                    if($log->action =='addedfromemail'){
+                        $title ='Lead created from email';
+                    }else{
+                        $title ='Lead manually created';
+                    }
+                    
                 }elseif($log->type =='activity'){
                     $icon ='<i class="fa fa-tasks"></i>';
                     $CI->db->where('id',$log->type_id);

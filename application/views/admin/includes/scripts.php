@@ -419,6 +419,23 @@ $(document).ready(function(){
           $('.imapgmail #imap_encryption').removeAttr('disabled');
           $('.imapyahoo #imap_encryption').attr('disabled', '');
           $('.imapoutlook #imap_encryption').attr('disabled', '');
+
+          $(".smtpother").hide();
+          $('.smtpother #smtp_host').attr('disabled', '');
+          $('.smtpother #smtp_port').attr('disabled', '');
+          $('.smtpother #smtp_encryption').attr('disabled', '');
+          $(".smtphost").show();
+          $(".smtpport").show();
+          $('.smtphost #smtp_host').removeAttr('disabled');
+          $('.smtpport #smtp_port').removeAttr('disabled');
+
+          $(".smtpgmail").show();
+          $(".smtpyahoo").hide();
+          $(".smtpoutlook").hide();
+
+          $('.smtpgmail #smtp_encryption').removeAttr('disabled');
+          $('.smtpyahoo #smtp_encryption').attr('disabled', '');
+          $('.smtpoutlook #smtp_encryption').attr('disabled', '');
         }
         else if(imap == 'imap.mail.yahoo.com') {
           $(".imapother").hide();
@@ -437,6 +454,24 @@ $(document).ready(function(){
           $('.imapgmail #imap_encryption').attr('disabled', '');
           $('.imapyahoo #imap_encryption').removeAttr('disabled');
           $('.imapoutlook #imap_encryption').attr('disabled', '');
+
+          $(".smtpother").hide();
+          $('.smtpother #smtp_host').attr('disabled', '');
+          $('.smtpother #smtp_port').attr('disabled', '');
+          $('.smtpother #smtp_encryption').attr('disabled', '');
+          $(".smtphost").show();
+          $(".smtpport").show();
+          $('.smtphost #smtp_host').removeAttr('disabled');
+          $('.smtpport #smtp_port').removeAttr('disabled');
+          
+          $(".smtpgmail").hide();
+          $(".smtpyahoo").show();
+          $(".smtpoutlook").hide();
+
+          $('.smtpgmail #smtp_encryption').attr('disabled', '');
+          $('.smtpyahoo #smtp_encryption').removeAttr('disabled');
+          $('.smtpoutlook #smtp_encryption').attr('disabled', '');
+
         }
         else if(imap == 'outlook.office365.com') {
           $(".imapother").hide();
@@ -455,6 +490,23 @@ $(document).ready(function(){
           $('.imapgmail #imap_encryption').attr('disabled', '');
           $('.imapyahoo #imap_encryption').attr('disabled', '');
           $('.imapoutlook #imap_encryption').removeAttr('disabled');
+
+          $(".smtpother").hide();
+          $('.smtpother #smtp_host').attr('disabled', '');
+          $('.smtpother #smtp_port').attr('disabled', '');
+          $('.smtpother #smtp_encryption').attr('disabled', '');
+          $(".smtphost").show();
+          $(".smtpport").show();
+          $('.smtphost #smtp_host').removeAttr('disabled');
+          $('.smtpport #smtp_port').removeAttr('disabled');
+          
+          $(".smtpgmail").hide();
+          $(".smtpyahoo").hide();
+          $(".smtpoutlook").show();
+
+          $('.smtpgmail #smtp_encryption').attr('disabled', '');
+          $('.smtpyahoo #smtp_encryption').attr('disabled', '');
+          $('.smtpoutlook #smtp_encryption').removeAttr('disabled');
         }
         else {
             $(".imapother").show();
@@ -474,6 +526,24 @@ $(document).ready(function(){
             $('.imapgmail #imap_encryption').attr('disabled', '');
             $('.imapyahoo #imap_encryption').attr('disabled', '');
             $('.imapoutlook #imap_encryption').attr('disabled','');
+
+            $(".smtpother").show();
+            $('.smtpother #smtp_host').removeAttr('disabled');
+            $('.smtpother #smtp_port').removeAttr('disabled');
+            $('.smtpother #smtp_encryption').removeAttr('disabled');
+
+            $(".smtpgmail").hide();
+            $(".smtpyahoo").hide();
+            $(".smtpoutlook").hide();
+            $(".smtphost").hide();
+            $(".smtpport").hide();
+            
+            $('.smtphost #smtp_host').attr('disabled', '');
+            $('.smtpport #smtp_port').attr('disabled', '');
+            
+            $('.smtpgmail #smtp_encryption').attr('disabled', '');
+            $('.smtpyahoo #smtp_encryption').attr('disabled', '');
+            $('.smtpoutlook #smtp_encryption').attr('disabled','');
             
         }
     });
@@ -495,6 +565,24 @@ $(document).ready(function(){
         $('.imapgmail #imap_encryption').removeAttr('disabled');
         $('.imapyahoo #imap_encryption').attr('disabled', '');
         $('.imapoutlook #imap_encryption').attr('disabled', '');
+
+
+        $(".smtpother").hide();
+        $('.smtpother #smtp_host').attr('disabled', '');
+        $('.smtpother #smtp_port').attr('disabled', '');
+        $('.smtpother #smtp_encryption').attr('disabled', '');
+        $(".smtphost").show();
+        $(".smtpport").show();
+        $('.smtphost #smtp_host').removeAttr('disabled');
+        $('.smtpport #smtp_port').removeAttr('disabled');
+
+        $(".smtpgmail").show();
+        $(".smtpyahoo").hide();
+        $(".smtpoutlook").hide();
+
+        $('.smtpgmail #smtp_encryption').removeAttr('disabled');
+        $('.smtpyahoo #smtp_encryption').attr('disabled', '');
+        $('.smtpoutlook #smtp_encryption').attr('disabled', '');
       }
       else if(imap == 'imap.mail.yahoo.com') {
         $(".imapother").hide();
@@ -513,6 +601,23 @@ $(document).ready(function(){
         $('.imapgmail #imap_encryption').attr('disabled', '');
         $('.imapyahoo #imap_encryption').removeAttr('disabled');
         $('.imapoutlook #imap_encryption').attr('disabled', '');
+
+        $(".smtpother").hide();
+        $('.smtpother #smtp_host').attr('disabled', '');
+        $('.smtpother #smtp_port').attr('disabled', '');
+        $('.smtpother #smtp_encryption').attr('disabled', '');
+        $(".smtphost").show();
+        $(".smtpport").show();
+        $('.smtphost #smtp_host').removeAttr('disabled');
+        $('.smtpport #smtp_port').removeAttr('disabled');
+        
+        $(".smtpgmail").hide();
+        $(".smtpyahoo").show();
+        $(".smtpoutlook").hide();
+
+        $('.smtpgmail #smtp_encryption').attr('disabled', '');
+        $('.smtpyahoo #smtp_encryption').removeAttr('disabled');
+        $('.smtpoutlook #smtp_encryption').attr('disabled', '');
       }
       else if(imap == 'outlook.office365.com') {
         $(".imapother").hide();
@@ -531,6 +636,23 @@ $(document).ready(function(){
         $('.imapgmail #imap_encryption').attr('disabled', '');
         $('.imapyahoo #imap_encryption').attr('disabled', '');
         $('.imapoutlook #imap_encryption').removeAttr('disabled');
+
+        $(".smtpother").hide();
+        $('.smtpother #smtp_host').attr('disabled', '');
+        $('.smtpother #smtp_port').attr('disabled', '');
+        $('.smtpother #smtp_encryption').attr('disabled', '');
+        $(".smtphost").show();
+        $(".smtpport").show();
+        $('.smtphost #smtp_host').removeAttr('disabled');
+        $('.smtpport #smtp_port').removeAttr('disabled');
+        
+        $(".smtpgmail").hide();
+        $(".smtpyahoo").hide();
+        $(".smtpoutlook").show();
+
+        $('.smtpgmail #smtp_encryption').attr('disabled', '');
+        $('.smtpyahoo #smtp_encryption').attr('disabled', '');
+        $('.smtpoutlook #smtp_encryption').removeAttr('disabled');
       }
       else {
           $(".imapother").show();
@@ -550,6 +672,24 @@ $(document).ready(function(){
           $('.imapgmail #imap_encryption').attr('disabled', '');
           $('.imapyahoo #imap_encryption').attr('disabled', '');
           $('.imapoutlook #imap_encryption').attr('disabled','');
+
+          $(".smtpother").show();
+          $('.smtpother #smtp_host').removeAttr('disabled');
+          $('.smtpother #smtp_port').removeAttr('disabled');
+          $('.smtpother #smtp_encryption').removeAttr('disabled');
+
+          $(".smtpgmail").hide();
+          $(".smtpyahoo").hide();
+          $(".smtpoutlook").hide();
+          $(".smtphost").hide();
+          $(".smtpport").hide();
+          
+          $('.smtphost #smtp_host').attr('disabled', '');
+          $('.smtpport #smtp_port').attr('disabled', '');
+          
+          $('.smtpgmail #smtp_encryption').attr('disabled', '');
+          $('.smtpyahoo #smtp_encryption').attr('disabled', '');
+          $('.smtpoutlook #smtp_encryption').attr('disabled','');
           
       }
       $("#imapserver").change(function(){
@@ -573,8 +713,27 @@ $(document).ready(function(){
           $('.imapgmail #imap_encryption').attr('disabled', '');
           $('.imapyahoo #imap_encryption').attr('disabled', '');
           $('.imapoutlook #imap_encryption').attr('disabled','');
+
+          $(".smtpother").show();
+          $('.smtpother #smtp_host').removeAttr('disabled');
+          $('.smtpother #smtp_port').removeAttr('disabled');
+          $('.smtpother #smtp_encryption').removeAttr('disabled');
+
+          $(".smtpgmail").hide();
+          $(".smtpyahoo").hide();
+          $(".smtpoutlook").hide();
+          $(".smtphost").hide();
+          $(".smtpport").hide();
+          
+          $('.smtphost #smtp_host').attr('disabled', '');
+          $('.smtpport #smtp_port').attr('disabled', '');
+          
+
+          $('.smtpgmail #smtp_encryption').attr('disabled', '');
+          $('.smtpyahoo #smtp_encryption').attr('disabled', '');
+          $('.smtpoutlook #smtp_encryption').attr('disabled','');
         } else {
-			$('#imap_port').val('993');
+			    $('#imap_port').val('993');
           $(".imapother").hide();
           $('.imapother #imap_host').attr('disabled', '');
           $('.imapother #imap_port').attr('disabled', '');
@@ -583,14 +742,28 @@ $(document).ready(function(){
           $(".imapport").show();
           $('.imaphost #imap_host').removeAttr('disabled');
           $('.imapport #imap_port').removeAttr('disabled');
+
+          $('#smtp_port').val('993');
+          $(".smtpother").hide();
+          $('.smtpother #smtp_host').attr('disabled', '');
+          $('.smtpother #smtp_port').attr('disabled', '');
+          $('.smtpother #smtp_encryption').attr('disabled', '');
+          $(".smtphost").show();
+          $(".smtpport").show();
+          $('.smtphost #smtp_host').removeAttr('disabled');
+          $('.smtpport #smtp_port').removeAttr('disabled');
+
           if(server == 'gmail') {
             $("#imap_host").val('imap.gmail.com');
+            $("#smtp_host").val('smtp.gmail.com');
           } 
           else if(server == 'yahoo') {
             $("#imap_host").val('imap.mail.yahoo.com');
+            $("#smtp_host").val('smtp.mail.yahoo.com');
           }
           else if(server == 'outlook') {
             $("#imap_host").val('outlook.office365.com');
+            $("#smtp_host").val('outlook.office365.com');
           }
           
           var imap = $("#imap_host").val();
@@ -602,6 +775,14 @@ $(document).ready(function(){
             $('.imapgmail #imap_encryption').removeAttr('disabled');
             $('.imapyahoo #imap_encryption').attr('disabled', '');
             $('.imapoutlook #imap_encryption').attr('disabled', '');
+
+            $(".smtpgmail").show();
+            $(".smtpyahoo").hide();
+            $(".smtpoutlook").hide();
+
+            $('.smtpgmail #smtp_encryption').removeAttr('disabled');
+            $('.smtpyahoo #smtp_encryption').attr('disabled', '');
+            $('.smtpoutlook #smtp_encryption').attr('disabled', '');
           }
           if(imap == 'imap.mail.yahoo.com') {
             $(".imapgmail").hide();
@@ -611,6 +792,14 @@ $(document).ready(function(){
             $('.imapgmail #imap_encryption').attr('disabled', '');
             $('.imapyahoo #imap_encryption').removeAttr('disabled');
             $('.imapoutlook #imap_encryption').attr('disabled', '');
+
+            $(".smtpgmail").hide();
+            $(".smtpyahoo").show();
+            $(".smtpoutlook").hide();
+
+            $('.smtpgmail #smtp_encryption').attr('disabled', '');
+            $('.smtpyahoo #smtp_encryption').removeAttr('disabled');
+            $('.smtpoutlook #smtp_encryption').attr('disabled', '');
           }
           if(imap == 'outlook.office365.com') {
             $(".imapgmail").hide();
@@ -621,6 +810,14 @@ $(document).ready(function(){
             $('.imapgmail #imap_encryption').attr('disabled', '');
             $('.imapyahoo #imap_encryption').attr('disabled', '');
             $('.imapoutlook #imap_encryption').removeAttr('disabled');
+            $(".smtpgmail").hide();
+            $(".smtpyahoo").hide();
+            $(".smtpoutlook").show();
+            $(".smtpother").hide();
+            
+            $('.smtpgmail #smtp_encryption').attr('disabled', '');
+            $('.smtpyahoo #smtp_encryption').attr('disabled', '');
+            $('.smtpoutlook #smtp_encryption').removeAttr('disabled');
           }
         }
       });

@@ -100,7 +100,10 @@ class Leads_model extends App_Model {
      * @return mixed false || leadid
      */
     public function add($data) {
-
+        if(isset($data['emailuid'])){
+            $emailuid =$data['emailuid'];
+            unset($data['emailuid']);
+        }
         $this->load->model('clients_model');
         if (isset($data['custom_contact_date']) || isset($data['custom_contact_date'])) {
             if (isset($data['contacted_today'])) {
@@ -236,8 +239,21 @@ class Leads_model extends App_Model {
             if($products) {
                 $this->products_model->save_lead_products($products, $insert_id, $currency);   
             }
-            log_activity('New Lead Added [ID: ' . $insert_id . ']');
-            $this->leads_model->log_activity($insert_id,'lead','added',$insert_id);
+
+            
+
+            
+            if(isset($emailuid)){
+                $this->leads_model->log_activity($insert_id,'lead','addedfromemail',$insert_id);
+                $this->load->library('mails/imap_mailer');
+                $this->imap_mailer->set_rel_type('lead');
+                $this->imap_mailer->set_rel_id($insert_id);
+                $this->imap_mailer->connectEmail($emailuid);
+            }else{
+                $this->leads_model->log_activity($insert_id,'lead','added',$insert_id);
+            }
+            
+
             handle_tags_save($tags, $insert_id, 'lead');
 
             if (isset($custom_fields)) {
@@ -1573,5 +1589,24 @@ class Leads_model extends App_Model {
         $this->db->select('COUNT(id) as count');
         $count =$this->db->get(db_prefix().'lead_log')->row();
         return $count->count;
+    }
+
+    public function get_leads_by_contact_email($email, $staff_id=0)
+    {
+
+        $this->db->join(db_prefix() . 'lead_contacts', db_prefix().'lead_contacts.lead_id='.db_prefix().'leads.id', 'left');
+        $this->db->join(db_prefix() . 'contacts', db_prefix().'contacts.id='.db_prefix().'lead_contacts.contacts_id', 'left');
+        if($staff_id)
+            $this->db->where(db_prefix().'leads.assigned',$staff_id);
+        $this->db->where(db_prefix().'leads.deleted_status',0);
+        $this->db->where(db_prefix().'leads.lost',0);
+        $this->db->where(db_prefix().'leads.junk',0);
+        $this->db->where(db_prefix().'leads.project_id',0);
+        $this->db->where(db_prefix().'contacts.email',$email);
+        $this->db->select(db_prefix().'leads.*');
+        // $this->db->select(db_prefix().'leads.firstname');
+        // $this->db->select(db_prefix().'leads.lastname');
+        // pre($this->db->get_compiled_select());
+        return $this->db->get(db_prefix().'leads')->result_object();
     }
 }

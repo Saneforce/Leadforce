@@ -32,18 +32,44 @@ function app_admin_footer()
 function init_head($aside = true)
 {
     $CI = &get_instance();
+    $CI->load->view('admin/includes/headnew');
+    echo  '<div id="page-wrapper">';
+    $CI->load->view('admin/includes/headernew', ['startedTimers' => $CI->misc_model->get_staff_started_timers()]);
+    $CI->load->view('admin/includes/setup_menu');
+    echo '<div id="page-body-wrapper">';
+    $CI->load->view('admin/includes/navbar');
+}
+
+function init_head_new($aside = true)
+{
+    $CI = &get_instance();
     $CI->load->view('admin/includes/head');
     $CI->load->view('admin/includes/header', ['startedTimers' => $CI->misc_model->get_staff_started_timers()]);
     $CI->load->view('admin/includes/setup_menu');
     if ($aside == true) {
         $CI->load->view('admin/includes/aside');
     }
+
+    
+    // $CI->load->view('admin/includes/setup_menu');
+    // if ($aside == true) {
+    //     $CI->load->view('admin/includes/aside');
+    // }
 }
+
 /**
  * @since  1.0.0
  * Init admin footer/tails
  */
 function init_tail()
+{
+    echo '</div>'; //end page-body-wrapper
+    echo '</div>'; //end pager-wrapper
+    $CI = &get_instance();
+    $CI->load->view('admin/includes/scripts');
+}
+
+function init_tail_new()
 {
     $CI = &get_instance();
     $CI->load->view('admin/includes/scripts');

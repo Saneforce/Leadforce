@@ -886,7 +886,6 @@ function get_imap_setting($staffid=''){
 		$table = db_prefix() . 'personal_mail_setting';
 		$config = get_or_update_setting($staffid,$table);
 		//foreach($imapsettings as $config){
-
 			if(!empty($config)){
 				$imapconf['host'] 	  = $config['imap_host'];
 				$imapconf['encrypto'] = $config['imap_encryption'];

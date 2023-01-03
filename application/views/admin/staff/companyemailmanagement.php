@@ -5,8 +5,8 @@
 		<div class="row">
 			<div class="col-md-12">
 
-				<div class="panel_s">
-					<div class="panel-body">
+				<div class="">
+					<div class="">
 						
 						<div class="clearfix"></div>
 						<style type="text/css">
@@ -69,32 +69,30 @@ table.body {
 }
 
 .email .nav.nav-pills.nav-stacked > li > a {
-	color: #666;
+	color: var(--theme-default-text-color);
 	border-top: 0;
 	border-left: 3px solid transparent;
 	border-radius: 0px;
+	font-size: 13px;
 }
 
 .email .nav.nav-pills.nav-stacked > li.active > a,
 .email .nav.nav-pills.nav-stacked > li.active > a:hover {
 	background-color: #f6f6f6;
-	border-left-color: #3c8dbc;
+	border-left-color: var(--theme-primary-light);
 	color: #444;
 }
 
 .email .nav.nav-pills.nav-stacked > li.header {
 	color: #777;
-	text-transform: uppercase;
 	position: relative;
 	padding: 0px 0 10px 0;
 }
 
-.email table {
-	font-weight: 600;
-}
-
 .email table a {
-	color: #666;
+	font-weight: initial;
+    font-size: 14px;
+    color: rgb(3 18 51);
 }
 
 .email table tr.read > td {
@@ -463,7 +461,7 @@ table.body {
 
 .email-app .message .details .attachments .attachment .menu a {
     padding: 0 0.5rem;
-    font-size: 14px;
+    font-size: 13px;
     color: #e1e6ef;
 }
 
@@ -477,7 +475,7 @@ table.body {
     }
 }
 .composebtn {
-	font-size:10.5px;
+	font-size:13px;
 }
 						</style>
 							
@@ -487,13 +485,14 @@ table.body {
 		<div class="grid email">
 		<div id="overlay" style="display: none;"><div class="spinner"></div></div>
 			<form id="search_sumbit1" method="POST">
+				
 				<div class="col-md-12" style="margin-bottom:15px;">
-					<div class="col-md-2"></div>
-					<div class="col-md-8">
-						<input id="search_text" type="text" class="form-control" placeholder="Search">
+					<div class="pull-left">
+						<a class="btn btn-block btn-info composebtn" data-toggle="modal" data-target="#compose-modal" onclick="tab_opon_popup()"><i class="fa fa-pencil" ></i> Compose Email</a>
 					</div>
-					<div class="col-md-2">
-						<button type="submit" class="btn btn-primary pull-right1">Search</button>
+					<div class="pull-right" style="display: flex;">
+						<input id="search_text" type="text" class="form-control" placeholder="Search" style="min-width: 300px;">
+						<button type="submit" class="btn btn-info pull-right mleft10">Search</button>
 					</div>
 				</div>
 				<input type="hidden" id="search_mail" value="">
@@ -519,11 +518,8 @@ table.body {
 					<!-- BEGIN INBOX MENU -->
 				<div class="row">
 					<div class="col-md-2">
-						<h2 class="grid-title"><i class="fa fa-inbox"></i> Inbox</h2>
-						<a class="btn btn-block btn-primary composebtn" data-toggle="modal" data-target="#compose-modal" onclick="tab_opon_popup()"><i class="fa fa-pencil" ></i>&nbsp;&nbsp;COMPOSE EMAIL</a>
 						<input type="hidden" id="req_page" value="1">
 						<input type="hidden" id="folder" value="INBOX">
-						<hr>
 						<div id="folder_id">
 						
 						</div>
@@ -536,7 +532,7 @@ table.body {
 							<form id="formId" >
 								<input type="hidden" value="1" id="sort_val">
 								<input type="hidden" value="date" id="sort_option">
-								<table class="table" id="table">
+								<table class="table dataTable" id="table">
 									<tbody>
 									<thead>
 										<th><input type="checkbox" id="select_all" onclick="check_all(this)"></th>
@@ -545,13 +541,13 @@ table.body {
 										<?php /*<th><b>To</b></th>*/?>
 										<th id="th_subject" class="th_class headerSortDown"><a href="javascript:void(0)" onclick="ch_sort('subject','th_subject')" class="subject_a a_header"><b>Subject</b></a></th>
 										<?php /*<th><b>Content</b></th>*/?>
-										<th><b>Deals</b></th>
-										<th style="width:10%"><b>Attachement Icon</b></th>
-										<th class=" th_class headerSortDown" id="th_date"  style="width:22%"><a href="javascript:void(0)" onclick="ch_sort('date','th_date')" class="a_header date_a th_head_color"><b>Date</b></a></th>
+										<th><b>Leads / Deals</b></th>
+										<th ><b>Attachement Icon</b></th>
+										<th class=" th_class headerSortDown" id="th_date"><a href="javascript:void(0)" onclick="ch_sort('date','th_date')" class="a_header date_a th_head_color"><b>Date</b></a></th>
 										<?php /*<th class=" th_class" id="th_date" ><b>Date</b></th>*/?>
 									</thead>
 									<?php //echo $folders['table']; ?>
-									</tbody>
+									</tbody> 
 								</table>
 							</form>
 							<?php //echo $pagination;?>
@@ -613,15 +609,16 @@ table.body {
 									</div>
 									<div class="col-md-12 bg-white" style="border-radius:6px;">
 										<div class="col-md-3">
-											<div class="tabs active" id="tab01">
-												<h6 class="text-muted">Compose Email</h6>
-											</div>
-											<div class="tabs " id="tab02" onclick="gettemplate_list()">
-												<h6 class="text-muted">Templates</h6>
-											</div>
-											<div class="tabs " id="tab03" onclick="reset_form()">
-												<h6 class="font-weight-bold text-muted">Create Template</h6>
-											</div>
+											<ul class="nav navbar-pills navbar-pills-flat nav-tabs nav-stacked mtop15">
+												<li class="tabs active" id="tab01">
+													<a class="text-muted">Compose Email</a>
+												<li class="tabs " id="tab02" onclick="gettemplate_list()">
+													<a class="text-muted">Templates</a>
+												</li>
+												<li class="tabs " id="tab03" onclick="reset_form()">
+													<a class="font-weight-bold text-muted">Create Template</a>
+												</li>
+											</ul>
 										</div>
 										<div class="col-md-9">
 											<fieldset id="tab011" class="show">
@@ -653,16 +650,18 @@ table.body {
 																}?>
 																</select>
 															</div>
-															
+														
+														
 														<?php //if(get_option('deal_map') == 'if more than one open deal – allow to map manually'){?>
 															<div class="form-group pipeselect"  style="display:none" id="pipeselect">
-															<label ><b>Select Deal</b></label>
+															<label ><b>Deal / Lead</b></label>
 																<select class="selectpicker" data-none-selected-text="<?php echo _l('Select Ay Deal'); ?>" name="deal_id" id="pipeline_id" data-width="100%" <?php if(get_option('deal_map') == 'if more than one open deal – allow to map manually'){?>data-live-search="true" <?php }?> >
 																</select>
 															</div>
 														<?php //}?>
 														<div class="form-group pipeselect" id="activity_type" style="display:none">
 															<label ><b>Activity Type</b></label>
+															<input type="hidden" name="activity_type" value="close">
 															<select class="selectpicker" data-none-selected-text="<?php echo _l('Activity Type'); ?>" name="activity_type"  data-width="100%" required>
 																<option value="open">Open</option>
 																<option value="close">Close</option>
@@ -679,12 +678,12 @@ table.body {
 														<input type="hidden" id="m_file" name="m_file">
 														<input type="hidden" name="repeat_every_custom" value="1">
 														<input type="hidden" name="repeat_type_custom" value="day">
-														<input type="hidden" name="rel_type" value="project">
+														<input type="hidden" name="rel_type" value="">
 														<input type="hidden" name="tasktype" value="2">
 														<input type="hidden" name="billable" value="on">
 														<input type="hidden" name="task_mark_complete_id" value="">
 														<input type="hidden" name="tags" value="">
-														<button type ="button" class="btn btn-primary" style="display:block;" onclick="mget_file('getFile','m')">Add Attachement </button>
+														<button type ="button" class="btn btn-info" style="display:block;" onclick="mget_file('getFile','m')">Add Attachement </button>
 														<input type='file' id="getFile" style="display:none" multiple name="attachment[]" onchange="get_up_val('getFile','m')"> 
 														
 														<div class="ch_files_m list_files">
@@ -695,7 +694,7 @@ table.body {
 														
 														<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Discard</button>
 														<div id="overlay_compose" class="overlay_new" style="display:none;position:absolute"><div class="spinner"></div></div>
-														<button type="submit" class="btn btn-primary pull-right"  style="margin-left:10px"><i class="fa fa-envelope"></i> Send Message</button>
+														<button type="submit" class="btn btn-info pull-right"  style="margin-left:10px"><i class="fa fa-envelope"></i> Send Message</button>
 														
 													</div>
 												</form>
@@ -722,7 +721,7 @@ table.body {
 														</div> 
 													</div>
 													<div class="modal-footer">
-														<button type="submit" class="btn btn-primary pull-right">Submit</button>
+														<button type="submit" class="btn btn-info pull-right">Submit</button>
 													</div>
 												</form>
 											</fieldset>
@@ -756,7 +755,7 @@ table.body {
 											</div> 
 										</div>
 										<div class="modal-footer">
-											<button type="submit" class="btn btn-primary pull-right">Submit</button>
+											<button type="submit" class="btn btn-info pull-right">Submit</button>
 										</div>
 									</form>
 								</div>
@@ -812,7 +811,7 @@ table.body {
 										</div>
 										<div class="modal-footer">
 											<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Discard</button>
-											<button type="submit" class="btn btn-primary pull-right"><i class="fa fa-envelope"></i> Send Message</button>
+											<button type="submit" class="btn btn-info pull-right"><i class="fa fa-envelope"></i> Send Message</button>
 										</div>
 									</form>
 								</div>
@@ -853,7 +852,9 @@ table.body {
 											<input type="hidden" name="priority" value="1">
 											<input type="hidden" name="repeat_every_custom" value="1">
 											<input type="hidden" name="repeat_type_custom" value="day">
-											<input type="hidden" name="rel_type" value="project">
+											<input type="hidden" name="rel_type" value="">
+											<input type="hidden" name="rel_id" value="">
+											<input type="hidden" name="parent_id" value="">
 											<input type="hidden" name="tasktype" value="2">
 											<input type="hidden" name="billable" value="on">
 											<input type="hidden" name="task_mark_complete_id" value="">
@@ -868,7 +869,7 @@ table.body {
 										</div>
 										<div class="modal-footer">
 											<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Discard</button>
-											<button type="submit" class="btn btn-primary pull-right"><i class="fa fa-envelope"></i> Send Message</button>
+											<button type="submit" class="btn btn-info pull-right"><i class="fa fa-envelope"></i> Send Message</button>
 										</div>
 									</form>
 								</div>
@@ -1157,6 +1158,7 @@ function add_to(uid){
 		uid:uid
 	},
 	function(data,status){
+		console.log('data');
 		var json = $.parseJSON(data);
 		$('#reply_toemail').val(json.from_address);
 		$('#ch_uid').val(uid);
@@ -1169,6 +1171,9 @@ function add_to(uid){
 		$('#rfilecnt').val(1);
 		$('#rallcnt').val(0);
 		$('#r_file').val('');
+		$('#reply-modal [name="rel_type"]').val(json.rel_data.rel_type);
+		$('#reply-modal [name="rel_id"]').val(json.rel_data.rel_id);
+		$('#reply-modal [name="parent_id"]').val(json.rel_data.parent_id);
 		tinyMCE.get('reply_description').setContent('');
 		$('#r_getFile').val('');
 		document.getElementById('overlay_new1').style.display = 'none'; 
@@ -1463,12 +1468,10 @@ function deal_values(){
 			$("#pipeline_id").append(data);
 			$("#pipeline_id").selectpicker("refresh");
 			var deal_val = $('#pipeline_id').val();
-			$('#activity_type').hide();
 			//$('#pipeselect').hide();
 			
 			if(data!=''){
 				$('#pipeselect').show();
-				$('#activity_type').show();
 			}
 		}
 
@@ -1494,7 +1497,6 @@ function del_template(a){
 
 </script>
 <script type="text/javascript">
-
     var frm1 = $('#template_form');
 
     frm1.submit(function (e) {
@@ -2142,9 +2144,6 @@ $(document).ready(function() {
     cursor: default;
 	z-index:1050 !important;
 }
-.text-muted {
-    padding: 10px;
-}
 .error{
 	color:red;
 }
@@ -2175,25 +2174,6 @@ fieldset.show {
     display: block
 }
 
-.tabs {
-    margin: 2px 5px 0px 5px;
-    cursor: pointer
-}
-
-
-.tabs.active {
-    border-bottom: 1px solid #2196F3;
-    background-color: #1e95b1;
-    color: #fff;
-    height: 30px;
-}
-.active .text-muted,.active .font-weight-bold {
-    color: #fff;
-    white-space: nowrap;
-    vertical-align: middle;
-    padding: 10px;
-}
-
 a:hover {
     text-decoration: none;
     color: #1565C0
@@ -2203,10 +2183,6 @@ a:hover {
     margin-bottom: 10px;
     border-radius: 5px;
     padding: 10px
-}
-
-.modal-backdrop {
-    background-color: #64B5F6
 }
 
 .line {
@@ -2219,6 +2195,10 @@ a:hover {
     .tabs h6 {
         font-size: 12px
     }
+}
+
+#emailViewerMeta p{
+	font-size: 13px !important;
 }
 
 </style>

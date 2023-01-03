@@ -90,14 +90,16 @@ class Settings extends AdminController
 			}
 			if($_REQUEST['group'] == 'company_settings') {
 				$post_data['settings']['connect_mail'] = $_REQUEST['connect_mail'];
-				 $post_data['settings']['company_imap_server'] = $_REQUEST['company_imap_server'];
-				
-				
+				$post_data['settings']['company_imap_server'] = $_REQUEST['company_imap_server'];
 				$post_data['settings']['company_mail_server'] = $_REQUEST['mail_server'];
-				
 				$post_data['settings']['company_imap_encryption'] = $_REQUEST['imap_encryption'];
                 $post_data['settings']['company_imap_host'] = $_REQUEST['imap_host'];
                 $post_data['settings']['company_imap_port'] = $_REQUEST['imap_port'];
+
+                $post_data['settings']['company_smtp_global_server'] = $_REQUEST['company_smtp_server'];
+                $post_data['settings']['company_smtp_global_encryption'] = $_REQUEST['smtp_encryption'];
+                $post_data['settings']['company_smtp_global_host'] = $_REQUEST['smtp_host'];
+                $post_data['settings']['company_smtp_global_port'] = $_REQUEST['smtp_port'];
                 //$post_data['settings']['company_smtp_email'] = $_REQUEST['smtp_email'];
                
             }
