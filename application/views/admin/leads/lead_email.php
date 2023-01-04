@@ -169,7 +169,7 @@ $emails =$this->leads_model->get_emails($lead->id);
 	<div class="col-md-12 email">
 		<div class="table-responsive">
 			<form id="formId" >
-				<table class="table " >
+				<table class="table dataTable" >
 					<thead>
 						<tr>
 						  <th>
@@ -180,7 +180,6 @@ $emails =$this->leads_model->get_emails($lead->id);
 						  <th>From</th>
 						  <th>To</th>
 						  <th>Subject</th>
-						  <th>Message</th>
 						  <th>Attachement</th>
 						  <th>Date</th>
 						</tr>
@@ -200,9 +199,6 @@ $emails =$this->leads_model->get_emails($lead->id);
 							  <td data-order="<?php echo $email1['to']; ?>"><a href="javascript:void(0)" onClick="getMessage('<?php echo $email1['id'];?>');"><?php echo $to_mails[0]['email']; ?></a></td>
 							  <td data-order="<?php echo $email1['subject']; ?>">
 								<a href="javascript:void(0)" onClick="getMessage('<?php echo $email1['id'];?>');"><?php echo $email1['subject'];?></a>
-							  </td>
-							  <td data-order="<?php echo $email1['body_plain']; ?>">
-								<a href="javascript:void(0)" onClick="getMessage('<?php echo $email1['id'];?>');"><?php echo $email1['body_plain']; ?></a>
 							  </td>
 							  <td>
 								<?php if(!empty($email1['attachements']) && $email1['attachements'] != '[]'){

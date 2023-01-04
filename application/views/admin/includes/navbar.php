@@ -62,6 +62,10 @@
             <li class="dropdown notifications-wrapper header-notifications" data-toggle="tooltip" title="<?php echo _l('nav_notifications'); ?>" data-placement="bottom">
                 <?php $this->load->view('admin/includes/notifications'); ?>
             </li>
+            <li class="dropdown notifications-wrapper header-notifications" data-toggle="tooltip" title="<?php echo _l('nav_notifications'); ?>" data-placement="bottom">
+            <a href="#" class="dropdown-toggle notifications-icon" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-cog" aria-hidden="true"></i></a>
+                
+            </li>
             <?php
             if (!is_mobile()) {
                 echo $top_search_area;

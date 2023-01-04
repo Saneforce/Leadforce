@@ -221,6 +221,39 @@
     .sidebarChildApp{
         margin-bottom: 5px;
     }
+
+    .btn-bottom-toolbar{
+        width: calc(100% - 60px);
+    }
+    #setup-menu-wrapper .nav.metis-menu{
+        width: 243px;
+        height: calc( 100vh - 66px );
+        overflow-y: auto;
+    }
+    #wrapper.wrapperstylechange{
+        width: calc( 100vw - 300px);
+    }
+    #setup-menu-wrapper{
+        max-height: calc( 100vh - 66px );
+        position: fixed;
+    }
+    #page-body-wrapper{
+        width: 100%;
+    }
+    #setup-menu li .nav-second-level li.active a{
+        border-radius: 5px;
+        display: block;
+        margin: 8px 15px 8px 15px;
+        background-color: var(--theme-primary-light);
+    }
+    .dropdown-menu>.active>a, .dropdown-menu>.active>a:focus, .dropdown-menu>.active>a:hover{
+        background-color: var(--theme-primary-light);
+    }
+
+    #setup-menu li.active>a{
+        color: #333!important;
+        background-color: #e3e8ee;
+    }
 </style>
 
 
