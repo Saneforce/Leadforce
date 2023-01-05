@@ -11,9 +11,6 @@
    .nav-tabs-horizontal li a .badge{
       margin-left: 5px;
    }
-   .nav-tabs-horizontal li.active a .badge, .nav-tabs-horizontal li:hover a .badge{
-      background-color: #02a9f4;
-   }
 </style>
 <style>
 .horizontal-tabs {
@@ -611,5 +608,8 @@
       
    });
 </script>
+
+<?php $this->load->view('admin/staff/emailcomposerjs') ?>
+
 </body>
 </html>

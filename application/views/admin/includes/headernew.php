@@ -254,6 +254,21 @@
         color: #333!important;
         background-color: #e3e8ee;
     }
+
+    .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover, .navbar-pills.nav-tabs>li>a:focus, .navbar-pills.nav-tabs>li>a:hover {
+        border-bottom: 1px solid var(--theme-primary-light);
+    }
+
+    .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover, .nav-tabs>li>a:focus, .nav-tabs>li>a:hover {
+        border-bottom: 1px solid var(--theme-primary-light);
+        color: var(--theme-primary-light);
+    }
+    .nav-tabs-horizontal li.active a .badge, .nav-tabs-horizontal li:hover a .badge {
+        background-color: var(--theme-primary-light);
+    }
+    .lead-info-heading h4 {
+        color: var(--theme-primary-light);
+    }
 </style>
 
 

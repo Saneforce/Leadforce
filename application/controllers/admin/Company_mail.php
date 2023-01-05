@@ -752,6 +752,12 @@ class Company_mail extends AdminController
 		else{
 			$redirect_url = site_url().'admin/company_mail/check_user_mail';
 		}
+
+		if($this->input->post('redirect')){
+			if($this->input->post('redirect') =='lead'){
+				$redirect_url = admin_url('leads/lead/'.$_POST['deal_id'].'?group=tab_email');
+			}
+		}
 		$this->load->library('mails/imap_mailer');
 		$this->imap_mailer->set_to($this->input->post('toemail', false));
 		$this->imap_mailer->set_subject($this->input->post('name', false));
