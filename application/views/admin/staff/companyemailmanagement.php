@@ -477,7 +477,7 @@ table.body {
 .composebtn {
 	font-size:13px;
 }
-						</style>
+</style>
 							
 							<div class="row">
 	<!-- BEGIN INBOX -->

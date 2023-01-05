@@ -231,7 +231,7 @@
    position: sticky;
    top: 0px;
    background-color: white;
-   z-index: 100;
+   z-index: 5;
    padding-top: 20px;
    display: flex;
    justify-content: space-between;
@@ -349,8 +349,7 @@
          <form id="LeadProdcutForm" method='post' name="LeadProdcutForm" action="<?php echo admin_url('leads/saveleadproducts/'.$lead->id); ?>">
          <?php $this->load->view('admin/leads/items'); ?>
          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary">Save changes</button>
+            <button type="submit" class="btn btn-info">Save changes</button>
          </div>
          <?php echo form_close(); ?>
       </div>

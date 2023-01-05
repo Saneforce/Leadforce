@@ -124,7 +124,7 @@
                                     <input type="number" name="total[]" value="<?php echo $pr['total_price']; ?>" placeholder="Total" readonly class="form-control" />
                                 </div>
                                 <span class="dropdown">
-                                    <button type="button" class="btn btn-primary " data-toggle="dropdown">...</button>
+                                    <button type="button" class="btn btn-info " data-toggle="dropdown">...</button>
                                     <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
                                         <li></li>
                                         <?php /* <li><a class="dropdown-item" href="#" onClick="gotoprod(<?php echo $i; ?>);">Go to Product</a></li>*/ ?>
@@ -199,7 +199,7 @@
                                     <input type="number" name="total[]" value="<?php echo $pr['total_price']; ?>" placeholder="Total" readonly class="form-control" />
                                 </div>
                                 <span class="dropdown">
-                                    <button type="button" class="btn btn-primary " data-toggle="dropdown">...</button>
+                                    <button type="button" class="btn btn-info " data-toggle="dropdown">...</button>
                                     <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
                                         <li></li>
                                         <?php /*  <li><a class="dropdown-item" href="#" onClick="gotoprod(<?php echo $i; ?>);">Go to Product</a></li>*/ ?>
@@ -293,7 +293,7 @@
                         <!-- <div class="col-md-1">
                         </div> -->
                         <span class="dropdown">
-                            <button type="button" class="btn btn-primary " data-toggle="dropdown">...</button>
+                            <button type="button" class="btn btn-info " data-toggle="dropdown">...</button>
                             <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
                                 <li></li>
                                 <?php /* <li><a class="dropdown-item" href="#" onClick="gotoprod(0);">Go to Product</a></li>*/ ?>

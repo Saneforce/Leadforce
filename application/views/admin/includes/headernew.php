@@ -301,7 +301,13 @@
                 if(count($item['children']) > 0 ){ 
                     $extraclass="dropright" ;
                     $extra ='data-toggle="dropdown" aria-expanded="false"';
-                } 
+                }
+
+                if($item['name'] == 'Email'){
+                    if(get_option('connect_mail') =='no'){
+                        $item['href'] =admin_url('outlook_mail/index');
+                    }
+                }
             ?>
 
 

@@ -305,6 +305,7 @@ class Leads extends AdminController
         }
 
         $data ['group'] =$this->input->get('group');
+        $data['title'] =_l('lead');
         if(!$data['group']){
             $data['group'] ='lead_activity';
         }

@@ -1,8 +1,4 @@
 <style>
-    .th_head_color {
-        color: darkgrey !important;
-    }
-
     .unread_col_col {
         background: gainsboro;
     }

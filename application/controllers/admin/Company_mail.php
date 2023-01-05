@@ -284,6 +284,9 @@ class Company_mail extends AdminController
 		}
     }
 	public function check_user_mail() {
+		if(get_option('connect_mail')=='no'){
+			redirect(admin_url('outlook_mail/connect_outlook'));
+		}
 		if(get_option('company_mail_server')=='yes'){
 			redirect(site_url().'admin/company_mail/check_company_mail');
 		}
@@ -745,12 +748,15 @@ class Company_mail extends AdminController
 				$_POST['deal_id'] =$relarray[1];
 			}
 		}
-
-		if(get_option('company_mail_server')=='yes'){
-			$redirect_url = site_url().'admin/company_mail/check_company_mail';
-		}
-		else{
-			$redirect_url = site_url().'admin/company_mail/check_user_mail';
+		if(get_option('connect_mail')=='no'){
+			$redirect_url = admin_url('outlook_mail/connect_outlook');
+		}else{
+			if(get_option('company_mail_server')=='yes'){
+				$redirect_url = site_url().'admin/company_mail/check_company_mail';
+			}
+			else{
+				$redirect_url = site_url().'admin/company_mail/check_user_mail';
+			}
 		}
 
 		if($this->input->post('redirect')){
@@ -910,202 +916,29 @@ class Company_mail extends AdminController
 	   redirect($redirect_url);
     }
 	public function reply() {
+		if(get_option('connect_mail')=='no'){
+			$redirect_url = admin_url('outlook_mail/connect_outlook');
+		}else{
 			if(get_option('company_mail_server')=='yes'){
 				$redirect_url = site_url().'admin/company_mail/check_company_mail';
 			}
 			else{
 				$redirect_url = site_url().'admin/company_mail/check_user_mail';
 			}
-			pre($_POST);
-			$this->load->library('mails/imap_mailer');
-			$this->imap_mailer->set_to($this->input->post('toemail', false));
-			$this->imap_mailer->set_subject($this->input->post('name', false));
-			$this->imap_mailer->set_message($this->input->post('description', false));
-			$this->imap_mailer->set_cc($this->input->post('ccemail', false));
-			$this->imap_mailer->set_bcc($this->input->post('bccemail', false));
-			$this->imap_mailer->set_attachments($_FILES["attachment"]);
-			$this->imap_mailer->set_rel_type($this->input->post('rel_type', false));
-			$this->imap_mailer->set_rel_id($this->input->post('rel_id', false));
-			$this->imap_mailer->set_redirectTo($redirect_url);
-			$this->imap_mailer->set_parentId($this->input->post('parent_id',false));
-			$this->imap_mailer->send();
-			return ;
-			$staff_id = get_staff_user_id();
-            $this->db->where('staffid ', $staff_id);
-            $assignee_admin = $this->db->get(db_prefix() . 'staff')->row();
-			$req_name = trim($assignee_admin->firstname.' '.$assignee_admin->lastname);
-            $data['description'] = $this->input->post('description', false);
-            $data['task_mark_complete_id'] = $this->input->post('task_mark_complete_id', false);
-            $data['billable'] = $this->input->post('billable', false);
-            $data['tasktype'] = $this->input->post('tasktype', false);
-            $data['name'] = $this->input->post('name', false);
-            $data['assignees'][0] = $assignee_admin->staffid;
-            $data['startdate'] = date('d-m-Y');
-            $data['priority'] = $this->input->post('priority', false);
-            $data['repeat_every_custom'] = $this->input->post('repeat_every_custom', false);
-            $data['repeat_type_custom'] = $this->input->post('repeat_type_custom', false);
-            $data['rel_type'] = $this->input->post('rel_type', false);
-            $data['tags'] = $this->input->post('tags', false);
-            $this->db->where('email', $this->input->post('toemail'));
-            $contacts = $this->db->get(db_prefix() . 'contacts')->row();
-			if(!empty($data['description'])){
-           // if ($contacts) {
-                $this->db->where('contacts_id', $contacts->id);
-                $this->db->limit(1);
-                $project = $this->db->get(db_prefix() . 'project_contacts')->row();
-                //if ($project) {
-                    if(!empty($project->project_id)){
-						$data['rel_id'] = $project->project_id;
-				   }else{
-					   $data['rel_id'] = $id;
-				   }
-				   if(!empty($contacts->id)){
-						$data['contacts_id'] = $contacts->id;
-				   }else{
-					   $data['contacts_id'] = 0;
-				   }
-                    //Initialize the connection:
-
-                    $this->load->library('email');
-                    $imapconf =  $smtpconf = array();
-					$imapconf = get_imap_setting();
-					$smtpconf = get_smtp_setings();
-					$this->email->initialize($smtpconf);
-
-                    $this->email->from($imapconf['username'], $req_name);
-                    $list = array($this->input->post('toemail', false));
-				
-                    $this->email->to($list);
-                    $this->email->cc($this->input->post('ccemail', false));
-                    $this->email->bcc($this->input->post('bccemail', false));
-                    $this->email->reply_to($imapconf['username'], 'Replay me');
-                    $this->email->reply_to($list);
-                    $this->email->subject($this->input->post('name', false));
-                    $this->email->message($this->input->post('description', false));
-					
-					$req_files = $m_file = array();
-					if(!empty($_FILES["attachment"])){
-						$req_data = check_upload();
-						$req_datas = json_decode($req_data);
-						$source_from1 = $req_datas->name;
-						$req_files = $req_datas->path;
-						if(!empty($req_files)){
-							foreach($req_files as $req_file123){
-								$this->email->attach( $req_file123);
-							}
-						}
-						/*if(!empty($_REQUEST['m_file'])){
-							$m_file = explode(',',$_REQUEST['m_file']);
-						}
-						$file_count = count($_FILES['attachment']['name']);
-						for($j=0;$j<$file_count;$j++){
-							if(!empty($_FILES['attachment']['name'][$j])&& (empty($m_file[0]) || !in_array($j, $m_file))){
-								$newFilePath = $req_files[$j] = FCPATH.'uploads/'.$_FILES['attachment']['name'][$j];
-								move_uploaded_file($_FILES['attachment']['tmp_name'][$j], $newFilePath);
-								$this->email->attach( $newFilePath);
-							}
-						}*/
-					}
-                    if ($ch_data = $this->email->send()) {
-						/*if(!empty($req_files)){
-							foreach($req_files as $req_file12){
-								unlink($req_file12);
-							}
-						}*/
-						//imap_num_recent();
-                        $this->load->library('imap');
-                        //Initialize the connection:
-                        $imap = $this->imap->check_imap($imapconf);
-						//Get the required datas:
-                        if ($imap) {
-                           $uid = $this->imap->get_company_latest_email_addresses($imapconf);
-                            if($uid == 'Cannot Read') {
-								$messages = get_mail_message($_POST,$imapconf);
-								//$message = "Don't have access to read Sent Folder. Please enable the //read permission to Sent folder in your mail server.";
-								//set_alert('warning', $message);
-                            	//redirect($redirect_url);
-							}else{
-								if(!empty($req_files)){
-									foreach($req_files as $req_file12){
-										unlink($req_file12);
-									}
-								}
-								$messages = $this->imap->get_company_mail_details($imapconf,$uid);
-								$data['source_from'] = $uid;
-							}
-                        } else {
-                            $message       = 'Cannot Connect IMAP Server.';
-                            set_alert('warning', $message);
-                            redirect($redirect_url);
-                        }
-                    } else {
-                        $message       = 'Cannot Connect SMTP Server.';
-                        set_alert('warning', $message);
-                        redirect($redirect_url);
-                    }
-                /*} else {
-                    $message       = 'Cannot create Activity.';
-                    set_alert('warning', $message);
-                    redirect($redirect_url);
-                }*/
-            //} 
-			}else{
-				 $message       = 'Please enter message';
-				set_alert('warning', $message);
-				redirect($redirect_url);
-			}
-			$cond_array = array('uid'=> $_POST['ch_uid'],'from_email'=>$_POST['toemail']);
-			$this->db->where($cond_array);
-			$this->db->limit(1);
-			$local_storage = $this->db->get(db_prefix() . 'localmailstorage')->row();
-			
-			if(!empty($local_storage->id)){
-				if($uid != 'Cannot Read') {
-					$source_from1 = array_column($messages['attachments'], 'name'); 
-				}
-				$req_msg[$i]['project_id']	= $data['rel_id'];
-				$req_msg[$i]['local_id']	= $local_storage->id;
-				$req_msg[$i]['task_id']		= $data['rel_id'];
-				$req_msg[$i]['mailid']		= $messages['id'];
-				$req_msg[$i]['uid'] 		= $messages['uid'];
-				$req_msg[$i]['staff_id'] 	= $staff_id;
-				$req_msg[$i]['from_email'] 	= $messages['from']['email'];
-				$req_msg[$i]['from_name'] 	= $messages['from']['name'];
-				$req_msg[$i]['mail_to']		= json_encode($messages['to']);
-				$req_msg[$i]['cc']			= json_encode($messages['cc']);
-				$req_msg[$i]['bcc']			= json_encode($messages['bcc']);
-				$req_msg[$i]['reply_to']	= json_encode($messages['reply_to']);
-				$req_msg[$i]['message_id']	= $messages['message_id'];
-				$req_msg[$i]['in_reply_to']	= $messages['in_reply_to'];
-				$req_msg[$i]['mail_references']	= json_encode($messages['references']);
-				$req_msg[$i]['date']		= $messages['date'];
-				$req_msg[$i]['udate']		= $messages['udate'];
-				$req_msg[$i]['subject']		= $messages['subject'];
-				$req_msg[$i]['recent']		= $messages['recent'];
-				$req_msg[$i]['priority']	= $messages['priority'];
-				$req_msg[$i]['mail_read']	= $messages['read'];
-				$req_msg[$i]['answered']	= $messages['answered'];
-				$req_msg[$i]['flagged']		= $messages['flagged'];
-				$req_msg[$i]['deleted']		= $messages['deleted'];
-				$req_msg[$i]['draft']		= $messages['draft'];
-				$req_msg[$i]['size']		= $messages['size'];
-				$req_msg[$i]['attachements']= json_encode($source_from1);
-				$req_msg[$i]['body_html']	= $messages['body']['html'];
-				$req_msg[$i]['body_plain']	= $messages['body']['plain'];
-				$req_msg[$i]['folder']	= 'Sent_mail';
-				$table = db_prefix() . 'reply';
-				$this->db->insert_batch($table, $req_msg);
-			}
-			if(get_option('link_deal')=='yes'){
-            $_id     = false;
-            $success = false;
-            $message = 'Activity Log Added Successfully';
-            log_activity('New Activity Log Added', 'Name: ' . $data['name'] . ']');
-		    set_alert('success', $message);
-			}else{
-				set_alert('success', 'Mail Send Successfully');
-			}
-		    redirect($redirect_url);
+		}
+		
+		$this->load->library('mails/imap_mailer');
+		$this->imap_mailer->set_to($this->input->post('toemail', false));
+		$this->imap_mailer->set_subject($this->input->post('name', false));
+		$this->imap_mailer->set_message($this->input->post('description', false));
+		$this->imap_mailer->set_cc($this->input->post('ccemail', false));
+		$this->imap_mailer->set_bcc($this->input->post('bccemail', false));
+		$this->imap_mailer->set_attachments($_FILES["attachment"]);
+		$this->imap_mailer->set_rel_type($this->input->post('rel_type', false));
+		$this->imap_mailer->set_rel_id($this->input->post('rel_id', false));
+		$this->imap_mailer->set_redirectTo($redirect_url);
+		$this->imap_mailer->set_parentId($this->input->post('parent_id',false));
+		$this->imap_mailer->send();
     }
 	public function autocomplete(){
 		$this->load->library('imap');

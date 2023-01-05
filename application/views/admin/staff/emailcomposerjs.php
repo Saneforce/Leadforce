@@ -352,9 +352,8 @@
         }
     }
     tinymce.init({
-        selector: 'textarea#template_edit_description',
+        selector: '#Edit-template textarea#template_edit_description',
         height: 100,
-        width: 570,
         menubar: true,
         plugins: [
             'advlist autolink lists charmap print preview anchor',
@@ -371,9 +370,8 @@
         }
     });
     tinymce.init({
-        selector: 'textarea#description',
+        selector: '#compose-modal textarea#description',
         height: 100,
-        width: 660,
         menubar: true,
         plugins: [
             'advlist autolink lists charmap print preview anchor',
@@ -390,9 +388,8 @@
         }
     });
     tinymce.init({
-        selector: 'textarea#template_description',
+        selector: '#compose-modal textarea#template_description',
         height: 100,
-        width: 670,
         menubar: true,
         plugins: [
             'advlist autolink lists charmap print preview anchor',

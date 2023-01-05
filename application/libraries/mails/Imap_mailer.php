@@ -20,14 +20,29 @@ class Imap_mailer
     protected $currentUid;
     protected $attachment_ids;
     protected $parentId;
+    protected $outlookCredentials;
+    protected $outlookToken;
 
     public function __construct()
     {
         $this->CI = &get_instance();
-        $this->CI->load->library('email');
-        $this->CI->load->library('imap');
+
         $this->CI->load->model('leads_model');
-        $this->imapconf = get_imap_setting();
+        if(get_option('connect_mail')=='no'){
+            $this->CI->load->helper("tasks_helper");
+            $this->outlookCredentials = outlook_credential();
+            $this->outlookToken = get_outlook_token();
+            refresh_token($this->outlookToken->email,$this->outlookToken->refresh_token);
+            $this->outlookToken = get_outlook_token();
+
+            
+        }else{
+            $this->CI->load->library('email');
+            $this->CI->load->library('imap');
+            $this->imapconf = get_imap_setting();
+            $this->smtpconf = $this->get_smtp_settings();
+        }
+        
     }
     public function set_to($to)
     {
@@ -231,7 +246,11 @@ class Imap_mailer
                 $data['project_id']	= $this->rel_id;
             elseif($this->rel_type =='lead')
                 $data['lead_id']	= $this->rel_id;
-                
+            
+            if(get_option('connect_mail')=='no'){
+                $data['mail_by'] ='outlook';
+            }
+
             if($this->parentId >0){
                 $data['local_id'] =$this->parentId;
                 $this->CI->db->insert(db_prefix() . 'reply', $data);
@@ -242,6 +261,7 @@ class Imap_mailer
             if($this->rel_type =='lead'){
                 $this->CI->leads_model->log_activity($this->rel_id,'email','added',$this->CI->db->insert_id());
             }
+            
         }
         
         if($this->redirectTo){
@@ -250,11 +270,208 @@ class Imap_mailer
         }
     }
     
+    public function send_outlook()
+    {
+        $to = $cc = $bcc =array();
+        $toarray = explode(",", $this->to);
+        if(!empty($toarray)){
+            foreach ($toarray as $eachTo) {
+                if(strlen(trim($eachTo)) > 0) {
+                    array_push($to, array(
+                        "EmailAddress" => array(
+                            "Address" => trim($eachTo)
+                        )
+                    ));
+                }
+            }
+        }
+        else{
+            array_push($to, array(
+                "EmailAddress" => array(
+                    "Address" => trim($this->to)
+                )
+            ));
+        }
+
+        $cclist = explode(",", $this->cc);
+        if(!empty($cclist)){
+            foreach ($cclist as $eachcc) {
+                if(strlen(trim($eachcc)) > 0) {
+                    array_push($cc, array(
+                        "EmailAddress" => array(
+                            "Address" => trim($eachcc)
+                        )
+                    ));
+                }
+            }
+        }
+        else{
+            array_push($cc, array(
+                "EmailAddress" => array(
+                    "Address" => trim($this->cc)
+                )
+            ));
+        }
+
+        $bcclist = explode(",", $this->bcc);
+        if(!empty($bcclist)){
+            foreach ($bcclist as $eachbcc) {
+                if(strlen(trim($eachcc)) > 0) {
+                    array_push($bcc, array(
+                        "EmailAddress" => array(
+                            "Address" => trim($eachbcc)
+                        )
+                    ));
+                }
+            }
+        }
+        else{
+            $thisbcc = array(
+                "EmailAddress" => array(
+                    "Address" => trim($_POST["bccemail"])
+                )
+            );
+            array_push($bcc, $thisbcc);
+        }
+        $_FILES["attachment"] =$this->attachments;
+        $request = array(
+            "Message" => array(
+                "Subject" =>$this->subject,
+                "ToRecipients" => $to,
+                "CcRecipients" => $cc,
+                "BccRecipients" => $bcc,
+                "Attachments" => get_attachement(),
+                "Body" => array(
+                    "ContentType" => "HTML",
+                    "Content" => $this->message
+                )
+            )
+        );
+        $request = json_encode($request);
+        
+        $headers = array(
+            "User-Agent: php-tutorial/1.0",
+            "Authorization: Bearer ".$this->outlookToken->token,
+            "Accept: application/json",
+            "Content-Type: application/json",
+            "Content-Length: ". strlen($request)
+        );
+        $req_url = $this->outlookCredentials["api_url"].'/me/sendmail';
+        $response = runCurl($req_url, $request, $headers);
+    }
+
+    public function read_outlook()
+    {
+
+        $outlookmessage =false;
+        $headers = array(
+			"User-Agent: php-tutorial/1.0",
+			"Authorization: Bearer ".$this->outlookToken->token,
+			"Accept: application/json",
+			"client-request-id: ".makeGuid(),
+			"return-client-request-id: true",
+			"X-AnchorMailbox: ". $this->outlookToken->email
+		);
+        $outlookApiUrl = $this->outlookCredentials["api_url"] . "/me/mailFolders" ;
+		$response = runCurl($outlookApiUrl, null, $headers);
+		$response = explode("\n", trim($response));
+		$response = $response[count($response) - 1];
+		$response = json_decode($response, true);
+        
+		if(!empty($response['value'])){
+			foreach($response['value'] as $folder1){
+				$icon = ucwords(strtolower($folder1['DisplayName']));
+				if($icon == 'Sent Items'){
+					$outlookApiUrl1 = $this->outlookCredentials["api_url"] . "/me/mailFolders/".$folder1['Id']."/messages" ;
+					$response1 = runCurl($outlookApiUrl1, null, $headers);
+					$response1 = explode("\n", trim($response1));
+					$response1 = $response1[count($response1) - 1];
+					$response1 = json_decode($response1, true);
+					$outlookmessage =$response1['value'][0];
+					break;
+				}
+				
+			}
+		}
+        
+        if($outlookmessage){
+            $to = $cc = $bcc = array();
+            if(!empty($outlookmessage['ToRecipients'])){
+                foreach($outlookmessage['ToRecipients'] as $mailto){
+                    $to[] =array(
+                        'email'=>$mailto['EmailAddress']['Address'],
+                        'name'=>$mailto['EmailAddress']['Name'],
+                    );
+                }
+            }
+
+            if(!empty($outlookmessage['CcRecipients'])){
+                foreach($outlookmessage['CcRecipients'] as $mailcc){
+                    $cc[] =array(
+                        'email'=>$mailcc['EmailAddress']['Address'],
+                        'name'=>$mailcc['EmailAddress']['Name'],
+                    );
+                }
+            }
+
+            if(!empty($outlookmessage['BccRecipients'])){
+                foreach($outlookmessage['BccRecipients'] as $mailbcc){
+                    $bcc[] =array(
+                        'email'=>$mailbcc['EmailAddress']['Address'],
+                        'name'=>$mailbcc['EmailAddress']['Name'],
+                    );
+                }
+            }
+
+            $email =array(
+                'id'=>0,
+                'uid'=>0,
+                'from'=>array(
+                    'email'=>$outlookmessage['From']['EmailAddress']['Address'],
+                    'name'=>$outlookmessage['From']['EmailAddress']['Name']
+                ),
+                'to'=>$to,
+                'cc'=>$cc,
+                'bcc'=>$cc,
+                'reply_to'=>$outlookmessage['ReplyTo'],
+                'message_id'=>$outlookmessage['Id'],
+                'in_reply_to'=>json_encode($outlookmessage['ReplyTo']),
+                'references'=>'',
+                'date'=>$outlookmessage['ReceivedDateTime'],
+                'udate'=>strtotime($outlookmessage['SentDateTime']),
+                'subject'=>$outlookmessage['Subject'],
+                'recent'=>'',
+                'priority'=>'',
+                'read'=>$outlookmessage['IsRead'],
+                'answered'=>$outlookmessage['IsRead'],
+                'flagged'=>$outlookmessage['Flag']['FlagStatus'],
+                'deleted'=>'',
+                'draft'=>'',
+                'size'=>'',
+                'body'=>array(
+                    'html'=>$outlookmessage['Body']['Content'],
+                    'plain'=>$outlookmessage['BodyPreview'],
+                )
+            );
+            $this->saveLocal($email);
+            if($this->redirectTo){
+                set_alert('success', 'Mail sent successfully');
+                redirect($this->redirectTo);
+            }
+        }
+        
+        
+    }
     public function send() 
     {
-        $this->smtpconf = $this->get_smtp_settings();
-        $this->send_smtp();
-        $this->read_imap();
+        if(get_option('connect_mail')=='no'){
+            $this->send_outlook();
+            $this->read_outlook();
+        }else{
+            $this->send_smtp();
+            $this->read_imap();
+        }
+        
     }
 
     public function getMessage($uid)

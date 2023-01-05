@@ -186,53 +186,126 @@ class Outlook_mail extends AdminController
 		$add_content = "'".$_REQUEST['msg_id']."'";
 		$output .= '<div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button><h4 class="modal-title"><i class="fa fa-envelope"></i> '.$response['Subject'].'</h4></div>';
 		$output .= '<div class="modal-body"><div class="email-app"><main class="message"><div class="details">';
-		//$output .= '<div class="title">'.$inboxEmails['subject'].'</div>';
+
+
 		if($_REQUEST['folder'] == 'Sent Items'){
-			$to_address = '';
+			$from_address = '';
 			if(!empty($response['ToRecipients'])){
 				foreach($response['ToRecipients'] as $to_mail1){
-					$to_address .= $to_mail1['EmailAddress']['Address'].', ';
+					$from_address .= $to_mail1['EmailAddress']['Address'].', ';
 				}
-				$to_address = rtrim($to_address,", ");
+				$from_address = rtrim($from_address,", ");
 			}
-			$output .= '<div class="header"><div class="from"><span>'.$to_address.'</span>'.$to_address.'</div><div class="date">'.date("d-M-Y H:i A",strtotime($response['ReceivedDateTime'])).'</div></div>';
 		}else{
-			$output .= '<div class="header"><div class="from"><span>'.$response['From']['EmailAddress']['Address'].'</span>'.$response['From']['EmailAddress']['Address'].'</div><div class="date">'.date("d-M-Y H:i A",strtotime($response['ReceivedDateTime'])).'</div></div>';
+			$from_address =$response['From']['EmailAddress']['Address'];
 		}
-		$output .= '<div class="content" style="margin-bottom:110px;overflow-wrap:break-word">'.$response['Body']['Content'].'</div><div class="col-md-12" style="margin-top:-100px"><div class="col-md-12"><div style="padding:0px 0px 33px 0px"><button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#forward-modal" onclick="add_content('.$add_content.')"><i class="fa fa-forward" ></i> Forward</button><button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#reply-modal" onclick="add_to('.$add_content.')" style="margin-right:10px;"><i class="fa fa-reply" ></i> Reply</button><button type="button" class="btn btn-primary pull-right" data-toggle="modal" data-target="#reply-modal" onclick="add_reply_all('.$add_content.')" style="margin-right:10px;"><i class="fa fa-reply" ></i> Reply All</button></div><div class="col-md-12" style="margin-top:20px;">';
-		$j1 = 0;
-		if(!empty($response['HasAttachments'] && $response['HasAttachments'] ==1)){
-			$headers = array(
-				"User-Agent: php-tutorial/1.0",
-				"Authorization: Bearer ".$token,
-				"Accept: application/json",
-				"client-request-id: ".makeGuid(),
-				"return-client-request-id: true",
-				"X-AnchorMailbox: ". $user_email
-			);
-			$outlookApiUrl = $outlook_data["api_url"] . "/me/Messages/".$msg_id."/attachments";
-			$response1 = runCurl($outlookApiUrl, null, $headers);
-			$response1 = explode("\n", trim($response1));
-			$response1 = $response1[count($response1) - 1];
-			$response1 = json_decode($response1, true);
-			
-			$j = count($response1["value"]);
-			foreach($response1["value"] as $attachement12){
+		$this->db->where('message_id',$response['Id']);
+		if(!$this->db->get(db_prefix().'localmailstorage')->row()){
+			$output .='
+				<div class="row" id="linktowrapper">
+					<div class="col-md-12">
+						<h5>Link to Deal or Lead</h5>
+						<div class="form-inline">
+							<input type="hidden" id="linktouid" value="'.$response['Id'].'" >
+							<div class="form-group mb-2" style="width:40%">
+								<select class="selectpicker" data-none-selected-text="Select Deal or Lead"  name="linkto_rel_id" id="linkto_rel_id" data-width="100%" data-live-search="true">'.render_deal_lead_list_by_email($from_address).'</select>
+							</div>
+							<button class="btn btn-info" id="linkto_rel_id_submit" type="button">Link with existing</button>
+							OR  
+							<a href="#" onclick="init_lead(0,false,'.$add_content.'); return false;" class="btn btn-info">New Lead</a>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="text-right">
+						</div>
+					</div>
+				</div>
+				<hr>
+			';
+		}
+
+		$output .='<div id="emailViewer">
+			<div class="emailViewerSubject">
+				<h3>'.$response['Subject'].'</h3>
+			</div>
+			<div class="emailViewerMeta">
+				<div class="row">
+					<div class="col-md-6">
+						<p class="no-margin" style="font-size: 13px;">From : <a>'.$response['From']['EmailAddress']['Address'].'</a></p>
+						<p class="no-margin" style="font-size: 13px;">To : <a>'.$response['ToRecipients'][0]['EmailAddress']['Address'].'</a></p>
+						<p class="no-margin" style="font-size: 13px;">'.date("d-M-Y H:i A",$response['udate']).'</p>
+					</div>
+					<div class="col-md-6">
+						<div class="button-group">
+							<button type="button" data-toggle="tooltip" data-original-title="Forward" class="btn btn-default pull-right" data-toggle="modal" data-target="#forward-modal" onclick="add_content('.$add_content.')"><i class="fa fa-share" aria-hidden="true"></i></button>
+							<button type="button" data-toggle="tooltip" data-original-title="Reply" class="btn btn-default pull-right" data-toggle="modal" data-target="#reply-modal" onclick="add_to('.$add_content.')" style="margin-right:5px;"><i class="fa fa-reply" ></i></button>
+							<button type="button" data-toggle="tooltip" data-original-title="Reply All" class="btn btn-default pull-right" data-toggle="modal" data-target="#reply-modal" onclick="add_reply_all('.$add_content.')" style="margin-right:5px;"><i class="fa fa-reply-all" aria-hidden="true"></i></button>
+						</div>
+					</div>
+				</div>
+			</div>';
+			$output .='<div style="margin-top:10px">';
+			$j1 = 0;
+			if(!empty($response['HasAttachments'] && $response['HasAttachments'] ==1)){
+				$headers = array(
+					"User-Agent: php-tutorial/1.0",
+					"Authorization: Bearer ".$token,
+					"Accept: application/json",
+					"client-request-id: ".makeGuid(),
+					"return-client-request-id: true",
+					"X-AnchorMailbox: ". $user_email
+				);
+				$outlookApiUrl = $outlook_data["api_url"] . "/me/Messages/".$msg_id."/attachments";
+				$response1 = runCurl($outlookApiUrl, null, $headers);
+				$response1 = explode("\n", trim($response1));
+				$response1 = $response1[count($response1) - 1];
+				$response1 = json_decode($response1, true);
 				
-				$name = "'".$attachement12['Name']."'";
-				$content = "'".$attachement12['ContentBytes']."'";
-				$downoad_url = admin_url('outlook_mail/download_attachment_single?name='.$attachement12['Name'].'&content='.$attachement12["ContentId"].'&msg_id='.$msg_id);
-				$output .= '<div class="btn btn-default pull-left" style="margin-right:10px;"><a href="'.$downoad_url.'" onclick="download_single('.$name.','.$content.')">'.$attachement12['Name'].'</a></div>';
-				$j1++;
+				$j = count($response1["value"]);
+				foreach($response1["value"] as $attachement12){
+					
+					$name = "'".$attachement12['Name']."'";
+					$content = "'".$attachement12['ContentBytes']."'";
+					$downoad_url = admin_url('outlook_mail/download_attachment_single?name='.$attachement12['Name'].'&content='.$attachement12["ContentId"].'&msg_id='.$msg_id);
+					$output .= '<div class="btn btn-default pull-left" style="margin-right:10px;"><a href="'.$downoad_url.'" onclick="download_single('.$name.','.$content.')">'.$attachement12['Name'].'</a></div>';
+					$j1++;
+				}
 			}
-		}
-		if($j1>1){
-			$downoad_url = admin_url('outlook_mail/outlook_all_download_attachment?msg_id='.$msg_id);
-				
-			$output .= '<div class="btn btn-default pull-left" style="margin-right:10px;"><a href="'.$downoad_url.'">Download All</a></div>';
-		}
-		$output .= '</div></div></div>';
-		$output .= '</div></main></div></div>';
+			if($j1>1){
+				$downoad_url = admin_url('outlook_mail/outlook_all_download_attachment?msg_id='.$msg_id);
+					
+				$output .= '<div class="btn btn-default pull-left" style="margin-right:10px;"><a href="'.$downoad_url.'">Download All</a></div>';
+			}
+			$output .='</div>';
+			$output .='<div class="emailViewerBody" style="margin-top:20px">'.$response['Body']['Content'].'</div>';
+
+		$output .='</div>';
+		$output .= '</div>';
+		$output .='
+		<script>
+			$("#linkto_rel_id").selectpicker();
+			$("#linkto_rel_id_submit").click(function(){
+				var linkto =$("#linkto_rel_id").val();
+				var linktouid =$("#linktouid").val();
+				$.ajax({
+					url: admin_url+"company_mail/linkemail",
+					type: "POST",
+					data: {linkto:linkto,linktouid:linktouid},
+					dataType: "json",
+					success: function(data) {
+						if(data.success){
+							$("#linktowrapper").remove();
+							alert_float("success", data.msg);
+						}else{
+							alert_float("danger", data.msg);
+						}
+						
+					}               
+				});
+			})
+		</script>
+		';
+		
 		$mailList['body'] = $output;
 		echo json_encode($mailList);
 		$request = array(
@@ -1213,8 +1286,29 @@ class Outlook_mail extends AdminController
 						$toname = $mail["Sender"]["EmailAddress"]["Address"];
 						$output .= '<td class="name"><a href="#" onClick="getMessage('.$req_mail_id.');">'.$to_address.'</a></td>';
 					}
+
+					$this->db->where('message_id',$mail['Id']);
+					
+
+					$local_mail =$this->db->get(db_prefix().'localmailstorage')->row();
+					$connect_rel_data ='';
+					
+					if($local_mail){
+						if($local_mail->deal_id){
+							$this->db->where('deleted_status',0);
+							$this->db->where('id',$local_mail->deal_id);
+							$deal =$this->db->get(db_prefix().'projects')->row();
+							$connect_rel_data ='<a href="#" onClick="updatedeal('.$mail['Id'].');">'.htmlentities($deal->name).' (Deal)</a>';
+						}elseif($local_mail->lead_id){
+							$this->db->where('deleted_status',0);
+							$this->db->where('id',$local_mail->lead_id);
+							$lead =$this->db->get(db_prefix().'leads')->row();
+							$connect_rel_data ='<a target="_blank" href="'.admin_url('leads/lead/'.$lead->id).'">'.htmlentities($lead->name).' (Lead)</a>';
+						}
+					}
+
 					$output .= '<td class="subject"><a href="#" onClick="getMessage('.$req_mail_id.');">'.substr($mail['Subject'],0,30).'</a></td>';
-					$output .= '<td class="subject"><a href="#" onClick="updatedeal('.$req_mail_id.');">Deal</a></td>';
+					$output .= '<td class="subject">'.$connect_rel_data.'</td>';
 					if(!empty($mail['HasAttachments']) && $mail["HasAttachments"] == 1){
 						$output .= '<td><a href="'.admin_url('outlook_mail/outlook_all_download_attachment?msg_id='.$mail['Id']).'" ><i class="fa fa-paperclip" aria-hidden="true"></i></a></td>';
 					}else{
