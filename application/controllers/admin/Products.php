@@ -1001,7 +1001,11 @@ class Products extends AdminController
     public function getdealproduct() {
         //$data = $this->products_model->getprod_price($cur);
         $result = array();
-        $getProds = $this->products_model->getdealprods();
+        if(isset($_POST['project']))
+            $getProds = $this->products_model->getdealprods();
+        else
+            $getProds = $this->products_model->getleadprods();
+
         $result['productscnt'] = (!empty($getProds))?count($getProds):0;
         $discount_value = 0;
         $cur = '';

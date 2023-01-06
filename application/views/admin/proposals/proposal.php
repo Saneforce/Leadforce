@@ -417,7 +417,7 @@
     var rel_type = $('#rel_type').val();
     var project = $('#prject_id').val();
     var proj_exist = 0;
-    if(rel_type != 'project' && project.length == 0) {
+    if(rel_type != 'project' && project.length == 0 && rel_type !='lead') {
       $('#change_items').val(1)
       $("#suptotaltxt").html('');
       $("#suptotal").html('');
@@ -706,6 +706,10 @@
       if(rel_type == 'project' && project.length == 0) {
         var url =  admin_url+'products/getdealproduct';
         var datas = {project:rel_id};
+      }
+      if(rel_type == 'lead' && project.length == 0) {
+        var url =  admin_url+'products/getdealproduct';
+        var datas = {lead:rel_id};
       }
       if(rel_type != 'project' && project.length > 0) {
         $('#change_items').val(0);

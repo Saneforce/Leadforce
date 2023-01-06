@@ -99,7 +99,16 @@ $emails =$this->leads_model->get_emails($lead->id);
 		</div>
 	</div>
 </div>
-
+<!-- END COMPOSE MESSAGE -->
+<div class="modal fade" id="message-modal" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-wrapper">
+		<div class="modal-dialog">
+			<div class="modal-content" id="message_id" style="height:auto;position:absolute;width:100%">
+				
+			</div>
+		</div>
+	</div>
+</div>
 <?php $this->load->view("admin/staff/emailcomposer") ?>
 
 <script>
@@ -118,6 +127,21 @@ $emails =$this->leads_model->get_emails($lead->id);
 			error: function(data) {
 				document.getElementById('overlay').style.display = 'none';
 			}
+		});
+	}
+
+	function getMessage(val){
+		document.getElementById('overlay').style.display = '';
+		$.post(admin_url + 'leads/getmessage',
+		{
+			uid:val
+		},
+		function(data,status){
+			document.getElementById('overlay').style.display = 'none'; 
+			$('#message-modal .modal-content').html(data);
+				// show modal
+			$('#message-modal').modal('show');
+			
 		});
 	}
 </script>

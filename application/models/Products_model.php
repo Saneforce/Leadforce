@@ -309,6 +309,16 @@ class Products_model extends App_Model {
         }
     }
 
+    public function getleadprods() {
+        $this->db->where('leadid', $_POST['lead']);
+        $products = $this->db->get(db_prefix() . 'lead_products')->result_array();
+        if($products) {
+            return $products;
+        } else {
+            return false;
+        }
+    }
+
     public function getinvoiceprods() {
         $this->db->where('projectid', $_POST['project']);
         $products = $this->db->get(db_prefix() . 'itemable')->result_array();

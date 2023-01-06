@@ -1876,4 +1876,65 @@ class Leads extends AdminController
         echo json_encode(array('success'=>true,'content'=>false));
         
     }
+
+    public function getmessage() {
+        $this->db->where('id', $_REQUEST['uid']);
+        $local_email =$this->db->get(db_prefix().'localmailstorage')->row();
+        $output ='';
+        if($local_email){
+            $mail_to =json_decode($local_email->mail_to);
+            $add_content = "'".$local_email->uid."'";
+            $output .= '<div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button><h4 class="modal-title"><i class="fa fa-envelope"></i> Email Viewer</h4></div>';
+		    $output .= '<div class="modal-body">';
+            $output .='<div id="emailViewer">
+			<div class="emailViewerSubject">
+				<h3>'.$local_email->subject.'</h3>
+			</div>
+			<div class="emailViewerMeta">
+				<div class="row">
+					<div class="col-md-6">
+						<p class="no-margin" style="font-size: 13px;">From : <a>'.$local_email->from_email.'</a></p>
+						<p class="no-margin" style="font-size: 13px;">To : <a>'.$mail_to[0]->email.'</a></p>
+						<p class="no-margin" style="font-size: 13px;">'.date("d-M-Y H:i A",$local_email->udate).'</p>
+					</div>
+					<div class="col-md-6">
+						<div class="button-group">
+							<button type="button" data-toggle="tooltip" data-original-title="Forward" class="btn btn-default pull-right" data-toggle="modal" data-target="#forward-modal" onclick="add_content('.$add_content.')"><i class="fa fa-share" aria-hidden="true"></i></button>
+							<button type="button" data-toggle="tooltip" data-original-title="Reply" class="btn btn-default pull-right" data-toggle="modal" data-target="#reply-modal" onclick="add_to('.$add_content.')" style="margin-right:5px;"><i class="fa fa-reply" ></i></button>
+							<button type="button" data-toggle="tooltip" data-original-title="Reply All" class="btn btn-default pull-right" data-toggle="modal" data-target="#reply-modal" onclick="add_reply_all('.$add_content.')" style="margin-right:5px;"><i class="fa fa-reply-all" aria-hidden="true"></i></button>
+						</div>
+					</div>
+				</div>
+			</div>';
+
+			// $output .='<div style="margin-top:10px">';
+			// $j1 = 0;
+			// if(!empty($inboxEmails['attachments'])){
+			// 	foreach($inboxEmails['attachments'] as $attachement12){
+			// 		$downoad_url = admin_url('company_mail/download_attachment_single/'.$inboxEmails['uid']).'?folder='.$_REQUEST['folder'].'&attach_id='.$j1;
+			// 		$output .= '<a class="btn btn-default mright5"  href="'.$downoad_url.'"><i class="fa fa-download" aria-hidden="true"></i> '.$attachement12['name'].'</a>';
+			// 		$j1++;
+			// 	}
+			// }
+			// if($j1>1){
+			// 	$downoad_url = admin_url('company_mail/download_attachment/'.$inboxEmails['uid']).'?folder='.$_REQUEST['folder'];
+					
+			// 	$output .= '<a class="btn btn-default"  href="'.$downoad_url.'"><i class="fa fa-download" aria-hidden="true"></i> Download All</a>';
+			// }
+			// $output .='</div>';
+			$output .='<div class="emailViewerBody" style="margin-top:20px">'.$local_email->body_html.'</div>';
+            $output .='</div>';
+            $output .= '</div>';
+        }else{
+            $output .= '<div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button><h4 class="modal-title"><i class="fa fa-envelope"></i> Email</h4></div>';
+		    $output .= '<div class="modal-body">';
+            $output .='<div id="emailViewer">';
+            $output .='<p> Could not get email</p>';
+            $output .='</div>';
+            $output .= '</div>';
+        }
+
+        echo $output;
+        
+    }
 }
