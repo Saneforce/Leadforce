@@ -113,6 +113,7 @@ class Dashboard extends AdminController
 		$data['pipelines'] = $this->pipeline_model->getPipeline();
 		$data['teammembers'] = $this->pipeline_model->getTeammembers();
 		$data['statuses'] = $this->leads_model->get_status();
+		$data['title'] ='Dashboard';
         $data = hooks()->apply_filters('before_dashboard_render', $data);
         $this->load->view('admin/dashboard/dashboard', $data);
     }

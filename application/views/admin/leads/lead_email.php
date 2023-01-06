@@ -101,3 +101,23 @@ $emails =$this->leads_model->get_emails($lead->id);
 </div>
 
 <?php $this->load->view("admin/staff/emailcomposer") ?>
+
+<script>
+	function sync_mail(){
+		document.getElementById('overlay').style.display = ''; 
+		$.ajax({
+			url: admin_url+'cronjob/store_local_mails',
+			type: 'POST',
+			data: { },
+			success: function(data) {
+					alert_float('success', 'Mail Fetched Successfully');
+					// location.reload();
+					// document.getElementById('overlay').style.display = 'none';
+				}
+			,
+			error: function(data) {
+				document.getElementById('overlay').style.display = 'none';
+			}
+		});
+	}
+</script>

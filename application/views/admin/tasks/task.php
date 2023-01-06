@@ -169,12 +169,11 @@ p#rel_id-error {
                </div> -->
           <div class="row">
             <div class="col-md-12">
-              <p class="bold"><?php echo _l('task_add_edit_description'); ?></p>
               <div class="form-group">
 			  <?php /*<textarea id="description" name="description" class="form-control tinymce_id" rows="4" placeholder="Add Description" ><?php echo (isset($task) ? $task->description : ''); ?></textarea>*/
 			  
 			  //echo render_textarea('description','',(isset($task) ? $task->description : ''),array('rows'=>4,'placeholder'=>_l('task_add_description'),'data-task-ae-editor'=>true, !is_mobile() ? 'onclick' : 'onfocus'=>(!isset($task) || isset($task) && $task->description == '' ? 'init_editor(\'.tinymce-task\', {height:50, auto_focus: true, menubar: false});' : ''),'id'=>'description','class'=>'tinymce_id'),array(),'no-mbot','tinymce-task');
-			  echo render_textarea('description','',(isset($task) ? $task->description : ''),array('rows'=>4,'placeholder'=>_l('task_add_description'),'id'=>'description','class'=>'tinymce_id'),array(),'no-mbot','tinymce-task');
+			  echo render_textarea('description','task_add_edit_description',(isset($task) ? $task->description : ''),array('rows'=>4,'placeholder'=>_l('task_add_description'),'id'=>'description','class'=>''),array(),'no-mbot','');
 			  ?>
 			  </div>
             </div>

@@ -11,7 +11,6 @@
             $selectedcontactid =$contact_details->contacts_id;
         }
     }
-    
 ?>
 <div class="<?php
 if ($openEdit == true) {
@@ -1128,9 +1127,11 @@ $hascoustomfields =$this->db->get(db_prefix() . 'customfields')->row();
         <?php endif; ?>
 
         $("#client_id").selectpicker("refresh");
-        get_person($('#client_id').val());
+        <?php if(!$selectedcontactid): ?>
+            get_person($('#client_id').val());
+        <?php endif; ?>
         $("#contactid").selectpicker("refresh");
-        $('#contactid').change(function(){;
+        $('#contactid').change(function(){
             var selectedcontact =$(this).val();
             if(selectedcontact ==''){
                 disabled_person_fields(false);
