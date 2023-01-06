@@ -12,20 +12,85 @@ function app_init_admin_sidebar_menu_items() {
             'icon' => 'fa fa-tachometer',
         ]);
     }
+
+    if (has_permission('leads', '', 'view')) {
+        $CI->app_menu->add_sidebar_menu_item('leads', [
+            'name' => _l('als_leads'),
+            'href' => admin_url('leads'),
+            'icon' => 'fa fa-tty',
+            'position' => 2,
+        ]);
+    }
+    
+    if (has_permission('projects', '', 'view') || has_permission('projects', '', 'view_own')) {
+        $CI->db->where('publishstatus', '1');
+        //if (!is_admin()) {
+            //$get_staff_user_id = get_staff_user_id();
+            //$CI->db->where('( find_in_set("'.$get_staff_user_id.'", teammembers) OR find_in_set("'.$get_staff_user_id.'", teamleader) )');
+            // $this->db->where(' <> 0');
+        //}
+        $pipelines = $CI->db->get(db_prefix() . 'pipeline')->result_array();
+        //echo $CI->db->last_query(); exit;
+        //echo "<pre>"; print_r($pipelines); exit;
+        //$projurl = admin_url('projects/kanban_noscroll?pipelines='.$pipelines[0]['id'].'&member=&gsearch=');
+        $projurl = admin_url('projects/index_list?pipelines=&member=&gsearch=');
+        if(!is_admin(get_staff_user_id())) {
+            $projurl = admin_url('projects/kanban_noscroll?pipelines='.$pipelines[0]['id'].'&member='.get_staff_user_id().'&gsearch=');
+			//$projurl = admin_url('projects/index_list?pipelines=&member='.get_staff_user_id().'&gsearch=');
+        }
+        
+        $CI->app_menu->add_sidebar_menu_item('projects', [
+            'name' => _l('projects'),
+            'href' => $projurl,
+            'icon' => 'fa fa-handshake-o',
+            'position' => 3,
+        ]);
+    }
+    if (has_permission('tasks', '', 'view') || has_permission('tasks', '', 'view_own')) {
+        $CI->app_menu->add_sidebar_menu_item('tasks', [
+            'name' => _l('als_tasks'),
+            'href' => admin_url('tasks'),
+            'icon' => 'fa fa-tasks',
+            'position' => 4,
+        ]);
+    }
+
+    if (has_permission('contacts', '', 'view')) {
+        $CI->app_menu->add_sidebar_menu_item('contacts', [
+            'name' => _l('Person'),
+            'slug' => 'all_contacts',
+            'href' => admin_url('all_contacts'),
+            'position' => 5,
+            'icon' => 'fa fa-id-card-o',
+        ]);
+    }
+
     if (has_permission('customers', '', 'view') || (have_assigned_customers() || (!have_assigned_customers() && has_permission('customers', '', 'create')))) {
         $CI->app_menu->add_sidebar_menu_item('customers', [
             'name' => _l('als_clients'),
             'href' => admin_url('clients'),
-            'position' => 4,
+            'position' => 6,
             'slug' => 'clients',
             'icon' => 'fa fa-building-o',
         ]);
     }
+
+    if (has_permission('email', '', 'view')) {
+        $CI->app_menu->add_sidebar_menu_item('email', [
+            'name' => 'Email',
+            'slug' => 'email',
+            //'href' => admin_url('tasks/emailmanagement'),
+			 'href' => admin_url('company_mail/check_company_mail'),
+            'position' => 7,
+            'icon' => 'fa fa-envelope',
+        ]);
+    }
+
     if (has_permission('sales')) {
         $CI->app_menu->add_sidebar_menu_item('sales', [
             'collapse' => true,
             'name' => _l('als_sales'),
-            'position' => 10,
+            'position' => 8,
             'icon' => 'fa fa-balance-scale',
         ]);
     }
@@ -119,28 +184,6 @@ function app_init_admin_sidebar_menu_items() {
             'position' => 20,
         ]);
     }
-
-    if (has_permission('contacts', '', 'view')) {
-        $CI->app_menu->add_sidebar_menu_item('contacts', [
-            'name' => _l('Person'),
-            'slug' => 'all_contacts',
-            'href' => admin_url('all_contacts'),
-            'position' => 5,
-            'icon' => 'fa fa-id-card-o',
-        ]);
-    }
-
-    if (has_permission('email', '', 'view')) {
-        $CI->app_menu->add_sidebar_menu_item('email', [
-            'name' => 'Email',
-            'slug' => 'email',
-            //'href' => admin_url('tasks/emailmanagement'),
-			 'href' => admin_url('company_mail/check_company_mail'),
-            'position' => 8,
-            'icon' => 'fa fa-envelope',
-        ]);
-    }
-	
     
     // if (has_permission('products', '', 'view')) {
     //     $CI->app_menu->add_sidebar_menu_item('products', [
@@ -182,38 +225,9 @@ function app_init_admin_sidebar_menu_items() {
         ]);
     }
         
-    if (has_permission('projects', '', 'view') || has_permission('projects', '', 'view_own')) {
-        $CI->db->where('publishstatus', '1');
-        //if (!is_admin()) {
-            //$get_staff_user_id = get_staff_user_id();
-            //$CI->db->where('( find_in_set("'.$get_staff_user_id.'", teammembers) OR find_in_set("'.$get_staff_user_id.'", teamleader) )');
-            // $this->db->where(' <> 0');
-        //}
-        $pipelines = $CI->db->get(db_prefix() . 'pipeline')->result_array();
-        //echo $CI->db->last_query(); exit;
-        //echo "<pre>"; print_r($pipelines); exit;
-        //$projurl = admin_url('projects/kanban_noscroll?pipelines='.$pipelines[0]['id'].'&member=&gsearch=');
-        $projurl = admin_url('projects/index_list?pipelines=&member=&gsearch=');
-        if(!is_admin(get_staff_user_id())) {
-            $projurl = admin_url('projects/kanban_noscroll?pipelines='.$pipelines[0]['id'].'&member='.get_staff_user_id().'&gsearch=');
-			//$projurl = admin_url('projects/index_list?pipelines=&member='.get_staff_user_id().'&gsearch=');
-        }
-        $CI->app_menu->add_sidebar_menu_item('projects', [
-            'name' => _l('projects'),
-            'href' => $projurl,
-            'icon' => 'fa fa-usd',
-            'position' => 2,
-        ]);
-    }
 
-    if (has_permission('tasks', '', 'view') || has_permission('tasks', '', 'view_own')) {
-        $CI->app_menu->add_sidebar_menu_item('tasks', [
-            'name' => _l('als_tasks'),
-            'href' => admin_url('tasks'),
-            'icon' => 'fa fa-tasks',
-            'position' => 3,
-        ]);
-    }
+
+    
 	
 	if (has_permission('pipelinestatus', '', 'view') || has_permission('pipelinestatus', '', 'view_own')) {
         $CI->app_menu->add_setup_menu_item('pipelinestatus', [
@@ -243,14 +257,7 @@ function app_init_admin_sidebar_menu_items() {
             ]);
         }
     }
-    if (has_permission('leads', '', 'view')) {
-        $CI->app_menu->add_sidebar_menu_item('leads', [
-            'name' => _l('als_leads'),
-            'href' => admin_url('leads'),
-            'icon' => 'fa fa-tty',
-            'position' => 45,
-        ]);
-    }
+    
 
     if (has_permission('knowledge_base', '', 'view')) {
         $CI->app_menu->add_sidebar_menu_item('knowledge-base', [
