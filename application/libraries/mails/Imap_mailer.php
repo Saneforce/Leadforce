@@ -484,7 +484,12 @@ class Imap_mailer
 
     public function connectEmail($uid)
     {
-        $this->saveLocal($this->getMessage($uid));
+        if(is_array($uid)){
+            $this->saveLocal($uid);
+        }else{
+            $this->saveLocal($this->getMessage($uid));
+        }
+        
     }
 
 }

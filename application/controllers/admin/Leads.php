@@ -264,6 +264,7 @@ class Leads extends AdminController
         $data['logs_count'] = $this->leads_model->get_logs_count($lead->id);
         $data['emails_count'] = $this->leads_model->get_emails_count($lead->id);
         $data['activity_count'] = $this->leads_model->get_activities_count($lead->id);
+        $data['calls_count'] = $this->leads_model->get_calls_count($lead->id);
         $data['proposal_count'] = $this->leads_model->get_proposal_count($lead->id);
         $data['files_count'] = $this->leads_model->get_files_count($lead->id);
         $data['notes_count'] = $this->leads_model->get_notes_count($lead->id);
@@ -1922,7 +1923,14 @@ class Leads extends AdminController
 			// 	$output .= '<a class="btn btn-default"  href="'.$downoad_url.'"><i class="fa fa-download" aria-hidden="true"></i> Download All</a>';
 			// }
 			// $output .='</div>';
-			$output .='<div class="emailViewerBody" style="margin-top:20px">'.$local_email->body_html.'</div>';
+            $message ='';
+            if(strlen(trim($local_email->body_html))>0 && $local_email->body_html !=0){
+                $message =$local_email->body_html;
+            }else{
+                $message =$local_email->body_plain;
+            }
+
+			$output .='<div class="emailViewerBody" style="margin-top:20px">'.$message.'</div>';
             $output .='</div>';
             $output .= '</div>';
         }else{

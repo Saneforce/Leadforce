@@ -515,7 +515,7 @@ class Company_mail extends AdminController
 			/*$output['table'] .= "</select><div class='btn-group' style='margin-left:10px;'><button type='button' class='btn btn-primary' id='default_submit' onclick='submit_default()' style='letter-spacing: 2px;
     font-weight: 700;'>Save</button></div></div>";*/
 			//$output['table'] .= "</div>";
-			$output['table'] .= "<table class='table  dataTable' ><thead><th>Name</th><th>Action</th></thead>";
+			$output['table'] .= "<table class='table' ><thead><th>Name</th><th>Action</th></thead>";
 			foreach($templates as $template2){
 				$req_class = "list_1".$template2['id'];
 				$req_id    = "'".$template2['id']."'";

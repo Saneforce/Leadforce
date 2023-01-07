@@ -2910,105 +2910,123 @@ class Imap
 			$sQuery12 = "select ".$staff_fields." from ".db_prefix()."staff where staffid = '".$staffid."'";
 			$assignee_admin = $CI->db->query($sQuery12)->row();
 			foreach($rResults as $uid1){
-				
 				$messages = $this->get_message($uid1);
-				
-				$req_project_id = get_deal_id_contactuser($messages['from']['email'],get_option('deal_map'));
-				if(empty($req_project_id)){
-					$req_project_id = get_deal_id_otheruser(get_option('deal_map'),$messages['to'],$messages['cc'],$messages['bcc']);
-				}
-				$req_project_id = json_decode($req_project_id);
-				if(!empty($req_project_id) && !empty($messages['uid']) && !empty($messages['id'])){
-					$ins_data['description'] = $messages['body']['html'];
-					$ins_data['billable']	 = 1;
-					$ins_data['tasktype']	 = 2;
-					$ins_data['name']		 = $messages['subject'];
-					$ins_data['startdate']	 = date('d-m-Y H:i:s');
-					$ins_data['priority']	 = 1;
-					$ins_data['rel_type']	 = 'project';
-					$ins_data['rel_id']		 = $req_project_id->project_id;
-					$ins_data['contacts_id'] = $req_project_id->contact_id;
-					$ins_data['source_from'] = $uid1;
-					$CI->db->reconnect();
-					$task_fields = "id,name,tasktype,description,priority,dateadded,datemodified,startdate,duedate,datefinished,addedfrom,is_added_from_contact,status,send_reminder,recurring_type,repeat_every,recurring,is_recurring_from,cycles,total_cycles,custom_recurring,last_recurring_date,rel_id,rel_type,is_public,contacts_id,billable,billed,invoice_id,hourly_rate,milestone,kanban_order,milestone_order,visible_to_client,deadline_notified,source_from,imported_id,call_request_id,call_code,call_msg";
-					$sQuery13 = "select ".$task_fields." from ".db_prefix()."tasks where source_from = '".$uid1."'";
-					$tasks_data = $CI->db->query($sQuery13)->row();
-					$data_assignee 			 = $assignee_admin->staffid;
-					if(empty($tasks_data)){
+				if($messages['in_reply_to']){
+					$CI->db->where('message_id',$messages['in_reply_to']);
+					$local_mail = $CI->db->get(db_prefix().'localmailstorage')->row();
+					if($local_mail){
+						if($local_mail->project_id){
+							$rel_type ='project';
+							$rel_id =$local_mail->project_id;
+						}else{
+							$rel_type ='lead';
+							$rel_id =$local_mail->lead_id;
+						}
+						$CI->load->library('mails/imap_mailer');
+						$CI->imap_mailer->set_rel_type($rel_type);
+						$CI->imap_mailer->set_rel_id($rel_id);
+						$CI->imap_mailer->connectEmail($messages);
+						$CI->db->insert(db_prefix() . 'imapuid', $messages['uid']);
+					}
+				}else{
+					$req_project_id = get_deal_id_contactuser($messages['from']['email'],get_option('deal_map'));
+					if(empty($req_project_id)){
+						$req_project_id = get_deal_id_otheruser(get_option('deal_map'),$messages['to'],$messages['cc'],$messages['bcc']);
+					}
+					$req_project_id = json_decode($req_project_id);
+					if(!empty($req_project_id) && !empty($messages['uid']) && !empty($messages['id'])){
+						$ins_data['description'] = $messages['body']['html'];
+						$ins_data['billable']	 = 1;
+						$ins_data['tasktype']	 = 2;
+						$ins_data['name']		 = $messages['subject'];
+						$ins_data['startdate']	 = date('d-m-Y H:i:s');
+						$ins_data['priority']	 = 1;
+						$ins_data['rel_type']	 = 'project';
+						$ins_data['rel_id']		 = $req_project_id->project_id;
+						$ins_data['contacts_id'] = $req_project_id->contact_id;
+						$ins_data['source_from'] = $uid1;
 						$CI->db->reconnect();
-						$id   = $CI->tasks_model->add($ins_data);
-						$assignData = [
-								'taskid'  => $id,
-								'staffid' => $data_assignee,
-								];
+						$task_fields = "id,name,tasktype,description,priority,dateadded,datemodified,startdate,duedate,datefinished,addedfrom,is_added_from_contact,status,send_reminder,recurring_type,repeat_every,recurring,is_recurring_from,cycles,total_cycles,custom_recurring,last_recurring_date,rel_id,rel_type,is_public,contacts_id,billable,billed,invoice_id,hourly_rate,milestone,kanban_order,milestone_order,visible_to_client,deadline_notified,source_from,imported_id,call_request_id,call_code,call_msg";
+						$sQuery13 = "select ".$task_fields." from ".db_prefix()."tasks where source_from = '".$uid1."'";
+						$tasks_data = $CI->db->query($sQuery13)->row();
+						$data_assignee 			 = $assignee_admin->staffid;
+						if(empty($tasks_data)){
+							$CI->db->reconnect();
+							$id   = $CI->tasks_model->add($ins_data);
+							$assignData = [
+									'taskid'  => $id,
+									'staffid' => $data_assignee,
+									];
+							$CI->db->reconnect();
+							$CI->db->insert(db_prefix() . 'task_assigned', $assignData);
+						}
+						else{
+							$id = $tasks_data->id;
+						}
 						$CI->db->reconnect();
-						$CI->db->insert(db_prefix() . 'task_assigned', $assignData);
-					}
-					else{
-						$id = $tasks_data->id;
-					}
-					$CI->db->reconnect();
-					$table_new1 = db_prefix() . 'projects';
-					$CI->db->select('*');
-					$CI->db->from($table_new1);
-					$condition12 = array('id'=>$ins_data['rel_id']);
-					$CI->db->where($condition12);
-					$cur_project12 = $CI->db->get()->row();
-					$ins_attachement = array_column($messages['attachments'], 'name'); 
-					$req_msg[$i]['project_id']	= $ins_data['rel_id'];
-					$req_msg[$i]['task_id']		= $id;
-					$req_msg[$i]['assignee']	= $data_assignee;
-					$req_msg[$i]['mailid']		= $messages['id'];
-					$req_msg[$i]['uid'] 		= $messages['uid'];
-					$req_msg[$i]['contacts_id']	= $ins_data['contacts_id'];
-					if(!empty($cur_project12->teamleader)){
-						$req_msg[$i]['staff_id'] 	= $cur_project12->teamleader;
-					}
-					else{
+						$table_new1 = db_prefix() . 'projects';
 						$CI->db->select('*');
-						$CI->db->where('project_id', $ins_data['rel_id']);
-						$CI->db->where('is_primary', 1);
-						$cur_project12 = $CI->db->get(db_prefix() . 'project_contacts')->row();
-						//$cur_project12 = $this->projects_model->get_primary_project_contact($ch_project_id);
-						$req_msg[$i]['staff_id'] 	= $cur_project12->contacts_id;
+						$CI->db->from($table_new1);
+						$condition12 = array('id'=>$ins_data['rel_id']);
+						$CI->db->where($condition12);
+						$cur_project12 = $CI->db->get()->row();
+						$ins_attachement = array_column($messages['attachments'], 'name'); 
+						$req_msg[$i]['project_id']	= $ins_data['rel_id'];
+						$req_msg[$i]['task_id']		= $id;
+						$req_msg[$i]['assignee']	= $data_assignee;
+						$req_msg[$i]['mailid']		= $messages['id'];
+						$req_msg[$i]['uid'] 		= $messages['uid'];
+						$req_msg[$i]['contacts_id']	= $ins_data['contacts_id'];
+						if(!empty($cur_project12->teamleader)){
+							$req_msg[$i]['staff_id'] 	= $cur_project12->teamleader;
+						}
+						else{
+							$CI->db->select('*');
+							$CI->db->where('project_id', $ins_data['rel_id']);
+							$CI->db->where('is_primary', 1);
+							$cur_project12 = $CI->db->get(db_prefix() . 'project_contacts')->row();
+							//$cur_project12 = $this->projects_model->get_primary_project_contact($ch_project_id);
+							$req_msg[$i]['staff_id'] 	= $cur_project12->contacts_id;
+						}
+						$req_msg[$i]['from_email'] 	= $messages['from']['email'];
+						$req_msg[$i]['from_name'] 		= $messages['from']['name'];
+						$req_msg[$i]['mail_to']		= json_encode($messages['to']);
+						$req_msg[$i]['cc']			= json_encode($messages['cc']);
+						$req_msg[$i]['bcc']			= json_encode($messages['bcc']);
+						$req_msg[$i]['reply_to']	= json_encode($messages['reply_to']);
+						$req_msg[$i]['message_id']	= $messages['message_id'];
+						$req_msg[$i]['in_reply_to']	= $messages['in_reply_to'];
+						$req_msg[$i]['mail_references']	= json_encode($messages['references']);
+						$req_msg[$i]['date']		= $messages['date'];
+						$req_msg[$i]['udate']		= $messages['udate'];
+						$req_msg[$i]['subject']		= $messages['subject'];
+						$req_msg[$i]['recent']		= $messages['recent'];
+						$req_msg[$i]['priority']	= $messages['priority'];
+						$req_msg[$i]['mail_read']	= $messages['read'];
+						$req_msg[$i]['answered']	= $messages['answered'];
+						$req_msg[$i]['flagged']		= $messages['flagged'];
+						$req_msg[$i]['deleted']		= $messages['deleted'];
+						$req_msg[$i]['draft']		= $messages['draft'];
+						$req_msg[$i]['size']		= $messages['size'];
+						$req_msg[$i]['attachements']= json_encode($ins_attachement);
+						$req_msg[$i]['body_html']	= $messages['body']['html'];
+						$req_msg[$i]['body_plain']	= $messages['body']['plain'];
+						$req_msg[$i]['folder']		= 'INBOX';
+						$CI->db->reconnect();
+						$table = db_prefix() . 'localmailstorage';
+						$CI->db->insert($table,$req_msg[$i]);
+						$i++;
+						
 					}
-					$req_msg[$i]['from_email'] 	= $messages['from']['email'];
-					$req_msg[$i]['from_name'] 		= $messages['from']['name'];
-					$req_msg[$i]['mail_to']		= json_encode($messages['to']);
-					$req_msg[$i]['cc']			= json_encode($messages['cc']);
-					$req_msg[$i]['bcc']			= json_encode($messages['bcc']);
-					$req_msg[$i]['reply_to']	= json_encode($messages['reply_to']);
-					$req_msg[$i]['message_id']	= $messages['message_id'];
-					$req_msg[$i]['in_reply_to']	= $messages['in_reply_to'];
-					$req_msg[$i]['mail_references']	= json_encode($messages['references']);
-					$req_msg[$i]['date']		= $messages['date'];
-					$req_msg[$i]['udate']		= $messages['udate'];
-					$req_msg[$i]['subject']		= $messages['subject'];
-					$req_msg[$i]['recent']		= $messages['recent'];
-					$req_msg[$i]['priority']	= $messages['priority'];
-					$req_msg[$i]['mail_read']	= $messages['read'];
-					$req_msg[$i]['answered']	= $messages['answered'];
-					$req_msg[$i]['flagged']		= $messages['flagged'];
-					$req_msg[$i]['deleted']		= $messages['deleted'];
-					$req_msg[$i]['draft']		= $messages['draft'];
-					$req_msg[$i]['size']		= $messages['size'];
-					$req_msg[$i]['attachements']= json_encode($ins_attachement);
-					$req_msg[$i]['body_html']	= $messages['body']['html'];
-					$req_msg[$i]['body_plain']	= $messages['body']['plain'];
-					$req_msg[$i]['folder']		= 'INBOX';
+					$uid_data[$j1]['folder']	= 'INBOX';
+					$uid_data[$j1]['uid']		= $uid1;
+					$uid_data[$j1]['staff_id']	= $staff_id;
+					$uid_data = array('uid'=>$uid1,'staff_id'=>$staffid,'folder'=>'INBOX');
+					$j1++;
 					$CI->db->reconnect();
-					$table = db_prefix() . 'localmailstorage';
-					$CI->db->insert($table,$req_msg[$i]);
-					$i++;
-					
+					$CI->db->insert(db_prefix() . 'imapuid', $uid_data);
 				}
-				$uid_data[$j1]['folder']	= 'INBOX';
-				$uid_data[$j1]['uid']		= $uid1;
-				$uid_data[$j1]['staff_id']	= $staff_id;
-				$uid_data = array('uid'=>$uid1,'staff_id'=>$staffid,'folder'=>'INBOX');
-				$j1++;
-				$CI->db->reconnect();
-				$CI->db->insert(db_prefix() . 'imapuid', $uid_data);
+				
 			}
 		}
 		

@@ -1,6 +1,9 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');?>
 
 
+<div class="content-center1" id="overlay_12" style="display:none">
+    <div class="pulse"> <i class="fa fa-phone fa-5x" aria-hidden="true"></i> </div>
+</div>
 
 <div id="appSidebar">
     <div id="applogo">

@@ -1006,7 +1006,7 @@ $hascoustomfields =$this->db->get(db_prefix() . 'customfields')->row();
         $('[name="address"]').val('').attr('readonly',status);
         $('[name="city"]').val('').attr('readonly',status);
         $('[name="state"]').val('').attr('readonly',status);
-        $('[name="country"]').val('').attr('readonly',status).selectpicker('refresh');
+        $('[name="country"]').val('').attr('disabled',status).selectpicker('refresh');
         $('[name="zip"]').val('').attr('readonly',status);
         $('[name="clientphonenumber"]').val('').attr('readonly',status);
     }

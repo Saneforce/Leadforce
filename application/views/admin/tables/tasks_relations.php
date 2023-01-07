@@ -23,9 +23,13 @@ if($rel_type == 'lead' || $rel_type == 'invoice' || $rel_type == 'estimate' || $
    
     $where = [];
     include_once(APPPATH . 'views/admin/tables/includes/tasks_filter.php');
-    
     if (!$this->ci->input->post('tasks_related_to')) {
         array_push($where, 'AND rel_id="' . $rel_id . '" AND rel_type="' . $rel_type . '"');
+        if(isset($_GET['call'])) {
+            array_push($where, ' AND tbltasks.call_request_id != ""');
+        //     $call = " AND ".db_prefix()."tasks.tasktype = (SELECT id FROM ".db_prefix()."tasktype WHERE name= 'Call') ";
+        //    array_push($where, $call);
+         }
     } else {
         // Used in the customer profile filters
         $tasks_related_to = explode(',', $this->ci->input->post('tasks_related_to'));

@@ -806,21 +806,6 @@ table.body {
         $(".grid-title").html(titleHeader);
     });
     //});
-    function gettemplate_list() {
-        $.post(admin_url + 'company_mail/template_list', {},
-            function(data) {
-                var json = $.parseJSON(data);
-                $("#template_list1").html(json.table);
-                $("#template_header").html(json.header);
-                $("#ch_default_temp").append('');
-                $('#ch_default_temp').empty();
-                $("#ch_default_temp").selectpicker("refresh");
-                $("#ch_default_temp").append(json.select_drop);
-                $("#ch_default_temp").selectpicker("refresh");
-
-            });
-    }
-
     function add_content(uid) {
         document.getElementById('overlay_new').style.display = '';
         $.post(admin_url + 'company_mail/content', {
@@ -922,45 +907,6 @@ table.body {
                 }
             });
     }
-
-    function submit_default() {
-        //$('#default_submit').prop('disabled', true);
-        var default_temp = $("#ch_default_temp").val();
-        $.post(admin_url + 'company_mail/change_default', {
-                default_template: default_temp
-            },
-            function(data, status) {
-                var json = $.parseJSON(data);
-                if (json.status == 'success') {
-                    //tinyMCE.activeEditor.setContent(json.description);
-                    $(".tabs").removeClass("active");
-                    $(".tabs h6").removeClass("font-weight-bold");
-                    $(".tabs h6").addClass("text-muted");
-                    $("#tab01").children("h6").removeClass("text-muted");
-                    $("#tab01").children("h6").addClass("font-weight-bold");
-                    $("#tab01").addClass("active");
-
-                    current_fs = $(".active");
-
-                    next_fs = "#tab011";
-
-                    $("fieldset").removeClass("show");
-                    $(next_fs).addClass("show");
-                    var text = tinyMCE.get('description').getContent();
-                    var req_text = text + json.description
-                    tinyMCE.get('description').setContent(req_text);
-                    //tinyMCE.activeEditor.execCommand('mceInsertContent',false,json.description);
-                    //$('#default_submit').prop('disabled', false);
-                    //gettemplate_list();
-
-                }
-            });
-        if (default_temp == '') {
-            var text = tinyMCE.get('description').getContent();
-            tinyMCE.get('description').setContent(text);
-        }
-    }
-
     function updatedeal(val) {
         document.getElementById('overlay').style.display = '';
         $.post(admin_url + 'staff/getdealsname', {
@@ -981,11 +927,6 @@ table.body {
                     $('#deal-modal').modal('show');
                 }
             });
-    }
-
-    function reset_form() {
-        $('#template_name').val('');
-        tinyMCE.get('template_description').setContent('');
     }
 </script>
 <?php hooks()->do_action('settings_tab_footer', 'email'); ?>

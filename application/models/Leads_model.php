@@ -1583,6 +1583,14 @@ class Leads_model extends App_Model {
         return $this->get_tabs_count($lead_id,'notes');
     }
 
+    public function get_calls_count($lead_id){
+        $this->db->where('rel_type','lead');
+        $this->db->where('rel_id',$lead_id);
+        $this->db->where('call_request_id !=',"");
+        $this->db->select('COUNT(id) as count');
+        $count =$this->db->get(db_prefix().'tasks')->row();
+        return $count->count;
+    }
     public function get_logs_count($lead_id)
     {
         $this->db->where('lead_id',$lead_id);

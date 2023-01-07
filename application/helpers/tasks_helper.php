@@ -367,7 +367,12 @@ function init_relation_tasks_table1($table_attributes = [])
 
     $name = 'rel-tasks';
     if ($table_attributes['data-new-rel-type'] == 'lead') {
-        $name = 'rel-tasks-leads';
+		if(isset($table_attributes['data-new-bycall']) &&  $table_attributes['data-new-bycall']=='bycall'){
+			$name = 'rel-tasks-leads-calls';
+		}else{
+			$name = 'rel-tasks-leads';
+		}
+        
     }
 
     $table      = '';

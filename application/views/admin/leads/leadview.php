@@ -287,6 +287,11 @@
             <?php echo _l('tasks'); ?><?php if($activity_count): ?><span class="badge badge-light ml-3" id="leadactivitycount"><?php echo $activity_count ?></span><?php endif; ?>
             </a>
          </li>
+         <li role="presentation" class="<?php echo ($group=='lead_calls')?"active": "" ?>">
+            <a href="#lead_calls" onclick="init_rel_tasks_table(<?php echo $lead->id; ?>,'lead','.table-rel-tasks-leads-calls');" aria-controls="lead_calls" role="tab" data-toggle="tab">
+            Calls <?php if($calls_count): ?><span class="badge badge-light ml-3" id="leadactivitycount"><?php echo $calls_count ?></span><?php endif; ?>
+            </a>
+         </li>
          <li role="presentation" class="<?php echo ($group=='tab_items')?"active": "" ?>">
             <a href="#tab_items" aria-controls="tab_items" role="tab" data-toggle="tab">
                 <?php echo _l('items') ?><?php if($productscnt): ?><span class="badge badge-light ml-3" id="leaditemcount"><?php echo $productscnt?></span><?php endif; ?>
@@ -457,6 +462,11 @@
       <div role="tabpanel" class="tab-pane <?php echo ($group=='tab_tasks_leads')?"active": "" ?>" id="tab_tasks_leads">
          <?php init_relation_tasks_table1(array('data-new-rel-id'=>$lead->id,'data-new-rel-type'=>'lead','no-filters'=>true)); ?>
       </div>
+
+      <div role="tabpanel" class="tab-pane <?php echo ($group=='lead_calls')?"active": "" ?>" id="lead_calls">
+         <?php init_relation_tasks_table1(array('data-new-rel-id'=>$lead->id,'data-new-rel-type'=>'lead','no-filters'=>true,'data-new-bycall'=>'bycall')); ?>
+      </div>
+
       <div role="tabpanel" class="tab-pane <?php echo ($group=='lead_reminders')?"active": "" ?>" id="lead_reminders">
          <a href="#" data-toggle="modal" class="btn btn-info" data-target=".reminder-modal-lead-<?php echo $lead->id; ?>"><i class="fa fa-bell-o"></i> <?php echo _l('lead_set_reminder_title'); ?></a>
          <hr />
@@ -592,6 +602,7 @@
    }
    $(document).ready(function () {
       init_rel_tasks_table(<?php echo $lead->id; ?>,'lead','.table-rel-tasks-leads');
+      init_rel_tasks_table(<?php echo $lead->id; ?>,'lead','.table-rel-tasks-leads-calls');
 
       init_lead_activities_log();
       var hasMoreLogs =true;
