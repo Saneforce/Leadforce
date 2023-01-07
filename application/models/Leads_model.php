@@ -1586,7 +1586,10 @@ class Leads_model extends App_Model {
     public function get_calls_count($lead_id){
         $this->db->where('rel_type','lead');
         $this->db->where('rel_id',$lead_id);
+        $this->db->group_start();
         $this->db->where('call_request_id !=',"");
+        $this->db->or_where('call_code !=',0);
+        $this->db->group_end();
         $this->db->select('COUNT(id) as count');
         $count =$this->db->get(db_prefix().'tasks')->row();
         return $count->count;

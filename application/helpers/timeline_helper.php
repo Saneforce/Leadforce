@@ -30,7 +30,12 @@ function render_lead_activities($lead_id,$page=0)
                     }
                     
                 }elseif($log->type =='activity'){
-                    $icon ='<i class="fa fa-tasks"></i>';
+                    if($log->action =='called'){
+                        $icon ='<i class="fa fa-phone" aria-hidden="true"></i>';
+                    }else{
+                        $icon ='<i class="fa fa-tasks"></i>';
+                    }
+                    
                     $CI->db->where('id',$log->type_id);
                     $activity =$CI->db->get(db_prefix().'tasks')->row();
                     $taskassinged =$CI->tasks_model->get_task_assignees($activity->id);
@@ -46,13 +51,20 @@ function render_lead_activities($lead_id,$page=0)
                     $activity_start_date =date_format($startdate,"M d , Y h:i a");
 
                     $activitystatusclass='';
-                    if($activity->datefinished){
+                    if($activity->datefinished || $activity->status ==5){
                         $activitystatusclass="text-success";
                     }elseif($startdate < date_create()){
                         $activitystatusclass="text-danger";
                     }
                     
                     $title ='<i class="fa fa-circle '.$activitystatusclass.'" aria-hidden="true"></i>   <a class="'.$activitystatusclass.'" herf="#" onclick="edit_task('.$activity->id.'); return false;" style="cursor:pointer">'.$activity->name.'</a>';
+                    if($log->action =='called'){
+                        $CI->db->where('task_id',$activity->id);
+                        $call_log =$CI->db->get(db_prefix().'call_history')->row();
+                        if($call_log){
+                            $meta_data .='<audio id="myAudio" controls><source src="'.base_url('uploads/recordings/'.$call_log->filename).'"></audio><br>';
+                        }
+                    }
                     $meta_data .='<span><i class="fa fa-star" aria-hidden="true"></i>  '.$taskType->name.'</span> | <span><a class="" href="'.admin_url("profile/".$taskassinged['assigneeid']).'"><i class="fa fa-user" aria-hidden="true"></i> '.$taskassinged['full_name'].'</a></span> | <span class=""><i class="fa fa-calendar" aria-hidden="true"></i> '.$activity_start_date.'</span>';
                     if($activity->description){
                         $detailed_content ='<div id="activitycontent'.$activity->id.'">

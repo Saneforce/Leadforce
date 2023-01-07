@@ -26,7 +26,8 @@ if($rel_type == 'lead' || $rel_type == 'invoice' || $rel_type == 'estimate' || $
     if (!$this->ci->input->post('tasks_related_to')) {
         array_push($where, 'AND rel_id="' . $rel_id . '" AND rel_type="' . $rel_type . '"');
         if(isset($_GET['call'])) {
-            array_push($where, ' AND tbltasks.call_request_id != ""');
+            // array_push($where,' AND '.db_prefix().'tasks.id IN ( Select task_id FROM '.db_prefix().'call_history)');
+            array_push($where, ' AND ('.db_prefix().'tasks.call_request_id != "" || '.db_prefix().'tasks.call_code != 0) ');
         //     $call = " AND ".db_prefix()."tasks.tasktype = (SELECT id FROM ".db_prefix()."tasktype WHERE name= 'Call') ";
         //    array_push($where, $call);
          }

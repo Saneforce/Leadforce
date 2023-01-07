@@ -315,7 +315,7 @@ if (!isset($lead)) {
                         <?php $allow_to_call = $this->callsettings_model->accessToCall(); ?>
                         <?php if($lead_person_details && $allow_to_call && $lead_person_details->phonenumber): 
                             $calling_code =$this->callsettings_model->getCallingCode($lead_person_details->phone_country_code);
-                            $contact .= '<div><a href="#" onclick="callfromdeal('.$lead_person_details->id.','.$lead->id.','.$lead_person_details->phonenumber.',\'task\',\''.$calling_code.'\');" title="Call Now"><img src="'.APP_BASE_URL.'/assets/images/call.png" style="width:25px;"> ' . $lead->phonenumber . '</a></div>';?>
+                            $contact .= '<div><a href="#" onclick="callfromdeal('.$lead_person_details->id.','.$lead->id.','.$lead_person_details->phonenumber.',\'lead\',\''.$calling_code.'\');" title="Call Now"><img src="'.APP_BASE_URL.'/assets/images/call.png" style="width:25px;"> ' . $lead->phonenumber . '</a></div>';?>
                             <p class="bold font-medium-xs"><?php echo $contact ?></p>
                         <?php else: ?>
                             <p class="bold font-medium-xs"><?php echo (isset($lead) && $lead->phonenumber != '' ? '<a href="tel:' . $lead->phonenumber . '">' . $lead->phonenumber . '</a>' : '-') ?></p>

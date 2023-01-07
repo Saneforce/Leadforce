@@ -210,7 +210,11 @@ class Callsettings_model extends App_Model {
                     'taskid'  => $insert_id,
                     'staffid' => $data['addedfrom'],
                 ]);
+                if($post['rel_type'] =='lead'){
+                    $this->leads_model->log_activity($post['rel_id'],'activity','called',$insert_id);
 
+                }
+                
                 log_activity('New Task Added [ID:' . $insert_id . ', Name: ' . $data['name'] . ']');
                 hooks()->do_action('after_add_task', $insert_id);
             }
