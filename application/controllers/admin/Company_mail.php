@@ -86,6 +86,7 @@ class Company_mail extends AdminController
 		$data['settings'] = $this->get_or_update_setting($staffid,$table);
 		//echo '<pre>';print_r($data);exit;
 		unset($_SESSION['debug']);
+		$data['title'] ='Connect Email';
 		$this->load->view('admin/settings/user/mail', $data);
     }
 	public function configure_email(){
@@ -410,6 +411,7 @@ class Company_mail extends AdminController
 		$table = db_prefix() . 'user_mail_setting';
 		$data['settings'] = $this->get_or_update_setting($staffid,$table);
 		unset($_SESSION['debug']);
+		$data['title'] ='Connect Email';
 		$this->load->view('admin/settings/user/companymail', $data);
     }
 	public function create_template(){

@@ -77,11 +77,7 @@ $emails =$this->leads_model->get_emails($lead->id);
 								<a href="javascript:void(0)" onClick="getMessage('<?php echo $email1['id'];?>');"><?php echo date('D, d M Y h:i A',strtotime($email1['date'])); ?></a>
 							  </td>
 						   </tr>
-						<?php }}else{ ?>
-						<tr>
-							<td colspan="7" class="text-center">No Record's Found</td>
-						</tr>
-						<?php }?>
+						<?php }}?>
 					</tbody>
 				</table>
 			</form>
