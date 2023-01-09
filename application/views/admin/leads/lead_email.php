@@ -28,14 +28,9 @@ $emails =$this->leads_model->get_emails($lead->id);
 	<div class="col-md-12 email">
 		<div class="table-responsive">
 			<form id="formId" >
-				<table class="table dataTable" >
+				<table class="table dt-table" >
 					<thead>
 						<tr>
-						  <th>
-							<?php if($email_count>0){?>
-								<input type="checkbox" id="select_all" onclick="check_all(this)">
-							<?php }?>
-						  </th>
 						  <th>From</th>
 						  <th>To</th>
 						  <th>Subject</th>
@@ -46,11 +41,6 @@ $emails =$this->leads_model->get_emails($lead->id);
 					<tbody>
 						<?php if(!empty($emails)){foreach($emails as $email1){?>
 						  <tr clss="<?php echo $email1['uiid'];?>_mail_row">
-							<td>
-								<?php if($req_staff_id == $email1['staff_id']){?>
-									<input type="checkbox" name="mails[]" onclick="check_header()" value="<?PHP echo $email1['id'];?>" class="check_mail">
-								<?php }?>
-							</td>
 							<td data-order="<?php echo $email1['from']; ?>">
 								<a href="javascript:void(0)" onClick="getMessage('<?php echo $email1['id'];?>');"><?php echo $email1['from_email'];?></a>
 							  </td>

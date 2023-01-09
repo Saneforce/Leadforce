@@ -395,7 +395,7 @@ table.body {
 							<form id="formId" >
 								<input type="hidden" value="1" id="sort_val">
 								<input type="hidden" value="date" id="sort_option">
-								<table class="table dataTable" id="table">
+								<table class="table dt-table" id="table">
 									<tbody>
 									<thead>
 										<th><input type="checkbox" id="select_all" onclick="check_all(this)"></th>

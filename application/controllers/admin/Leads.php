@@ -1898,13 +1898,13 @@ class Leads extends AdminController
 						<p class="no-margin" style="font-size: 13px;">To : <a>'.$mail_to[0]->email.'</a></p>
 						<p class="no-margin" style="font-size: 13px;">'.date("d-M-Y H:i A",$local_email->udate).'</p>
 					</div>
-					<div class="col-md-6">
-						<div class="button-group">
+					<div class="col-md-6">';
+						$reply ='<div class="button-group">
 							<button type="button" data-toggle="tooltip" data-original-title="Forward" class="btn btn-default pull-right" data-toggle="modal" data-target="#forward-modal" onclick="add_content('.$add_content.')"><i class="fa fa-share" aria-hidden="true"></i></button>
 							<button type="button" data-toggle="tooltip" data-original-title="Reply" class="btn btn-default pull-right" data-toggle="modal" data-target="#reply-modal" onclick="add_to('.$add_content.')" style="margin-right:5px;"><i class="fa fa-reply" ></i></button>
 							<button type="button" data-toggle="tooltip" data-original-title="Reply All" class="btn btn-default pull-right" data-toggle="modal" data-target="#reply-modal" onclick="add_reply_all('.$add_content.')" style="margin-right:5px;"><i class="fa fa-reply-all" aria-hidden="true"></i></button>
-						</div>
-					</div>
+						</div>';
+					$output .='</div>
 				</div>
 			</div>';
 

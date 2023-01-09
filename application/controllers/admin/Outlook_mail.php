@@ -201,18 +201,24 @@ class Outlook_mail extends AdminController
 		}
 		$this->db->where('message_id',$response['Id']);
 		if(!$this->db->get(db_prefix().'localmailstorage')->row()){
+
+			$linked_deals_leads =render_deal_lead_list_by_email($from_address);
+
 			$output .='
 				<div class="row" id="linktowrapper">
 					<div class="col-md-12">
 						<h5>Link to Deal or Lead</h5>
 						<div class="form-inline">
-							<input type="hidden" id="linktouid" value="'.$response['Id'].'" >
-							<div class="form-group mb-2" style="width:40%">
-								<select class="selectpicker" data-none-selected-text="Select Deal or Lead"  name="linkto_rel_id" id="linkto_rel_id" data-width="100%" data-live-search="true">'.render_deal_lead_list_by_email($from_address).'</select>
-							</div>
-							<button class="btn btn-info" id="linkto_rel_id_submit" type="button">Link with existing</button>
-							OR  
-							<a href="#" onclick="init_lead(0,false,'.$add_content.'); return false;" class="btn btn-info">New Lead</a>
+							<input type="hidden" id="linktouid" value="'.$response['Id'].'" >';
+							if($linked_deals_leads){
+								$output .='<div class="form-group mb-2" style="width:40%">
+									<select class="selectpicker" data-none-selected-text="Select Deal or Lead"  name="linkto_rel_id" id="linkto_rel_id" data-width="100%" data-live-search="true">'.$linked_deals_leads.'</select>
+								</div>
+								<button class="btn btn-info" id="linkto_rel_id_submit" type="button">Link with existing</button>
+								OR  ';
+							}
+							
+							$output .='<a href="#" onclick="init_lead(0,false,'.$add_content.'); return false;" class="btn btn-info">New Lead</a>
 						</div>
 					</div>
 					<div class="col-md-4">
@@ -235,13 +241,13 @@ class Outlook_mail extends AdminController
 						<p class="no-margin" style="font-size: 13px;">To : <a>'.$response['ToRecipients'][0]['EmailAddress']['Address'].'</a></p>
 						<p class="no-margin" style="font-size: 13px;">'.date("d-M-Y H:i A",$response['udate']).'</p>
 					</div>
-					<div class="col-md-6">
-						<div class="button-group">
+					<div class="col-md-6">';
+						$reply ='<div class="button-group">
 							<button type="button" data-toggle="tooltip" data-original-title="Forward" class="btn btn-default pull-right" data-toggle="modal" data-target="#forward-modal" onclick="add_content('.$add_content.')"><i class="fa fa-share" aria-hidden="true"></i></button>
 							<button type="button" data-toggle="tooltip" data-original-title="Reply" class="btn btn-default pull-right" data-toggle="modal" data-target="#reply-modal" onclick="add_to('.$add_content.')" style="margin-right:5px;"><i class="fa fa-reply" ></i></button>
 							<button type="button" data-toggle="tooltip" data-original-title="Reply All" class="btn btn-default pull-right" data-toggle="modal" data-target="#reply-modal" onclick="add_reply_all('.$add_content.')" style="margin-right:5px;"><i class="fa fa-reply-all" aria-hidden="true"></i></button>
-						</div>
-					</div>
+						</div>';
+					$output .='</div>
 				</div>
 			</div>';
 			$output .='<div style="margin-top:10px">';

@@ -1211,7 +1211,6 @@ class Imap
 			//$uids = imap_sort($this->stream, SORTFROM,$_REQUEST['sort_val'],SE_UID);
 		}
 		else if(trim($search)==''){
-			
 			//$uids = $this->search();
 			//pre($MC);
 			if(empty($pag_no)){
@@ -1233,8 +1232,13 @@ class Imap
 				
 				$results =imap_fetch_overview($this->stream,$cur_lmt.":".$cur_offt,0);
 				$last_rec = count($results) -1;
-				
-				$uids = imap_sort($this->stream, SORTDATE,$_REQUEST['sort_val'],SE_UID,'SINCE "'.$results[0]->date.'" BEFORE "'.$results[$last_rec]->date.'"');
+				if($last_rec >10){
+					$last_rec -=10;
+				}else{
+					$last_rec=0;
+				}
+				// $uids = imap_sort($this->stream, SORTDATE,$_REQUEST['sort_val'],SE_UID,'SINCE "'.$results[0]->date.'" BEFORE "'.$results[$last_rec]->date.'"');
+				$uids = imap_sort($this->stream, SORTDATE,$_REQUEST['sort_val'],SE_UID,'SINCE "'.$results[$last_rec]->date.'"');
 			}
 			else{
 				$uids = $this->search();
@@ -1947,18 +1951,22 @@ class Imap
 		$this->CI->db->where('uid',$inboxEmails['uid']);
 		$this->CI->db->where('message_id',$inboxEmails['message_id']);
 		if(!$this->CI->db->get(db_prefix().'localmailstorage')->row()){
+			$linked_deals_leads =render_deal_lead_list_by_email($inboxEmails['from']['email']);
 			$output .='
 				<div class="row" id="linktowrapper">
 					<div class="col-md-12">
 						<h5>Link to Deal or Lead</h5>
 						<div class="form-inline">
-							<input type="hidden" id="linktouid" value="'.$inboxEmails['uid'].'" >
-							<div class="form-group mb-2" style="width:40%">
-								<select class="selectpicker" data-none-selected-text="Select Deal or Lead"  name="linkto_rel_id" id="linkto_rel_id" data-width="100%" data-live-search="true">'.render_deal_lead_list_by_email($inboxEmails['from']['email']).'</select>
-							</div>
-							<button class="btn btn-info" id="linkto_rel_id_submit" type="button">Link with existing</button>
-							OR  
-							<a href="#" onclick="init_lead(0,false,'.$add_content.'); return false;" class="btn btn-info">New Lead</a>
+							<input type="hidden" id="linktouid" value="'.$inboxEmails['uid'].'" >';
+							if($linked_deals_leads){
+								$output .='<div class="form-group mb-2" style="width:40%">
+								<select class="selectpicker" data-none-selected-text="Select Deal or Lead"  name="linkto_rel_id" id="linkto_rel_id" data-width="100%" data-live-search="true">'.$linked_deals_leads.'</select>
+								</div>
+								<button class="btn btn-info" id="linkto_rel_id_submit" type="button">Link with existing</button>
+								OR  ';
+							}
+							
+							$output .='<a href="#" onclick="init_lead(0,false,'.$add_content.'); return false;" class="btn btn-info">New Lead</a>
 						</div>
 					</div>
 					<div class="col-md-4">
@@ -1980,13 +1988,13 @@ class Imap
 						<p class="no-margin" style="font-size: 13px;">To : <a>'.$inboxEmails['to'][0]['email'].'</a></p>
 						<p class="no-margin" style="font-size: 13px;">'.date("d-M-Y H:i A",$inboxEmails['udate']).'</p>
 					</div>
-					<div class="col-md-6">
-						<div class="button-group">
+					<div class="col-md-6">';
+						$reply ='<div class="button-group">
 							<button type="button" data-toggle="tooltip" data-original-title="Forward" class="btn btn-default pull-right" data-toggle="modal" data-target="#forward-modal" onclick="add_content('.$add_content.')"><i class="fa fa-share" aria-hidden="true"></i></button>
 							<button type="button" data-toggle="tooltip" data-original-title="Reply" class="btn btn-default pull-right" data-toggle="modal" data-target="#reply-modal" onclick="add_to('.$add_content.')" style="margin-right:5px;"><i class="fa fa-reply" ></i></button>
 							<button type="button" data-toggle="tooltip" data-original-title="Reply All" class="btn btn-default pull-right" data-toggle="modal" data-target="#reply-modal" onclick="add_reply_all('.$add_content.')" style="margin-right:5px;"><i class="fa fa-reply-all" aria-hidden="true"></i></button>
-						</div>
-					</div>
+						</div>';
+					$output .='</div>
 				</div>
 			</div>';
 			
