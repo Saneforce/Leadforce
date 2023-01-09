@@ -1142,6 +1142,18 @@ $hascoustomfields =$this->db->get(db_prefix() . 'customfields')->row();
                 set_person_detials(selectedcontact);
             }
         });
+        $('#company').blur(function(){
+            if($("#client_id").val() ==''){
+                if($(this).val() ==''){
+                    get_person($('#client_id').val());
+                }else{
+                    $('#contactid').empty();
+                    $("#contactid").prepend('<option value="" selected="">New Person</option>');
+                    $('#contactid').selectpicker('refresh');
+                }
+                
+            }
+        })
         $('#client_id').change(function(){
             var selectedclientid =$(this).val();
             get_person(selectedclientid);
