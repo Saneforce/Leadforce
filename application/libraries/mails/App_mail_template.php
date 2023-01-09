@@ -282,11 +282,11 @@ class App_mail_template
 
 
             if ($fromemail == '') {
-                $fromemail = get_option('smtp_email');
+                $fromemail = get_option('company_smtp_email');
             }
 
             if ($fromname == '') {
-                $fromname = get_option('companyname');
+                $fromname = get_option('company_smtp_username');
             }
 
         return [
@@ -296,8 +296,8 @@ class App_mail_template
         }
 
         return [
-                'fromemail' => get_option('smtp_email'),
-                'fromname'  => $this->template->fromname != '' ? $this->template->fromname : get_option('companyname'),
+                'fromemail' => get_option('company_smtp_email'),
+                'fromname'  => $this->template->fromname != '' ? $this->template->fromname : get_option('company_smtp_username'),
             ];
     }
 

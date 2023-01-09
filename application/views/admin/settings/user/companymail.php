@@ -38,7 +38,7 @@
                   </div>
                 </div>
                 <div class="btn-bottom-toolbar1 pull-right">
-                  <button type="submit" class="btn btn-save btn-primary" name="submit_save"><?php echo _l('save'); ?></button>
+                  <button type="submit" class="btn btn-save btn-info" name="submit_save"><?php echo _l('save'); ?></button>
                 </div>
 
               </div>
