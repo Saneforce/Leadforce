@@ -14,7 +14,7 @@ $emails =$this->leads_model->get_emails($lead->id);
 				<a class="btn btn-info composebtn" href="<?php echo $url1;?>"><i class="fa fa-pencil" ></i>&nbsp;&nbsp;<?php echo _l('compose_email');?></a>
 			<?php }?>
 
-			<a class="btn btn-info pull-right composebtn" href="javascript:void(0)" onclick="sync_mail()" title="<?php echo _l('sync_mail_help_text');?>"><i class="fa fa-pencil" ></i>&nbsp;&nbsp;<?php echo _l('sync_mail');?></a>
+			<a class="btn btn-info pull-right composebtn" href="javascript:void(0)" onclick="sync_mail()" title="<?php echo _l('sync_mail_help_text');?>"><i class="fa fa-refresh" aria-hidden="true"></i>&nbsp;&nbsp;<?php echo _l('sync_mail');?></a>
 
 			<div  class="header" id="myHeader" style="display:none;">
 				<div class="col-md-12" style="background: #fff;">
@@ -120,8 +120,9 @@ $emails =$this->leads_model->get_emails($lead->id);
 			data: { },
 			success: function(data) {
 					alert_float('success', 'Mail Fetched Successfully');
-					// location.reload();
-					// document.getElementById('overlay').style.display = 'none';
+					setTimeout(function(){  
+						window.location.href = '<?php echo admin_url('leads/lead/'.$lead->id.'?group=tab_email') ?>';
+					}, 500);
 				}
 			,
 			error: function(data) {

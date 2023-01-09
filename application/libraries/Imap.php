@@ -2882,10 +2882,9 @@ class Imap
 		$this->stream  = imap_open($this->mailbox, $config['username'], $config['password'])or die('Cannot connect to mail: ' . pr(imap_errors()));;
 		$folders = imap_list($this->stream, $this->mailbox, '*');
 		$mailList['folders'] = $this->get_subfolders(str_replace($this->mailbox, '', $folders));
-		$output = '';
-		$this->select_folder('INBOX');
+		$this->select_folder('[Gmail]/All Mail');
 		$uids = $this->search();
-		$req_uid = $uids;
+		$req_uid = array_slice($uids, 0, 20);
 		$CI          = & get_instance();
 		$CI->db->reconnect();
 		
@@ -2911,9 +2910,16 @@ class Imap
 			$assignee_admin = $CI->db->query($sQuery12)->row();
 			foreach($rResults as $uid1){
 				$messages = $this->get_message($uid1);
-				if($messages['in_reply_to']){
-					$CI->db->where('message_id',$messages['in_reply_to']);
+				$CI->db->reconnect();
+				$CI->db->insert(db_prefix() . 'imapuid',array('staff_id'=>$staffid,'uid'=>$messages['uid'],'folder'=>'INBOX'));
+				if($messages['in_reply_to'] || ($messages['references'] && isset($message['references'][0]) && $message['references'][0])){
+					if($messages['references']){
+						$CI->db->where('message_id',$messages['references'][0]);
+					}else{
+						$CI->db->where('message_id',$messages['in_reply_to']);
+					}
 					$local_mail = $CI->db->get(db_prefix().'localmailstorage')->row();
+
 					if($local_mail){
 						if($local_mail->project_id){
 							$rel_type ='project';
@@ -2926,9 +2932,8 @@ class Imap
 						$CI->imap_mailer->set_rel_type($rel_type);
 						$CI->imap_mailer->set_rel_id($rel_id);
 						$CI->imap_mailer->connectEmail($messages);
-						$CI->db->insert(db_prefix() . 'imapuid', $messages['uid']);
 					}
-				}else{
+				}elseif(false){
 					$req_project_id = get_deal_id_contactuser($messages['from']['email'],get_option('deal_map'));
 					if(empty($req_project_id)){
 						$req_project_id = get_deal_id_otheruser(get_option('deal_map'),$messages['to'],$messages['cc'],$messages['bcc']);
@@ -3023,8 +3028,6 @@ class Imap
 					$uid_data[$j1]['staff_id']	= $staff_id;
 					$uid_data = array('uid'=>$uid1,'staff_id'=>$staffid,'folder'=>'INBOX');
 					$j1++;
-					$CI->db->reconnect();
-					$CI->db->insert(db_prefix() . 'imapuid', $uid_data);
 				}
 				
 			}
