@@ -482,11 +482,6 @@ table.body {
 <?php init_tail(); ?>
 
 <script>
-    function over_lay(cur_id) {
-        document.getElementById('overlay_' + cur_id).style.display = '';
-        $(".btn").prop('disabled', true);
-    }
-
     function mget_file(c_id, c) {
         var fcnt = $('#' + c + 'filecnt').val();
         var tcnt = $('#' + c + 'totcnt').val();

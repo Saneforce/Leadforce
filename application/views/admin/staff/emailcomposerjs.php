@@ -900,4 +900,9 @@
             tinyMCE.get('description').setContent(text);
         }
     }
+
+    function over_lay(cur_id) {
+        document.getElementById('overlay' + cur_id).style.display = '';
+        $(".btn").prop('disabled', true);
+    }
 </script>

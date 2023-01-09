@@ -132,6 +132,7 @@ class Imap_mailer
 
     public function send_smtp()
     {
+        
         $this->CI->email->initialize($this->smtpconf);
         $this->CI->email->from($this->imapconf['username'], '');
         $this->CI->email->to(array($this->to));
@@ -153,11 +154,10 @@ class Imap_mailer
                 }
             }
         }
-        
         if ($this->CI->email->send()) {
 
         }else{
-            $message       = 'Cannot Connect SMTP Server.';
+            $message       = 'Could Not Connect SMTP Server.';
             set_alert('warning', $message);
             redirect($this->redirectTo);
         }

@@ -333,13 +333,17 @@ class Imap
 
 	protected function get_subfolders($folders)
 	{
-		for ($i = 0; $i < count($folders); $i++)
-		{
-			if (isset(explode('.', $folders[$i])[1]))
+		if(is_array($folders)){
+			for ($i = 0; $i < count($folders); $i++)
 			{
-				$folders[$i] = $this->get_subfolders($folders[$i]);
+				
+				if (isset(explode('.', $folders[$i])[1]))
+				{
+					$folders[$i] = $this->get_subfolders($folders[$i]);
+				}
 			}
 		}
+		
 
 		// for ($i = 0; $i < count($folders); $i++)
 		// {
@@ -348,7 +352,7 @@ class Imap
 		// 		$folders[$folders[$i]] = $this->static_dot_notation($folders[$i]);
 		// 	}
 		// }
-
+		
 		return $folders;
 	}
 
@@ -1089,11 +1093,14 @@ class Imap
 	}
 	public function get_company_folders_inbox($imapconf,$pag_no='',$counts='',$search='')
 	{
+		
 		$mailList = [];
 		$start = microtime(true);
 		$this->mailbox = '{' . $imapconf['host'] . ':'.$imapconf['port'].'/imap/ssl/novalidate-cert}';
 		$this->stream  = imap_open($this->mailbox, $imapconf['username'], $imapconf['password'])or die('Cannot connect to mail: ' . pr(imap_errors()));;
+		
 		$folders = imap_list($this->stream, $this->mailbox, '*');
+
 		$mailList['folders'] = $this->get_subfolders(str_replace($this->mailbox, '', $folders));
 		if(!empty($mailList['folders'])){
 			$i = $req_count = 0;
@@ -1156,7 +1163,6 @@ class Imap
 			$_REQUEST['folder'] = 'INBOX';
 		}
 		$this->select_folder($_REQUEST['folder']);
-		
 		$this->mailbox = '{' . $imapconf['host'] . ':'.$imapconf['port'].'/imap/ssl/novalidate-cert}'.$_REQUEST['folder'];
 		$this->stream  = imap_open($this->mailbox, $imapconf['username'], $imapconf['password'])or die('Cannot connect to mail: ' . pr(imap_errors()));
 		$MC = imap_check($this->stream);
