@@ -165,6 +165,7 @@ class Leads_model extends App_Model {
                 'state'=>$data['state'],
                 'address'=>$data['address'],
                 'website'=>$data['website'],
+                'zip'=>$data['zip'],
             );
             
             $data['client_id']=$this->clients_model->add($companyData);
@@ -229,6 +230,13 @@ class Leads_model extends App_Model {
         $currency = $data['currency'];
         $data['lead_currency'] =$currency;
         unset($data['currency']);
+
+        foreach($data['no'] as $val) {
+            if($data['status_'.$val]) {
+                unset($data['status_'.$val]);
+            }
+        }
+
         unset($data['no']);
         $this->db->insert(db_prefix() . 'leads', $data);
         $insert_id = $this->db->insert_id();

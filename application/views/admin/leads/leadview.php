@@ -287,11 +287,6 @@
             <?php echo _l('tasks'); ?><?php if($activity_count): ?><span class="badge badge-light ml-3" id="leadactivitycount"><?php echo $activity_count ?></span><?php endif; ?>
             </a>
          </li>
-         <li role="presentation" class="<?php echo ($group=='lead_calls')?"active": "" ?>">
-            <a href="#lead_calls" onclick="init_rel_tasks_table(<?php echo $lead->id; ?>,'lead','.table-rel-tasks-leads-calls');" aria-controls="lead_calls" role="tab" data-toggle="tab">
-            Calls <?php if($calls_count): ?><span class="badge badge-light ml-3" id="leadactivitycount"><?php echo $calls_count ?></span><?php endif; ?>
-            </a>
-         </li>
          <li role="presentation" class="<?php echo ($group=='tab_items')?"active": "" ?>">
             <a href="#tab_items" aria-controls="tab_items" role="tab" data-toggle="tab">
                 <?php echo _l('items') ?><?php if($productscnt): ?><span class="badge badge-light ml-3" id="leaditemcount"><?php echo $productscnt?></span><?php endif; ?>
@@ -313,6 +308,11 @@
          <li role="presentation" class="<?php echo ($group=='tab_proposals_leads')?"active": "" ?>">
             <a href="#tab_proposals_leads" onclick="initDataTable('.table-proposals-lead', admin_url + 'proposals/proposal_relations/' + <?php echo $lead->id; ?> + '/lead','undefined', 'undefined','undefined',[6,'desc']);" aria-controls="tab_proposals_leads" role="tab" data-toggle="tab">
             <?php echo _l('proposals'); ?><?php if($proposal_count): ?><span class="badge badge-light ml-3" id="leadproposalcount"><?php echo $proposal_count?></span><?php endif; ?>
+            </a>
+         </li>
+         <li role="presentation" class="<?php echo ($group=='lead_calls')?"active": "" ?>">
+            <a href="#lead_calls" onclick="init_rel_tasks_table(<?php echo $lead->id; ?>,'lead','.table-rel-tasks-leads-calls');" aria-controls="lead_calls" role="tab" data-toggle="tab">
+            Calls <?php if($calls_count): ?><span class="badge badge-light ml-3" id="leadactivitycount"><?php echo $calls_count ?></span><?php endif; ?>
             </a>
          </li>
          <li role="presentation" class="<?php echo ($group=='attachments')?"active": "" ?>">

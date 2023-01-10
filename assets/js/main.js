@@ -1371,6 +1371,8 @@ $(function() {
         "assigned": "[name='view_assigned']",
         "status": "[name='view_status[]']",
         "source": "[name='view_source']",
+        "client_id": "[name='client_id']",
+        "contact_id": "[name='contact_id']",
     };
 
     // Init the table

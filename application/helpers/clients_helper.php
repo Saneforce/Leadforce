@@ -272,11 +272,19 @@ function app_init_customer_profile_tabs()
         'position' => 40,
     ]);
 
-    $CI->app_tabs->add_customer_profile_tab('estimates', [
-        'name'     => _l('estimates'),
-        'icon'     => 'fa fa-clipboard',
-        'view'     => 'admin/clients/groups/estimates',
-        'visible'  => (has_permission('estimates', '', 'view') || has_permission('estimates', '', 'view_own') || (get_option('allow_staff_view_estimates_assigned') == 1 && staff_has_assigned_estimates())),
+    // $CI->app_tabs->add_customer_profile_tab('estimates', [
+    //     'name'     => _l('estimates'),
+    //     'icon'     => 'fa fa-clipboard',
+    //     'view'     => 'admin/clients/groups/estimates',
+    //     'visible'  => (has_permission('estimates', '', 'view') || has_permission('estimates', '', 'view_own') || (get_option('allow_staff_view_estimates_assigned') == 1 && staff_has_assigned_estimates())),
+    //     'position' => 45,
+    // ]);
+
+    $CI->app_tabs->add_customer_profile_tab('leads', [
+        'name'     => _l('leads'),
+        'icon'     => 'fa fa-tty',
+        'view'     => 'admin/clients/groups/leads',
+        'visible'  => (has_permission('leads', '', 'view') || has_permission('leads', '', 'view_own')),
         'position' => 45,
     ]);
 

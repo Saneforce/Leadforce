@@ -171,7 +171,14 @@ if ($this->ci->input->post('source')) {
     array_push($where, 'AND source =' . $this->ci->db->escape_str($this->ci->input->post('source')));
 }
 
+if ($this->ci->input->post('client_id')) {
+    array_push($where, 'AND client_id =' . $this->ci->input->post('client_id'));
+}
 
+
+if ($this->ci->input->post('contact_id')) {
+    array_push($where, 'AND '.db_prefix().'leads.id IN ( Select lead_id from '.db_prefix().'lead_contacts Where contacts_id='.$this->ci->input->post('contact_id').')');
+}
 
 
 array_push($where, 'AND deleted_status = 0');
@@ -266,7 +273,7 @@ foreach ($rResult as $aRow) {
     }
     if (isset($aRow['phonenumber'])) {
         if($person_details){
-            $row['phonenumber'] =$person_details->phonenumber;
+            $aRow['phonenumber'] =$person_details->phonenumber;
         }
         $row['phonenumber'] = ($aRow['phonenumber'] != '' ? '<a href="tel:' . $aRow['phonenumber'] . '">' . $aRow['phonenumber'] . '</a>' : '');
         
