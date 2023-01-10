@@ -132,12 +132,14 @@ class Imap_mailer
 
     public function send_smtp()
     {
-        
+        $this->CI->email->clear();
         $this->CI->email->initialize($this->smtpconf);
         $this->CI->email->from($this->imapconf['username'], '');
         $this->CI->email->to(array($this->to));
-        $this->CI->email->cc($this->cc);
-        $this->CI->email->bcc($this->bcc);
+        if($this->cc)
+            $this->CI->email->cc($this->cc);
+        if($this->bcc)
+            $this->CI->email->bcc($this->bcc);
         $this->CI->email->reply_to($this->imapconf['username'], 'Replay me');
         $this->CI->email->subject($this->subject);
         $this->CI->email->message($this->message);
