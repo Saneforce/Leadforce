@@ -268,7 +268,7 @@ class Cronjob extends CI_Controller
 							foreach($response['value'] as $folder1){
 								$icon = ucwords(strtolower($folder1['DisplayName']));
 								if($icon == 'Inbox'){
-									$outlookApiUrl1 = $outlook_data["api_url"] . "/me/mailFolders/".$folder1['Id']."/messages?". http_build_query($search);
+									$outlookApiUrl1 = $outlook_data["api_url"] . "/me/mailFolders/".$folder1['Id']."/messages?";
 									$response1 = runCurl($outlookApiUrl1, null, $headers);
 									$response1 = explode("\n", trim($response1));
 									$response1 = $response1[count($response1) - 1];
@@ -284,6 +284,26 @@ class Cronjob extends CI_Controller
 									if(!empty($response1['value']) && count($response1["value"])){
 										
 										foreach ($response1["value"] as $mail) {
+											
+											$uid_data = array('msg_id'=>$mail['Id'],'staff_id'=>$staff_id);
+											
+											$this->db->insert(db_prefix() . 'outlookmsgid', $uid_data);
+											$this->db->where("ConversationId",$mail['ConversationId']);
+											$local_mail =$this->db->get(db_prefix().'localmailstorage')->row();
+											if($local_mail){
+												if($local_mail->project_id){
+													$rel_type ='project';
+													$rel_id =$local_mail->project_id;
+												}else{
+													$rel_type ='lead';
+													$rel_id =$local_mail->lead_id;
+												}
+												$this->load->library('mails/imap_mailer');
+												$this->imap_mailer->set_rel_type($rel_type);
+												$this->imap_mailer->set_rel_id($rel_id);
+												$this->imap_mailer->connectEmail($mail,'outlook');
+											}
+											continue;
 											$source_from1 = $source_from2 = array();
 											if(!empty($req_msg_id) && ($req_msg_id == $mail['Id'] || in_array($mail['Id'],$msg_ids))){
 												break;

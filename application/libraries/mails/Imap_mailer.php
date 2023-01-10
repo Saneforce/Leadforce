@@ -194,6 +194,10 @@ class Imap_mailer
                     $this->currentUid =$uid;
                 }
                 $this->saveLocal($email);
+                if($this->redirectTo){
+                    set_alert('success', 'Mail sent successfully');
+                    redirect($this->redirectTo);
+                }
             }
         } else {
             $message       = 'Cannot Connect IMAP Server.';
@@ -252,6 +256,9 @@ class Imap_mailer
             if(get_option('connect_mail')=='no'){
                 $data['mail_by'] ='outlook';
             }
+            if(isset($email['ConversationId'])){
+                $data['ConversationId'] =$email['ConversationId'];
+            }
 
             if($this->parentId >0){
                 $data['local_id'] =$this->parentId;
@@ -264,11 +271,6 @@ class Imap_mailer
                 $this->CI->leads_model->log_activity($this->rel_id,'email','added',$this->CI->db->insert_id());
             }
             
-        }
-        
-        if($this->redirectTo){
-            set_alert('success', 'Mail sent successfully');
-            redirect($this->redirectTo);
         }
     }
     
@@ -360,6 +362,11 @@ class Imap_mailer
         );
         $req_url = $this->outlookCredentials["api_url"].'/me/sendmail';
         $response = runCurl($req_url, $request, $headers);
+        if($response){
+            sleep(5); // need this because of outlook read email
+            $this->read_outlook();
+            
+        }
     }
 
     public function read_outlook()
@@ -397,65 +404,7 @@ class Imap_mailer
 		}
         
         if($outlookmessage){
-            $to = $cc = $bcc = array();
-            if(!empty($outlookmessage['ToRecipients'])){
-                foreach($outlookmessage['ToRecipients'] as $mailto){
-                    $to[] =array(
-                        'email'=>$mailto['EmailAddress']['Address'],
-                        'name'=>$mailto['EmailAddress']['Name'],
-                    );
-                }
-            }
-
-            if(!empty($outlookmessage['CcRecipients'])){
-                foreach($outlookmessage['CcRecipients'] as $mailcc){
-                    $cc[] =array(
-                        'email'=>$mailcc['EmailAddress']['Address'],
-                        'name'=>$mailcc['EmailAddress']['Name'],
-                    );
-                }
-            }
-
-            if(!empty($outlookmessage['BccRecipients'])){
-                foreach($outlookmessage['BccRecipients'] as $mailbcc){
-                    $bcc[] =array(
-                        'email'=>$mailbcc['EmailAddress']['Address'],
-                        'name'=>$mailbcc['EmailAddress']['Name'],
-                    );
-                }
-            }
-
-            $email =array(
-                'id'=>0,
-                'uid'=>0,
-                'from'=>array(
-                    'email'=>$outlookmessage['From']['EmailAddress']['Address'],
-                    'name'=>$outlookmessage['From']['EmailAddress']['Name']
-                ),
-                'to'=>$to,
-                'cc'=>$cc,
-                'bcc'=>$cc,
-                'reply_to'=>$outlookmessage['ReplyTo'],
-                'message_id'=>$outlookmessage['Id'],
-                'in_reply_to'=>json_encode($outlookmessage['ReplyTo']),
-                'references'=>'',
-                'date'=>$outlookmessage['ReceivedDateTime'],
-                'udate'=>strtotime($outlookmessage['SentDateTime']),
-                'subject'=>$outlookmessage['Subject'],
-                'recent'=>'',
-                'priority'=>'',
-                'read'=>$outlookmessage['IsRead'],
-                'answered'=>$outlookmessage['IsRead'],
-                'flagged'=>$outlookmessage['Flag']['FlagStatus'],
-                'deleted'=>'',
-                'draft'=>'',
-                'size'=>'',
-                'body'=>array(
-                    'html'=>$outlookmessage['Body']['Content'],
-                    'plain'=>$outlookmessage['BodyPreview'],
-                )
-            );
-            $this->saveLocal($email);
+            $this->outlookSaveLocal($outlookmessage);
             if($this->redirectTo){
                 set_alert('success', 'Mail sent successfully');
                 redirect($this->redirectTo);
@@ -464,11 +413,75 @@ class Imap_mailer
         
         
     }
+
+    public function outlookSaveLocal($outlookmessage)
+    {
+        $to = $cc = $bcc = array();
+        if(!empty($outlookmessage['ToRecipients'])){
+            foreach($outlookmessage['ToRecipients'] as $mailto){
+                $to[] =array(
+                    'email'=>$mailto['EmailAddress']['Address'],
+                    'name'=>$mailto['EmailAddress']['Name'],
+                );
+            }
+        }
+
+        if(!empty($outlookmessage['CcRecipients'])){
+            foreach($outlookmessage['CcRecipients'] as $mailcc){
+                $cc[] =array(
+                    'email'=>$mailcc['EmailAddress']['Address'],
+                    'name'=>$mailcc['EmailAddress']['Name'],
+                );
+            }
+        }
+
+        if(!empty($outlookmessage['BccRecipients'])){
+            foreach($outlookmessage['BccRecipients'] as $mailbcc){
+                $bcc[] =array(
+                    'email'=>$mailbcc['EmailAddress']['Address'],
+                    'name'=>$mailbcc['EmailAddress']['Name'],
+                );
+            }
+        }
+
+        $email =array(
+            'id'=>0,
+            'uid'=>0,
+            'from'=>array(
+                'email'=>$outlookmessage['From']['EmailAddress']['Address'],
+                'name'=>$outlookmessage['From']['EmailAddress']['Name']
+            ),
+            'to'=>$to,
+            'cc'=>$cc,
+            'bcc'=>$cc,
+            'reply_to'=>$outlookmessage['ReplyTo'],
+            'message_id'=>$outlookmessage['Id'],
+            'in_reply_to'=>json_encode($outlookmessage['ReplyTo']),
+            'references'=>'',
+            'date'=>$outlookmessage['ReceivedDateTime'],
+            'udate'=>strtotime($outlookmessage['SentDateTime']),
+            'subject'=>$outlookmessage['Subject'],
+            'recent'=>'',
+            'priority'=>'',
+            'read'=>$outlookmessage['IsRead'],
+            'answered'=>$outlookmessage['IsRead'],
+            'flagged'=>$outlookmessage['Flag']['FlagStatus'],
+            'deleted'=>'',
+            'draft'=>'',
+            'size'=>'',
+            'body'=>array(
+                'html'=>$outlookmessage['Body']['Content'],
+                'plain'=>$outlookmessage['BodyPreview'],
+            ),
+            'ConversationId'=>$outlookmessage['ConversationId'],
+        );
+
+        $this->saveLocal($email);
+    }
     public function send() 
     {
         if(get_option('connect_mail')=='no'){
             $this->send_outlook();
-            $this->read_outlook();
         }else{
             $this->send_smtp();
             $this->read_imap();
@@ -484,11 +497,17 @@ class Imap_mailer
         return $message;
     }
 
-    public function connectEmail($uid)
+    public function connectEmail($uid,$type="imap")
     {
         if(is_array($uid)){
-            $this->saveLocal($uid);
+            if($type =='imap'){
+                $this->saveLocal($uid);
+            }elseif($type=='outlook'){
+                $this->outlookSaveLocal($uid);
+            }
+            
         }else{
+            
             $this->saveLocal($this->getMessage($uid));
         }
         

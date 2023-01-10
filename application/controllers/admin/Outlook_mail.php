@@ -1370,6 +1370,7 @@ class Outlook_mail extends AdminController
 	}
 	public function connect_outlook(){
 		$data = array();
+		$data['title'] ='Outlook';
 		$this->load->view('admin/outlook/emailmanagement', $data);
 	}
 	public function connect_mail() {
