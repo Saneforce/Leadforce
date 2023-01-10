@@ -308,7 +308,7 @@ class Leads extends AdminController
         $data ['group'] =$this->input->get('group');
         $data['title'] =_l('lead');
         if(!$data['group']){
-            $data['group'] ='lead_activity';
+            $data['group'] ='tab_tasks_leads';
         }
         if($id){
             echo $this->load->view('admin/leads/leadview', $data, true);
