@@ -612,7 +612,11 @@ if ($table_attributes['data-new-rel-type'] !== 'customer') {
 	$table_data_temp['company'] = _l('client');
 }
 */
-$tasks_list_column_order = (array)json_decode(get_option('tasks_list_column_order_'.$table_attributes['data-new-rel-type'])); //pr($tasks_list_column_order);
+if($table_attributes['data-new-rel-type'] =='lead'){
+	$tasks_list_column_order = (array)json_decode(get_option('tasks_list_column_order')); 
+}else{
+	$tasks_list_column_order = (array)json_decode(get_option('tasks_list_column_order_'.$table_attributes['data-new-rel-type']));
+}
 $table_data = array();
  foreach($tasks_list_column_order as $ckey=>$cval){
 	 if(isset($table_data_temp[$ckey])){
@@ -643,7 +647,12 @@ $table_data = array();
 
     $name = 'rel-tasks';
     if ($table_attributes['data-new-rel-type'] == 'lead') {
-        $name = 'rel-tasks-leads';
+		if(isset($table_attributes['data-new-bycall']) &&  $table_attributes['data-new-bycall']=='bycall'){
+			$name = 'rel-tasks-leads-calls';
+		}else{
+			$name = 'rel-tasks-leads';
+		}
+        
     }
 
     $table      = '';

@@ -460,11 +460,11 @@
             ?>
       </div>
       <div role="tabpanel" class="tab-pane <?php echo ($group=='tab_tasks_leads')?"active": "" ?>" id="tab_tasks_leads">
-         <?php init_relation_tasks_table1(array('data-new-rel-id'=>$lead->id,'data-new-rel-type'=>'lead','no-filters'=>true)); ?>
+         <?php init_relation_tasks_table(array('data-new-rel-id'=>$lead->id,'data-new-rel-type'=>'lead','no-filters'=>true)); ?>
       </div>
 
       <div role="tabpanel" class="tab-pane <?php echo ($group=='lead_calls')?"active": "" ?>" id="lead_calls">
-         <?php init_relation_tasks_table1(array('data-new-rel-id'=>$lead->id,'data-new-rel-type'=>'lead','no-filters'=>true,'data-new-bycall'=>'bycall')); ?>
+         <?php init_relation_tasks_table(array('data-new-rel-id'=>$lead->id,'data-new-rel-type'=>'lead','no-filters'=>true,'data-new-bycall'=>'bycall')); ?>
       </div>
 
       <div role="tabpanel" class="tab-pane <?php echo ($group=='lead_reminders')?"active": "" ?>" id="lead_reminders">

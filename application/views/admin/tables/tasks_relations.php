@@ -5,7 +5,7 @@ $hasPermissionEdit   = has_permission('tasks', '', 'edit');
 $hasPermissionDelete = has_permission('tasks', '', 'delete');
 $tasksPriorities     = get_tasks_priorities();
 $CI = &get_instance(); 
-if($rel_type == 'lead' || $rel_type == 'invoice' || $rel_type == 'estimate' || $rel_type == 'ticket' || $rel_type == 'expense' || $rel_type == 'proposal' ) {
+if($rel_type == 'invoice' || $rel_type == 'estimate' || $rel_type == 'ticket' || $rel_type == 'expense' || $rel_type == 'proposal' ) {
     $aColumns = [
         1,
         db_prefix() . 'tasks.id as id',
@@ -260,8 +260,11 @@ else {
         $aColumns_temp['company'] = db_prefix() . 'clients.company as company';
     }
     */
-
-    $tasks_list_column_order = (array)json_decode(get_option('tasks_list_column_order_'.$rel_type)); //pr($tasks_list_column_order);
+    if($rel_type =='lead'){
+        $tasks_list_column_order = (array)json_decode(get_option('tasks_list_column_order'));
+    }else{
+        $tasks_list_column_order = (array)json_decode(get_option('tasks_list_column_order_'.$rel_type));
+    }
     
     $aColumns = array();
     $aColumns[] = db_prefix() . 'tasks.id as id';
@@ -272,7 +275,6 @@ else {
             $aColumns[] =$aColumns_temp[$ckey];
         }
     }
-
     $sIndexColumn = 'id';
     $sTable       = db_prefix() . 'tasks';
 
@@ -345,10 +347,8 @@ else {
         $rel_to_query .= ')';
         array_push($where, $rel_to_query);
     }
-    if($_GET['call']) {
-       //array_push($where, ' AND tbltasks.call_request_id != ""');
-	   $call = " AND ".db_prefix()."tasks.tasktype = (SELECT id FROM ".db_prefix()."tasktype WHERE name= 'Call') ";
-      array_push($where, $call);
+    if(isset($_GET['call'])) {
+        array_push($where, ' AND ('.db_prefix().'tasks.call_request_id != "" || '.db_prefix().'tasks.call_code != 0) ');
     }
 
     $join = [];
