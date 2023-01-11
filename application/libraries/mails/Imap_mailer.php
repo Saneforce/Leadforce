@@ -472,7 +472,7 @@ class Imap_mailer
             'size'=>'',
             'body'=>array(
                 'html'=>$outlookmessage['Body']['Content'],
-                'plain'=>$outlookmessage['BodyPreview'],
+                'plain'=>$outlookmessage['Body']['Content'],
             ),
             'ConversationId'=>$outlookmessage['ConversationId'],
         );

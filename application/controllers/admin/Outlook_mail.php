@@ -283,7 +283,7 @@ class Outlook_mail extends AdminController
 				$output .= '<div class="btn btn-default pull-left" style="margin-right:10px;"><a href="'.$downoad_url.'">Download All</a></div>';
 			}
 			$output .='</div>';
-			$output .='<div class="emailViewerBody" style="margin-top:20px">'.$response['Body']['Content'].'</div>';
+			$output .='<div class="emailViewerBody" style="margin-top:20px">'.nl2br($response['Body']['Content']).'</div>';
 
 		$output .='</div>';
 		$output .= '</div>';

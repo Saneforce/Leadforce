@@ -286,8 +286,11 @@ class Cronjob extends CI_Controller
 										foreach ($response1["value"] as $mail) {
 											
 											$uid_data = array('msg_id'=>$mail['Id'],'staff_id'=>$staff_id);
-											
 											$this->db->insert(db_prefix() . 'outlookmsgid', $uid_data);
+											if(!empty($req_msg_id) && ($req_msg_id == $mail['Id'] || in_array($mail['Id'],$msg_ids))){
+												break;
+											}
+
 											$this->db->where("ConversationId",$mail['ConversationId']);
 											$local_mail =$this->db->get(db_prefix().'localmailstorage')->row();
 											if($local_mail){
@@ -305,9 +308,7 @@ class Cronjob extends CI_Controller
 											}
 											continue;
 											$source_from1 = $source_from2 = array();
-											if(!empty($req_msg_id) && ($req_msg_id == $mail['Id'] || in_array($mail['Id'],$msg_ids))){
-												break;
-											}
+											
 											if(!empty($mail['HasAttachments']) && $mail["HasAttachments"] == 1){
 												$list_attachment = $this->list_attachment($mail['Id'],$staff_id);
 												if(!empty($list_attachment)){
