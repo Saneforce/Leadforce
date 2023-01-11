@@ -298,7 +298,7 @@ else {
             
         }elseif($rel_type == 'contact') {
             array_push($where, ' AND ((rel_type="contact" AND rel_id ='.$rel_id.') OR (contacts_id IN (' . $rel_id . ') ))');
-        }elseif($rel_type == 'project_call' || (isset($_GET['call']) && $_GET['call'] =='bycall')) {
+        }elseif($rel_type == 'project_call' || ($rel_type != 'lead' && isset($_GET['call']) && $_GET['call'] =='bycall')) {
 			$staffid = get_staff_user_id();
 			$cur_qry = " (SELECT id FROM ".db_prefix()."tasktype WHERE name= 'Call') AND ".db_prefix()."tasks.id IN (select taskid from ".db_prefix()."task_assigned where staffid ='".$staffid."')";
 			array_push($where, 'AND rel_id="' . $rel_id . '" AND rel_type="project" AND '.db_prefix().'tasks.tasktype ='.$cur_qry.' ');

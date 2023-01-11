@@ -60,6 +60,7 @@ function render_lead_activities($lead_id,$page=0)
                     $title ='<i class="fa fa-circle '.$activitystatusclass.'" aria-hidden="true"></i>   <a class="'.$activitystatusclass.'" herf="#" onclick="edit_task('.$activity->id.'); return false;" style="cursor:pointer">'.$activity->name.'</a>';
                     if($log->action =='called'){
                         $CI->db->where('task_id',$activity->id);
+                        $CI->db->order_by("id", "desc");
                         $call_log =$CI->db->get(db_prefix().'call_history')->row();
                         if($call_log){
                             $meta_data .='<audio id="myAudio" controls><source src="'.base_url('uploads/recordings/'.$call_log->filename).'"></audio><br>';
