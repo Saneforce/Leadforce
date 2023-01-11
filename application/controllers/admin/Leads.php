@@ -192,7 +192,26 @@ class Leads extends AdminController
 		else {
             if(isset($_GET['emailuid']) && $_GET['emailuid']){
                 $this->load->library('mails/imap_mailer');
-                $data['email_data'] =$this->imap_mailer->getMessage($_GET['emailuid']);
+                $email_data =$this->imap_mailer->getMessage($_GET['emailuid']);
+                if(get_option('connect_mail') =='yes'){
+                    $data['email_data'] =array(
+                        'uid'=>$email_data['uid'],
+                        'from'=>[
+                            'email'=>$email_data['form']['email'],
+                        ],
+                        'subject'=>$email_data['subject'],
+                    );
+                }else{
+                    $data['email_data'] =array(
+                        'uid'=>$email_data['Id'],
+                        'from'=>[
+                            'email'=>$email_data['From']['EmailAddress']['Address'],
+                        ],
+                        'subject'=>$email_data['Subject'],
+                    );
+                }
+
+                
             }
 			$data['teamleaders'] = $this->staff_model->get('', ['role' => 2, 'active' => 1]);
 			$data['teammembers'] = $this->staff_model->get('', ['role' => 1, 'active' => 1]);

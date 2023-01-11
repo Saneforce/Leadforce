@@ -22,13 +22,14 @@ class Imap_mailer
     protected $parentId;
     protected $outlookCredentials;
     protected $outlookToken;
-
+    protected $connectMail;
     public function __construct()
     {
         $this->CI = &get_instance();
 
         $this->CI->load->model('leads_model');
-        if(get_option('connect_mail')=='no'){
+        $this->connectMail = get_option('connect_mail');
+        if($this->connectMail =='no'){
             $this->CI->load->helper("tasks_helper");
             $this->outlookCredentials = outlook_credential();
             $this->outlookToken = get_outlook_token();
@@ -253,7 +254,7 @@ class Imap_mailer
             elseif($this->rel_type =='lead')
                 $data['lead_id']	= $this->rel_id;
             
-            if(get_option('connect_mail')=='no'){
+            if($this->connectMail=='no'){
                 $data['mail_by'] ='outlook';
             }
             if(isset($email['ConversationId'])){
@@ -480,7 +481,7 @@ class Imap_mailer
     }
     public function send() 
     {
-        if(get_option('connect_mail')=='no'){
+        if($this->connectMail=='no'){
             $this->send_outlook();
         }else{
             $this->send_smtp();
@@ -489,7 +490,7 @@ class Imap_mailer
         
     }
 
-    public function getMessage($uid)
+    public function getImapMessage($uid)
     {
         $this->CI->imap->connect($this->imapconf);
         $message = $this->CI->imap->get_message($uid);
@@ -497,18 +498,50 @@ class Imap_mailer
         return $message;
     }
 
-    public function connectEmail($uid,$type="imap")
+    public function getOutlookMessage($msg_id)
+    {
+		$token		= $this->outlookToken->token;
+		$user_email = $this->outlookToken->email;
+		$headers = array(
+			"User-Agent: php-tutorial/1.0",
+			"Authorization: Bearer ".$token,
+			"Accept: application/json",
+			"client-request-id: ".makeGuid(),
+			"return-client-request-id: true",
+			"X-AnchorMailbox: ". $user_email
+		);
+		$outlookApiUrl = $this->outlookCredentials["api_url"] . "/me/messages/".$msg_id;
+		$response = runCurl($outlookApiUrl, null, $headers);
+		$response = explode("\n", trim($response));
+		$response = $response[count($response) - 1];
+		$response = json_decode($response, true);
+        return $response;
+    }
+    public function getMessage($uid)
+    {
+        if($this->connectMail =='yes'){
+            return $this->getImapMessage($uid);
+        }else{
+            return $this->getOutlookMessage($uid);
+        }
+        
+    }
+
+    public function connectEmail($uid)
     {
         if(is_array($uid)){
-            if($type =='imap'){
+            if($this->connectMail =='yes'){
                 $this->saveLocal($uid);
-            }elseif($type=='outlook'){
+            }else{
                 $this->outlookSaveLocal($uid);
             }
-            
         }else{
+            if($this->connectMail =='yes'){
+                $this->saveLocal($this->getMessage($uid));
+            }else{
+                $this->outlookSaveLocal($this->getMessage($uid));
+            }
             
-            $this->saveLocal($this->getMessage($uid));
         }
         
     }

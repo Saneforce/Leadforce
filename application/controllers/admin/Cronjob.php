@@ -301,7 +301,7 @@ class Cronjob extends CI_Controller
 												$this->load->library('mails/imap_mailer');
 												$this->imap_mailer->set_rel_type($rel_type);
 												$this->imap_mailer->set_rel_id($rel_id);
-												$this->imap_mailer->connectEmail($mail,'outlook');
+												$this->imap_mailer->connectEmail($mail);
 											}
 											continue;
 											$source_from1 = $source_from2 = array();
