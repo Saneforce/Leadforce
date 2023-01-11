@@ -642,7 +642,12 @@ class Tasks_model extends App_Model
             $tags = $data['tags'];
             unset($data['tags']);
         }
-        //pre($data);
+        if($data['rel_type'] =='lead'){
+            $lead_contact_id =$this->leads_model->get_lead_contact($data['rel_id']);
+            if($lead_contact_id){
+                $data['contacts_id'] =$lead_contact_id->contacts_id;
+            }
+        }
         $this->db->insert(db_prefix() . 'tasks', $data);
         $insert_id = $this->db->insert_id();
         if ($insert_id) {

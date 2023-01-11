@@ -483,58 +483,6 @@ table.body {
 <?php init_tail(); ?>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/intlTelInput-jquery.min.js"></script>
 <script>
-    function mget_file(c_id, c) {
-        var fcnt = $('#' + c + 'filecnt').val();
-        var tcnt = $('#' + c + 'totcnt').val();
-        if (tcnt <= 1) {
-            document.getElementById(c_id).click();
-        } else {
-            document.getElementById(c_id + '_' + tcnt).click();
-        }
-    }
-
-    function rm_file(a, b) {
-        var c = $('#' + a + '_file').val() + b + ',';
-        $('#' + a + '_' + b + '_del').hide();
-        $('#' + a + '_file').val(c);
-    }
-
-    function get_up_val(c_id, c) {
-        var fcnt = $('#' + c + 'filecnt').val();
-        var tcnt = $('#' + c + 'totcnt').val();
-        var allcnt = $('#' + c + 'allcnt').val();
-        var req_tcnt = parseInt(tcnt) + parseInt(1);
-        var req_fcnt = parseInt(fcnt) + parseInt(1);
-        var req_cid = "'" + c_id + "'";
-        var req_c = "'" + c + "'";
-        var req_id = "'" + c + "div_" + req_tcnt;
-        var file = $('#' + c_id);
-        if (tcnt != 1) {
-            var file = $('#' + c_id + '_' + tcnt);
-        }
-        var fileName = '';
-        allcnt1 = parseInt(allcnt) + parseInt(file[0].files.length);
-
-        for (var i = 0; i < file[0].files.length; i++) {
-            if (allcnt1 == file[0].files.length) {
-                var j = i;
-            } else {
-                var j = parseInt(allcnt) + i;
-            }
-            var chr = "'" + c + "'";
-            var c_no = "'" + j + "'";
-            fileName = fileName + '<div id="' + c + '_' + j + '_del" class="col-md-12" style="float:left;margin-top:5px;margin-top:5px;font-weight: 900;font-size: 15px;"><div class="col-md-9">' + file[0].files[i].name + '</div><div class="col-md-3"><a href="javascript:void(0)"  onclick="rm_file(' + chr + ',' + c_no + ')" title="Delete"><i class="fa fa-trash fa-2x" id="" style="color:red"></i></a></div></div>';
-        }
-        $('.ch_files_' + c).append(fileName);
-        var req_file = '<div id="' + req_id + '"><input type="file" id="' + c_id + '_' + req_tcnt + '" style="display:none" name="attachment[]" multiple onchange="get_up_val(' + req_cid + ',' + req_c + ')"></div><br><br>';
-
-        $('#' + c + '_files').append(req_file);
-        $('#' + c + 'filecnt').val(req_fcnt);
-        $('#' + c + 'totcnt').val(req_tcnt);
-        $('#' + c + 'allcnt').val(allcnt1);
-
-    }
-
     function ch_sort(ch_val, b) {
         var sort_val = $("#sort_val").val();
         var sort_option = $("#sort_option").val();

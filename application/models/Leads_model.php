@@ -428,7 +428,7 @@ class Leads_model extends App_Model {
             
             $data['client_id']=$this->clients_model->add($companyData);
         }
-        
+        unset($data['country']);
         unset($data['clientphonenumber']);
         unset($data['clientphone_country_code']);
 
