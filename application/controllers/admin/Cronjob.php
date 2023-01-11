@@ -273,7 +273,7 @@ class Cronjob extends CI_Controller
 									$response1 = explode("\n", trim($response1));
 									$response1 = $response1[count($response1) - 1];
 									$response1 = json_decode($response1, true);
-									$sQuery1 = "select * from ".db_prefix()."outlookmsgid where staff_id = '".$staff_id."' order by id desc ";
+									$sQuery1 = "select * from ".db_prefix()."outlookmsgid order by id desc ";
 									$rResults12 = $this->db->query($sQuery1)->result_array();
 									$msg_ids	 = array_column($rResults12, 'msg_id'); 
 									$req_msg_id = '';
