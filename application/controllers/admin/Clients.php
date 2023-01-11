@@ -463,8 +463,8 @@ class Clients extends AdminController
             $client                = $this->clients_model->get($id);
 			$data['customer_tabs'] = array(
 			'profile'=>array('slug'=>'profile','name'=>'Profile','icon'=>'fa fa-user-circle','view'=>'admin/clients/groups/profile_contact','position'=>1,'href'=>'#','children'=>array(),),
-			'projects'=>array('slug'=>'projects','name'=>_l('projects'),'icon'=>'fa fa-bars','view'=>'admin/clients/groups/projects_contact','position'=>1,'href'=>'#','children'=>array(),),
-			'leads'=>array('slug'=>'leads','name'=>_l('leads'),'icon'=>'fa fa-bars','view'=>'admin/clients/groups/leads_contact','position'=>1,'href'=>'#','children'=>array(),),
+			'projects'=>array('slug'=>'projects','name'=>_l('projects'),'icon'=>'fa fa-handshake-o','view'=>'admin/clients/groups/projects_contact','position'=>1,'href'=>'#','children'=>array(),),
+			'leads'=>array('slug'=>'leads','name'=>_l('leads'),'icon'=>'fa fa-tty','view'=>'admin/clients/groups/leads_contact','position'=>1,'href'=>'#','children'=>array(),),
 			'tasks'=>array('slug'=>'tasks','name'=>_l('tasks'),'icon'=>'fa fa-tasks','view'=>'admin/clients/groups/tasks_contact','position'=>1,'href'=>'#','children'=>array(),),
 			);
 		

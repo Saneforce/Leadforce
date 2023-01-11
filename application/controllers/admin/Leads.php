@@ -1949,7 +1949,7 @@ class Leads extends AdminController
                 $message =$local_email->body_plain;
             }
 
-			$output .='<div class="emailViewerBody" style="margin-top:20px">'.$message.'</div>';
+			$output .='<div class="emailViewerBody" style="margin-top:20px">'.nl2br($message).'</div>';
             $output .='</div>';
             $output .= '</div>';
         }else{

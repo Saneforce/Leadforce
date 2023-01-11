@@ -292,12 +292,13 @@
                 <?php echo _l('items') ?><?php if($productscnt): ?><span class="badge badge-light ml-3" id="leaditemcount"><?php echo $productscnt?></span><?php endif; ?>
             </a>
          </li>
-         <li role="presentation" class="<?php echo ($group=='tab_email')?"active": "" ?>">
-            <a href="#tab_email" aria-controls="tab_email" role="tab" data-toggle="tab">
-                <?php echo _l('email') ?><?php if($emails_count): ?><span class="badge badge-light ml-3" id="leademailcount"><?php echo $emails_count?></span><?php endif; ?>
-            </a>
-         </li>
-
+         <?php if(has_permission('email', '', 'view')): ?>
+            <li role="presentation" class="<?php echo ($group=='tab_email')?"active": "" ?>">
+               <a href="#tab_email" aria-controls="tab_email" role="tab" data-toggle="tab">
+                  <?php echo _l('email') ?><?php if($emails_count): ?><span class="badge badge-light ml-3" id="leademailcount"><?php echo $emails_count?></span><?php endif; ?>
+               </a>
+            </li>
+         <?php endif; ?>
          <?php if(count($mail_activity) > 0 || isset($show_email_activity) && $show_email_activity){ ?>
          <li role="presentation" class="<?php echo ($group=='tab_email_activity')?"active": "" ?>">
             <a href="#tab_email_activity" aria-controls="tab_email_activity" role="tab" data-toggle="tab">
@@ -310,11 +311,13 @@
             <?php echo _l('proposals'); ?><?php if($proposal_count): ?><span class="badge badge-light ml-3" id="leadproposalcount"><?php echo $proposal_count?></span><?php endif; ?>
             </a>
          </li>
+         <?php if($this->callsettings_model->accessToCall()): ?>
          <li role="presentation" class="<?php echo ($group=='lead_calls')?"active": "" ?>">
             <a href="#lead_calls" onclick="init_rel_tasks_table(<?php echo $lead->id; ?>,'lead','.table-rel-tasks-leads-calls');" aria-controls="lead_calls" role="tab" data-toggle="tab">
             Calls <?php if($calls_count): ?><span class="badge badge-light ml-3" id="leadactivitycount"><?php echo $calls_count ?></span><?php endif; ?>
             </a>
          </li>
+         <?php endif; ?>
          <li role="presentation" class="<?php echo ($group=='attachments')?"active": "" ?>">
             <a href="#attachments" aria-controls="attachments" role="tab" data-toggle="tab">
             <?php echo _l('lead_files'); ?><?php if($files_count): ?><span class="badge badge-light ml-3" id="leadfilescount"><?php echo $files_count?></span><?php endif; ?>
@@ -462,11 +465,12 @@
       <div role="tabpanel" class="tab-pane <?php echo ($group=='tab_tasks_leads')?"active": "" ?>" id="tab_tasks_leads">
          <?php init_relation_tasks_table(array('data-new-rel-id'=>$lead->id,'data-new-rel-type'=>'lead','no-filters'=>true)); ?>
       </div>
-
+         
+      <?php if($this->callsettings_model->accessToCall()): ?>
       <div role="tabpanel" class="tab-pane <?php echo ($group=='lead_calls')?"active": "" ?>" id="lead_calls">
          <?php init_relation_tasks_table(array('data-new-rel-id'=>$lead->id,'data-new-rel-type'=>'lead','no-filters'=>true,'data-new-bycall'=>'bycall')); ?>
       </div>
-
+      <?php endif; ?>
       <div role="tabpanel" class="tab-pane <?php echo ($group=='lead_reminders')?"active": "" ?>" id="lead_reminders">
          <a href="#" data-toggle="modal" class="btn btn-info" data-target=".reminder-modal-lead-<?php echo $lead->id; ?>"><i class="fa fa-bell-o"></i> <?php echo _l('lead_set_reminder_title'); ?></a>
          <hr />
@@ -562,6 +566,56 @@
     
    </div>
    </div>
+
+   <div class="modal fade" id="play_record" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document" style="width:340px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">
+                    <span class="edit-title">Play Recorded</span>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                    <div id="playhtml">
+                      
+                    </div>
+                  </div>
+                  
+              </div>
+            </div>
+            <div class="modal-footer">
+                <button group="button" class="btn btn-default" id="closeaudio" ><?php echo _l('close'); ?></button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="view_history" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button group="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">
+                    <span class="edit-title">Call History</span>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                    <div id="historyhtml">
+                      
+                    </div>
+                  </div>
+                  
+              </div>
+            </div>
+            <div class="modal-footer">
+                <button group="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+            </div>
+        </div>
+    </div>
+</div>
 <?php hooks()->do_action('lead_modal_profile_bottom',(isset($lead) ? $lead->id : '')); ?>
 
 <?php init_tail(); ?>
@@ -602,7 +656,10 @@
    }
    $(document).ready(function () {
       init_rel_tasks_table(<?php echo $lead->id; ?>,'lead','.table-rel-tasks-leads');
+
+      <?php if($this->callsettings_model->accessToCall()): ?>
       init_rel_tasks_table(<?php echo $lead->id; ?>,'lead','.table-rel-tasks-leads-calls');
+      <?php endif?>
 
       init_lead_activities_log();
       var hasMoreLogs =true;

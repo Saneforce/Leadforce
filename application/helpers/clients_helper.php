@@ -133,7 +133,7 @@ function filter_client_visible_tabs($tabs)
 
     $appliedSettings = is_array($visible);
     foreach ($tabs as $key => $tab) {
-        if (has_permission($key, '', 'view')) {
+        if ($key == 'profile' || has_permission($key, '', 'view')) {
             
             // Check visibility from settings too
             if ($key != 'profile' && $key != 'contacts' && $appliedSettings) {
