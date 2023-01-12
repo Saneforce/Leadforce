@@ -1065,7 +1065,7 @@ class Projects extends AdminController
     {
         $this->set_session_url();
        
-        $data['title'] = _l('project_gant');
+        $data['title'] = _l('projects');
 
 
         $data['gsearch']    = $this->input->get('gsearch');
@@ -1111,7 +1111,7 @@ class Projects extends AdminController
     {
         $this->set_session_url();
        
-        $data['title'] = _l('project_gant');
+        $data['title'] = _l('projects');
 
 
         $data['gsearch']    = $this->input->get('gsearch');
@@ -1158,7 +1158,7 @@ class Projects extends AdminController
     {
         $this->set_session_url();
         
-        $data['title'] = _l('project_gant');
+        $data['title'] = _l('projects');
 
 
         if(isset($_REQUEST['nav']) && !empty($_REQUEST['nav'])) {

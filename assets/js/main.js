@@ -1033,6 +1033,8 @@ $(function() {
                 $address.height(0).height(scrollHeight - 15);
                 $address.css('padding-top', '9px');
             }
+        }else{
+            location.reload(); 
         }
     });
 

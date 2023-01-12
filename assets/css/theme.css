@@ -110,6 +110,9 @@ a:hover{
     z-index: 999;
 }
 
+.tooltip a{
+    color: white !important;
+}
 .btn-primary{
     background-color: var(--theme-primary-light);
 }
