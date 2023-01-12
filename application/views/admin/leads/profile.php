@@ -1012,6 +1012,9 @@ $hascoustomfields =$this->db->get(db_prefix() . 'customfields')->row();
 
 <script>
     function disabled_orgaization_fields(status=true){
+        <?php if (!has_permission('customers', '', 'create')): ?>
+            status =true;
+        <?php endif; ?>
         $('[name="company"]').val('').attr('readonly',status);
         $('[name="website"]').val('').attr('readonly',status);
         $('[name="address"]').val('').attr('readonly',status);
@@ -1022,6 +1025,9 @@ $hascoustomfields =$this->db->get(db_prefix() . 'customfields')->row();
         $('[name="clientphonenumber"]').val('').attr('readonly',status);
     }
     function disabled_person_fields(status=true){
+        <?php if (!has_permission('leads', '', 'create')): ?>
+            status =true;
+        <?php endif; ?>
         $('[name="personname"]').val('').attr('readonly',status);
         $('[name="title"]').val('').attr('readonly',status);
         $('[name="email"]').val('').attr('readonly',status);
@@ -1100,6 +1106,9 @@ $hascoustomfields =$this->db->get(db_prefix() . 'customfields')->row();
     document.addEventListener("DOMContentLoaded", () => {
     validate_lead_form();
     <?php endif; ?>
+        <?php if (!has_permission('customers', '', 'create')): ?>
+            disabled_orgaization_fields(true);
+        <?php endif; ?>
 
         init_ajax_search('customer', '#client_id.ajax-search');
         // -----Country Code Selection
