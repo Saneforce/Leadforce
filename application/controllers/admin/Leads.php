@@ -829,8 +829,18 @@ class Leads extends AdminController
             ajax_access_denied();
         }
 
-        handle_lead_attachments($id);
-        echo json_encode(['leadView' => $lastFile ? $this->_get_lead_data($id) : [], 'id' => $id]);
+        $status =handle_lead_attachments($id);
+        if($status === true){
+            echo json_encode(['leadView' => $lastFile ? $this->_get_lead_data($id) : [], 'id' => $id]);
+
+        }else{
+            if(!$status){
+                $status ="Could not upload file";
+            }
+            http_response_code(415);
+            die($status);
+        }
+       
     }
 
     public function add_external_attachment()

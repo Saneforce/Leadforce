@@ -290,3 +290,7 @@ a:hover{
 .btn-info.active, .btn-info:active, .open>.dropdown-toggle.btn-info,.btn-info:hover{
     border-color: var(--theme-info-dark-hover);
 }
+
+.dropzone .dz-preview .dz-error-message {
+    color: white !important;
+}

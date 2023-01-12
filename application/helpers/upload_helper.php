@@ -234,26 +234,26 @@ function handle_lead_attachments($leadid, $index_name = 'file', $form_activity =
     if (isset($_FILES[$index_name]) && empty($_FILES[$index_name]['name']) && $form_activity) {
         return;
     }
-
+    
     if (isset($_FILES[$index_name]) && _perfex_upload_error($_FILES[$index_name]['error'])) {
         header('HTTP/1.0 400 Bad error');
         echo _perfex_upload_error($_FILES[$index_name]['error']);
         die;
     }
-
+    
     $CI = & get_instance();
     if($index_name == 'file') {
         if (isset($_FILES[$index_name]['name']) && $_FILES[$index_name]['name'] != '' && !empty($_FILES[$index_name]['name'])) {
             hooks()->do_action('before_upload_lead_attachment', $leadid);
             $path = get_upload_path_by_type('lead') . $leadid . '/';
+            
             // Get the temp file path
             $tmpFilePath = $_FILES[$index_name]['tmp_name'];
             // Make sure we have a filepath
             if (!empty($tmpFilePath) && $tmpFilePath != '') {
                 if (!_upload_extension_allowed($_FILES[$index_name]['name'])) {
-                    return false;
+                    return "Unsupported file format";
                 }
-    
                 _maybe_create_upload_path($path);
     
                 $filename    = unique_filename($path, $_FILES[$index_name]['name']);
@@ -268,7 +268,7 @@ function handle_lead_attachments($leadid, $index_name = 'file', $form_activity =
                         'filetype'  => $_FILES[$index_name]['type'],
                         ];
                     $CI->leads_model->add_attachment_to_database($leadid, $data, false, $form_activity);
-    
+                    
                     return true;
                 }
             }
@@ -285,7 +285,7 @@ function handle_lead_attachments($leadid, $index_name = 'file', $form_activity =
             // Make sure we have a filepath
             if (!empty($tmpFilePath) && $tmpFilePath != '') {
                 if (!_upload_extension_allowed($_FILES[$index_name]['name'][$count])) {
-                    return false;
+                    return "Unsupported file format";
                 }
 
                 _maybe_create_upload_path($path);
