@@ -672,6 +672,9 @@
             }
          }
       })
+      $('body').on('click','.dropdown  .dropdown-toggle',function(){
+         $(this).parent().removeClass('dropup');
+      })
       
    });
 </script>

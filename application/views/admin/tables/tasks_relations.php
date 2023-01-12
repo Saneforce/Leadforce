@@ -636,12 +636,12 @@ else {
         }
         $row_temp['priority']  = '';
         if(isset($aRow['priority'])) {
-            $outputPriority = '<span style="color:' . task_priority_color($aRow['priority']) . ';" class="inline-block">' . task_priority($aRow['priority']);
+            $outputPriority = '<span style="color:' . task_priority_color($aRow['priority']) . ';" class="inline-block">';
     
             if (has_permission('tasks', '', 'edit') && $aRow['status'] != Tasks_model::STATUS_COMPLETE) {
                 $outputPriority .= '<div class="dropdown inline-block mleft5 table-export-exclude ">';
                 $outputPriority .= '<a href="#" style="font-size:14px;vertical-align:middle;" class="dropdown-toggle text-dark" id="tableTaskPriority-' . $aRow['id'] . '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-original-title="" title="">';
-                $outputPriority .= '<span data-toggle="tooltip" title="' . _l('task_single_priority') . '"><i class="fa fa-caret-down" aria-hidden="true"></i></span>';
+                $outputPriority .= '<span data-toggle="tooltip" title="' . _l('task_single_priority') . '">'. task_priority($aRow['priority']).'<i class="fa fa-caret-down" aria-hidden="true" style="display:inherit;margin-left:5px"></i></span>';
                 $outputPriority .= '</a>';
     
                 $outputPriority .= '<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="tableTaskPriority-' . $aRow['id'] . '">';

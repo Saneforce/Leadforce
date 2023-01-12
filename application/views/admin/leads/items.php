@@ -26,6 +26,10 @@
         text-align: left;
         border: 1px solid rgb(255, 255, 255);
     }
+    #suptotaltxt{
+        width: 200px;
+        display: block;
+    }
 </style>
 
 
