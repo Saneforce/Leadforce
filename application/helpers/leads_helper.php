@@ -262,3 +262,13 @@ function get_lead_name_by_id($id)
 
     return '';
 }
+
+hooks()->add_filter('tasks_related_table_data', 'lead_tasks_related_table_data');
+function lead_tasks_related_table_data($columns)
+{
+    unset($columns['project_name']);
+    unset($columns['project_status']);
+    unset($columns['project_pipeline']);
+    unset($columns['teamleader']);
+    return $columns;
+}

@@ -251,7 +251,7 @@ if($rel_type == 'invoice' || $rel_type == 'estimate' || $rel_type == 'ticket' ||
 } 
 else {
     $aColumns_temp =  get_tasks_all_fields();
-
+    $aColumns_temp = hooks()->apply_filters('tasks_related_table_data', $aColumns_temp);
     /*
     if ($rel_to !== 'project') {
         $aColumns_temp['project_name'] = db_prefix() . 'projects.name as project_name';
@@ -269,7 +269,7 @@ else {
     $aColumns = array();
     $aColumns[] = db_prefix() . 'tasks.id as id';
     $aColumns[] = db_prefix().'clients.userid as userid';
-
+    $tasks_list_column_order = hooks()->apply_filters('tasks_related_table_data', $tasks_list_column_order);
     foreach($tasks_list_column_order as $ckey=>$cval){
         if(isset($aColumns_temp[$ckey])){
             $aColumns[] =$aColumns_temp[$ckey];
@@ -356,6 +356,7 @@ else {
     array_push($join, 'LEFT JOIN '.db_prefix().'projects  as '.db_prefix().'projects ON '.db_prefix().'projects.id = ' .db_prefix() . 'tasks.rel_id AND ' .db_prefix() . 'tasks.rel_type ="project" ');
     array_push($join, 'LEFT JOIN '.db_prefix().'leads  as '.db_prefix().'leads ON '.db_prefix().'leads.id = ' .db_prefix() . 'tasks.rel_id AND ' .db_prefix() . 'tasks.rel_type ="lead" ');
     array_push($join, 'LEFT JOIN '.db_prefix().'projects_status  as '.db_prefix().'projects_status ON '.db_prefix().'projects_status.id = ' .db_prefix() . 'projects.status');
+    array_push($join, 'LEFT JOIN '.db_prefix().'pipeline  as '.db_prefix().'pipeline ON '.db_prefix().'pipeline.id = ' .db_prefix() . 'projects.pipeline_id');
     array_push($join, 'LEFT JOIN '.db_prefix().'clients  as '.db_prefix().'clients ON '.db_prefix().'clients.userid = ' .db_prefix() . 'projects.clientid OR '.db_prefix().'clients.userid = ' .db_prefix() . 'leads.client_id');
     array_push($join, 'LEFT JOIN '.db_prefix().'contacts  as '.db_prefix().'contacts ON '.db_prefix().'contacts.id = ' .db_prefix() . 'tasks.contacts_id');
     $custom_fields = get_table_custom_fields('tasks');
@@ -386,7 +387,7 @@ else {
     $aColumns[] = db_prefix().'projects.teamleader as p_teamleader';
     $aColumns[] = db_prefix().'contacts.id as contactsid';
     $aColumns = hooks()->apply_filters('tasks_related_table_sql_columns', $aColumns);
-
+    
     // Fix for big queries. Some hosting have max_join_limit
     if (count($custom_fields) > 4) {
         @$this->ci->db->query('SET SQL_BIG_SELECTS=1');

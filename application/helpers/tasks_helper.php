@@ -528,6 +528,8 @@ function init_relation_tasks_table($table_attributes = [])
 		'project_contacts'=>_l('project_contacts'),
 		'priority'=>_l('tasks_list_priority'),
 	];
+
+	$table_datas = hooks()->apply_filters('tasks_related_table_data', $table_datas);
 	/*$table_data_temp = array(
         'id'=>_l('the_number_sign'),
         'task_name'=>[
@@ -770,12 +772,12 @@ function tasks_summary_data($rel_id = null, $rel_type = null)
         $tasks_where = 'rel_type != "" AND ';
         if($status['id'] == 1) {
             //$tasks_where = $tasks_where.' AND startdate > ' . date('Y-m-d');
-            $tasks_where = ' date(startdate) > CURDATE() AND status != 5 ';
+            $tasks_where = ' date('.db_prefix().'tasks.startdate) > CURDATE() AND status != 5 ';
         } elseif($status['id'] == 3) {
             //$tasks_where = $tasks_where.' AND startdate = ' . date('Y-m-d');
-            $tasks_where = ' date(startdate) = CURDATE() AND status != 5 ';
+            $tasks_where = ' date('.db_prefix().'tasks.startdate) = CURDATE() AND status != 5 ';
         } elseif($status['id'] == 2) {
-            $tasks_where = ' date(startdate) < CURDATE() AND status != 5 ';
+            $tasks_where = ' date('.db_prefix().'tasks.startdate) < CURDATE() AND status != 5 ';
         }  elseif($status['id'] == 5) {
             $tasks_where = 'status = ' . $status['id'];
         }
@@ -2977,13 +2979,13 @@ function api_tasks_summary_data($rel_id = null, $rel_type = null)
     foreach ($statuses as $status) {
         $tasks_where = 'rel_type != "" AND ';
         if($status == 'overdue') {
-			$tasks_where = ' date(startdate) < CURDATE() AND status != 5 ';
+			$tasks_where = ' date('.db_prefix().'tasks.startdate) < CURDATE() AND status != 5 ';
         } elseif($status == 'today') {
-            $tasks_where = ' date(startdate) = CURDATE()';
+            $tasks_where = ' date('.db_prefix().'tasks.startdate) = CURDATE()';
         } elseif($status == 'tomorrow') {
-            $tasks_where = ' date(startdate) = (CURDATE()+1)';
+            $tasks_where = ' date('.db_prefix().'tasks.startdate) = (CURDATE()+1)';
         }  elseif($status== 'dayaftertomorrow') {
-            $tasks_where = ' date(startdate) = (CURDATE()+2)';
+            $tasks_where = ' date('.db_prefix().'tasks.startdate) = (CURDATE()+2)';
         }
         $my_staffids = $CI->staff_model->get_my_staffids();
         
