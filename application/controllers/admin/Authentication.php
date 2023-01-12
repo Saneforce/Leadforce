@@ -142,7 +142,8 @@ class Authentication extends App_Controller
                     redirect(admin_url('authentication/forgot_password'));
                 } elseif ($success == true) {
                     set_alert('success', _l('check_email_for_resetting_password'));
-                    redirect(admin_url('authentication'));
+                    $this->load->view('authentication/email_sent');
+                    return;
                 } else {
                     set_alert('danger', _l('error_setting_new_password_key'));
                     redirect(admin_url('authentication/forgot_password'));
