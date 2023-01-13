@@ -24,7 +24,7 @@ class Tasks_model extends App_Model
     // Auto Update Status
     public function auto_update_status()
     {
-        $this->db->where('startdate', date('Y-m-d'));
+        $this->db->like('startdate', date('Y-m-d'));
         $this->db->where('status', 1);
         $this->db->update(db_prefix() . 'tasks', ['status' => 3,]);
 
