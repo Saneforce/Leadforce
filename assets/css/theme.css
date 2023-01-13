@@ -169,6 +169,8 @@ a:hover{
     left: unset;
     margin-left: 0px;
     width: 31vw;
+    max-height: calc( 100vh - 60px);
+    overflow-y: auto;
 }
 .header-notifications .dropdown-toggle.notifications-icon{
     color: var(--theme-primary-text-color);

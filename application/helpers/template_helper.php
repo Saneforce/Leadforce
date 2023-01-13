@@ -229,7 +229,7 @@ function get_company_logo($uri = '', $href_class = '', $type = '')
 
     if ($company_logo != '') {
         $logo = '<a href="' . $logoURL . '" class="logo img-responsive' . ($href_class != '' ? ' ' . $href_class : '') . '">
-        <img src="' . base_url('uploads/company/' . $company_logo) . '" class="img-responsive" alt="' . html_escape($company_name) . '">
+        <img src="' . base_url('uploads/company/' . $company_logo) . '?v=1.0" class="img-responsive" alt="' . html_escape($company_name) . '">
         </a>';
     } elseif ($company_name != '') {
         $logo = '<a href="' . $logoURL . '" class="' . $href_class . ' logo logo-text">' . $company_name . '</a>';

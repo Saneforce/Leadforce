@@ -88,9 +88,10 @@ input[type="email"]:focus {
   color: #fff;
   background: rgb(3 18 51);
 }
-.btn-info:hover {
+.btn-info:hover,.btn-info.active, .btn-info:active, .open > .dropdown-toggle.btn-info,.btn-info:focus,.btn-info.active.focus, .btn-info.active:focus, .btn-info.active:hover, .btn-info:active.focus, .btn-info:active:focus, .btn-info:active:hover, .open > .dropdown-toggle.btn-info.focus, .open > .dropdown-toggle.btn-info:focus, .open > .dropdown-toggle.btn-info:hover {
   color: #fff;
   background: #071940;
+  border: 0;
 }
 .company-logo {
   display: block;
