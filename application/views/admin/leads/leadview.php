@@ -621,6 +621,10 @@
 <?php init_tail(); ?>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/intlTelInput-jquery.min.js"></script>
 <script>
+
+   function gettasks_summary_data(){
+      
+   }
    function load_lead_activity_log(page){
          $.ajax({
             type: 'GET',

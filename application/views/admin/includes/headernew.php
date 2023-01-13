@@ -8,7 +8,7 @@
 <div id="appSidebar">
     <div id="applogo">
         <a href="<?php echo site_url(); ?>" class="logo ">
-            <img src="<?php echo base_url('uploads/company/logo1.png'); ?>" class="" alt="<?php echo html_escape(get_option('companyname')); ?>">
+            <img src="<?php echo base_url('uploads/company/logo1.png?v=1.0'); ?>" class="" alt="<?php echo html_escape(get_option('companyname')); ?>">
         </a>
     </div>
 
