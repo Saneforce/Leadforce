@@ -3192,8 +3192,8 @@ class Tasks_model extends App_Model
         array_push($join, 'LEFT JOIN '.db_prefix().'clients  as '.db_prefix().'clients ON '.db_prefix().'clients.userid = ' .db_prefix() . 'projects.clientid');
        array_push($join, 'LEFT JOIN '.db_prefix().'contacts  as '.db_prefix().'contacts ON ('.db_prefix().'contacts.id = ' .db_prefix() . 'tasks.contacts_id  OR (' .db_prefix() . 'tasks.rel_type ="contact" AND '.db_prefix().'contacts.id = ' .db_prefix() . 'tasks.rel_id) )');
          
-        // include_once(APPPATH . 'views/admin/tables/includes/tasks_filter.php');
-        // include_once(APPPATH . 'views/admin/tables/includes/tasks_wo_status_filter.php');
+        include_once(APPPATH . 'views/admin/tables/includes/tasks_filter.php');
+        include_once(APPPATH . 'views/admin/tables/includes/tasks_wo_status_filter.php');
 
         // ROle based records
         $my_staffids = $this->staff_model->get_my_staffids();
@@ -3202,8 +3202,13 @@ class Tasks_model extends App_Model
             array_push($where, ' AND (' . db_prefix() . 'tasks.id in (select taskid from tbltask_assigned where staffid in (' . implode(',',$my_staffids) . ')) OR ' . db_prefix() . 'tasks.rel_id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')) OR  ' . db_prefix() . 'projects.teamleader in (' . implode(',',$my_staffids) . ') )');
             array_push($wherewo, ' AND (' . db_prefix() . 'tasks.id in (select taskid from tbltask_assigned where staffid in (' . implode(',',$my_staffids) . ')) OR ' . db_prefix() . 'tasks.rel_id IN (SELECT ' . db_prefix() . 'projects.id FROM ' . db_prefix() . 'projects join ' . db_prefix() . 'project_members  on ' . db_prefix() . 'project_members.project_id = ' . db_prefix() . 'projects.id WHERE ' . db_prefix() . 'project_members.staff_id in (' . implode(',',$my_staffids) . ')) OR  ' . db_prefix() . 'projects.teamleader in (' . implode(',',$my_staffids) . ') )');
         }
+        
         if(!empty($where_cond)){
-			array_push($where, $where_cond);
+			$where_cond = ltrim($where_cond," where");
+            if(substr(trim($where_cond), 0, 3) =='and'){
+                $where_cond = substr(trim($where_cond), 3);
+            }
+			array_push($where, ' AND '.$where_cond);
 		}
         if(isset($_POST['search']['value']) && ($_POST['search']['value'] == 'deal' || $_POST['search']['value'] == 'Deal')) {
             array_push($where, ' AND ' . db_prefix() . 'tasks.rel_type like "%project%"');
