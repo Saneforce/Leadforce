@@ -234,8 +234,8 @@ function handle_lead_attachments($leadid, $index_name = 'file', $form_activity =
     if (isset($_FILES[$index_name]) && empty($_FILES[$index_name]['name']) && $form_activity) {
         return;
     }
-    
-    if (isset($_FILES[$index_name]) && _perfex_upload_error($_FILES[$index_name]['error'])) {
+
+    if (isset($_FILES[$index_name]) && !is_array($_FILES[$index_name]['name']) && _perfex_upload_error($_FILES[$index_name]['error'])) {
         header('HTTP/1.0 400 Bad error');
         echo _perfex_upload_error($_FILES[$index_name]['error']);
         die;

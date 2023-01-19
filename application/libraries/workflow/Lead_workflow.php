@@ -249,6 +249,25 @@ class Lead_workflow extends Workflow_app
                 )
             );
         }
+
+        $web_forms =$this->ci->db->get(db_prefix().'web_to_lead')->result_object();
+        if($web_forms){
+            $forms =array();
+            foreach($web_forms as $web_form){
+                $forms [$web_form->id] =$web_form->name;
+            }
+            $this->setQueryFields(
+                self::$module['name'],
+                array(
+                    'id'=>'from_form_id',
+                    'label'=>'Web Form',
+                    'type'=>'string',
+                    'input'=>'select',
+                    'values'=>$forms,
+                    'operators'=> array('equal', 'not_equal')
+                )
+            );
+        }
     }
 
     public function lead_created($lead_id){

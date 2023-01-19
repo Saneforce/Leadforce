@@ -236,18 +236,12 @@ class Forms extends ClientsController
                     $this->db->insert(db_prefix() . 'leads', $regular_fields);
                     $lead_id = $this->db->insert_id();
 
-                    hooks()->do_action('lead_created', [
-                        'lead_id'          => $lead_id,
-                        'web_to_lead_form' => true,
-                        ]);
-
+                    hooks()->do_action('lead_created', $lead_id);
                     $success = false;
                     if ($lead_id) {
                         $success = true;
 
-                        $this->leads_model->log_lead_activity($lead_id, 'not_lead_imported_from_form', true, serialize([
-                            $form->name,
-                            ]));
+                        $this->leads_model->log_activity($lead_id,'lead','addedfromform',$form->id);
                         // /handle_custom_fields_post
                         $custom_fields_build['leads'] = [];
                         foreach ($custom_fields as $cf) {
@@ -258,8 +252,8 @@ class Forms extends ClientsController
                         handle_custom_fields_post($lead_id, $custom_fields_build);
 
                         $this->leads_model->lead_assigned_member_notification($lead_id, $form->responsible, true);
-//pre($_FILES);
-                        handle_lead_attachments($lead_id, 'file-input', $form->name);
+//pre($_FILES); 
+                        handle_lead_attachments($lead_id, 'file-input');
 
                         if ($form->notify_lead_imported != 0) {
                             if ($form->notify_type == 'assigned') {

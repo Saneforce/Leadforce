@@ -20,11 +20,18 @@ function render_lead_activities($lead_id,$page=0)
                 $log_data ='<span class=""><i class="fa fa-calendar" aria-hidden="true"></i> '.$logged_at.'</span> | <a class="" href="'.admin_url("profile/".$log->staff_id).'"><i class="fa fa-user" aria-hidden="true"></i> '.get_staff_full_name($log->staff_id).'</a>';
                 $meta_data ='';
                 $detailed_content ='';
-                $profile_icon =staff_profile_image($log->staff_id);
                 if($log->type =='lead'){
                     $icon ='<i class="fa fa-tty"></i>';
                     if($log->action =='addedfromemail'){
                         $title ='Lead created from email';
+                    }elseif($log->action =='addedfromform'){
+                        $title ='Lead created from web form';
+                        $CI->db->where('id',$log->type_id);
+                        $web_to_lead_form =$CI->db->get(db_prefix().'web_to_lead')->row();
+                        if($web_to_lead_form){
+                            $meta_data .='<span><a href="'.admin_url('leads/form/'.$web_to_lead_form->id).'">'.$web_to_lead_form->name.'</a></span>';
+                        }
+
                     }else{
                         $title ='Lead manually created';
                     }
