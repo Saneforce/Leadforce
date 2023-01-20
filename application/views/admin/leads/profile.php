@@ -201,6 +201,16 @@ if (!isset($lead)) {
                             <p class="bold font-medium-xs"><?php echo (isset($lead) ? app_format_money($lead->lead_cost, $lead_currency) : '-') ?></p>
                         </div>
                     </div>
+                    <?php if (isset($lead) && $lead->from_form_id != 0) { ?>
+                    <div class="row">
+                        <div class="col-md-6">
+                        
+                    <p class="lead-field-heading"><?php echo _l('web_to_lead_form'); ?></p>
+                    <p class="bold font-medium-xs mbot15"><?php echo $lead->form_data->name; ?></p>
+                
+                        </div>
+                    </div>
+                    <?php } ?>
             </div>
             <div class="col-md-12 col-xs-12 lead-information-col">
                 <div class="lead-info-heading">
@@ -361,10 +371,6 @@ if (!isset($lead)) {
                   }
                   ?>
                   </p> */ ?>
-                <?php if (isset($lead) && $lead->from_form_id != 0) { ?>
-                    <p class="lead-field-heading"><?php echo _l('web_to_lead_form'); ?></p>
-                    <p class="bold font-medium-xs mbot15"><?php echo $lead->form_data->name; ?></p>
-                <?php } ?>
             </div>
             <div class="col-md-12 col-xs-12 lead-information-col">
                 <?php if (total_rows(db_prefix() . 'customfields', array('fieldto' => 'leads', 'active' => 1)) > 0 && isset($lead)) { ?>
@@ -645,8 +651,10 @@ echo render_select('teamleader', $teamleaders, array('staffid', array('firstname
     <div class="row">
         <?php if($lead_person_details){
             $value =$lead_person_details->name;
-        }else{
+        }elseif(!$selectedclientid){
             $value =$lead->name;
+        }else{
+            $value='';
         }
         ?>
         <div class="col-md-6">
@@ -654,8 +662,10 @@ echo render_select('teamleader', $teamleaders, array('staffid', array('firstname
         </div>
         <?php if($lead_person_details){
             $value =$lead_person_details->title;
-        }else{
+        }elseif(!$selectedclientid){
             $value =$lead->title;
+        }else{
+            $value='';
         }
         ?>
         <div class="col-md-6">
@@ -668,8 +678,10 @@ echo render_select('teamleader', $teamleaders, array('staffid', array('firstname
         <div class="col-md-6">
             <?php if($lead_person_details){
                 $value =$lead_person_details->email;
-            }else{
+            }elseif(!$selectedclientid){
                 $value =$lead->email;
+            }else{
+                $value='';
             }
             ?>
             <?php $value = (isset($email_data) ? $email_data['from']['email'] : $value); ?>
@@ -682,8 +694,10 @@ echo render_select('teamleader', $teamleaders, array('staffid', array('firstname
         <div class="col-md-6">
             <?php if($lead_person_details){
                 $value =$lead_person_details->phonenumber;
-            }else{
+            }elseif(!$selectedclientid){
                 $value =$lead->phonenumber;
+            }else{
+                $value='';
             }
             ?>
 
@@ -1049,7 +1063,7 @@ $hascoustomfields =$this->db->get(db_prefix() . 'customfields')->row();
         $('[name="clientphonenumber"]').val('').attr('readonly',status);
     }
     function disabled_person_fields(status=true,reset=true){
-        <?php if (!has_permission('leads', '', 'create')): ?>
+        <?php if (!has_permission('contacts', '', 'create')): ?>
             status =true;
         <?php endif; ?>
         if(reset ==true){

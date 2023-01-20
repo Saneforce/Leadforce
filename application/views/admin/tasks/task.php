@@ -417,6 +417,11 @@ p#rel_id-error {
 			   <div class="checkbox checkbox-info" id="type_reminder" style="">
 					<input type="checkbox" name="send_reminder" value="yes" id="act_rem_type" <?php  if(isset($task) && $task->send_reminder == 'yes'){echo 'checked';}?>><label class="check_label" >Send Reminder</label>
 				</div>
+            <?php if(!$task): ?>
+            <div class="checkbox checkbox-info" id="mark_as_done" style="">
+					<input type="checkbox" name="mark_as_done" value="yes" id="mark_as_done" <?php  if(isset($task) && $task->send_reminder == 'yes'){echo 'checked';}?>><label class="check_label" >Mark as done</label>
+				</div>
+            <?php endif; ?>
                <?php $rel_id_custom_field = (isset($task) ? $task->id : false); ?>
                <?php echo render_custom_fields('tasks',$rel_id_custom_field); ?>
                

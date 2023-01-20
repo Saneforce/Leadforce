@@ -569,6 +569,12 @@ class Tasks extends AdminController
         }
         if ($this->input->post()) {
             $data                = $this->input->post();
+            $auto_complete =false;
+            if(isset($data['mark_as_done']) && $data['mark_as_done'] =='yes'){
+				$auto_complete =true;
+                unset($data['mark_as_done']);
+			}
+
 			if($data['rel_type'] =='contact'){
                 $data['contacts_id'] =$data['rel_id'];
             }
@@ -601,6 +607,10 @@ class Tasks extends AdminController
                 $data_assignee = $data['assignees'];
                 unset($data['assignees']);
                 $id   = $data['taskid']  = $this->tasks_model->add($data);
+
+                if($auto_complete ==true){
+                    $this->tasks_model->mark_as(5, $id);
+                }
                 foreach($data_assignee as $taskey => $tasvalue ){
                     $data['assignee'] = $tasvalue;
                    
