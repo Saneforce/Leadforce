@@ -614,7 +614,7 @@ table.body {
     });
     //});
     function add_content(uid) {
-        document.getElementById('overlay_new').style.display = '';
+        document.getElementById('overlay').style.display = '';
         $.post(admin_url + 'company_mail/content', {
                 uid: uid
             },
@@ -629,22 +629,22 @@ table.body {
                 $('#ffilecnt').val(1);
                 $('#fallcnt').val(0);
                 $('#f_file').val('');
-                check_email('', 'forward_toemail');
+                // check_email('', 'forward_toemail');
                 $('#f_getFile').val('');
                 $('#forward_subject').val('Fwd: ' + json.subject);
                 tinyMCE.get('forward_description').setContent(json.message);
-                document.getElementById('overlay_new').style.display = 'none';
+                $('#forward-modal').modal('show');
+                document.getElementById('overlay').style.display = 'none';
 
             });
     }
 
     function add_to(uid) {
-        document.getElementById('overlay_new1').style.display = '';
+        document.getElementById('overlay').style.display = '';
         $.post(admin_url + 'company_mail/to_mail', {
                 uid: uid
             },
             function(data, status) {
-                console.log('data');
                 var json = $.parseJSON(data);
                 $('#reply_toemail').val(json.from_address);
                 $('#ch_uid').val(uid);
@@ -662,13 +662,14 @@ table.body {
                 $('#reply-modal [name="parent_id"]').val(json.rel_data.parent_id);
                 tinyMCE.get('reply_description').setContent('');
                 $('#r_getFile').val('');
-                document.getElementById('overlay_new1').style.display = 'none';
+                $('#reply-modal').modal('show');
+                document.getElementById('overlay').style.display = 'none';
 
             });
     }
 
     function add_reply_all(uid) {
-        document.getElementById('overlay_new1').style.display = '';
+        document.getElementById('overlay').style.display = '';
         $.post(admin_url + 'company_mail/add_reply_all', {
                 uid: uid
             },
@@ -688,7 +689,8 @@ table.body {
                 $('#r_file').val('');
                 tinyMCE.get('reply_description').setContent('');
                 $('#r_getFile').val('');
-                document.getElementById('overlay_new1').style.display = 'none';
+                $('#reply-modal').modal('show');
+                document.getElementById('overlay').style.display = 'none';
 
             });
     }

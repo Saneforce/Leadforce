@@ -108,7 +108,9 @@
   width: 50px;
   height: 50px;
 }
-
+#overlay{
+    z-index: 9999;
+}
 /* Transparent Overlay */
 #overlay:before,.overlay_new:before {
   content: '';

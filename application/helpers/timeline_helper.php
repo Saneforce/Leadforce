@@ -92,7 +92,14 @@ function render_lead_activities($lead_id,$page=0)
                     $detailed_content ='<div class="comment note-bg">'.$note->description.'</div>';
                 }elseif($log->type =='email'){
                     $CI->db->where('id',$log->type_id);
-                    $email =$CI->db->get(db_prefix().'localmailstorage')->row();
+                    if($log->action =='added'){
+                        $email =$CI->db->get(db_prefix().'localmailstorage')->row();
+                    }elseif($log->action =='replied'){
+                        $email =$CI->db->get(db_prefix().'reply')->row();
+                    }else{
+                        $email =false;
+                    }
+                    
                     if(!$email){
                         continue;
                     }

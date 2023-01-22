@@ -261,15 +261,19 @@ class Imap_mailer
                 $data['ConversationId'] =$email['ConversationId'];
             }
 
+            $log_action ='added';
             if($this->parentId >0){
+                unset($data['attachment_id']);
+                unset($data['mail_by']);
                 $data['local_id'] =$this->parentId;
                 $this->CI->db->insert(db_prefix() . 'reply', $data);
+                $log_action ='replied';
             }else{
                 $this->CI->db->insert(db_prefix() . 'localmailstorage', $data);
             }
             
             if($this->rel_type =='lead'){
-                $this->CI->leads_model->log_activity($this->rel_id,'email','added',$this->CI->db->insert_id());
+                $this->CI->leads_model->log_activity($this->rel_id,'email',$log_action,$this->CI->db->insert_id());
             }
             
         }

@@ -98,6 +98,87 @@ $emails =$this->leads_model->get_emails($lead->id);
 <?php $this->load->view("admin/staff/emailcomposer") ?>
 
 <script>
+	function add_content(uid) {
+        document.getElementById('overlay').style.display = '';
+        $.post(admin_url + 'company_mail/content', {
+                uid: uid
+            },
+            function(data, status) {
+                var json = $.parseJSON(data);
+                $('.ch_files_f').html('');
+                $('#f_files').html('');
+                $('#forward_toemail').val('');
+                $('#forward_ccemail').val('');
+                $('#forward_bccemail').val('');
+                $('#ftotcnt').val(1);
+                $('#ffilecnt').val(1);
+                $('#fallcnt').val(0);
+                $('#f_file').val('');
+                // check_email('', 'forward_toemail');
+                $('#f_getFile').val('');
+                $('#forward_subject').val('Fwd: ' + json.subject);
+                tinyMCE.get('forward_description').setContent(json.message);
+                $('#forward-modal').modal('show');
+                document.getElementById('overlay').style.display = 'none';
+
+            });
+    }
+
+    function add_to(uid) {
+        document.getElementById('overlay').style.display = '';
+        $.post(admin_url + 'company_mail/to_mail', {
+                uid: uid
+            },
+            function(data, status) {
+                var json = $.parseJSON(data);
+                $('#reply_toemail').val(json.from_address);
+                $('#ch_uid').val(uid);
+                $('#reply_subject').val('Re: ' + json.subject);
+                $('.ch_files_r').html('');
+                $('#r_files').html('');
+                $('#reply_ccemail').val('');
+                $('#reply_bccemail').val('');
+                $('#ftotcnt').val(1);
+                $('#rfilecnt').val(1);
+                $('#rallcnt').val(0);
+                $('#r_file').val('');
+                $('#reply-modal [name="rel_type"]').val(json.rel_data.rel_type);
+                $('#reply-modal [name="rel_id"]').val(json.rel_data.rel_id);
+                $('#reply-modal [name="parent_id"]').val(json.rel_data.parent_id);
+                tinyMCE.get('reply_description').setContent('');
+                $('#r_getFile').val('');
+                $('#reply-modal').modal('show');
+                document.getElementById('overlay').style.display = 'none';
+
+            });
+    }
+
+    function add_reply_all(uid) {
+        document.getElementById('overlay').style.display = '';
+        $.post(admin_url + 'company_mail/add_reply_all', {
+                uid: uid
+            },
+            function(data, status) {
+                var json = $.parseJSON(data);
+                $('#reply_toemail').val(json.from_address);
+                $('#ch_uid').val(uid);
+                $('#reply_subject').val('Re: ' + json.subject);
+
+                $('.ch_files_r').html('');
+                $('#r_files').html('');
+                $('#reply_ccemail').val('');
+                $('#reply_bccemail').val('');
+                $('#ftotcnt').val(1);
+                $('#rfilecnt').val(1);
+                $('#rallcnt').val(0);
+                $('#r_file').val('');
+                tinyMCE.get('reply_description').setContent('');
+                $('#r_getFile').val('');
+                $('#reply-modal').modal('show');
+                document.getElementById('overlay').style.display = 'none';
+
+            });
+    }
 	function sync_mail(){
 		document.getElementById('overlay').style.display = ''; 
 		$.ajax({

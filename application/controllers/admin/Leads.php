@@ -197,7 +197,7 @@ class Leads extends AdminController
                     $data['email_data'] =array(
                         'uid'=>$email_data['uid'],
                         'from'=>[
-                            'email'=>$email_data['form']['email'],
+                            'email'=>$email_data['from']['email'],
                         ],
                         'subject'=>$email_data['subject'],
                     );
@@ -1933,6 +1933,7 @@ class Leads extends AdminController
 							<button type="button" data-toggle="tooltip" data-original-title="Reply" class="btn btn-default pull-right" data-toggle="modal" data-target="#reply-modal" onclick="add_to('.$add_content.')" style="margin-right:5px;"><i class="fa fa-reply" ></i></button>
 							<button type="button" data-toggle="tooltip" data-original-title="Reply All" class="btn btn-default pull-right" data-toggle="modal" data-target="#reply-modal" onclick="add_reply_all('.$add_content.')" style="margin-right:5px;"><i class="fa fa-reply-all" aria-hidden="true"></i></button>
 						</div>';
+                    $output .=$reply;
 					$output .='</div>
 				</div>
 			</div>';
