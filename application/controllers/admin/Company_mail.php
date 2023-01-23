@@ -237,9 +237,16 @@ class Company_mail extends AdminController
         $this->load->library('imap');
         $imapconf = array();
 		$data = array();
-		$table = db_prefix() . 'personal_mail_setting';
+		if(get_option('company_mail_server')=='no'){
+			$table = db_prefix() . 'personal_mail_setting';
+			
+		}else{
+			$table = db_prefix() . 'user_mail_setting';
+		}
+
+		
 		$data['settings'] = $config = $this->get_or_update_setting($staffid,$table);
-		$table = db_prefix() . 'user_mail_setting';
+		
 		if(!empty($data['settings'])){
 			$imapconf = get_imap_setting();
 			

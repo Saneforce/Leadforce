@@ -13,7 +13,9 @@ class Plugins extends AdminController
 
     public function index()
     {
-        $this->load->view('admin/plugins/plugins');
+        $data =[];
+        $data['title'] ='Plugins';
+        $this->load->view('admin/plugins/plugins',$data);
     }
 
 }
