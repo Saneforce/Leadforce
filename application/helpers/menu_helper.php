@@ -398,6 +398,15 @@ function app_init_admin_sidebar_menu_items() {
         // ]);
     }
 
+    if (is_admin()) {
+        $CI->app_menu->add_sidebar_menu_item('plugins', [
+            'name' => _l('plugins'),
+            'href' => admin_url('plugins'),
+            'icon' => 'fa fa-plug',
+            'position' => 65,
+        ]);
+    }
+
     // Setup menu
     if (has_permission('workflow', '', 'edit')) {
         $CI->app_menu->add_setup_menu_item('workflow', [
@@ -407,6 +416,7 @@ function app_init_admin_sidebar_menu_items() {
             'position' => 225,
         ]);
     }
+    
 
 if (is_admin()) {
     if (has_permission('staff', '', 'view')) {
@@ -664,13 +674,13 @@ if (is_admin()) {
             ]); */
         }
 
-	if (has_permission('settings', '', 'view')) {
-        $CI->app_menu->add_setup_menu_item('target', [
-            'href' => admin_url('target'),
-            'name' => _l('target'),
-            'position' => 222,
-        ]);
-    }
+	// if (has_permission('settings', '', 'view')) {
+    //     $CI->app_menu->add_setup_menu_item('target', [
+    //         'href' => admin_url('target'),
+    //         'name' => _l('target'),
+    //         'position' => 222,
+    //     ]);
+    // }
 
     if (has_permission('password_policy', '', 'view')) {
         $CI->app_menu->add_setup_menu_item('password_policy', [

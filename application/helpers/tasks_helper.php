@@ -1778,7 +1778,7 @@ function get_reminder_settings($user_id){
 function check_get_msg($cur_type,$cur_lang){
 	$req_date = date("Y-m-d");
 	$CI   = &get_instance();
-	$res = $CI->db->query("SELECT emailtemplateid ,type,slug,language,name,subject,message,fromname,fromemail,plaintext,active,order FROM " . db_prefix() . "emailtemplates WHERE type = '".$cur_type."' and language ='".$cur_lang."'")->row();
+	$res = $CI->db->query("SELECT emailtemplateid ,type,slug,language,name,subject,message,fromname,fromemail,plaintext,active,`order` FROM " . db_prefix() . "emailtemplates WHERE type = '".$cur_type."' and language ='".$cur_lang."'")->row();
 	
 	return $res;
 }

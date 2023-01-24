@@ -4246,3 +4246,4 @@ $lang['field_settings']     =   'Field Settings';
 $lang['RejectionReason']    =   'Rejection Reason';
 $lang['als_sales']          =   'Sales';
 $lang['sms'] = 'SMS';
+$lang['plugins'] = 'Plugins';
