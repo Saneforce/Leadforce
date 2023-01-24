@@ -224,29 +224,7 @@ function app_init_admin_sidebar_menu_items() {
             'position' => 25,
         ]);
     }
-        
 
-
-    
-	
-	if (has_permission('pipelinestatus', '', 'view') || has_permission('pipelinestatus', '', 'view_own')) {
-        $CI->app_menu->add_setup_menu_item('pipelinestatus', [
-            'name' => _l('als_pipelinestatus'),
-            'href' => admin_url('pipelinestatus'),
-            'position' => 35,
-        ]);
-    }
-	
-	
-
-	if (has_permission('tasktype', '', 'view') || has_permission('tasktype', '', 'view_own')) {
-        $CI->app_menu->add_setup_menu_item('tasktype', [
-            'name' => _l('als_tasktype'),
-            'href' => admin_url('tasktype'),
-            'position' => 35,
-        ]);
-    }
-	
     if (has_permission('tickets')) {
         if ((!is_staff_member() && get_option('access_tickets_to_none_staff_members') == 1) || is_staff_member()) {
             $CI->app_menu->add_sidebar_menu_item('support', [
@@ -268,68 +246,7 @@ function app_init_admin_sidebar_menu_items() {
         ]);
     }
 
-    if (has_permission('pipeline', '', 'view')) {
-        $CI->app_menu->add_setup_menu_item('pipeline', [
-            'name' => _l('als_pipe'),
-            'href' => admin_url('pipeline'),
-            //'icon' => 'fa fa-bullhorn',
-            'position' => 55,
-        ]);
-    }
 
-    if (has_permission('DealRejectionReasons', '', 'view')) {
-        $CI->app_menu->add_setup_menu_item('DealRejectionReasons', [
-            'name' => _l('als_DealRejectionReasons'),
-            'href' => admin_url('DealRejectionReasons'),
-            //'icon' => 'fa fa-bullhorn',
-            'position' => 56,
-        ]);
-    }
-
-    if (has_permission('workflow', '', 'edit')) {
-        $CI->app_menu->add_setup_menu_item('workflow', [
-            'name' => _l('workflow'),
-            'href' => admin_url('workflow'),
-            //'icon' => 'fa fa-bullhorn',
-            'position' => 56,
-        ]);
-    }
-
-    if (has_permission('DealLossReasons', '', 'view')) {
-        $CI->app_menu->add_setup_menu_item('DealLossReasons', [
-            'name' => _l('als_DealLossReasons'),
-            'href' => admin_url('DealLossReasons'),
-            //'icon' => 'fa fa-bullhorn',
-            'position' => 56,
-        ]);
-    }
-
-    if (has_permission('ImportData', '', 'view')) {
-        $CI->app_menu->add_setup_menu_item('ImportData', [
-            'name' => _l('ImportData'),
-            'href' => admin_url('ImportData'),
-            //'icon' => 'fa fa-bullhorn',
-            'position' => 100,
-        ]);
-    }
-
-    if (has_permission('AssignFollowers', '', 'view')) {
-        $CI->app_menu->add_setup_menu_item('AssignFollowers', [
-            'name' => _l('AssignFollowers'),
-            'href' => admin_url('AssignFollowers'),
-            //'icon' => 'fa fa-bullhorn',
-            'position' => 100,
-        ]);
-    }
-
-    if (has_permission('AccountTransfer', '', 'view')) {
-        $CI->app_menu->add_setup_menu_item('AccountTransfer', [
-            'name' => _l('AccountTransfer'),
-            'href' => admin_url('AccountTransfer'),
-            //'icon' => 'fa fa-bullhorn',
-            'position' => 100,
-        ]);
-    }
 
     if (has_permission('utilities')) {
         // Utilities
@@ -482,91 +399,24 @@ function app_init_admin_sidebar_menu_items() {
     }
 
     // Setup menu
+    if (has_permission('workflow', '', 'edit')) {
+        $CI->app_menu->add_setup_menu_item('workflow', [
+            'name' => _l('workflow'),
+            'href' => admin_url('workflow'),
+            //'icon' => 'fa fa-bullhorn',
+            'position' => 225,
+        ]);
+    }
+
+if (is_admin()) {
     if (has_permission('staff', '', 'view')) {
-        $CI->app_menu->add_setup_menu_item('staff', [
-            'name' => _l('als_staff'),
-            'href' => admin_url('staff'),
-            'position' => 5,
-        ]);
-    }
-
-    if (has_permission('password_policy', '', 'view')) {
-        $CI->app_menu->add_setup_menu_item('password_policy', [
-            'name' => _l('password_policy'),
-            'href' => admin_url('passwordpolicy'),
-            'position' => 5,
-        ]);
-    }
-
-
-    if (is_admin()) {
-        if (has_permission('customers')) {
-            $CI->app_menu->add_setup_menu_item('customers', [
-                'collapse' => true,
-                'slug' => 'clients',
-                'name' => _l('clients'),
-                'position' => 10,
-            ]);
-
-            $CI->app_menu->add_setup_children_item('customers', [
-                'slug' => 'customer-groups',
-                'name' => _l('customer_groups'),
-                'href' => admin_url('clients/groups'),
-                'position' => 5,
-            ]);
-            $CI->app_menu->add_setup_children_item('customers', [
-                'slug' => 'customer-import',
-                'name' => _l('import_customers'),
-                'href' => admin_url('clients/import'),
-                'position' => 6,
-            ]);
-        }
-        if (has_permission('support')) {
-            $CI->app_menu->add_setup_menu_item('support', [
-                'collapse' => true,
-                'name' => _l('support'),
-                'position' => 15,
-            ]);
-
-            $CI->app_menu->add_setup_children_item('support', [
-                'slug' => 'departments',
-                'name' => _l('acs_departments'),
-                'href' => admin_url('departments'),
-                'position' => 5,
-            ]);
-            $CI->app_menu->add_setup_children_item('support', [
-                'slug' => 'tickets-predefined-replies',
-                'name' => _l('acs_ticket_predefined_replies_submenu'),
-                'href' => admin_url('tickets/predefined_replies'),
-                'position' => 10,
-            ]);
-            $CI->app_menu->add_setup_children_item('support', [
-                'slug' => 'tickets-priorities',
-                'name' => _l('acs_ticket_priority_submenu'),
-                'href' => admin_url('tickets/priorities'),
-                'position' => 15,
-            ]);
-            $CI->app_menu->add_setup_children_item('support', [
-                'slug' => 'tickets-statuses',
-                'name' => _l('acs_ticket_statuses_submenu'),
-                'href' => admin_url('tickets/statuses'),
-                'position' => 20,
-            ]);
-
-            $CI->app_menu->add_setup_children_item('support', [
-                'slug' => 'tickets-services',
-                'name' => _l('acs_ticket_services_submenu'),
-                'href' => admin_url('tickets/services'),
-                'position' => 25,
-            ]);
-            $CI->app_menu->add_setup_children_item('support', [
-                'slug' => 'tickets-spam-filters',
-                'name' => _l('spam_filters'),
-                'href' => admin_url('spam_filters/view/tickets'),
-                'position' => 30,
-            ]);
-        }
-        if (has_permission('leads')) {
+    $CI->app_menu->add_setup_menu_item('custom-fields', [
+        'href' => admin_url('custom_fields'),
+        'name' => _l('asc_custom_fields'),
+        'position' => 2,
+    ]);
+}
+    if (has_permission('leads')) {
             $CI->app_menu->add_setup_menu_item('leads', [
                 'collapse' => true,
                 'name' => _l('acs_leads'),
@@ -578,201 +428,254 @@ function app_init_admin_sidebar_menu_items() {
                 'href' => admin_url('leads/sources'),
                 'position' => 5,
             ]);
-            // $CI->app_menu->add_setup_children_item('leads', [
-            //     'slug' => 'leads-statuses',
-            //     'name' => _l('acs_leads_statuses_submenu'),
-            //     'href' => admin_url('leads/statuses'),
-            //     'position' => 10,
-            // ]);
-            // $CI->app_menu->add_setup_children_item('leads', [
-            //     'slug' => 'leads-email-integration',
-            //     'name' => _l('leads_email_integration'),
-            //     'href' => admin_url('leads/email_integration'),
-            //     'position' => 15,
-            // ]);
+
             $CI->app_menu->add_setup_children_item('leads', [
                 'slug' => 'web-to-lead',
                 'name' => _l('web_to_lead'),
                 'href' => admin_url('leads/forms'),
-                'position' => 20,
+                'position' => 5,
             ]);
-        }
+    }
 
+    if (has_permission('staff', '', 'view')) {
+        $CI->app_menu->add_setup_menu_item('staff', [
+            'name' => _l('als_staff'),
+            'href' => admin_url('staff'),
+            'position' => 3,
+        ]);    
+        
+        $CI->app_menu->add_setup_children_item('staff', [
+            'name' => _l('als_staff'),
+            'href' => admin_url('staff'),
+            //'icon' => 'fa fa-bullhorn',
+            'position' => 5,
+        ]);
+            $CI->app_menu->add_setup_children_item('staff', [
+                'name' => _l('AssignFollowers'),
+                'href' => admin_url('AssignFollowers'),
+                //'icon' => 'fa fa-bullhorn',
+                'position' => 5,
+            ]);
+      
+    
+            $CI->app_menu->add_setup_children_item('staff', [
+                'name' => _l('AccountTransfer'),
+                'href' => admin_url('AccountTransfer'),
+                //'icon' => 'fa fa-bullhorn',
+                'position' => 5,
+            ]);
+        
+    }
+
+    if (has_permission('settings')) {
+            $CI->app_menu->add_setup_menu_item('deal', [
+                'collapse' => true,
+                'name' => _l('deal'),
+                'position' => 2,
+            ]);
+            $CI->app_menu->add_setup_children_item('deal', [
+                'slug' => 'pipeline',
+                'name' => _l('als_pipe'),
+                'href' => admin_url('pipeline'),
+                //'icon' => 'fa fa-bullhorn',
+                'position' => 5,
+            ]);
+            $CI->app_menu->add_setup_children_item('deal', [
+                'slug' => 'pipelinestatus',
+                'name' => _l('als_pipelinestatus'),
+                'href' => admin_url('pipelinestatus'),
+                'position' => 5,
+            ]);
+    if (has_permission('ImportData', '', 'view')) {
+                $CI->app_menu->add_setup_children_item('deal', [
+                    'name' => _l('ImportData'),
+                    'href' => admin_url('ImportData'),
+                    //'icon' => 'fa fa-bullhorn',
+                    'position' => 3,
+                ]);
+            }
+            $CI->app_menu->add_setup_children_item('deal', [
+                'slug' => 'deal-fields',
+                'href' => admin_url('deal_fields'),
+                'name' => _l('field_settings'),
+                'position' => 5,
+            ]);             
+            $CI->app_menu->add_setup_children_item('deal', [
+                'slug' => 'DealLossReasons',
+                'name' => _l('loss_reason_name'),
+                'href' => admin_url('DealLossReasons'),
+                //'icon' => 'fa fa-bullhorn',
+                'position' => 5,
+            ]);        
+            $CI->app_menu->add_setup_children_item('deal', [
+                'slug' => 'DealRejectionReasons',
+                'name' => _l('RejectionReason'),
+                'href' => admin_url('DealRejectionReasons'),
+                //'icon' => 'fa fa-bullhorn',
+                'position' => 5,
+            ]);
+            
+        }
+            if (has_permission('customers')) {
+                $CI->app_menu->add_setup_menu_item('customers', [
+                    'collapse' => true,
+                    'slug' => 'clients',
+                    'name' => _l('clients'),
+                    'position' => 30,
+                ]);
+
+                $CI->app_menu->add_setup_children_item('customers', [
+                    'slug' => 'customer-groups',
+                    'name' => _l('customer_groups'),
+                    'href' => admin_url('clients/groups'),
+                    'position' => 5,
+                ]);
+                $CI->app_menu->add_setup_children_item('customers', [
+                    'slug' => 'customer-import',
+                    'name' => _l('import_customers'),
+                    'href' => admin_url('clients/import'),
+                    'position' => 5,
+                ]);
+            }
+            if (has_permission('settings')) {
+                $CI->app_menu->add_setup_menu_item('activity', [
+                    'collapse' => true,
+                    'name' => _l('activity'),
+                    'position' => 1,
+                ]);
+            if (has_permission('tasktype', '', 'view') || has_permission('tasktype', '', 'view_own')) {
+                $CI->app_menu->add_setup_children_item('activity', [
+                    'name' => _l('activity_type'),
+                    'href' => admin_url('tasktype'),
+                    'position' => 5,
+                ]);
+                }
+            
+                $CI->app_menu->add_setup_children_item('activity', [
+                    'href' => admin_url('activity_transfer'),
+                    'name' => _l('act_transfer'),
+                    'position' => 5,
+                ]);
+            
+        }
         if (has_permission('settings')) {
-            $CI->app_menu->add_setup_menu_item('sms', [
+            $CI->app_menu->add_setup_menu_item('sales', [
                 'collapse' => true,
-                'name' => _l('sms'),
-                'position' => 20,
+                'name' => _l('als_sales'),
+                'position' => 215,
             ]);
-            $CI->app_menu->add_setup_children_item('sms', [
-                'slug' => 'sms-templates',
-                'name' => 'Templates',
-                'href' => admin_url('plugin/sms'),
-                'position' => 5,
-            ]);
-            $CI->app_menu->add_setup_children_item('sms', [
-                'slug' => 'sms-daffytel',
-                'name' => 'Daffytel',
-                'href' => admin_url('plugin/sms/daffytel'),
-                'position' => 5,
-            ]);
-        }
+        
+        
+            if (has_permission('settings', '', 'view')) {
+                $CI->app_menu->add_setup_children_item('sales', [
+                    'href' => admin_url('taxes'),
+                    'name' => _l('taxes'),
+                    'position' => 5,
+                ]);
+            }
 
-        if (has_permission('finance')) {
-            $CI->app_menu->add_setup_menu_item('finance', [
-                'collapse' => true,
-                'name' => _l('acs_finance'),
-                'position' => 25,
-            ]);
-            $CI->app_menu->add_setup_children_item('finance', [
-                'slug' => 'taxes',
-                'name' => _l('acs_sales_taxes_submenu'),
-                'href' => admin_url('taxes'),
-                'position' => 5,
-            ]);
-            $CI->app_menu->add_setup_children_item('finance', [
+            $CI->app_menu->add_setup_children_item('sales', [
                 'slug' => 'currencies',
                 'name' => _l('acs_sales_currencies_submenu'),
                 'href' => admin_url('currencies'),
-                'position' => 10,
-            ]);
-            $CI->app_menu->add_setup_children_item('finance', [
-                'slug' => 'payment-modes',
-                'name' => _l('acs_sales_payment_modes_submenu'),
-                'href' => admin_url('paymentmodes'),
-                'position' => 15,
-            ]);
-            $CI->app_menu->add_setup_children_item('finance', [
-                'slug' => 'expenses-categories',
-                'name' => _l('acs_expense_categories'),
-                'href' => admin_url('expenses/categories'),
-                'position' => 20,
-            ]);
-        }
-        if (has_permission('contracts')) {
-            $CI->app_menu->add_setup_menu_item('contracts', [
-                'collapse' => true,
-                'name' => _l('acs_contracts'),
-                'position' => 30,
-            ]);
-            $CI->app_menu->add_setup_children_item('contracts', [
-                'slug' => 'contracts-types',
-                'name' => _l('acs_contract_types'),
-                'href' => admin_url('contracts/types'),
                 'position' => 5,
             ]);
-        }
-//        $modules_name = _l('modules');
-//
-//        if ($modulesNeedsUpgrade = $CI->app_modules->number_of_modules_that_require_database_upgrade()) {
-//            $modules_name .= '<span class="badge menu-badge bg-warning">' . $modulesNeedsUpgrade . '</span>';
-//        }
-//
-//        $CI->app_menu->add_setup_menu_item('modules', [
-//            'href' => admin_url('modules'),
-//            'name' => $modules_name,
-//            'position' => 35,
-//        ]);
-//
-       $CI->app_menu->add_setup_menu_item('custom-fields', [
-           'href' => admin_url('custom_fields'),
-           'name' => _l('asc_custom_fields'),
-           'position' => 45,
-       ]);
-//
-//        $CI->app_menu->add_setup_menu_item('gdpr', [
-//            'href' => admin_url('gdpr'),
-//            'name' => _l('gdpr_short'),
-//            'position' => 50,
-//        ]);
+            if (has_permission('settings', '', 'view')) {
+                $CI->app_menu->add_setup_children_item('sales', [
+                    'href' => admin_url('Invoicepdfconfig'),
+                    'name' => _l('invoice_pdf_config'),
+                    'position' => 5,
+                    ]);
+            }
+        
+    }
 
-        // $CI->app_menu->add_setup_menu_item('roles', [
-        //     'href' => admin_url('roles'),
-        //     'name' => _l('acs_roles'),
-        //     'position' => 55,
-        // ]);
-        // if (has_permission('designation', '', 'view') || has_permission('designation', '', 'view_own')) {
-        //     $CI->app_menu->add_setup_menu_item('designation', [
-        //         'name' => _l('acs_designation'),
-        //         'href' => admin_url('designation'),
-        //         'position' => 55,
-        //     ]);
-        // }
-        /*             $CI->app_menu->add_setup_menu_item('api', [
-          'href'     => admin_url('api'),
-          'name'     => 'API',
-          'position' => 65,
-          ]); */
-    }
-    $CI->app_menu->add_setup_menu_item('finance', [
-        'slug' => 'currencies',
-        'name' => _l('acs_sales_currencies_submenu'),
-        'href' => admin_url('currencies'),
-        'position' => 199,
-    ]);
-    if (has_permission('settings', '', 'view')) {
-        $CI->app_menu->add_setup_menu_item('settings', [
-            'href' => admin_url('settings?group=company'),
-            'name' => _l('acs_settings'),
-            'position' => 200,
-        ]);
-    }
-	if (has_permission('settings', '', 'view')) {
-        $CI->app_menu->add_setup_menu_item('email_config', [
-            'href' => admin_url('settings?group=company_settings'),
-            'name' => _l('email_config'),
-            'position' => 201,
-        ]);
-    }
-	
-	if (has_permission('settings', '', 'view')) {
-        $CI->app_menu->add_setup_menu_item('activity_transfer', [
-            'href' => admin_url('activity_transfer'),
-            'name' => _l('activity_transfer'),
-            'position' => 202,
-        ]);
-    }
+            if (has_permission('settings')) {
+                $CI->app_menu->add_setup_menu_item('sms', [
+                    'collapse' => true,
+                    'name' => _l('sms'),
+                    'position' => 215,
+                ]);
+                $CI->app_menu->add_setup_children_item('sms', [
+                    'slug' => 'sms-templates',
+                    'name' =>_l('templates'),
+                    'href' => admin_url('plugin/sms'),
+                    'position' => 5,
+                ]);
+                $CI->app_menu->add_setup_children_item('sms', [
+                    'slug' => 'sms-daffytel',
+                    'name' => 'Daffytel',
+                    'href' => admin_url('plugin/sms/daffytel'),
+                    'position' => 5,
+                ]);
+            }
+
+            if (has_permission('settings')) {
+                $CI->app_menu->add_setup_menu_item('email', [
+                    'collapse' => true,
+                    'name' => _l('email'),
+                    'position' => 4,
+                ]);
+            
+                $CI->app_menu->add_setup_children_item('email', [
+                'href' => admin_url('emails'),
+                'name' => _l('templates'),
+                'position' => 5,
+                ]);
+        
+    
+                $CI->app_menu->add_setup_children_item('email', [
+                'href' => admin_url('settings?group=company_settings'),
+                'name' => _l('configuration'),
+                'position' => 5,
+                ]);
+        }
+        if (has_permission('settings', '', 'view')) {
+            $CI->app_menu->add_setup_menu_item('enable_call', [
+                'href' => admin_url('call_settings/enable_call'),
+                'name' => _l('call_settings'),
+                'position' => 6,
+            ]);
+        }
+       
+    //
+    //        $CI->app_menu->add_setup_menu_item('gdpr', [
+    //            'href' => admin_url('gdpr'),
+    //            'name' => _l('gdpr_short'),
+    //            'position' => 50,
+    //        ]);
+
+            // $CI->app_menu->add_setup_menu_item('roles', [
+            //     'href' => admin_url('roles'),
+            //     'name' => _l('acs_roles'),
+            //     'position' => 55,
+            // ]);
+            // if (has_permission('designation', '', 'view') || has_permission('designation', '', 'view_own')) {
+            //     $CI->app_menu->add_setup_menu_item('designation', [
+            //         'name' => _l('acs_designation'),
+            //         'href' => admin_url('designation'),
+            //         'position' => 55,
+            //     ]);
+            // }
+            /*             $CI->app_menu->add_setup_menu_item('api', [
+            'href'     => admin_url('api'),
+            'name'     => 'API',
+            'position' => 65,
+            ]); */
+        }
+
 	if (has_permission('settings', '', 'view')) {
         $CI->app_menu->add_setup_menu_item('target', [
             'href' => admin_url('target'),
             'name' => _l('target'),
-            'position' => 202,
+            'position' => 222,
         ]);
     }
 
-    if (has_permission('email_templates', '', 'view')) {
-        $CI->app_menu->add_setup_menu_item('email-templates', [
-            'href' => admin_url('emails'),
-            'name' => _l('acs_email_templates'),
-            'position' => 40,
-        ]);
-    }
-
-    if (has_permission('settings', '', 'view')) {
-        $CI->app_menu->add_setup_menu_item('enable_call', [
-            'href' => admin_url('call_settings/enable_call'),
-            'name' => _l('call_settings'),
-            'position' => 203,
-        ]);
-    }
-	if (has_permission('settings', '', 'view')) {
-        $CI->app_menu->add_setup_menu_item('tax', [
-            'href' => admin_url('taxes'),
-            'name' => _l('taxes'),
-            'position' => 204,
-        ]);
-    }
-    if (has_permission('settings', '', 'view')) {
-        $CI->app_menu->add_setup_menu_item('Invoicepdfconfig', [
-            'href' => admin_url('Invoicepdfconfig'),
-            'name' => _l('invoice_pdf_config'),
-            'position' => 206,
-            ]);
-    }
-	if (has_permission('settings', '', 'view')) {
-        $CI->app_menu->add_setup_menu_item('deal-fields', [
-            'href' => admin_url('deal_fields'),
-            'name' => _l('Deal_fields'),
+    if (has_permission('password_policy', '', 'view')) {
+        $CI->app_menu->add_setup_menu_item('password_policy', [
+            'name' => _l('password_policy'),
+            'href' => admin_url('passwordpolicy'),
             'position' => 205,
         ]);
     }
@@ -780,7 +683,15 @@ function app_init_admin_sidebar_menu_items() {
         $CI->app_menu->add_setup_menu_item('reminder', [
             'href' => admin_url('reminder'),
             'name' => _l('reminder_settings'),
-            'position' => 207,
+            'position' => 210,
+        ]);
+    }
+    
+    if (has_permission('settings', '', 'view')) {
+        $CI->app_menu->add_setup_menu_item('settings', [
+            'href' => admin_url('settings?group=company'),
+            'name' => _l('acs_settings'),
+            'position' => 220,
         ]);
     }
 }
