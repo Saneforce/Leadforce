@@ -5,7 +5,7 @@
                 <p class="text-muted">Webhook URL</p>
             </div>
             <div class="col-xs-8">
-                <p class=""><?php echo base_url('webhooks/acres99/lead') ?></p>
+                <p class=""><?php echo base_url('webhooks/acres99/lead/'.$configure_id) ?></p>
             </div>
 
             <div class="col-xs-4">

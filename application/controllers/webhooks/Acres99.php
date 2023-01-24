@@ -11,9 +11,9 @@ class Acres99 extends App_Controller
         $this->load->model('leads_model');
     }
 
-    public function lead()
+    public function lead($id)
     {
-        $config = $this->plugins_model->get_config_by_plugin('99acres_lead');
+        $config = $this->plugins_model->get_config($id);
         $data['configured_web_forms'] = '';
         $form_id = 0;
         if ($config) {

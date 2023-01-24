@@ -13,6 +13,9 @@ class Plugins extends AdminController
 
     public function index()
     {
+        if(!is_admin()){
+            access_denied();
+        }
         $data =[];
         $data['title'] ='Plugins';
         $this->load->view('admin/plugins/plugins',$data);

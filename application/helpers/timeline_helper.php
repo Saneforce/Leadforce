@@ -24,6 +24,8 @@ function render_lead_activities($lead_id,$page=0)
                     $icon ='<i class="fa fa-tty"></i>';
                     if($log->action =='addedfromemail'){
                         $title ='Lead created from email';
+                    }elseif($log->action =='addedfrom99acres'){
+                        $title ='Lead created from 99acres';
                     }elseif($log->action =='addedfromform'){
                         $title ='Lead created from web form';
                         $CI->db->where('id',$log->type_id);

@@ -52,6 +52,21 @@ class Plugins_model extends App_Model
         return $config;
     }
 
+    public function get_configs_by_plugin($plugin)
+    {
+        $this->db->where('plugin',$plugin);
+        $configs =$this->db->get(db_prefix().'plugin_configs')->result_object();
+
+        if($configs){
+            foreach($configs as $key => $value){
+                if($configs[$key]->config){
+                    $configs[$key]->config =json_decode($configs[$key]->config,true);
+                }
+            }
+        }
+        return $configs;
+    }
+
     public function get_leadads()
     {
         $this->db->where('plugin','facebook_leadads');
