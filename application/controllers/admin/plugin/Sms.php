@@ -64,7 +64,7 @@ class Sms extends AdminController
                 $_POST['access_token'] =$configuration['access_token'];
             }
         }
-        $data =['title'=>_l('daffytel')];
+        $data =['title'=>'Daffytel'];
         $this->load->view('admin/plugins/sms/daffytel',$data);
     }
 

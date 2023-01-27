@@ -29,7 +29,6 @@
                                 </td>
                                 <td>
                                     <a href="#" onclick="edit_source(this,<?php echo $source['id']; ?>); return false" data-name="<?php echo $source['name']; ?>" class="btn btn-default btn-icon"><i class="fa fa-pencil-square-o"></i></a>
-                            <a href="#" <?php if($source['slug'] == 'indiamart') { ?> onclick="merge_fields('<?php echo $source['name']; ?>',<?php echo $source['id']; ?>); return false" <?php } ?> class="btn btn-primary">Merge Fields</a>
                                     <!-- <a href="<?php echo admin_url('leads/delete_source/'.$source['id']); ?>" class="btn btn-danger btn-icon _delete"><i class="fa fa-remove"></i></a> -->
                                 </td>
                             </tr>
